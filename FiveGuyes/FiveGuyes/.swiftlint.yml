@@ -1,0 +1,45 @@
+disabled_rules: # 실행에서 제외할 룰 식별자들
+    # 라인 뒤 공백을 허용 (불필요한 경고 방지)
+    - trailing_whitespace # From https://realm.github.io/SwiftLint/trailing_whitespace.html
+    
+    # 식별자 이름 길이 제한을 비활성화 (더 유연한 네이밍 허용)
+    - identifier_name # From https://realm.github.io/SwiftLint/identifier_name.html
+
+opt_in_rules: # 기본(default) 룰이 아닌 룰들을 활성화
+    # 임포트 구문을 정렬하여 코드 가독성 향상
+    - sorted_imports # From https://realm.github.io/SwiftLint/sorted_imports.html
+    
+    # 강제 언래핑 사용에 대한 경고
+    - force_unwrapping # From https://realm.github.io/SwiftLint/force_unwrapping.html
+
+    # .isEmpty를 사용해 더 효율적인 빈 컬렉션 확인
+    - empty_count # From https://realm.github.io/SwiftLint/empty_count.html
+
+# 강제 캐스팅에 대한 경고 수준 설정
+force_cast: # From https://realm.github.io/SwiftLint/force_cast.html
+    severity: warning # 강제 캐스팅을 error 대신 warning으로 설정
+
+# 강제 try에 대한 경고 수준 설정
+force_try: # From https://realm.github.io/SwiftLint/force_try.html
+    severity: warning # 강제 try를 error 대신 warning으로 설정
+
+# 한 줄의 코드 길이 제한
+line_length: # From https://realm.github.io/SwiftLint/line_length.html
+    warning: 200 # 줄 길이가 200자를 넘을 경우 warning
+    error: 250 # 줄 길이가 250자를 넘을 경우 error
+
+# 함수 본문 길이 제한
+function_body_length: # From https://realm.github.io/SwiftLint/function_body_length.html
+    warning: 15 # 함수 본문이 15줄을 넘을 경우 warning
+    error: 30 # 함수 본문이 30줄을 넘을 경우 error
+
+# 클래스, 구조체, 열거형의 본문 길이 제한
+type_body_length: # From https://realm.github.io/SwiftLint/type_body_length.html
+    warning: 300 # 길이가 300줄을 넘을 경우 warning
+    error: 500 # 길이가 500줄을 넘을 경우 error
+    
+# 포함할 파일 경로 (이 항목이 존재하면 `--path`는 무시됨)
+#included:
+
+# 제외할 파일 경로 (`included`보다 우선순위 높음)
+#excluded:
