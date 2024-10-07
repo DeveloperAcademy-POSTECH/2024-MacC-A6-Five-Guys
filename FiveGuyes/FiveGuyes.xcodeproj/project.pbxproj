@@ -34,6 +34,34 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		2653E2A82CB3ACF0001DC51A /* Models */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		2653E2A92CB3ACF8001DC51A /* Stores */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Stores;
+			sourceTree = "<group>";
+		};
+		2653E2AA2CB3AD06001DC51A /* Protocols */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Protocols;
+			sourceTree = "<group>";
+		};
+		2653E2AB2CB3AD14001DC51A /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
 		26890B882CAE811A008DFF49 = {
 			isa = PBXGroup;
 			children = (
@@ -74,7 +102,7 @@
 			isa = PBXGroup;
 			children = (
 				26890B982CAE811D008DFF49 /* Assets.xcassets */,
-				26890BB22CAE90F2008DFF49 /* Extensions */,
+				2653E2AB2CB3AD14001DC51A /* Extensions */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -82,26 +110,12 @@
 		26890BAE2CAE904A008DFF49 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				26890BAF2CAE90D8008DFF49 /* Models */,
-				26890BB02CAE90DE008DFF49 /* Stores */,
+				2653E2A82CB3ACF0001DC51A /* Models */,
+				2653E2A92CB3ACF8001DC51A /* Stores */,
 				26890BB12CAE90E4008DFF49 /* Views */,
-				26890BB32CAE90FB008DFF49 /* Protocols */,
+				2653E2AA2CB3AD06001DC51A /* Protocols */,
 			);
 			path = Sources;
-			sourceTree = "<group>";
-		};
-		26890BAF2CAE90D8008DFF49 /* Models */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Models;
-			sourceTree = "<group>";
-		};
-		26890BB02CAE90DE008DFF49 /* Stores */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Stores;
 			sourceTree = "<group>";
 		};
 		26890BB12CAE90E4008DFF49 /* Views */ = {
@@ -114,20 +128,6 @@
 				26890BB82CAE9137008DFF49 /* Shared */,
 			);
 			path = Views;
-			sourceTree = "<group>";
-		};
-		26890BB22CAE90F2008DFF49 /* Extensions */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Extensions;
-			sourceTree = "<group>";
-		};
-		26890BB32CAE90FB008DFF49 /* Protocols */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Protocols;
 			sourceTree = "<group>";
 		};
 		26890BB52CAE9116008DFF49 /* Components */ = {
