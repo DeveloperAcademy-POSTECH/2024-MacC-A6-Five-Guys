@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1A01D3F12CB3C03E00B3D726 /* ImageTestingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A01D3F02CB3C03E00B3D726 /* ImageTestingView.swift */; };
 		26890B952CAE811A008DFF49 /* FiveGuyesApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26890B942CAE811A008DFF49 /* FiveGuyesApp.swift */; };
 		26890B972CAE811A008DFF49 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26890B962CAE811A008DFF49 /* ContentView.swift */; };
 		26890B992CAE811D008DFF49 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 26890B982CAE811D008DFF49 /* Assets.xcassets */; };
@@ -14,7 +15,20 @@
 		26890BBD2CAE98E2008DFF49 /* .swiftlint.yml in Resources */ = {isa = PBXBuildFile; fileRef = 26890BBC2CAE98E2008DFF49 /* .swiftlint.yml */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		1A9D96BD2CB4FACA0046B8AB /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 7;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		1A01D3F02CB3C03E00B3D726 /* ImageTestingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageTestingView.swift; sourceTree = "<group>"; };
 		26890B912CAE811A008DFF49 /* FiveGuyes.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FiveGuyes.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		26890B942CAE811A008DFF49 /* FiveGuyesApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FiveGuyesApp.swift; sourceTree = "<group>"; };
 		26890B962CAE811A008DFF49 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -126,6 +140,7 @@
 				26890BB62CAE9120008DFF49 /* Navigation */,
 				26890BB72CAE912C008DFF49 /* Screen */,
 				26890BB82CAE9137008DFF49 /* Shared */,
+				1A01D3F02CB3C03E00B3D726 /* ImageTestingView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -165,9 +180,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 26890B9F2CAE811D008DFF49 /* Build configuration list for PBXNativeTarget "FiveGuyes" */;
 			buildPhases = (
+				1A9D96BF2CB4FBA80046B8AB /* SwiftLint */,
 				26890B8D2CAE811A008DFF49 /* Sources */,
 				26890B8E2CAE811A008DFF49 /* Frameworks */,
 				26890B8F2CAE811A008DFF49 /* Resources */,
+				1A9D96BD2CB4FACA0046B8AB /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -228,12 +245,34 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		1A9D96BF2CB4FBA80046B8AB /* SwiftLint */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = SwiftLint;
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nexport PATH=\"$PATH:/opt/homebrew/bin\"\nif which swiftlint > /dev/null; then\n  swiftlint\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		26890B8D2CAE811A008DFF49 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				26890B972CAE811A008DFF49 /* ContentView.swift in Sources */,
+				1A01D3F12CB3C03E00B3D726 /* ImageTestingView.swift in Sources */,
 				26890B952CAE811A008DFF49 /* FiveGuyesApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -375,8 +414,9 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"FiveGuyes/Preview Content\"";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = KH2J34Z4ZK;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -409,8 +449,9 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"FiveGuyes/Preview Content\"";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = KH2J34Z4ZK;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
