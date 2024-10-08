@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2405000C2CB3B9E800813E26 /* TestingMetaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2405000B2CB3B9E800813E26 /* TestingMetaView.swift */; };
+		2405000E2CB3BDB800813E26 /* ImageMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2405000D2CB3BDB800813E26 /* ImageMetadata.swift */; };
+		240500102CB3BF9200813E26 /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2405000F2CB3BF9200813E26 /* ImagePicker.swift */; };
 		26890B952CAE811A008DFF49 /* FiveGuyesApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26890B942CAE811A008DFF49 /* FiveGuyesApp.swift */; };
 		26890B972CAE811A008DFF49 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26890B962CAE811A008DFF49 /* ContentView.swift */; };
 		26890B992CAE811D008DFF49 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 26890B982CAE811D008DFF49 /* Assets.xcassets */; };
@@ -15,6 +18,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		2405000B2CB3B9E800813E26 /* TestingMetaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestingMetaView.swift; sourceTree = "<group>"; };
+		2405000D2CB3BDB800813E26 /* ImageMetadata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ImageMetadata.swift; path = FiveGuyes/Sources/Views/ImageMetadata.swift; sourceTree = SOURCE_ROOT; };
+		2405000F2CB3BF9200813E26 /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
 		26890B912CAE811A008DFF49 /* FiveGuyes.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FiveGuyes.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		26890B942CAE811A008DFF49 /* FiveGuyesApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FiveGuyesApp.swift; sourceTree = "<group>"; };
 		26890B962CAE811A008DFF49 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -37,6 +43,7 @@
 		2653E2A82CB3ACF0001DC51A /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				2405000D2CB3BDB800813E26 /* ImageMetadata.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -122,6 +129,8 @@
 			isa = PBXGroup;
 			children = (
 				26890B962CAE811A008DFF49 /* ContentView.swift */,
+				2405000B2CB3B9E800813E26 /* TestingMetaView.swift */,
+				2405000F2CB3BF9200813E26 /* ImagePicker.swift */,
 				26890BB52CAE9116008DFF49 /* Components */,
 				26890BB62CAE9120008DFF49 /* Navigation */,
 				26890BB72CAE912C008DFF49 /* Screen */,
@@ -233,7 +242,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2405000C2CB3B9E800813E26 /* TestingMetaView.swift in Sources */,
 				26890B972CAE811A008DFF49 /* ContentView.swift in Sources */,
+				240500102CB3BF9200813E26 /* ImagePicker.swift in Sources */,
+				2405000E2CB3BDB800813E26 /* ImageMetadata.swift in Sources */,
 				26890B952CAE811A008DFF49 /* FiveGuyesApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -375,9 +387,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"FiveGuyes/Preview Content\"";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = K3CQFPAA9A;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "이 앱에서는 사진을 사용하기 위해 앨범에 접근이 필요합니다";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -409,9 +422,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"FiveGuyes/Preview Content\"";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = K3CQFPAA9A;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "이 앱에서는 사진을 사용하기 위해 앨범에 접근이 필요합니다";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
