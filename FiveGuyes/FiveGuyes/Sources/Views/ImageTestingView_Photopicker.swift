@@ -17,10 +17,51 @@ class PhotoPickerViewModel: ObservableObject {
     @Published var photoModel = PhotoModel()
 }
 
+
+// UIViewControllerRepresentable을 사용해 UIImagePickerController 연결
+struct CameraPickerView: UIViewControllerRepresentable {
+    @ObservedObject var viewModel: PhotoPickerViewModel
+    @Environment(\.presentationMode) var presentationMode
+
+    func makeUIViewController(context: Context) -> UIImagePickerController {
+        let picker = UIImagePickerController()
+        picker.sourceType = .camera
+        picker.delegate = context.coordinator
+        return picker
+    }
+
+    func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {}
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+
+    class Coordinator: NSObject, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
+        let parent: CameraPickerView
+
+        init(_ parent: CameraPickerView) {
+            self.parent = parent
+        }
+
+        func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+            if let image = info[.originalImage] as? UIImage {
+                parent.viewModel.photoModel.selectedImages.append(image) // 배열에 이미지 추가
+            }
+            parent.presentationMode.wrappedValue.dismiss()
+        }
+
+        func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+            parent.presentationMode.wrappedValue.dismiss()
+        }
+    }
+}
+
+
 struct ImageTestingView: View {
 
     @StateObject private var viewModel = PhotoPickerViewModel()
     @State private var selectedItems: [PhotosPickerItem] = [] // 선택된 이미지 아이템
+    @State private var isCameraPresented = false // 카메라 표시 상태
 
     var body: some View {
         VStack {
@@ -69,6 +110,20 @@ struct ImageTestingView: View {
                 }
             }
         }
+        
+        // 카메라 버튼 추가
+        Button("Open Camera") {
+            isCameraPresented = true
+        }
+        .font(.headline)
+        .padding()
+        .background(Color.green)
+        .foregroundColor(.white)
+        .cornerRadius(8)
+        .sheet(isPresented: $isCameraPresented) {
+            CameraPickerView(viewModel: viewModel)
+        }
+
     }
 }
 
