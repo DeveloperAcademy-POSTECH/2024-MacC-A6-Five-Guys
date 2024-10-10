@@ -1,8 +1,8 @@
 //
-//  ImageTestingView_Photopicker.swift
+//  ImageTestingView.swift
 //  FiveGuyes
 //
-//  Created by Shim Hyeonhee on 10/8/24.
+//  Created by Shim Hyeonhee on 10/10/24.
 //
 
 import PhotosUI
@@ -16,7 +16,6 @@ struct ImageTestingView: View {
 
     var body: some View {
         VStack {
-            // Display selected images and camera image
             if !selectedImages.isEmpty || cameraImage != nil {
                 ScrollView(.horizontal) {
                     HStack {
@@ -91,53 +90,6 @@ struct ImageTestingView: View {
 
     private func addImage(_ image: UIImage) {
         selectedImages.append(image)
-    }
-}
-
-struct CameraPickerView: UIViewControllerRepresentable {
-    @Binding var selectedImage: UIImage?
-    @Environment(\.presentationMode) var presentationMode
-
-    var onImagePicked: (UIImage?) -> Void
-    var onCancel: () -> Void
-
-    func makeUIViewController(context: Context) -> UIImagePickerController {
-        let picker = UIImagePickerController()
-        picker.sourceType = .camera
-        picker.delegate = context.coordinator
-        return picker
-    }
-
-    func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {}
-
-    class Delegate: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
-        var onImagePicked: (UIImage?) -> Void
-        var onCancel: () -> Void
-        
-        init(onImagePicked: @escaping (UIImage?) -> Void, onCancel: @escaping () -> Void) {
-            self.onImagePicked = onImagePicked
-            self.onCancel = onCancel
-        }
-        
-        func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
-            let image = info[.originalImage] as? UIImage
-            onImagePicked(image)
-            picker.dismiss(animated: true)
-        }
-
-        func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-            onCancel()
-            picker.dismiss(animated: true)
-        }
-    }
-
-    func makeCoordinator() -> Delegate {
-        return Delegate(onImagePicked: { image in
-            self.selectedImage = image
-            self.presentationMode.wrappedValue.dismiss()
-        }, onCancel: {
-            self.presentationMode.wrappedValue.dismiss()
-        })
     }
 }
 
