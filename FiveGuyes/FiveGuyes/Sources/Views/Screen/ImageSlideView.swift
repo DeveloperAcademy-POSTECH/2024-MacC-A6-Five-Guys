@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct ImageSlideView: View {
-    @State private var selectedImage = ""
     @State private var selectedIndex = 0
     
     /// 모든 이미지에 적용할 애니메이션 (현재는 -100만큼 이동하는 애니메이션)
@@ -19,18 +18,15 @@ struct ImageSlideView: View {
     private let imageNames = ["imageDummy1", "imageDummy2", "imageDummy3", "imageDummy4", "imageDummy5"]
     
     var body: some View {
-        TabView(selection: $selectedImage) {
-            ForEach(imageNames, id: \.self) {
-                AnimatedImageView(imageName: $0, animation: animation)
+        TabView(selection: $selectedIndex) {
+            ForEach(imageNames.indices, id: \.self) {
+                AnimatedImageView(imageName: imageNames[$0], animation: animation)
             }
         }
         .tabViewStyle(.automatic)
         .onReceive(timer, perform: { _ in
-            // 타이머가 실행될 때마다 다음 이미지를 선택
             let nextIndex = (selectedIndex + 1) % imageNames.count
-            
             selectedIndex = nextIndex
-            selectedImage = imageNames[nextIndex]
         })
         .background(.black)
     }
