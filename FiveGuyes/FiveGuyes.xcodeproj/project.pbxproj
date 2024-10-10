@@ -10,7 +10,7 @@
 		1A4068A12CB6650200F1F288 /* GalleryPickerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A4068A02CB6650200F1F288 /* GalleryPickerViewModel.swift */; };
 		1AF815212CB7B1870073A523 /* ImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AF815202CB7B1870073A523 /* ImageView.swift */; };
 		1AF815232CB7B1B10073A523 /* CameraPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AF815222CB7B1B10073A523 /* CameraPickerView.swift */; };
-		1AF815252CB7C2E80073A523 /* Photos.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AF815242CB7C2E80073A523 /* Photos.swift */; };
+		1AF815252CB7C2E80073A523 /* Photo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AF815242CB7C2E80073A523 /* Photo.swift */; };
 		1AF815272CB7CAD30073A523 /* CameraPickerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AF815262CB7CAD30073A523 /* CameraPickerViewModel.swift */; };
 		26890B952CAE811A008DFF49 /* FiveGuyesApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26890B942CAE811A008DFF49 /* FiveGuyesApp.swift */; };
 		26890B972CAE811A008DFF49 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26890B962CAE811A008DFF49 /* ContentView.swift */; };
@@ -23,7 +23,7 @@
 		1A4068A02CB6650200F1F288 /* GalleryPickerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = GalleryPickerViewModel.swift; path = FiveGuyes/Sources/GalleryPickerViewModel.swift; sourceTree = SOURCE_ROOT; };
 		1AF815202CB7B1870073A523 /* ImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ImageView.swift; path = FiveGuyes/Sources/Views/ImageView.swift; sourceTree = SOURCE_ROOT; };
 		1AF815222CB7B1B10073A523 /* CameraPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CameraPickerView.swift; path = FiveGuyes/Sources/Views/CameraPickerView.swift; sourceTree = SOURCE_ROOT; };
-		1AF815242CB7C2E80073A523 /* Photos.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Photos.swift; path = FiveGuyes/Sources/Photos.swift; sourceTree = SOURCE_ROOT; };
+		1AF815242CB7C2E80073A523 /* Photo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Photo.swift; path = FiveGuyes/Sources/Photo.swift; sourceTree = SOURCE_ROOT; };
 		1AF815262CB7CAD30073A523 /* CameraPickerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CameraPickerViewModel.swift; path = FiveGuyes/Sources/CameraPickerViewModel.swift; sourceTree = SOURCE_ROOT; };
 		26890B912CAE811A008DFF49 /* FiveGuyes.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FiveGuyes.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		26890B942CAE811A008DFF49 /* FiveGuyesApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FiveGuyesApp.swift; sourceTree = "<group>"; };
@@ -122,7 +122,7 @@
 			children = (
 				1A4068A02CB6650200F1F288 /* GalleryPickerViewModel.swift */,
 				1AF815262CB7CAD30073A523 /* CameraPickerViewModel.swift */,
-				1AF815242CB7C2E80073A523 /* Photos.swift */,
+				1AF815242CB7C2E80073A523 /* Photo.swift */,
 				2653E2A82CB3ACF0001DC51A /* Models */,
 				2653E2A92CB3ACF8001DC51A /* Stores */,
 				26890BB12CAE90E4008DFF49 /* Views */,
@@ -249,7 +249,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1AF815272CB7CAD30073A523 /* CameraPickerViewModel.swift in Sources */,
-				1AF815252CB7C2E80073A523 /* Photos.swift in Sources */,
+				1AF815252CB7C2E80073A523 /* Photo.swift in Sources */,
 				1A4068A12CB6650200F1F288 /* GalleryPickerViewModel.swift in Sources */,
 				26890B972CAE811A008DFF49 /* ContentView.swift in Sources */,
 				1AF815212CB7B1870073A523 /* ImageView.swift in Sources */,

@@ -17,11 +17,11 @@ struct ImageView: View {
     var body: some View {
         VStack {
             // 이미지가 있을 때 스크롤뷰로 표시
-            if !galleryViewModel.gallerySelectedPhotos.isEmpty || galleryViewModel.cameraSelectedPhoto != nil {
+            if !galleryViewModel.selectedGalleryPhotos.isEmpty || galleryViewModel.selectedCameraSPhoto != nil {
                 ScrollView(.horizontal) {
                     HStack {
                         // 선택된 갤러리 이미지들 표시
-                        ForEach(galleryViewModel.gallerySelectedPhotos, id: \.imageData) { photo in
+                        ForEach(galleryViewModel.selectedGalleryPhotos, id: \.imageData) { photo in
                             if let uiImage = photo.uiImage {
                                 Image(uiImage: uiImage)
                                     .resizable()
@@ -32,7 +32,7 @@ struct ImageView: View {
                         }
                         
                         // 카메라에서 선택한 이미지 표시
-                        if let cameraPhoto = galleryViewModel.cameraSelectedPhoto, let uiImage = cameraPhoto.uiImage {
+                        if let cameraPhoto = galleryViewModel.selectedCameraSPhoto, let uiImage = cameraPhoto.uiImage {
                             Image(uiImage: uiImage)
                                 .resizable()
                                 .scaledToFit()
