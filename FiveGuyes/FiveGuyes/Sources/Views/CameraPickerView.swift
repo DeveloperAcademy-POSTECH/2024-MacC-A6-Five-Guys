@@ -10,8 +10,6 @@ import SwiftUI
 
 struct CameraPickerView: UIViewControllerRepresentable {
     @Binding var selectedImage: UIImage?
-    @Environment(\.presentationMode) var presentationMode
-
     var onImagePicked: (UIImage?) -> Void
     var onCancel: () -> Void
 
@@ -24,15 +22,19 @@ struct CameraPickerView: UIViewControllerRepresentable {
 
     func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {}
 
-    class Delegate: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    func makeCoordinator() -> Coordinator {
+        return Coordinator(onImagePicked: onImagePicked, onCancel: onCancel)
+    }
+
+    class Coordinator: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
         var onImagePicked: (UIImage?) -> Void
         var onCancel: () -> Void
-        
+
         init(onImagePicked: @escaping (UIImage?) -> Void, onCancel: @escaping () -> Void) {
             self.onImagePicked = onImagePicked
             self.onCancel = onCancel
         }
-        
+
         func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
             let image = info[.originalImage] as? UIImage
             onImagePicked(image)
@@ -44,17 +46,4 @@ struct CameraPickerView: UIViewControllerRepresentable {
             picker.dismiss(animated: true)
         }
     }
-
-    func makeCoordinator() -> Delegate {
-        return Delegate(onImagePicked: { image in
-            self.selectedImage = image
-            self.presentationMode.wrappedValue.dismiss()
-        }, onCancel: {
-            self.presentationMode.wrappedValue.dismiss()
-        })
-    }
-}
-
-#Preview {
-    CameraPickerView( selectedImage: .constant(nil), onImagePicked: { _ in }, onCancel: {})
 }

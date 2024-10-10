@@ -9,14 +9,9 @@ import PhotosUI
 import SwiftUI
 import UIKit
 
-// model 과 로직을 하나로 통일 - ObservableObject로 Store폴더에 정리
-class PhotoPickerViewModel: ObservableObject {
-    @Published var selectedImages: [UIImage] = []
-
-    // Append the selected image logic
-    func appendImage(_ image: UIImage) {
-        self.selectedImages.append(image)
-    }
+final class PhotoPickerViewModel: ObservableObject {
+    @Published var gallerySelectedPhotos: [Photo] = []  // 선택된 갤러리 이미지
+    @Published var cameraSelectedPhoto: Photo?   // 카메라에서 선택된 이미지
 
     func loadImagesFromPicker(_ items: [PhotosPickerItem]) {
         for item in items {
@@ -24,14 +19,22 @@ class PhotoPickerViewModel: ObservableObject {
                 DispatchQueue.main.async {
                     switch result {
                     case .success(let data):
-                        if let data = data, let uiImage = UIImage(data: data) {
-                            self.selectedImages.append(uiImage)
+                        if let data = data {
+                            let photo = Photo(imageData: data)
+                            self.gallerySelectedPhotos.append(photo)
                         }
                     case .failure(let error):
                         print("Error loading image: \(error.localizedDescription)")
                     }
                 }
             }
+        }
+    }
+
+    func setCameraImage(_ image: UIImage) {
+        if let imageData = image.pngData() {
+            let photo = Photo(imageData: imageData)
+            self.cameraSelectedPhoto = photo
         }
     }
 }

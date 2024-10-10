@@ -9,25 +9,30 @@ import PhotosUI
 import SwiftUI
 
 struct ImageTestingView: View {
-    @State private var selectedImages: [UIImage] = []
-    @State private var selectedItems: [PhotosPickerItem] = []
-    @State private var isCameraPresented = false
-    @State private var cameraImage: UIImage?
+    @StateObject private var viewModel = PhotoPickerViewModel()  // ViewModel 인스턴스
+    @State private var selectedItems: [PhotosPickerItem] = []    // 갤러리에서 선택한 항목
+    @State private var isCameraPresented = false                 // 카메라 시트 표시 여부
 
     var body: some View {
         VStack {
-            if !selectedImages.isEmpty || cameraImage != nil {
+            // 이미지가 있을 때 스크롤뷰로 표시
+            if !viewModel.gallerySelectedPhotos.isEmpty || viewModel.cameraSelectedPhoto != nil {
                 ScrollView(.horizontal) {
                     HStack {
-                        ForEach(selectedImages, id: \.self) { image in
-                            Image(uiImage: image)
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 100, height: 100)
-                                .cornerRadius(8)
+                        // 선택된 갤러리 이미지들 표시
+                        ForEach(viewModel.gallerySelectedPhotos, id: \.imageData) { photo in
+                            if let uiImage = photo.uiImage {
+                                Image(uiImage: uiImage)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 100, height: 100)
+                                    .cornerRadius(8)
+                            }
                         }
-                        if let cameraImage = cameraImage {
-                            Image(uiImage: cameraImage)
+                        
+                        // 카메라에서 선택한 이미지 표시
+                        if let cameraPhoto = viewModel.cameraSelectedPhoto, let uiImage = cameraPhoto.uiImage {
+                            Image(uiImage: uiImage)
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 100, height: 100)
@@ -36,9 +41,11 @@ struct ImageTestingView: View {
                     }
                 }
             } else {
-                Text("No image selected")
+                Text("선택된 이미지가 아직 없어요")
                     .font(.headline)
             }
+
+            // 갤러리에서 사진 선택
             PhotosPicker(selection: $selectedItems, maxSelectionCount: 0, matching: .images) {
                 Text("Select Photos")
                     .font(.headline)
@@ -48,9 +55,10 @@ struct ImageTestingView: View {
                     .cornerRadius(8)
             }
             .onChange(of: selectedItems) {
-                loadImagesFromPicker(selectedItems)
+                viewModel.loadImagesFromPicker(selectedItems)
             }
 
+            // 카메라 열기 버튼
             Button("Open Camera") {
                 isCameraPresented = true
             }
@@ -60,39 +68,18 @@ struct ImageTestingView: View {
             .foregroundColor(.white)
             .cornerRadius(8)
             .sheet(isPresented: $isCameraPresented) {
-                CameraPickerView(selectedImage: $cameraImage, onImagePicked: { image in
-                    if let image = image {
-                        addImage(image)
-                    }
-                }, onCancel: {
-                    print("Camera was canceled")
-                })
-            }
-        }
-    }
-
-    private func loadImagesFromPicker(_ items: [PhotosPickerItem]) {
-        for item in items {
-            item.loadTransferable(type: Data.self) { result in
-                DispatchQueue.main.async {
-                    switch result {
-                    case .success(let data):
-                        if let data = data, let uiImage = UIImage(data: data) {
-                            self.addImage(uiImage)
+                CameraPickerView(
+                    selectedImage: .constant(nil),
+                    onImagePicked: { image in
+                        if let image = image {
+                            viewModel.setCameraImage(image)
                         }
-                    case .failure(let error):
-                        print("Error loading image: \(error.localizedDescription)")
+                    },
+                    onCancel: {
+                        print("카메라가 취소되었어요")
                     }
-                }
+                )
             }
         }
     }
-
-    private func addImage(_ image: UIImage) {
-        selectedImages.append(image)
-    }
-}
-
-#Preview {
-    ImageTestingView()
 }
