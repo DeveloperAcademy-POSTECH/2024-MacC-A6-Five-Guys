@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2653E2C42CB78B9C001DC51A /* AnimatedImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2653E2C32CB78B9C001DC51A /* AnimatedImageView.swift */; };
 		2653E2C82CB7A689001DC51A /* ImageAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2653E2C72CB7A689001DC51A /* ImageAnimation.swift */; };
 		2653E2CA2CB7A775001DC51A /* View+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2653E2C92CB7A775001DC51A /* View+Extension.swift */; };
 		26890B952CAE811A008DFF49 /* FiveGuyesApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26890B942CAE811A008DFF49 /* FiveGuyesApp.swift */; };
@@ -17,6 +18,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		2653E2C32CB78B9C001DC51A /* AnimatedImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatedImageView.swift; sourceTree = "<group>"; };
 		2653E2C72CB7A689001DC51A /* ImageAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageAnimation.swift; sourceTree = "<group>"; };
 		2653E2C92CB7A775001DC51A /* View+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Extension.swift"; sourceTree = "<group>"; };
 		26890B912CAE811A008DFF49 /* FiveGuyes.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FiveGuyes.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -78,6 +80,7 @@
 		2653E2C12CB687FF001DC51A /* Screen */ = {
 			isa = PBXGroup;
 			children = (
+				2653E2C32CB78B9C001DC51A /* AnimatedImageView.swift */,
 			);
 			path = Screen;
 			sourceTree = "<group>";
@@ -241,6 +244,7 @@
 			files = (
 				26890B972CAE811A008DFF49 /* ContentView.swift in Sources */,
 				26890B952CAE811A008DFF49 /* FiveGuyesApp.swift in Sources */,
+				2653E2C42CB78B9C001DC51A /* AnimatedImageView.swift in Sources */,
 				2653E2CA2CB7A775001DC51A /* View+Extension.swift in Sources */,
 				2653E2C82CB7A689001DC51A /* ImageAnimation.swift in Sources */,
 			);
