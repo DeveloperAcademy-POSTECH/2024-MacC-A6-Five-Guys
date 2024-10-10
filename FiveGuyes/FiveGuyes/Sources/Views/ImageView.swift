@@ -8,19 +8,20 @@
 import PhotosUI
 import SwiftUI
 
-struct ImageTestingView: View {
-    @StateObject private var viewModel = PhotoPickerViewModel()  // ViewModel 인스턴스
+struct ImageView: View {
+    @StateObject private var galleryViewModel = GalleryPickerViewModel()  // ViewModel 인스턴스
     @State private var selectedItems: [PhotosPickerItem] = []    // 갤러리에서 선택한 항목
     @State private var isCameraPresented = false                 // 카메라 시트 표시 여부
+    @StateObject private var cameraViewModel = CameraPickerViewModel()
 
     var body: some View {
         VStack {
             // 이미지가 있을 때 스크롤뷰로 표시
-            if !viewModel.gallerySelectedPhotos.isEmpty || viewModel.cameraSelectedPhoto != nil {
+            if !galleryViewModel.gallerySelectedPhotos.isEmpty || galleryViewModel.cameraSelectedPhoto != nil {
                 ScrollView(.horizontal) {
                     HStack {
                         // 선택된 갤러리 이미지들 표시
-                        ForEach(viewModel.gallerySelectedPhotos, id: \.imageData) { photo in
+                        ForEach(galleryViewModel.gallerySelectedPhotos, id: \.imageData) { photo in
                             if let uiImage = photo.uiImage {
                                 Image(uiImage: uiImage)
                                     .resizable()
@@ -31,7 +32,7 @@ struct ImageTestingView: View {
                         }
                         
                         // 카메라에서 선택한 이미지 표시
-                        if let cameraPhoto = viewModel.cameraSelectedPhoto, let uiImage = cameraPhoto.uiImage {
+                        if let cameraPhoto = galleryViewModel.cameraSelectedPhoto, let uiImage = cameraPhoto.uiImage {
                             Image(uiImage: uiImage)
                                 .resizable()
                                 .scaledToFit()
@@ -55,7 +56,7 @@ struct ImageTestingView: View {
                     .cornerRadius(8)
             }
             .onChange(of: selectedItems) {
-                viewModel.loadImagesFromPicker(selectedItems)
+                galleryViewModel.loadImagesFromPicker(selectedItems)
             }
 
             // 카메라 열기 버튼
@@ -68,17 +69,9 @@ struct ImageTestingView: View {
             .foregroundColor(.white)
             .cornerRadius(8)
             .sheet(isPresented: $isCameraPresented) {
-                CameraPickerView(
-                    selectedImage: .constant(nil),
-                    onImagePicked: { image in
-                        if let image = image {
-                            viewModel.setCameraImage(image)
-                        }
-                    },
-                    onCancel: {
-                        print("카메라가 취소되었어요")
-                    }
-                )
+                CameraPickerView(viewModel: cameraViewModel, onCancel: {
+                    print("Camera cancelled")
+                })
             }
         }
     }

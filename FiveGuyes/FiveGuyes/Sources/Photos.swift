@@ -4,6 +4,7 @@
 //
 //  Created by Shim Hyeonhee on 10/10/24.
 //
+
 import UIKit
 
 struct Photo {

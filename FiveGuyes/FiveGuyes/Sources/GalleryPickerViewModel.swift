@@ -9,7 +9,7 @@ import PhotosUI
 import SwiftUI
 import UIKit
 
-final class PhotoPickerViewModel: ObservableObject {
+final class GalleryPickerViewModel: ObservableObject {
     @Published var gallerySelectedPhotos: [Photo] = []  // 선택된 갤러리 이미지
     @Published var cameraSelectedPhoto: Photo?   // 카메라에서 선택된 이미지
 
