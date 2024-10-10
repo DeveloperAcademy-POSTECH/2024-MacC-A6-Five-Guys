@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1A4068A12CB6650200F1F288 /* PhotoPickerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A4068A02CB6650200F1F288 /* PhotoPickerViewModel.swift */; };
 		1A9D96C12CB51BB70046B8AB /* ImageTestingView_Photopicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A9D96C02CB51BB70046B8AB /* ImageTestingView_Photopicker.swift */; };
 		26890B952CAE811A008DFF49 /* FiveGuyesApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26890B942CAE811A008DFF49 /* FiveGuyesApp.swift */; };
 		26890B972CAE811A008DFF49 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26890B962CAE811A008DFF49 /* ContentView.swift */; };
@@ -16,6 +17,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1A4068A02CB6650200F1F288 /* PhotoPickerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PhotoPickerViewModel.swift; path = FiveGuyes/Sources/Views/PhotoPickerViewModel.swift; sourceTree = SOURCE_ROOT; };
 		1A9D96C02CB51BB70046B8AB /* ImageTestingView_Photopicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageTestingView_Photopicker.swift; sourceTree = "<group>"; };
 		26890B912CAE811A008DFF49 /* FiveGuyes.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FiveGuyes.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		26890B942CAE811A008DFF49 /* FiveGuyesApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FiveGuyesApp.swift; sourceTree = "<group>"; };
@@ -46,6 +48,7 @@
 		2653E2A92CB3ACF8001DC51A /* Stores */ = {
 			isa = PBXGroup;
 			children = (
+				1A4068A02CB6650200F1F288 /* PhotoPickerViewModel.swift */,
 			);
 			path = Stores;
 			sourceTree = "<group>";
@@ -236,6 +239,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1A4068A12CB6650200F1F288 /* PhotoPickerViewModel.swift in Sources */,
 				26890B972CAE811A008DFF49 /* ContentView.swift in Sources */,
 				1A9D96C12CB51BB70046B8AB /* ImageTestingView_Photopicker.swift in Sources */,
 				26890B952CAE811A008DFF49 /* FiveGuyesApp.swift in Sources */,
