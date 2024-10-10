@@ -56,5 +56,5 @@ struct CameraPickerView: UIViewControllerRepresentable {
 }
 
 #Preview {
-    CameraPickerView( selectedImage: .constant(nil), onImagePicked: { _ in }, onCancel: {} )
+    CameraPickerView( selectedImage: .constant(nil), onImagePicked: { _ in }, onCancel: {})
 }
