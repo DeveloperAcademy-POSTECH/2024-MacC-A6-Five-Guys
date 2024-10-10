@@ -21,6 +21,7 @@
 		2405000B2CB3B9E800813E26 /* TestingMetaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestingMetaView.swift; sourceTree = "<group>"; };
 		2405000D2CB3BDB800813E26 /* ImageMetadata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ImageMetadata.swift; path = FiveGuyes/Sources/Views/ImageMetadata.swift; sourceTree = SOURCE_ROOT; };
 		2405000F2CB3BF9200813E26 /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
+		24C1B83D2CB54A8D000F3B53 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		26890B912CAE811A008DFF49 /* FiveGuyes.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FiveGuyes.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		26890B942CAE811A008DFF49 /* FiveGuyesApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FiveGuyesApp.swift; sourceTree = "<group>"; };
 		26890B962CAE811A008DFF49 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -43,7 +44,6 @@
 		2653E2A82CB3ACF0001DC51A /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				2405000D2CB3BDB800813E26 /* ImageMetadata.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -88,6 +88,7 @@
 		26890B932CAE811A008DFF49 /* FiveGuyes */ = {
 			isa = PBXGroup;
 			children = (
+				24C1B83D2CB54A8D000F3B53 /* Info.plist */,
 				26890B942CAE811A008DFF49 /* FiveGuyesApp.swift */,
 				26890BBC2CAE98E2008DFF49 /* .swiftlint.yml */,
 				26890BAD2CAE903E008DFF49 /* Resources */,
@@ -117,6 +118,7 @@
 		26890BAE2CAE904A008DFF49 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				2405000D2CB3BDB800813E26 /* ImageMetadata.swift */,
 				2653E2A82CB3ACF0001DC51A /* Models */,
 				2653E2A92CB3ACF8001DC51A /* Stores */,
 				26890BB12CAE90E4008DFF49 /* Views */,
@@ -390,7 +392,9 @@
 				DEVELOPMENT_TEAM = K3CQFPAA9A;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "이 앱에서는 사진을 사용하기 위해 앨범에 접근이 필요합니다";
+				INFOPLIST_FILE = FiveGuyes/Info.plist;
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -425,7 +429,9 @@
 				DEVELOPMENT_TEAM = K3CQFPAA9A;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "이 앱에서는 사진을 사용하기 위해 앨범에 접근이 필요합니다";
+				INFOPLIST_FILE = FiveGuyes/Info.plist;
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
