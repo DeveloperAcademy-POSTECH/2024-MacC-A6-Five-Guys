@@ -7,9 +7,21 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+
 		2405000C2CB3B9E800813E26 /* TestingMetaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2405000B2CB3B9E800813E26 /* TestingMetaView.swift */; };
 		2405000E2CB3BDB800813E26 /* ImageMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2405000D2CB3BDB800813E26 /* ImageMetadata.swift */; };
 		240500102CB3BF9200813E26 /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2405000F2CB3BF9200813E26 /* ImagePicker.swift */; };
+
+		2653E2C42CB78B9C001DC51A /* AnimatedImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2653E2C32CB78B9C001DC51A /* AnimatedImageView.swift */; };
+		2653E2C62CB7979A001DC51A /* ImageSlideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2653E2C52CB7979A001DC51A /* ImageSlideView.swift */; };
+		2653E2C82CB7A689001DC51A /* ImageAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2653E2C72CB7A689001DC51A /* ImageAnimation.swift */; };
+		2653E2CA2CB7A775001DC51A /* View+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2653E2C92CB7A775001DC51A /* View+Extension.swift */; };
+		1A4068A12CB6650200F1F288 /* GalleryPickerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A4068A02CB6650200F1F288 /* GalleryPickerViewModel.swift */; };
+		1AF815212CB7B1870073A523 /* ImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AF815202CB7B1870073A523 /* ImageView.swift */; };
+		1AF815232CB7B1B10073A523 /* CameraPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AF815222CB7B1B10073A523 /* CameraPickerView.swift */; };
+		1AF815252CB7C2E80073A523 /* Photo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AF815242CB7C2E80073A523 /* Photo.swift */; };
+		1AF815272CB7CAD30073A523 /* CameraPickerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AF815262CB7CAD30073A523 /* CameraPickerViewModel.swift */; };
+
 		26890B952CAE811A008DFF49 /* FiveGuyesApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26890B942CAE811A008DFF49 /* FiveGuyesApp.swift */; };
 		26890B972CAE811A008DFF49 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26890B962CAE811A008DFF49 /* ContentView.swift */; };
 		26890B992CAE811D008DFF49 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 26890B982CAE811D008DFF49 /* Assets.xcassets */; };
@@ -18,10 +30,23 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+
 		2405000B2CB3B9E800813E26 /* TestingMetaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestingMetaView.swift; sourceTree = "<group>"; };
 		2405000D2CB3BDB800813E26 /* ImageMetadata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ImageMetadata.swift; path = FiveGuyes/Sources/Views/ImageMetadata.swift; sourceTree = SOURCE_ROOT; };
 		2405000F2CB3BF9200813E26 /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
 		24C1B83D2CB54A8D000F3B53 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+
+		2653E2C32CB78B9C001DC51A /* AnimatedImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatedImageView.swift; sourceTree = "<group>"; };
+		2653E2C52CB7979A001DC51A /* ImageSlideView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageSlideView.swift; sourceTree = "<group>"; };
+		2653E2C72CB7A689001DC51A /* ImageAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageAnimation.swift; sourceTree = "<group>"; };
+		2653E2C92CB7A775001DC51A /* View+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Extension.swift"; sourceTree = "<group>"; };
+
+		1A4068A02CB6650200F1F288 /* GalleryPickerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = GalleryPickerViewModel.swift; path = FiveGuyes/Sources/GalleryPickerViewModel.swift; sourceTree = SOURCE_ROOT; };
+		1AF815202CB7B1870073A523 /* ImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ImageView.swift; path = FiveGuyes/Sources/Views/ImageView.swift; sourceTree = SOURCE_ROOT; };
+		1AF815222CB7B1B10073A523 /* CameraPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CameraPickerView.swift; path = FiveGuyes/Sources/Views/CameraPickerView.swift; sourceTree = SOURCE_ROOT; };
+		1AF815242CB7C2E80073A523 /* Photo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Photo.swift; path = FiveGuyes/Sources/Photo.swift; sourceTree = SOURCE_ROOT; };
+		1AF815262CB7CAD30073A523 /* CameraPickerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CameraPickerViewModel.swift; path = FiveGuyes/Sources/CameraPickerViewModel.swift; sourceTree = SOURCE_ROOT; };
+
 		26890B912CAE811A008DFF49 /* FiveGuyes.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FiveGuyes.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		26890B942CAE811A008DFF49 /* FiveGuyesApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FiveGuyesApp.swift; sourceTree = "<group>"; };
 		26890B962CAE811A008DFF49 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -44,6 +69,7 @@
 		2653E2A82CB3ACF0001DC51A /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				2653E2C72CB7A689001DC51A /* ImageAnimation.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -62,11 +88,35 @@
 			path = Protocols;
 			sourceTree = "<group>";
 		};
-		2653E2AB2CB3AD14001DC51A /* Extensions */ = {
+		2653E2BF2CB687EA001DC51A /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				2653E2C92CB7A775001DC51A /* View+Extension.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		2653E2C02CB687F4001DC51A /* Navigation */ = {
 			isa = PBXGroup;
 			children = (
 			);
-			path = Extensions;
+			path = Navigation;
+			sourceTree = "<group>";
+		};
+		2653E2C12CB687FF001DC51A /* Screen */ = {
+			isa = PBXGroup;
+			children = (
+				2653E2C32CB78B9C001DC51A /* AnimatedImageView.swift */,
+				2653E2C52CB7979A001DC51A /* ImageSlideView.swift */,
+			);
+			path = Screen;
+			sourceTree = "<group>";
+		};
+		2653E2C22CB68807001DC51A /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Shared;
 			sourceTree = "<group>";
 		};
 		26890B882CAE811A008DFF49 = {
@@ -110,7 +160,7 @@
 			isa = PBXGroup;
 			children = (
 				26890B982CAE811D008DFF49 /* Assets.xcassets */,
-				2653E2AB2CB3AD14001DC51A /* Extensions */,
+				2653E2BF2CB687EA001DC51A /* Extensions */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -118,7 +168,13 @@
 		26890BAE2CAE904A008DFF49 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+
 				2405000D2CB3BDB800813E26 /* ImageMetadata.swift */,
+
+				1A4068A02CB6650200F1F288 /* GalleryPickerViewModel.swift */,
+				1AF815262CB7CAD30073A523 /* CameraPickerViewModel.swift */,
+				1AF815242CB7C2E80073A523 /* Photo.swift */,
+
 				2653E2A82CB3ACF0001DC51A /* Models */,
 				2653E2A92CB3ACF8001DC51A /* Stores */,
 				26890BB12CAE90E4008DFF49 /* Views */,
@@ -131,12 +187,17 @@
 			isa = PBXGroup;
 			children = (
 				26890B962CAE811A008DFF49 /* ContentView.swift */,
+
 				2405000B2CB3B9E800813E26 /* TestingMetaView.swift */,
 				2405000F2CB3BF9200813E26 /* ImagePicker.swift */,
+
+				1AF815202CB7B1870073A523 /* ImageView.swift */,
+				1AF815222CB7B1B10073A523 /* CameraPickerView.swift */,
+
 				26890BB52CAE9116008DFF49 /* Components */,
-				26890BB62CAE9120008DFF49 /* Navigation */,
-				26890BB72CAE912C008DFF49 /* Screen */,
-				26890BB82CAE9137008DFF49 /* Shared */,
+				2653E2C02CB687F4001DC51A /* Navigation */,
+				2653E2C12CB687FF001DC51A /* Screen */,
+				2653E2C22CB68807001DC51A /* Shared */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -146,27 +207,6 @@
 			children = (
 			);
 			path = Components;
-			sourceTree = "<group>";
-		};
-		26890BB62CAE9120008DFF49 /* Navigation */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Navigation;
-			sourceTree = "<group>";
-		};
-		26890BB72CAE912C008DFF49 /* Screen */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Screen;
-			sourceTree = "<group>";
-		};
-		26890BB82CAE9137008DFF49 /* Shared */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Shared;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -244,11 +284,23 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+
 				2405000C2CB3B9E800813E26 /* TestingMetaView.swift in Sources */,
-				26890B972CAE811A008DFF49 /* ContentView.swift in Sources */,
 				240500102CB3BF9200813E26 /* ImagePicker.swift in Sources */,
 				2405000E2CB3BDB800813E26 /* ImageMetadata.swift in Sources */,
+
+				1AF815272CB7CAD30073A523 /* CameraPickerViewModel.swift in Sources */,
+				1AF815252CB7C2E80073A523 /* Photo.swift in Sources */,
+				1A4068A12CB6650200F1F288 /* GalleryPickerViewModel.swift in Sources */,
+				26890B972CAE811A008DFF49 /* ContentView.swift in Sources */,
+				1AF815212CB7B1870073A523 /* ImageView.swift in Sources */,
+
 				26890B952CAE811A008DFF49 /* FiveGuyesApp.swift in Sources */,
+				2653E2C62CB7979A001DC51A /* ImageSlideView.swift in Sources */,
+				2653E2C42CB78B9C001DC51A /* AnimatedImageView.swift in Sources */,
+				2653E2CA2CB7A775001DC51A /* View+Extension.swift in Sources */,
+				2653E2C82CB7A689001DC51A /* ImageAnimation.swift in Sources */,
+				1AF815232CB7B1B10073A523 /* CameraPickerView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -392,9 +444,13 @@
 				DEVELOPMENT_TEAM = K3CQFPAA9A;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+
 				INFOPLIST_FILE = FiveGuyes/Info.plist;
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "";
+
+				INFOPLIST_KEY_NSCameraUsageDescription = "";
+
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -429,9 +485,13 @@
 				DEVELOPMENT_TEAM = K3CQFPAA9A;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+
 				INFOPLIST_FILE = FiveGuyes/Info.plist;
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "";
+
+				INFOPLIST_KEY_NSCameraUsageDescription = "";
+
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
