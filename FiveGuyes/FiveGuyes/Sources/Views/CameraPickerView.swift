@@ -10,7 +10,6 @@ import SwiftUI
 
 struct CameraPickerView: UIViewControllerRepresentable {
     @ObservedObject var viewModel: CameraPickerViewModel
-    var onCancel: () -> Void
     
     func makeUIViewController(context: Context) -> UIImagePickerController {
         let picker = UIImagePickerController()
@@ -22,16 +21,14 @@ struct CameraPickerView: UIViewControllerRepresentable {
     func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {}
 
     func makeCoordinator() -> Coordinator {
-        return Coordinator(viewModel: viewModel, onCancel: onCancel)
+        return Coordinator(viewModel: viewModel)
     }
 
     class Coordinator: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
         var viewModel: CameraPickerViewModel
-        var onCancel: () -> Void
         
-        init(viewModel: CameraPickerViewModel, onCancel: @escaping () -> Void) {
+        init(viewModel: CameraPickerViewModel) {
             self.viewModel = viewModel
-            self.onCancel = onCancel
         }
 
         func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
@@ -43,7 +40,6 @@ struct CameraPickerView: UIViewControllerRepresentable {
 
         func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
             viewModel.cancel()  // 선택 취소 처리
-            onCancel()  // 추가적인 취소 처리
             picker.dismiss(animated: true)
         }
     }

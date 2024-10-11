@@ -31,7 +31,7 @@ final class GalleryPickerViewModel: ObservableObject {
         }
     }
 
-    func setCameraImage(_ image: UIImage) {
+    func getCameraImage(_ image: UIImage) {
         if let imageData = image.pngData() {
             let photo = Photo(imageData: imageData)
             self.selectedCameraSPhoto = photo

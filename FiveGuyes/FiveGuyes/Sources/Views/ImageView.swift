@@ -46,7 +46,7 @@ struct ImageView: View {
                     .font(.headline)
             }
 
-            // 갤러리에서 사진 선택
+            // 갤러리
             PhotosPicker(selection: $selectedItems, maxSelectionCount: 0, matching: .images) {
                 Text("Select Photos")
                     .font(.headline)
@@ -59,8 +59,8 @@ struct ImageView: View {
                 galleryViewModel.loadImagesFromPicker(selectedItems)
             }
 
-            // 카메라 열기 버튼
-            Button("Open Camera") {
+            // 카메라
+            Button("카메라") {
                 isCameraPresented = true
             }
             .font(.headline)
@@ -69,9 +69,7 @@ struct ImageView: View {
             .foregroundColor(.white)
             .cornerRadius(8)
             .sheet(isPresented: $isCameraPresented) {
-                CameraPickerView(viewModel: cameraViewModel, onCancel: {
-                    print("Camera cancelled")
-                })
+                CameraPickerView(viewModel: cameraViewModel)
             }
         }
     }
