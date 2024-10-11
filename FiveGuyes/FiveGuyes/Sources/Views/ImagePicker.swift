@@ -67,56 +67,67 @@ struct ImagePicker: UIViewControllerRepresentable {
     }
 
     private func processImage(at url: URL) {
-        guard let source = CGImageSourceCreateWithURL(url as CFURL, nil),
-              let properties = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [String: Any] else { return }
-        
-        var imageDate: Date?
-
-        if let exif = properties[kCGImagePropertyExifDictionary as String] as? [String: Any],
-           let dateString = exif[kCGImagePropertyExifDateTimeOriginal as String] as? String {
-            let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "yyyy:MM:dd HH:mm:ss"
-            imageDate = dateFormatter.date(from: dateString)
+        guard let properties = loadImageProperties(at: url) else {
+            print("❌ ImagePicker/processImage: Failed to load image properties")
+            return
         }
         
+        let imageDate = extractImageDate(from: properties)
         processGPSInfo(from: properties, imageDate: imageDate)
     }
 
+    private func loadImageProperties(at url: URL) -> [String: Any]? {
+        guard let source = CGImageSourceCreateWithURL(url as CFURL, nil),
+              let properties = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [String: Any] else {
+            return nil
+        }
+        return properties
+    }
+
+    private func extractImageDate(from properties: [String: Any]) -> Date? {
+        guard let exif = properties[kCGImagePropertyExifDictionary as String] as? [String: Any],
+              let dateString = exif[kCGImagePropertyExifDateTimeOriginal as String] as? String else {
+            print("❌ ImagePicker/extractImageDate: No EXIF date found")
+            return nil
+        }
+        
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy:MM:dd HH:mm:ss"
+        return formatter.date(from: dateString)
+    }
+
     private func processGPSInfo(from properties: [String: Any], imageDate: Date?) {
-        if let gps = properties[kCGImagePropertyGPSDictionary as String] as? [String: Any],
-           let latitude = gps[kCGImagePropertyGPSLatitude as String] as? Double,
-           let longitude = gps[kCGImagePropertyGPSLongitude as String] as? Double {
-            self.getLocationName(latitude: latitude, longitude: longitude) { locationName in
-                DispatchQueue.main.async {
-                    self.imageMetadata = ImageMetadata(imageDate: imageDate, location: locationName)
-                    self.locationName = locationName
-                }
-            }
-        } else {
-            DispatchQueue.main.async {
-                self.imageMetadata = ImageMetadata(imageDate: imageDate, location: nil)
-                self.locationName = nil
-            }
+        guard let gps = properties[kCGImagePropertyGPSDictionary as String] as? [String: Any],
+              let latitude = gps[kCGImagePropertyGPSLatitude as String] as? Double,
+              let longitude = gps[kCGImagePropertyGPSLongitude as String] as? Double else {
+            print("❌ ImagePicker/processGPSInfo: GPS 데이터가 없습니다 - 문제 발생")
+            updateMetadata(imageDate: imageDate, location: nil)
+            return
+        }
+
+        Task {
+            let locationName = await getLocationName(latitude: latitude, longitude: longitude)
+            updateMetadata(imageDate: imageDate, location: locationName)
+        }
+    }
+
+    private func updateMetadata(imageDate: Date?, location: String?) {
+        DispatchQueue.main.async {
+            self.imageMetadata = ImageMetadata(imageDate: imageDate, location: location)
+            self.locationName = location
         }
     }
     
-    func getLocationName(latitude: Double, longitude: Double, completion: @escaping (String?) -> Void) {
+    private func getLocationName(latitude: Double, longitude: Double) async -> String? {
         let location = CLLocation(latitude: latitude, longitude: longitude)
-        CLGeocoder().reverseGeocodeLocation(location) { placemarks, _ in
-            
-            if let placemark = placemarks?.first {
-                let administrativeArea = placemark.administrativeArea ?? ""
-                let locality = placemark.locality ?? ""
-                let subLocality = placemark.subLocality ?? ""
-                let name = placemark.name ?? ""
-                
-                let fullLocationName = [administrativeArea, locality, subLocality, name]
-                    .filter { !$0.isEmpty }
-                    .joined(separator: " ")
-                
-                completion(fullLocationName.trimmingCharacters(in: .whitespaces))
-            } else {
-                completion(nil)
+        return await withCheckedContinuation { continuation in
+            CLGeocoder().reverseGeocodeLocation(location) { placemarks, _ in
+                let fullLocationName = placemarks?.first.map { placemark in
+                    [placemark.administrativeArea, placemark.locality, placemark.subLocality, placemark.name]
+                        .compactMap { $0 }
+                        .joined(separator: " ")
+                } ?? nil
+                continuation.resume(returning: fullLocationName?.trimmingCharacters(in: .whitespaces))
             }
         }
     }

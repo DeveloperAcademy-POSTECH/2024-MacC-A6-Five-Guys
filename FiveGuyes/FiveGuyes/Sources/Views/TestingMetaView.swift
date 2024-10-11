@@ -30,7 +30,7 @@ struct TestingMetaView: View {
             
             if let metadata = imageMetadata {
                 if let imageDate = metadata.imageDate {
-                    let formattedDate = formatDate(from: imageDate)
+                    let formattedDate = DateFormat.formatDate(from: imageDate)
                     VStack {
                         Text(formattedDate)
                     }
@@ -60,12 +60,6 @@ struct TestingMetaView: View {
                 ImagePicker(selectedImage: $selectedImage, imageMetadata: $imageMetadata, locationName: $locationName)
             }
         }
-    }
-    
-    func formatDate(from date: Date) -> String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy년 M월 d일"
-        return dateFormatter.string(from: date)
     }
 }
 

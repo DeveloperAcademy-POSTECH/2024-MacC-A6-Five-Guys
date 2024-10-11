@@ -11,8 +11,7 @@ import SwiftUI
 struct FiveGuyesApp: App {
     var body: some Scene {
         WindowGroup {
-            TestingMetaView()
-//            ContentView()
+            ContentView()
         }
     }
 }
