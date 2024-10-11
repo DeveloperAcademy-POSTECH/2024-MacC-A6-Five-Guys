@@ -1,13 +1,13 @@
 # 2024-MacC-A6-Five-Guys
 🍔🍔🍔🍔🍔
 <a href="" target="_blank">
-<img src="" alt="배너" width="100%"/>
+<img src="https://github.com/user-attachments/assets/1de99816-86ab-4aed-9d0a-b7c590cf71a2" alt="배너" width="100%"/>
 </a>
 
 <br/>
 <br/>
 
-[서비스 링크](/)
+[APP 링크](/)
 
 <br/>
 <br/>
@@ -22,9 +22,9 @@
 # 2. Team Members (팀원 및 팀 소개)
 | 호랑 | 해피 | 웰디 | 세니 | 카키 |
 |:------:|:------:|:------:|:------:|:------:|
-| <img src="" alt="호랑" width="150"> | <img src="" alt="해피" width="150"> | <img src="" alt="웰디" width="150"> | <img src="" alt="세니" width="150"> | <img src="" alt="카키" width="150"> |
+| <img src="https://github.com/user-attachments/assets/10ef38dc-1617-4b82-be29-065d1b01e7d0" alt="호랑" width="150"> | <img src="https://github.com/user-attachments/assets/dc6f5ec1-1c70-4977-b4ec-a890d5c82112" alt="해피" width="150"> | <img src="https://github.com/user-attachments/assets/beeaf07b-8ef8-436f-a651-3b4e2974ad9c" alt="웰디" width="150"> | <img src="https://github.com/user-attachments/assets/fd9e3c52-a65a-4834-b9fd-4d551e285a1a" alt="세니" width="150"> | <img src="https://github.com/user-attachments/assets/68f7b1ee-2740-4d85-ba79-d5c44ef6ca93" alt="카키" width="150"> |
 | Dev | Dev | Dev | Design | Design |
-| [GitHub](https://github.com/) | [GitHub](https://github.com/) | [GitHub](https://github.com/) | [GitHub](https://github.com/) | [GitHub](https://github.com/) |
+| [GitHub](https://github.com/) | [GitHub](https://github.com/) | [GitHub](https://github.com/) | [Website](https://github.com/) | [Website](https://github.com/) |
 
 <br/>
 <br/>
@@ -49,11 +49,11 @@
 # 4. Tasks & Responsibilities (작업 및 역할 분담)
 |  |  |  |
 |-----------------|-----------------|-----------------|
-| 호랑   |  <img src="" alt="호랑" width="100"> | <ul><li>여행 피커뷰 개발</li><li>기능1 개발</li><li>기능2 개발</li></ul>     |
-| 해피   |  <img src="" alt="해피" width="100"> | <ul><li>메타데이터 불러오기 개발</li><li>기능1 개발</li><li>기능2 개발</li></ul> |
-| 웰디   |  <img src="" alt="웰디" width="100"> | <ul><li>갤러리 연동 개발</li><li>기능1</li><li>기능2 개발</li><li>기능2 개발</li></ul>  |
-| 세니   |  <img src="" alt="세니" width="100"> | <ul><li>디자인1</li><li>디자인2</li><li>기획 및 디자인</li></ul>    |
-| 카키   |  <img src="" alt="카키" width="100"> | <ul><li>디자인1</li><li>디자인2</li><li>기획 및 디자인</li></ul>    |
+| 호랑   |  <img src="https://github.com/user-attachments/assets/10ef38dc-1617-4b82-be29-065d1b01e7d0" alt="호랑" width="100"> | <ul><li>여행 피커뷰 개발</li><li>기능1 개발</li><li>기능2 개발</li></ul>     |
+| 해피   |  <img src="https://github.com/user-attachments/assets/dc6f5ec1-1c70-4977-b4ec-a890d5c82112" alt="해피" width="100"> | <ul><li>메타데이터 불러오기 개발</li><li>기능1 개발</li><li>기능2 개발</li></ul> |
+| 웰디   |  <img src="https://github.com/user-attachments/assets/beeaf07b-8ef8-436f-a651-3b4e2974ad9c" alt="웰디" width="100"> | <ul><li>갤러리 연동 개발</li><li>기능1</li><li>기능2 개발</li><li>기능2 개발</li></ul>  |
+| 세니   |  <img src="https://github.com/user-attachments/assets/fd9e3c52-a65a-4834-b9fd-4d551e285a1a" alt="세니" width="100"> | <ul><li>디자인1</li><li>디자인2</li><li>기획 및 디자인</li></ul>    |
+| 카키   |  <img src="https://github.com/user-attachments/assets/68f7b1ee-2740-4d85-ba79-d5c44ef6ca93" alt="카키" width="100"> | <ul><li>디자인1</li><li>디자인2</li><li>기획 및 디자인</li></ul>    |
 <br/>
 <br/>
 
@@ -69,23 +69,22 @@
 ## 5.2 Frotend
 |  |  |  |
 |-----------------|-----------------|-----------------|
-| Swift    |  <img src="https://img.shields.io/badge/Swift-F05138?style=flat-square&logo=Swift&logoColor=white" alt="Swift" width="100"> | v   |
+| Swift    |  <img src="https://img.shields.io/badge/Swift-F05138?style=flat-square&logo=Swift&logoColor=white" alt="Swift" width="50"> | v   |
 
 <br/>
 
 ## 5.3 Backend
 |  |  |  |
 |-----------------|-----------------|-----------------|
-| Firebase    |  <img src="https://github.com/user-attachments/assets/1694e458-9bb0-4a0b-8fe6-8efc6e675fa1" alt="Firebase" width="100">    | v   |
+| Firebase    |  <img src="https://github.com/user-attachments/assets/1694e458-9bb0-4a0b-8fe6-8efc6e675fa1" alt="Firebase" width="50">    | v   |
 
 <br/>
 
 ## 5.4 Cooperation
 |  |  |
 |-----------------|-----------------|
-| Git    |  <img src="https://github.com/user-attachments/assets/483abc38-ed4d-487c-b43a-3963b33430e6" alt="git" width="100">    |
-| Git Kraken    |  <img src="https://github.com/user-attachments/assets/32c615cb-7bc0-45cd-91ea-0d1450bfc8a9" alt="git kraken" width="100">    |
-| Notion    |  <img src="https://github.com/user-attachments/assets/34141eb9-deca-416a-a83f-ff9543cc2f9a" alt="Notion" width="100">    |
+| Git    |  <img src="https://github.com/user-attachments/assets/483abc38-ed4d-487c-b43a-3963b33430e6" alt="git" width="50">    |   
+| Notion    |  <img src="https://github.com/user-attachments/assets/34141eb9-deca-416a-a83f-ff9543cc2f9a" alt="Notion" width="50">    |
 
 <br/>
 
@@ -122,32 +121,7 @@ SwiftUI Foldering
 <br/>
 <br/>
 
-# 8. PR Template
-
-
-```swift
-<!--[#이슈번호] Title
-ex) [#1] PR Templete 생성
-타이틀 양식 참고하고 지우기 !!-->
-## 📝 작업 내용
-> 이번 PR에서 작업한 내용을 간략히 설명해주세요
-
-- 
-- 
-
-### 스크린샷 (선택)
-<img src="" width="300"/>
-
-## 💬 리뷰 요구사항(선택)
-> 리뷰어가 특별히 봐주었으면 하는 부분이 있다면 작성해주세요
-
-- ex) 메서드 XXX의 이름을 더 잘 짓고 싶은데 혹시 좋은 명칭이 있을까요?
-- 
-
-```
-
-
-# 9. 커밋 컨벤션
+# 8. 커밋 컨벤션
 
 
 ### 제목과 본문을 빈행으로 분리
@@ -203,5 +177,30 @@ git commit -m "feat: 회원가입 기능 추가
 ```
 
 </aside>
+
+
+# 9. PR Template
+
+
+```swift
+<!--[#이슈번호] Title
+ex) [#1] PR Templete 생성
+타이틀 양식 참고하고 지우기 !!-->
+## 📝 작업 내용
+> 이번 PR에서 작업한 내용을 간략히 설명해주세요
+
+- 
+- 
+
+### 스크린샷 (선택)
+<img src="" width="300"/>
+
+## 💬 리뷰 요구사항(선택)
+> 리뷰어가 특별히 봐주었으면 하는 부분이 있다면 작성해주세요
+
+- ex) 메서드 XXX의 이름을 더 잘 짓고 싶은데 혹시 좋은 명칭이 있을까요?
+- 
+
+```
 
 
