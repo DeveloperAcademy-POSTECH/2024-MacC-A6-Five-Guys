@@ -16,6 +16,7 @@
 		2653E2C62CB7979A001DC51A /* ImageSlideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2653E2C52CB7979A001DC51A /* ImageSlideView.swift */; };
 		2653E2C82CB7A689001DC51A /* ImageAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2653E2C72CB7A689001DC51A /* ImageAnimation.swift */; };
 		2653E2CA2CB7A775001DC51A /* View+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2653E2C92CB7A775001DC51A /* View+Extension.swift */; };
+		2653E2F52CBA6ADB001DC51A /* LinearGradient+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2653E2F42CBA6ADB001DC51A /* LinearGradient+Extension.swift */; };
 		26890B952CAE811A008DFF49 /* FiveGuyesApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26890B942CAE811A008DFF49 /* FiveGuyesApp.swift */; };
 		26890B972CAE811A008DFF49 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26890B962CAE811A008DFF49 /* ContentView.swift */; };
 		26890B992CAE811D008DFF49 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 26890B982CAE811D008DFF49 /* Assets.xcassets */; };
@@ -33,6 +34,7 @@
 		2653E2C52CB7979A001DC51A /* ImageSlideView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageSlideView.swift; sourceTree = "<group>"; };
 		2653E2C72CB7A689001DC51A /* ImageAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageAnimation.swift; sourceTree = "<group>"; };
 		2653E2C92CB7A775001DC51A /* View+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Extension.swift"; sourceTree = "<group>"; };
+		2653E2F42CBA6ADB001DC51A /* LinearGradient+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LinearGradient+Extension.swift"; sourceTree = "<group>"; };
 		26890B912CAE811A008DFF49 /* FiveGuyes.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FiveGuyes.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		26890B942CAE811A008DFF49 /* FiveGuyesApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FiveGuyesApp.swift; sourceTree = "<group>"; };
 		26890B962CAE811A008DFF49 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -78,6 +80,7 @@
 			isa = PBXGroup;
 			children = (
 				2653E2C92CB7A775001DC51A /* View+Extension.swift */,
+				2653E2F42CBA6ADB001DC51A /* LinearGradient+Extension.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -262,6 +265,7 @@
 			files = (
 				1AF815272CB7CAD30073A523 /* CameraPickerViewModel.swift in Sources */,
 				1AF815252CB7C2E80073A523 /* Photo.swift in Sources */,
+				2653E2F52CBA6ADB001DC51A /* LinearGradient+Extension.swift in Sources */,
 				1A4068A12CB6650200F1F288 /* GalleryPickerViewModel.swift in Sources */,
 				26890B972CAE811A008DFF49 /* ContentView.swift in Sources */,
 				1AF815212CB7B1870073A523 /* ImageView.swift in Sources */,
