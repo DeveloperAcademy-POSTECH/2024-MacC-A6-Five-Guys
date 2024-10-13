@@ -57,7 +57,7 @@ struct TestingMetaView: View {
                 Text("이미지 선택")
             })
             .sheet(isPresented: $showImagePicker) {
-                LoadMetaDataView(selectedImage: $selectedImage, imageMetadata: $imageMetadata, locationName: $locationName)
+                LoadMetadataView(selectedImage: $selectedImage, imageMetadata: $imageMetadata, locationName: $locationName)
             }
         }
     }

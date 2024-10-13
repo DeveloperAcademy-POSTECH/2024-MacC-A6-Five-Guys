@@ -10,11 +10,11 @@ import CoreLocation
 import Photos
 import SwiftUI
 
-struct LoadMetaDataView: UIViewControllerRepresentable {
+struct LoadMetadataView: UIViewControllerRepresentable {
     class Coordinator: NSObject, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
-        let parent: LoadMetaDataView
+        let parent: LoadMetadataView
         
-        init(_ parent: LoadMetaDataView) {
+        init(_ parent: LoadMetadataView) {
             self.parent = parent
         }
         
