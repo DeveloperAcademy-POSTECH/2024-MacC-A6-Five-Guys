@@ -30,7 +30,7 @@ struct TestingMetaView: View {
             
             if let metadata = imageMetadata {
                 if let imageDate = metadata.imageDate {
-                    let formattedDate = DateFormat.formatDate(from: imageDate)
+                    let formattedDate = DateFormatter.formatDate(from: imageDate)
                     VStack {
                         Text(formattedDate)
                     }
@@ -57,7 +57,7 @@ struct TestingMetaView: View {
                 Text("이미지 선택")
             })
             .sheet(isPresented: $showImagePicker) {
-                ImagePicker(selectedImage: $selectedImage, imageMetadata: $imageMetadata, locationName: $locationName)
+                LoadMetaDataView(selectedImage: $selectedImage, imageMetadata: $imageMetadata, locationName: $locationName)
             }
         }
     }
