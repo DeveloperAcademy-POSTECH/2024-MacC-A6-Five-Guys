@@ -5,10 +5,9 @@
 //  Created by 신혜연 on 10/14/24.
 //
 
-import SwiftUI
 import CoreLocation
-import Photos
 import SwiftUI
+import Photos
 
 struct LoadMetadataView: UIViewControllerRepresentable {
     class Coordinator: NSObject, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
