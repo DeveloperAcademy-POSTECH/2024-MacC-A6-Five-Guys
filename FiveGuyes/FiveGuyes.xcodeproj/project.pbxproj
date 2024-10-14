@@ -24,6 +24,7 @@
 		2653E3082CBBE695001DC51A /* PretendardFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2653E3072CBBE695001DC51A /* PretendardFont.swift */; };
 		2653E30E2CBCF597001DC51A /* FeedProgressTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2653E30D2CBCF597001DC51A /* FeedProgressTimer.swift */; };
 		2653E3102CBCF5DC001DC51A /* FeedPagingRectangle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2653E30F2CBCF5DC001DC51A /* FeedPagingRectangle.swift */; };
+		2653E3122CBCF67A001DC51A /* FeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2653E3112CBCF67A001DC51A /* FeedView.swift */; };
 		26890B952CAE811A008DFF49 /* FiveGuyesApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26890B942CAE811A008DFF49 /* FiveGuyesApp.swift */; };
 		26890B972CAE811A008DFF49 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26890B962CAE811A008DFF49 /* ContentView.swift */; };
 		26890B992CAE811D008DFF49 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 26890B982CAE811D008DFF49 /* Assets.xcassets */; };
@@ -50,6 +51,7 @@
 		2653E3072CBBE695001DC51A /* PretendardFont.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PretendardFont.swift; sourceTree = "<group>"; };
 		2653E30D2CBCF597001DC51A /* FeedProgressTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedProgressTimer.swift; sourceTree = "<group>"; };
 		2653E30F2CBCF5DC001DC51A /* FeedPagingRectangle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedPagingRectangle.swift; sourceTree = "<group>"; };
+		2653E3112CBCF67A001DC51A /* FeedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedView.swift; sourceTree = "<group>"; };
 		26890B912CAE811A008DFF49 /* FiveGuyes.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FiveGuyes.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		26890B942CAE811A008DFF49 /* FiveGuyesApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FiveGuyesApp.swift; sourceTree = "<group>"; };
 		26890B962CAE811A008DFF49 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -113,6 +115,7 @@
 			children = (
 				2653E2C32CB78B9C001DC51A /* AnimatedImageView.swift */,
 				2653E2C52CB7979A001DC51A /* ImageSlideView.swift */,
+				2653E3112CBCF67A001DC51A /* FeedView.swift */,
 			);
 			path = Screen;
 			sourceTree = "<group>";
@@ -324,6 +327,7 @@
 				2653E3082CBBE695001DC51A /* PretendardFont.swift in Sources */,
 				2653E2C62CB7979A001DC51A /* ImageSlideView.swift in Sources */,
 				2653E2C42CB78B9C001DC51A /* AnimatedImageView.swift in Sources */,
+				2653E3122CBCF67A001DC51A /* FeedView.swift in Sources */,
 				2653E3052CBBE615001DC51A /* FontAsset.swift in Sources */,
 				2653E2CA2CB7A775001DC51A /* View+Extension.swift in Sources */,
 				2653E2C82CB7A689001DC51A /* ImageAnimation.swift in Sources */,
