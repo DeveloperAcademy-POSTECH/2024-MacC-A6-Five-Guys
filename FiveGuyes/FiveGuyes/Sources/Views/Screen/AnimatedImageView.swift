@@ -19,9 +19,13 @@ struct AnimatedImageView: View {
         Image(imageName)
             .resizable()
             .scaledToFill()
+            .containerRelativeFrame([.horizontal, .vertical])
             .applyAnimation(animation, isAnimating: isAnimating)
             .onAppear {
                 isAnimating = true  // 화면이 나타날 때 애니메이션을 시작
+            }
+            .onDisappear {
+                isAnimating = false
             }
     }
 }
