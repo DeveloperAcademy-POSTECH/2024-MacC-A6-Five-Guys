@@ -7,16 +7,21 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		2653E2C42CB78B9C001DC51A /* AnimatedImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2653E2C32CB78B9C001DC51A /* AnimatedImageView.swift */; };
-		2653E2C62CB7979A001DC51A /* ImageSlideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2653E2C52CB7979A001DC51A /* ImageSlideView.swift */; };
-		2653E2C82CB7A689001DC51A /* ImageAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2653E2C72CB7A689001DC51A /* ImageAnimation.swift */; };
-		2653E2CA2CB7A775001DC51A /* View+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2653E2C92CB7A775001DC51A /* View+Extension.swift */; };
 		1A4068A12CB6650200F1F288 /* GalleryPickerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A4068A02CB6650200F1F288 /* GalleryPickerViewModel.swift */; };
 		1AF815212CB7B1870073A523 /* ImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AF815202CB7B1870073A523 /* ImageView.swift */; };
 		1AF815232CB7B1B10073A523 /* CameraPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AF815222CB7B1B10073A523 /* CameraPickerView.swift */; };
 		1AF815252CB7C2E80073A523 /* Photo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AF815242CB7C2E80073A523 /* Photo.swift */; };
 		1AF815272CB7CAD30073A523 /* CameraPickerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AF815262CB7CAD30073A523 /* CameraPickerViewModel.swift */; };
-
+		2653E2C42CB78B9C001DC51A /* AnimatedImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2653E2C32CB78B9C001DC51A /* AnimatedImageView.swift */; };
+		2653E2C62CB7979A001DC51A /* ImageSlideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2653E2C52CB7979A001DC51A /* ImageSlideView.swift */; };
+		2653E2C82CB7A689001DC51A /* ImageAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2653E2C72CB7A689001DC51A /* ImageAnimation.swift */; };
+		2653E2CA2CB7A775001DC51A /* View+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2653E2C92CB7A775001DC51A /* View+Extension.swift */; };
+		2653E2F52CBA6ADB001DC51A /* LinearGradient+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2653E2F42CBA6ADB001DC51A /* LinearGradient+Extension.swift */; };
+		2653E2FA2CBA97E8001DC51A /* Pretendard-SemiBold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 2653E2F92CBA97E8001DC51A /* Pretendard-SemiBold.otf */; };
+		2653E2FC2CBA97F7001DC51A /* Pretendard-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = 2653E2FB2CBA97F7001DC51A /* Pretendard-Regular.otf */; };
+		2653E2FE2CBA9803001DC51A /* Pretendard-Medium.otf in Resources */ = {isa = PBXBuildFile; fileRef = 2653E2FD2CBA9803001DC51A /* Pretendard-Medium.otf */; };
+		2653E3052CBBE615001DC51A /* FontAsset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2653E3042CBBE615001DC51A /* FontAsset.swift */; };
+		2653E3082CBBE695001DC51A /* PretendardFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2653E3072CBBE695001DC51A /* PretendardFont.swift */; };
 		26890B952CAE811A008DFF49 /* FiveGuyesApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26890B942CAE811A008DFF49 /* FiveGuyesApp.swift */; };
 		26890B972CAE811A008DFF49 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26890B962CAE811A008DFF49 /* ContentView.swift */; };
 		26890B992CAE811D008DFF49 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 26890B982CAE811D008DFF49 /* Assets.xcassets */; };
@@ -25,16 +30,22 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		2653E2C32CB78B9C001DC51A /* AnimatedImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatedImageView.swift; sourceTree = "<group>"; };
-		2653E2C52CB7979A001DC51A /* ImageSlideView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageSlideView.swift; sourceTree = "<group>"; };
-		2653E2C72CB7A689001DC51A /* ImageAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageAnimation.swift; sourceTree = "<group>"; };
-		2653E2C92CB7A775001DC51A /* View+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Extension.swift"; sourceTree = "<group>"; };
-
 		1A4068A02CB6650200F1F288 /* GalleryPickerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = GalleryPickerViewModel.swift; path = FiveGuyes/Sources/GalleryPickerViewModel.swift; sourceTree = SOURCE_ROOT; };
 		1AF815202CB7B1870073A523 /* ImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ImageView.swift; path = FiveGuyes/Sources/Views/ImageView.swift; sourceTree = SOURCE_ROOT; };
 		1AF815222CB7B1B10073A523 /* CameraPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CameraPickerView.swift; path = FiveGuyes/Sources/Views/CameraPickerView.swift; sourceTree = SOURCE_ROOT; };
 		1AF815242CB7C2E80073A523 /* Photo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Photo.swift; path = FiveGuyes/Sources/Photo.swift; sourceTree = SOURCE_ROOT; };
 		1AF815262CB7CAD30073A523 /* CameraPickerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CameraPickerViewModel.swift; path = FiveGuyes/Sources/CameraPickerViewModel.swift; sourceTree = SOURCE_ROOT; };
+		2653E2C32CB78B9C001DC51A /* AnimatedImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatedImageView.swift; sourceTree = "<group>"; };
+		2653E2C52CB7979A001DC51A /* ImageSlideView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageSlideView.swift; sourceTree = "<group>"; };
+		2653E2C72CB7A689001DC51A /* ImageAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageAnimation.swift; sourceTree = "<group>"; };
+		2653E2C92CB7A775001DC51A /* View+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Extension.swift"; sourceTree = "<group>"; };
+		2653E2F42CBA6ADB001DC51A /* LinearGradient+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LinearGradient+Extension.swift"; sourceTree = "<group>"; };
+		2653E2F92CBA97E8001DC51A /* Pretendard-SemiBold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Pretendard-SemiBold.otf"; sourceTree = "<group>"; };
+		2653E2FB2CBA97F7001DC51A /* Pretendard-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Pretendard-Regular.otf"; sourceTree = "<group>"; };
+		2653E2FD2CBA9803001DC51A /* Pretendard-Medium.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Pretendard-Medium.otf"; sourceTree = "<group>"; };
+		2653E2FF2CBA985A001DC51A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		2653E3042CBBE615001DC51A /* FontAsset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontAsset.swift; sourceTree = "<group>"; };
+		2653E3072CBBE695001DC51A /* PretendardFont.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PretendardFont.swift; sourceTree = "<group>"; };
 		26890B912CAE811A008DFF49 /* FiveGuyes.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FiveGuyes.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		26890B942CAE811A008DFF49 /* FiveGuyesApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FiveGuyesApp.swift; sourceTree = "<group>"; };
 		26890B962CAE811A008DFF49 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -80,6 +91,7 @@
 			isa = PBXGroup;
 			children = (
 				2653E2C92CB7A775001DC51A /* View+Extension.swift */,
+				2653E2F42CBA6ADB001DC51A /* LinearGradient+Extension.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -107,6 +119,34 @@
 			path = Shared;
 			sourceTree = "<group>";
 		};
+		2653E2F82CBA9744001DC51A /* Pretendard */ = {
+			isa = PBXGroup;
+			children = (
+				2653E3072CBBE695001DC51A /* PretendardFont.swift */,
+				2653E3062CBBE646001DC51A /* FontFiles */,
+			);
+			path = Pretendard;
+			sourceTree = "<group>";
+		};
+		2653E3062CBBE646001DC51A /* FontFiles */ = {
+			isa = PBXGroup;
+			children = (
+				2653E2F92CBA97E8001DC51A /* Pretendard-SemiBold.otf */,
+				2653E2FB2CBA97F7001DC51A /* Pretendard-Regular.otf */,
+				2653E2FD2CBA9803001DC51A /* Pretendard-Medium.otf */,
+			);
+			path = FontFiles;
+			sourceTree = "<group>";
+		};
+		2653E3092CBBE70E001DC51A /* FontAsset */ = {
+			isa = PBXGroup;
+			children = (
+				2653E3042CBBE615001DC51A /* FontAsset.swift */,
+				2653E2F82CBA9744001DC51A /* Pretendard */,
+			);
+			path = FontAsset;
+			sourceTree = "<group>";
+		};
 		26890B882CAE811A008DFF49 = {
 			isa = PBXGroup;
 			children = (
@@ -126,6 +166,7 @@
 		26890B932CAE811A008DFF49 /* FiveGuyes */ = {
 			isa = PBXGroup;
 			children = (
+				2653E2FF2CBA985A001DC51A /* Info.plist */,
 				26890B942CAE811A008DFF49 /* FiveGuyesApp.swift */,
 				26890BBC2CAE98E2008DFF49 /* .swiftlint.yml */,
 				26890BAD2CAE903E008DFF49 /* Resources */,
@@ -147,6 +188,7 @@
 			isa = PBXGroup;
 			children = (
 				26890B982CAE811D008DFF49 /* Assets.xcassets */,
+				2653E3092CBBE70E001DC51A /* FontAsset */,
 				2653E2BF2CB687EA001DC51A /* Extensions */,
 			);
 			path = Resources;
@@ -251,7 +293,10 @@
 			files = (
 				26890BBD2CAE98E2008DFF49 /* .swiftlint.yml in Resources */,
 				26890B9C2CAE811D008DFF49 /* Preview Assets.xcassets in Resources */,
+				2653E2FC2CBA97F7001DC51A /* Pretendard-Regular.otf in Resources */,
 				26890B992CAE811D008DFF49 /* Assets.xcassets in Resources */,
+				2653E2FA2CBA97E8001DC51A /* Pretendard-SemiBold.otf in Resources */,
+				2653E2FE2CBA9803001DC51A /* Pretendard-Medium.otf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -264,12 +309,15 @@
 			files = (
 				1AF815272CB7CAD30073A523 /* CameraPickerViewModel.swift in Sources */,
 				1AF815252CB7C2E80073A523 /* Photo.swift in Sources */,
+				2653E2F52CBA6ADB001DC51A /* LinearGradient+Extension.swift in Sources */,
 				1A4068A12CB6650200F1F288 /* GalleryPickerViewModel.swift in Sources */,
 				26890B972CAE811A008DFF49 /* ContentView.swift in Sources */,
 				1AF815212CB7B1870073A523 /* ImageView.swift in Sources */,
 				26890B952CAE811A008DFF49 /* FiveGuyesApp.swift in Sources */,
+				2653E3082CBBE695001DC51A /* PretendardFont.swift in Sources */,
 				2653E2C62CB7979A001DC51A /* ImageSlideView.swift in Sources */,
 				2653E2C42CB78B9C001DC51A /* AnimatedImageView.swift in Sources */,
+				2653E3052CBBE615001DC51A /* FontAsset.swift in Sources */,
 				2653E2CA2CB7A775001DC51A /* View+Extension.swift in Sources */,
 				2653E2C82CB7A689001DC51A /* ImageAnimation.swift in Sources */,
 				1AF815232CB7B1B10073A523 /* CameraPickerView.swift in Sources */,
@@ -416,6 +464,7 @@
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = FiveGuyes/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -451,6 +500,7 @@
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = FiveGuyes/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
