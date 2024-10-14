@@ -82,6 +82,7 @@ struct CustomDatePicker: View {
                     
                     Text(dayFormatter.string(from: date))
                         .font(.system(size: 20))
+                        .fontWeight(isStartDate || isEndDate ? .semibold : .regular)
                         .frame(width: 44, height: 44)
                         .background(isStartDate || isEndDate ? Color(red: 0.5, green: 0.37, blue: 1) : (isInRange ? Color(red: 0.5, green: 0.37, blue: 1).opacity(0.3) : Color.clear))
                         .foregroundColor(isStartDate || isEndDate ? .white : .black)
