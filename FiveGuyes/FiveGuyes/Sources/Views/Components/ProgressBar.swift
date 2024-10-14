@@ -19,68 +19,17 @@ struct ProgressBar: View {
                 Rectangle()
                     .fill(Color(red: 0.85, green: 0.85, blue: 0.85))
                     .frame(height: 1)
-                // 동그라미
-                HStack(alignment: .center) {
-                    VStack {
-                        Circle()
-                            .fill( Color(red: 0.85, green: 0.85, blue: 0.85))
-                        
-                            .onTapGesture {
-                                navigationRouter.push(.photo)
-                            }
-                    }
-                    Spacer()
-                    VStack {
-                        Circle().fill(Color(red: 0.85, green: 0.85, blue: 0.85))
-                            .frame(width: 20, height: 20)
-                    }
-                    .onTapGesture {
-                        navigationRouter.push(.emotion)
-                                               }
-                    Spacer()
-                    VStack {
-                        Circle().fill(Color(red: 0.85, green: 0.85, blue: 0.85))
-                            .frame(width: 20, height: 20)
-                        
-                    }
-                    .onTapGesture {
-                        navigationRouter.push(.complete)
-                                               }
-                }
-                Spacer()
-                    .frame(height: 2.5)
-                // 설명
                 HStack {
-                    Text("사진")
-                        .font(
-                            Font.custom("Pretendard", size: 14)
-                                .weight(.medium)
-                        )
-                        .multilineTextAlignment(.center)
-                        .foregroundColor(Color(red: 0.56, green: 0.56, blue: 0.58))
+                    // 동그라미
+                    ProgressCircle(text: "사진")
                     Spacer()
-                    Text("사진")
-                        .font(
-                            Font.custom("Pretendard", size: 14)
-                                .weight(.medium)
-                        )
-                        .multilineTextAlignment(.center)
-                        .foregroundColor(Color(red: 0.56, green: 0.56, blue: 0.58))
+                    ProgressCircle(text: "감정")
                     Spacer()
-                    Text("사진")
-                        .font(
-                            Font.custom("Pretendard", size: 14)
-                                .weight(.medium)
-                        )
-                        .multilineTextAlignment(.center)
-                        .foregroundColor(Color(red: 0.56, green: 0.56, blue: 0.58))
-                    
+                    ProgressCircle(text: "완료")
                 }
                 .padding(.horizontal, 31.5)
             }
-            
         }
         .padding(.horizontal, 34)
     }
 }
-

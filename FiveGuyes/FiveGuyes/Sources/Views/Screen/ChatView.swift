@@ -19,6 +19,7 @@ struct ChatView: View {
                     Title()
                     Spacer()
                         .frame(height: 28)
+                    
                     ProgressBar()
                     Spacer()
                         .frame(height: 28)
@@ -31,7 +32,7 @@ struct ChatView: View {
                     
                     // 말풍선 컴포넌트
                     ChatBotBubble(message: "여행 기간을 알려주세요!")
-                   
+                    // 말풍선 사이 간격
                     Spacer()
                         .frame(height: 8)
                     // 내 말풍선 컴포넌트
@@ -39,10 +40,11 @@ struct ChatView: View {
                     
                     // 버튼
                     PurpleChatViewButton(text: "맞아")
-                    
+                    // 버튼 사이 간격
                     Spacer()
                         .frame(height: 8)
                     WhiteChatViewButton(text: "아니야")
+                        .padding(.bottom, 45)
                 }
                 .frame(width: 393, height: 54, alignment: .top)
                 
