@@ -12,6 +12,7 @@
 		1AF815232CB7B1B10073A523 /* CameraPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AF815222CB7B1B10073A523 /* CameraPickerView.swift */; };
 		1AF815252CB7C2E80073A523 /* Photo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AF815242CB7C2E80073A523 /* Photo.swift */; };
 		1AF815272CB7CAD30073A523 /* CameraPickerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AF815262CB7CAD30073A523 /* CameraPickerViewModel.swift */; };
+		2466F7712CBC43F80019F1A0 /* DatePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2466F7702CBC43F80019F1A0 /* DatePickerView.swift */; };
 		2653E2C42CB78B9C001DC51A /* AnimatedImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2653E2C32CB78B9C001DC51A /* AnimatedImageView.swift */; };
 		2653E2C62CB7979A001DC51A /* ImageSlideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2653E2C52CB7979A001DC51A /* ImageSlideView.swift */; };
 		2653E2C82CB7A689001DC51A /* ImageAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2653E2C72CB7A689001DC51A /* ImageAnimation.swift */; };
@@ -35,6 +36,7 @@
 		1AF815222CB7B1B10073A523 /* CameraPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CameraPickerView.swift; path = FiveGuyes/Sources/Views/CameraPickerView.swift; sourceTree = SOURCE_ROOT; };
 		1AF815242CB7C2E80073A523 /* Photo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Photo.swift; path = FiveGuyes/Sources/Photo.swift; sourceTree = SOURCE_ROOT; };
 		1AF815262CB7CAD30073A523 /* CameraPickerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CameraPickerViewModel.swift; path = FiveGuyes/Sources/CameraPickerViewModel.swift; sourceTree = SOURCE_ROOT; };
+		2466F7702CBC43F80019F1A0 /* DatePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatePickerView.swift; sourceTree = "<group>"; };
 		2653E2C32CB78B9C001DC51A /* AnimatedImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatedImageView.swift; sourceTree = "<group>"; };
 		2653E2C52CB7979A001DC51A /* ImageSlideView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageSlideView.swift; sourceTree = "<group>"; };
 		2653E2C72CB7A689001DC51A /* ImageAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageAnimation.swift; sourceTree = "<group>"; };
@@ -200,6 +202,7 @@
 				1A4068A02CB6650200F1F288 /* GalleryPickerViewModel.swift */,
 				1AF815262CB7CAD30073A523 /* CameraPickerViewModel.swift */,
 				1AF815242CB7C2E80073A523 /* Photo.swift */,
+				2466F7702CBC43F80019F1A0 /* DatePickerView.swift */,
 				2653E2A82CB3ACF0001DC51A /* Models */,
 				2653E2A92CB3ACF8001DC51A /* Stores */,
 				26890BB12CAE90E4008DFF49 /* Views */,
@@ -315,6 +318,7 @@
 				1AF815212CB7B1870073A523 /* ImageView.swift in Sources */,
 				26890B952CAE811A008DFF49 /* FiveGuyesApp.swift in Sources */,
 				2653E3082CBBE695001DC51A /* PretendardFont.swift in Sources */,
+				2466F7712CBC43F80019F1A0 /* DatePickerView.swift in Sources */,
 				2653E2C62CB7979A001DC51A /* ImageSlideView.swift in Sources */,
 				2653E2C42CB78B9C001DC51A /* AnimatedImageView.swift in Sources */,
 				2653E3052CBBE615001DC51A /* FontAsset.swift in Sources */,
