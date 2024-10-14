@@ -10,17 +10,9 @@ import SwiftUI
 struct DatePickerView: View {
     @State private var startDate: Date = Date()
     @State private var endDate: Date = Date()
-    
-    var body: some View {
-        CustomDatePicker(startDate: $startDate, endDate: $endDate)
-    }
-}
-
-struct CustomDatePicker: View {
-    @Binding var startDate: Date
-    @Binding var endDate: Date
-    
+    @State private var currentDate: Date = Date()
     private let calendar = Calendar.current
+    
     private let monthFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "ko_KR")
@@ -34,7 +26,6 @@ struct CustomDatePicker: View {
         return formatter
     }()
     
-    @State private var currentDate: Date = Date()
     private var daysInMonth: [Date] {
         guard let monthRange = calendar.range(of: .day, in: .month, for: currentDate) else { return [] }
         return monthRange.compactMap {
@@ -49,28 +40,9 @@ struct CustomDatePicker: View {
                     .fontWeight(.semibold)
                     .font(.system(size: 20))
                 Spacer()
-                HStack(spacing: 28) {
-                    Button(action: moveToPreviousMonth) {
-                        Image(systemName: "chevron.left")
-                            .font(
-                                Font.custom("SF Pro", size: 20)
-                                    .weight(.medium)
-                            )
-                            .multilineTextAlignment(.center)
-                            .foregroundColor(Color(red: 0.5, green: 0.37, blue: 1))
-                            .frame(width: 15, height: 24, alignment: .top)
-                        
-                    }
-                    Button(action: moveToNextMonth) {
-                        Image(systemName: "chevron.right")
-                            .font(
-                                Font.custom("SF Pro", size: 20)
-                                    .weight(.medium)
-                            )
-                            .multilineTextAlignment(.center)
-                            .foregroundColor(Color(red: 0.5, green: 0.37, blue: 1))
-                            .frame(width: 15, height: 24, alignment: .top)
-                    }
+                HStack(spacing: 30) {
+                    createMonthButton(action: moveToPreviousMonth, imageName: "chevron.left")
+                    createMonthButton(action: moveToNextMonth, imageName: "chevron.right")
                 }
             }
             
@@ -94,7 +66,7 @@ struct CustomDatePicker: View {
             }
             
             Button {
-                // 기간 선택 후 로직 작성
+                // TODO: 기간 선택 후 로직 작성
             } label: {
                 HStack(alignment: .center, spacing: 10) {
                     Text("선택 완료")
@@ -107,7 +79,16 @@ struct CustomDatePicker: View {
                 .cornerRadius(16)
             }
         }
-        .padding(.horizontal, 16)
+        .padding(.horizontal, 20)
+    }
+    
+    private func createMonthButton(action: @escaping () -> Void, imageName: String) -> some View {
+        Button(action: action) {
+            Image(systemName: imageName)
+                .resizable()
+                .frame(width: 10, height: 18, alignment: .top)
+                .foregroundColor(.primeryPurple)
+        }
     }
     
     private func moveToPreviousMonth() {
