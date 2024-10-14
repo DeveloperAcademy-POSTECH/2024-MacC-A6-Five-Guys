@@ -6,8 +6,8 @@
 //
 
 import CoreLocation
-import SwiftUI
 import Photos
+import SwiftUI
 
 struct LoadMetadataView: UIViewControllerRepresentable {
     class Coordinator: NSObject, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
@@ -20,13 +20,15 @@ struct LoadMetadataView: UIViewControllerRepresentable {
         func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
             if let asset = info[.phAsset] as? PHAsset {
                 let imageLoader = ImageLoader()
-                imageLoader.loadImage(for: asset) { image in
+                
+                Task {
+                    let image = await imageLoader.loadImage(for: asset)
                     self.parent.selectedImage = image
+                    
                     let metadataLoader = MetadataLoader()
-                    metadataLoader.loadMetadata(for: asset) { imageMetadata in
-                        self.parent.imageMetadata = imageMetadata
-                        self.parent.locationName = imageMetadata?.location
-                    }
+                    let imageMetadata = await metadataLoader.loadMetadata(for: asset)
+                    self.parent.imageMetadata = imageMetadata
+                    self.parent.locationName = imageMetadata?.location
                 }
             }
             parent.presentationMode.wrappedValue.dismiss()
@@ -41,7 +43,7 @@ struct LoadMetadataView: UIViewControllerRepresentable {
     @Binding var selectedImage: UIImage?
     @Binding var imageMetadata: ImageMetadata?
     @Binding var locationName: String?
-
+    
     func makeUIViewController(context: Context) -> UIImagePickerController {
         let picker = UIImagePickerController()
         picker.delegate = context.coordinator
@@ -52,7 +54,7 @@ struct LoadMetadataView: UIViewControllerRepresentable {
     
     func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {
     }
-
+    
     func makeCoordinator() -> Coordinator {
         Coordinator(self)
     }

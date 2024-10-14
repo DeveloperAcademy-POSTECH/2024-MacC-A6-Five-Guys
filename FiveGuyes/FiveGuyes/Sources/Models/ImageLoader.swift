@@ -9,13 +9,14 @@ import Photos
 import UIKit
 
 class ImageLoader {
-    func loadImage(for asset: PHAsset, completion: @escaping (UIImage?) -> Void) {
+    func loadImage(for asset: PHAsset) async -> UIImage? {
         let options = PHImageRequestOptions()
-        options.isSynchronous = true
+        options.isSynchronous = false
         options.deliveryMode = .highQualityFormat
-        
-        PHImageManager.default().requestImage(for: asset, targetSize: CGSize(width: 300, height: 300), contentMode: .aspectFit, options: options) { image, _ in
-            completion(image)
+        return await withCheckedContinuation { continuation in
+            PHImageManager.default().requestImage(for: asset, targetSize: CGSize(width: 300, height: 300), contentMode: .aspectFit, options: options) { image, _ in
+                continuation.resume(returning: image)
+            }
         }
     }
 }
