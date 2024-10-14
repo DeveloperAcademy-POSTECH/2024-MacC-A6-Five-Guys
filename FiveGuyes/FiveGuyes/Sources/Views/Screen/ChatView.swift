@@ -14,7 +14,8 @@ struct ChatView: View {
     var body: some View {
         NavigationStack(path: $navigationRouter.paths) {
             ZStack(alignment: .top) {
-                VStack(spacing: 0) {                    // 여행기록하기 네비게이션 bar
+                VStack(spacing: 0) {                    
+                    // 여행기록하기 네비게이션 bar
                     Title()
                     Spacer()
                         .frame(height: 28)
@@ -22,68 +23,41 @@ struct ChatView: View {
                     Spacer()
                         .frame(height: 28)
                     // 말풍선 컴포넌트
-                    HStack(alignment: .center, spacing: 10) {
-                        // 텍스트필드
-                        Text("반가워요. 유경님의 여행추억을\n대신 기억해주는 챗봇이에요!")
-                            .font(Font.custom("Pretendard", size: 20))
-                            .foregroundColor(Color(red: 0.12, green: 0.12, blue: 0.12))
-                    }
-                    .padding(.horizontal, 20)
-                    .padding(.vertical, 16)
-                    .background(Color(red: 0.95, green: 0.95, blue: 0.95))
-                    .clipShape(AiChatBubble(radius: 16, corners: [.topLeft, .topRight, .bottomRight]))
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.leading, 16)
+                    ChatBotBubble(message: "반가워요. 유경님의 여행추억을\n대신 기억해주는 챗봇이에요!")
                     
                     // 말풍선 사이 간격
                     Spacer()
                         .frame(height: 8)
                     
                     // 말풍선 컴포넌트
-                    HStack(alignment: .center, spacing: 10) {
-                        // Body1/Regular
-                        Text("여행 기간을 알려주세요!")
-                            .font(Font.custom("Pretendard", size: 20))
-                            .foregroundColor(Color(red: 0.12, green: 0.12, blue: 0.12))
-                    }
-                    .padding(.horizontal, 20)
-                    .padding(.vertical, 16)
-                    .background(Color(red: 0.95, green: 0.95, blue: 0.95))
-                    .clipShape(AiChatBubble(radius: 16, corners: [.topLeft, .topRight, .bottomRight]))
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.leading, 16)
+                    ChatBotBubble(message: "여행 기간을 알려주세요!")
+                   
                     Spacer()
                         .frame(height: 8)
                     // 내 말풍선 컴포넌트
-                    HStack(alignment: .center, spacing: 10) {
-                        // Body1/Regular
-                        Text("6박 7일, 이번주 토요일까지야")
-                            .font(Font.custom("Pretendard", size: 20))
-                            .foregroundColor(Color(red: 0.12, green: 0.12, blue: 0.12))
-                        
-                    }
-                    .padding(.horizontal, 20)
-                    .padding(.vertical, 16)
-                    .background(Color(red: 0.94, green: 0.93, blue: 1))
-                    .clipShape(MyChatBubble(radius: 16, corners: [.topLeft, .topRight, .bottomLeft]))
-                    .frame(maxWidth: .infinity, alignment: .trailing)
-                    .padding(.trailing, 16)
+                    MyChatBubble(message: "6박 7일, 이번주 토요일까지야")
+                    
+                    // 버튼
+                    PurpleChatViewButton(text: "맞아")
+                    
+                    Spacer()
+                        .frame(height: 8)
+                    WhiteChatViewButton(text: "아니야")
                 }
                 .frame(width: 393, height: 54, alignment: .top)
                 
             }
-          //  .frame(width: 393, height: 852)
             .background(.white)
            
         }
         .navigationDestination(for: ChatViewRoute.self) { route in
             switch route {
             case .photo:
-               PhotoChatView()
+               Text("사진으로 넘어감")
             case .emotion:
-               EmotionChatView()
+                Text("감정으로 넘어감")
             case .complete:
-                CompleteChatView()
+                Text("완료로 넘어감")
             }
         }
         .environmentObject(navigationRouter)

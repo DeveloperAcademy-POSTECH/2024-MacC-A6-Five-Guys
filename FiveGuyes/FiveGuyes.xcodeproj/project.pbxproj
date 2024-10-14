@@ -10,12 +10,11 @@
 		1A4068A12CB6650200F1F288 /* GalleryPickerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A4068A02CB6650200F1F288 /* GalleryPickerViewModel.swift */; };
 		1A8C66162CBD0E270025DDB5 /* Router.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A8C66152CBD0E270025DDB5 /* Router.swift */; };
 		1A8C66182CBD0E640025DDB5 /* ChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A8C66172CBD0E640025DDB5 /* ChatView.swift */; };
-		1A8C661A2CBD0E8C0025DDB5 /* CompleteChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A8C66192CBD0E8C0025DDB5 /* CompleteChatView.swift */; };
-		1A8C661C2CBD0EAB0025DDB5 /* ChatBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A8C661B2CBD0EAB0025DDB5 /* ChatBubble.swift */; };
-		1A8C661E2CBD0EC40025DDB5 /* EmotionChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A8C661D2CBD0EC40025DDB5 /* EmotionChatView.swift */; };
-		1A8C66202CBD0EDC0025DDB5 /* PhotoChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A8C661F2CBD0EDC0025DDB5 /* PhotoChatView.swift */; };
+		1A8C661C2CBD0EAB0025DDB5 /* ChatBubbleDesign.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A8C661B2CBD0EAB0025DDB5 /* ChatBubbleDesign.swift */; };
 		1A8C66222CBD56DF0025DDB5 /* Title.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A8C66212CBD56DF0025DDB5 /* Title.swift */; };
 		1A8C66242CBD57020025DDB5 /* ProgressBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A8C66232CBD57020025DDB5 /* ProgressBar.swift */; };
+		1A8C66262CBD595A0025DDB5 /* ChatBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A8C66252CBD595A0025DDB5 /* ChatBubble.swift */; };
+		1A8C66282CBD5AFB0025DDB5 /* ChatViewButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A8C66272CBD5AFB0025DDB5 /* ChatViewButton.swift */; };
 		1AF815212CB7B1870073A523 /* ImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AF815202CB7B1870073A523 /* ImageView.swift */; };
 		1AF815232CB7B1B10073A523 /* CameraPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AF815222CB7B1B10073A523 /* CameraPickerView.swift */; };
 		1AF815252CB7C2E80073A523 /* Photo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AF815242CB7C2E80073A523 /* Photo.swift */; };
@@ -41,12 +40,11 @@
 		1A4068A02CB6650200F1F288 /* GalleryPickerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = GalleryPickerViewModel.swift; path = FiveGuyes/Sources/GalleryPickerViewModel.swift; sourceTree = SOURCE_ROOT; };
 		1A8C66152CBD0E270025DDB5 /* Router.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Router.swift; sourceTree = "<group>"; };
 		1A8C66172CBD0E640025DDB5 /* ChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatView.swift; sourceTree = "<group>"; };
-		1A8C66192CBD0E8C0025DDB5 /* CompleteChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompleteChatView.swift; sourceTree = "<group>"; };
-		1A8C661B2CBD0EAB0025DDB5 /* ChatBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatBubble.swift; sourceTree = "<group>"; };
-		1A8C661D2CBD0EC40025DDB5 /* EmotionChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmotionChatView.swift; sourceTree = "<group>"; };
-		1A8C661F2CBD0EDC0025DDB5 /* PhotoChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoChatView.swift; sourceTree = "<group>"; };
+		1A8C661B2CBD0EAB0025DDB5 /* ChatBubbleDesign.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatBubbleDesign.swift; sourceTree = "<group>"; };
 		1A8C66212CBD56DF0025DDB5 /* Title.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Title.swift; sourceTree = "<group>"; };
 		1A8C66232CBD57020025DDB5 /* ProgressBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressBar.swift; sourceTree = "<group>"; };
+		1A8C66252CBD595A0025DDB5 /* ChatBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatBubble.swift; sourceTree = "<group>"; };
+		1A8C66272CBD5AFB0025DDB5 /* ChatViewButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewButton.swift; sourceTree = "<group>"; };
 		1AF815202CB7B1870073A523 /* ImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ImageView.swift; path = FiveGuyes/Sources/Views/ImageView.swift; sourceTree = SOURCE_ROOT; };
 		1AF815222CB7B1B10073A523 /* CameraPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CameraPickerView.swift; path = FiveGuyes/Sources/Views/CameraPickerView.swift; sourceTree = SOURCE_ROOT; };
 		1AF815242CB7C2E80073A523 /* Photo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Photo.swift; path = FiveGuyes/Sources/Photo.swift; sourceTree = SOURCE_ROOT; };
@@ -126,9 +124,6 @@
 				2653E2C32CB78B9C001DC51A /* AnimatedImageView.swift */,
 				2653E2C52CB7979A001DC51A /* ImageSlideView.swift */,
 				1A8C66172CBD0E640025DDB5 /* ChatView.swift */,
-				1A8C66192CBD0E8C0025DDB5 /* CompleteChatView.swift */,
-				1A8C661D2CBD0EC40025DDB5 /* EmotionChatView.swift */,
-				1A8C661F2CBD0EDC0025DDB5 /* PhotoChatView.swift */,
 			);
 			path = Screen;
 			sourceTree = "<group>";
@@ -246,9 +241,11 @@
 		26890BB52CAE9116008DFF49 /* Components */ = {
 			isa = PBXGroup;
 			children = (
-				1A8C661B2CBD0EAB0025DDB5 /* ChatBubble.swift */,
+				1A8C661B2CBD0EAB0025DDB5 /* ChatBubbleDesign.swift */,
 				1A8C66212CBD56DF0025DDB5 /* Title.swift */,
 				1A8C66232CBD57020025DDB5 /* ProgressBar.swift */,
+				1A8C66252CBD595A0025DDB5 /* ChatBubble.swift */,
+				1A8C66272CBD5AFB0025DDB5 /* ChatViewButton.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -336,20 +333,19 @@
 				2653E2F52CBA6ADB001DC51A /* LinearGradient+Extension.swift in Sources */,
 				1A4068A12CB6650200F1F288 /* GalleryPickerViewModel.swift in Sources */,
 				1A8C66182CBD0E640025DDB5 /* ChatView.swift in Sources */,
-				1A8C661A2CBD0E8C0025DDB5 /* CompleteChatView.swift in Sources */,
+				1A8C66282CBD5AFB0025DDB5 /* ChatViewButton.swift in Sources */,
 				26890B972CAE811A008DFF49 /* ContentView.swift in Sources */,
-				1A8C661C2CBD0EAB0025DDB5 /* ChatBubble.swift in Sources */,
+				1A8C661C2CBD0EAB0025DDB5 /* ChatBubbleDesign.swift in Sources */,
 				1AF815212CB7B1870073A523 /* ImageView.swift in Sources */,
 				26890B952CAE811A008DFF49 /* FiveGuyesApp.swift in Sources */,
 				1A8C66162CBD0E270025DDB5 /* Router.swift in Sources */,
 				2653E3082CBBE695001DC51A /* PretendardFont.swift in Sources */,
 				1A8C66242CBD57020025DDB5 /* ProgressBar.swift in Sources */,
 				2653E2C62CB7979A001DC51A /* ImageSlideView.swift in Sources */,
-				1A8C661E2CBD0EC40025DDB5 /* EmotionChatView.swift in Sources */,
 				2653E2C42CB78B9C001DC51A /* AnimatedImageView.swift in Sources */,
-				1A8C66202CBD0EDC0025DDB5 /* PhotoChatView.swift in Sources */,
 				1A8C66222CBD56DF0025DDB5 /* Title.swift in Sources */,
 				2653E3052CBBE615001DC51A /* FontAsset.swift in Sources */,
+				1A8C66262CBD595A0025DDB5 /* ChatBubble.swift in Sources */,
 				2653E2CA2CB7A775001DC51A /* View+Extension.swift in Sources */,
 				2653E2C82CB7A689001DC51A /* ImageAnimation.swift in Sources */,
 				1AF815232CB7B1B10073A523 /* CameraPickerView.swift in Sources */,

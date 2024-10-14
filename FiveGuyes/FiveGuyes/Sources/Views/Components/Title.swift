@@ -31,4 +31,3 @@ struct Title: View {
         .padding(.horizontal, 32)
     }
 }
-
