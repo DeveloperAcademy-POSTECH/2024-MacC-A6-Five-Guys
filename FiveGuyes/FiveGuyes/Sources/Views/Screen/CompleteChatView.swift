@@ -196,4 +196,3 @@ struct CompleteChatView: View {
 #Preview {
     CompleteChatView()
 }
-
