@@ -202,7 +202,6 @@
 				1A4068A02CB6650200F1F288 /* GalleryPickerViewModel.swift */,
 				1AF815262CB7CAD30073A523 /* CameraPickerViewModel.swift */,
 				1AF815242CB7C2E80073A523 /* Photo.swift */,
-				2466F7702CBC43F80019F1A0 /* DatePickerView.swift */,
 				2653E2A82CB3ACF0001DC51A /* Models */,
 				2653E2A92CB3ACF8001DC51A /* Stores */,
 				26890BB12CAE90E4008DFF49 /* Views */,
@@ -214,6 +213,7 @@
 		26890BB12CAE90E4008DFF49 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				2466F7702CBC43F80019F1A0 /* DatePickerView.swift */,
 				26890B962CAE811A008DFF49 /* ContentView.swift */,
 				1AF815202CB7B1870073A523 /* ImageView.swift */,
 				1AF815222CB7B1B10073A523 /* CameraPickerView.swift */,
