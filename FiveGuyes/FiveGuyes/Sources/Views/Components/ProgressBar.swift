@@ -18,16 +18,15 @@ struct ProgressBar: View {
                 // 프로그레스 바
                 Rectangle()
                     .fill(Color(red: 0.85, green: 0.85, blue: 0.85))
-                    .frame(height: 1)
-                HStack {
-                    // 동그라미
+                    .frame(width: 305, height: 1)
+                    .padding(.bottom, 18.5)
+                HStack(alignment: .center) {
                     ProgressCircle(text: "사진")
                     Spacer()
-                    ProgressCircle(text: "감정")
+                    ProgressCircle(text: "사진")
                     Spacer()
-                    ProgressCircle(text: "완료")
+                    ProgressCircle(text: "사진")
                 }
-                .padding(.horizontal, 31.5)
             }
         }
         .padding(.horizontal, 34)

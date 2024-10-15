@@ -37,17 +37,17 @@ struct ChatView: View {
                         .frame(height: 8)
                     // 내 말풍선 컴포넌트
                     MyChatBubble(message: "6박 7일, 이번주 토요일까지야")
-                    
-                    // 버튼
-                    PurpleChatViewButton(text: "맞아")
-                    // 버튼 사이 간격
-                    Spacer()
-                        .frame(height: 8)
-                    WhiteChatViewButton(text: "아니야")
-                        .padding(.bottom, 45)
+                   
                 }
                 .frame(width: 393, height: 54, alignment: .top)
-                
+                Spacer()
+                // 버튼
+                PurpleChatViewButton(text: "맞아")
+                // 버튼 사이 간격
+                Spacer()
+                    .frame(height: 8)
+                WhiteChatViewButton(text: "아니야")
+                    .padding(.bottom, 45)
             }
             .background(.white)
            
