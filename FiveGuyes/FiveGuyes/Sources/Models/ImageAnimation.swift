@@ -22,12 +22,11 @@ enum ImageAnimation {
         switch self {
         case .movedBy(let distance):
             view
-                .offset(x: isAnimating ? distance / 2 : -distance / 2)
-                .animation(.linear(duration: 2).repeatForever(autoreverses: false), value: isAnimating)
+                .offset(x: isAnimating ? distance / 2 : 0)
+                .animation(.linear(duration: 2), value: isAnimating)
         case .scale(let initialScale, let finalScale):
             view
                 .scaleEffect(isAnimating ? finalScale : initialScale)
-                .animation(.linear(duration: 2).repeatForever(autoreverses: false), value: isAnimating)
         }
     }
 }
