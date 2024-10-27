@@ -74,7 +74,7 @@
 			isa = PBXGroup;
 			children = (
 				26890B982CAE811D008DFF49 /* Assets.xcassets */,
-				26D852F82CCE408A0016239A /* Extensions */,
+				26D853002CCE44600016239A /* Extensions */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -82,10 +82,10 @@
 		26890BAE2CAE904A008DFF49 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				26D852FF2CCE40E40016239A /* Models */,
-				26D852FE2CCE40E00016239A /* Stores */,
+				26D853032CCE44730016239A /* Models */,
+				26D853022CCE44720016239A /* Stores */,
 				26890BB12CAE90E4008DFF49 /* Views */,
-				26D852FD2CCE40DC0016239A /* Protocols */,
+				26D853012CCE446F0016239A /* Protocols */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -94,19 +94,12 @@
 			isa = PBXGroup;
 			children = (
 				26890B962CAE811A008DFF49 /* ContentView.swift */,
-				26D852FA2CCE40930016239A /* Components */,
-				26D852F92CCE40930016239A /* Navigation */,
 				26D852FB2CCE40BC0016239A /* Screen */,
-				26D852FC2CCE40C60016239A /* Shared */,
+				26D852F92CCE40930016239A /* Navigation */,
+				26D853052CCE44970016239A /* Components */,
+				26D853042CCE44950016239A /* Shared */,
 			);
 			path = Views;
-			sourceTree = "<group>";
-		};
-		26D852F82CCE408A0016239A /* Extensions */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Extensions;
 			sourceTree = "<group>";
 		};
 		26D852F92CCE40930016239A /* Navigation */ = {
@@ -116,13 +109,6 @@
 			path = Navigation;
 			sourceTree = "<group>";
 		};
-		26D852FA2CCE40930016239A /* Components */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Components;
-			sourceTree = "<group>";
-		};
 		26D852FB2CCE40BC0016239A /* Screen */ = {
 			isa = PBXGroup;
 			children = (
@@ -130,32 +116,46 @@
 			path = Screen;
 			sourceTree = "<group>";
 		};
-		26D852FC2CCE40C60016239A /* Shared */ = {
+		26D853002CCE44600016239A /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
 			);
-			path = Shared;
+			path = Extensions;
 			sourceTree = "<group>";
 		};
-		26D852FD2CCE40DC0016239A /* Protocols */ = {
+		26D853012CCE446F0016239A /* Protocols */ = {
 			isa = PBXGroup;
 			children = (
 			);
 			path = Protocols;
 			sourceTree = "<group>";
 		};
-		26D852FE2CCE40E00016239A /* Stores */ = {
+		26D853022CCE44720016239A /* Stores */ = {
 			isa = PBXGroup;
 			children = (
 			);
 			path = Stores;
 			sourceTree = "<group>";
 		};
-		26D852FF2CCE40E40016239A /* Models */ = {
+		26D853032CCE44730016239A /* Models */ = {
 			isa = PBXGroup;
 			children = (
 			);
 			path = Models;
+			sourceTree = "<group>";
+		};
+		26D853042CCE44950016239A /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		26D853052CCE44970016239A /* Components */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Components;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
