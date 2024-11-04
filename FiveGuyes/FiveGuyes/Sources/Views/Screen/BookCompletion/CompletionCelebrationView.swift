@@ -54,10 +54,14 @@ struct CompletionCelebrationView: View {
             .foregroundStyle(.green)
             .padding(.vertical, 4)
             .padding(.horizontal, 8)
-            .background(
-                .white,
-                in: RoundedRectangle(cornerRadius: 8)
-            )
+        //            .background(
+        //                .white,
+        //                in: RoundedRectangle(cornerRadius: 8)
+        //            )
+            .background {
+                RoundedRectangle(cornerRadius: 8)
+                    .foregroundColor(.white)
+            }
     }
     
     private var celebrationMessage: some View {
@@ -81,7 +85,6 @@ struct CompletionCelebrationView: View {
                     .frame(height: 80)
                     .offset(y: -75)
             }
-        
     }
     
     private var readingSummary: some View {
@@ -90,26 +93,25 @@ struct CompletionCelebrationView: View {
             .foregroundStyle(.black)
             .padding(.vertical, 4)
             .padding(.horizontal, 10)
-            .background(
-                .white,
-                in: RoundedRectangle(cornerRadius: 8)
-            )
+            .background {
+                RoundedRectangle(cornerRadius: 8)
+                    .foregroundColor(.white)
+            }
     }
     
     private var reflectionButton: some View {
         NavigationLink {
-            CompletionReflectionView()
+            CompletionReviewView()
         } label: {
             Text("완독 소감 작성하기")
                 .font(.system(size: 20, weight: .semibold))
                 .foregroundStyle(.white)
                 .frame(maxWidth: .infinity)
                 .frame(height: 56)
-                .background(
-                    Color.green.opacity(0.9),
-                    in: RoundedRectangle(
-                        cornerRadius: 16)
-                )
+                .background {
+                    RoundedRectangle(cornerRadius: 16)
+                        .foregroundColor(.green)
+                }
         }
     }
 }
