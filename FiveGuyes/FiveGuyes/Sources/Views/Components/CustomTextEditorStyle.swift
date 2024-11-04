@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+// TODO: 폰트, 컬러 수정하기
 struct CustomTextEditorStyle: ViewModifier {
     let placeholder: String
     @Binding var text: String
@@ -22,6 +23,7 @@ struct CustomTextEditorStyle: ViewModifier {
             .autocorrectionDisabled()
             .background(Color(red: 0.93, green: 0.97, blue: 0.95))
             .opacity(0.8)
+            .foregroundStyle(.black)
             .clipShape(RoundedRectangle(cornerRadius: 16))
             .scrollContentBackground(.hidden)
             .font(.system(size: 14))
