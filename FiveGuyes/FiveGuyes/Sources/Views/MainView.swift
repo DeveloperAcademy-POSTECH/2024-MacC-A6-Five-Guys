@@ -48,7 +48,7 @@ struct MainView: View {
                     }
                 }
                 
-                HStack(spacing: 20) {
+                HStack(spacing: 16) {
                     Button {
                         // TODO: 만약 책이 등록되면 활성화 - 전체 캘린더 뷰로 이동
                     } label: {
@@ -57,7 +57,8 @@ struct MainView: View {
                             Text("전체")
                         }
                         .font(.system(size: 20))
-                        .padding(16)
+                        .padding(.vertical, 16)
+                        .padding(.horizontal, 18)
                         .foregroundColor(Color.gray)
                         .background(Color(red: 0.98, green: 1, blue: 0.99))
                         .overlay(
@@ -76,7 +77,7 @@ struct MainView: View {
                         }
                         .font(.system(size: 20))
                         .padding(.vertical, 16)
-                        .padding(.horizontal, 30)
+                        .padding(.horizontal, 33)
                         .foregroundColor(Color.white)
                         .fontWeight(.semibold)
                         .background(Color.green)
