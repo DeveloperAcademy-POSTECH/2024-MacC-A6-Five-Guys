@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		264440502CD8A3AC0031A290 /* CompletionReflectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2644404F2CD8A3AC0031A290 /* CompletionReflectionView.swift */; };
 		264440532CD8B1540031A290 /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 264440522CD8B1540031A290 /* String+Extension.swift */; };
 		264440552CD8E0100031A290 /* KeyboardObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 264440542CD8E0100031A290 /* KeyboardObserver.swift */; };
 		264440572CD8E0D20031A290 /* CustomTextEditorStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 264440562CD8E0D20031A290 /* CustomTextEditorStyle.swift */; };
@@ -18,6 +19,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		2644404F2CD8A3AC0031A290 /* CompletionReflectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletionReflectionView.swift; sourceTree = "<group>"; };
 		264440522CD8B1540031A290 /* String+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Extension.swift"; sourceTree = "<group>"; };
 		264440542CD8E0100031A290 /* KeyboardObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardObserver.swift; sourceTree = "<group>"; };
 		264440562CD8E0D20031A290 /* CustomTextEditorStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTextEditorStyle.swift; sourceTree = "<group>"; };
@@ -40,6 +42,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		264440512CD8A3B50031A290 /* BookCompletion */ = {
+			isa = PBXGroup;
+			children = (
+				2644404F2CD8A3AC0031A290 /* CompletionReflectionView.swift */,
+			);
+			path = BookCompletion;
+			sourceTree = "<group>";
+		};
 		26890B882CAE811A008DFF49 = {
 			isa = PBXGroup;
 			children = (
@@ -118,6 +128,7 @@
 		26D852FB2CCE40BC0016239A /* Screen */ = {
 			isa = PBXGroup;
 			children = (
+				264440512CD8A3B50031A290 /* BookCompletion */,
 			);
 			path = Screen;
 			sourceTree = "<group>";
@@ -243,6 +254,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				26890B972CAE811A008DFF49 /* ContentView.swift in Sources */,
+				264440502CD8A3AC0031A290 /* CompletionReflectionView.swift in Sources */,
 				26890B952CAE811A008DFF49 /* FiveGuyesApp.swift in Sources */,
 				264440532CD8B1540031A290 /* String+Extension.swift in Sources */,
 				264440572CD8E0D20031A290 /* CustomTextEditorStyle.swift in Sources */,
