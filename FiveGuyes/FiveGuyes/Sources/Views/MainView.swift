@@ -26,17 +26,16 @@ struct MainView: View {
                 ZStack {
                     Rectangle()
                         .foregroundColor(Color(red: 0.96, green: 0.98, blue: 0.97))
-                        .frame(height: 220)
+                        .frame(width: 353, height: 220)
                         .cornerRadius(16)
                         .padding(.bottom, 16)
                     VStack {
                         HStack {
                             Text("읽고 있는 책이 없어요!\n읽고 있는 책을 등록해주세요")
-                                .padding(.leading, 24)
                                 .lineSpacing(6)
                             Spacer()
                         }
-                        .padding(.top, 24)
+                        .padding(24)
                         Spacer()
                         HStack {
                             Spacer()
@@ -84,7 +83,7 @@ struct MainView: View {
                         .cornerRadius(16)
                     }
                 }
-                .padding(.bottom, 50)
+                .padding(.bottom, 40)
                 
                 VStack(spacing: 24) {
                     TitleView(title: "완독 리스트")
