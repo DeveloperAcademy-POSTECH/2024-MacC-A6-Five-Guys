@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct ContentView: View {
+struct BookSearchView: View {
     @State private var selectedPageCount: Int?
     @State private var isNavigatingToTotalPageView = false
     @State private var resetBookmark = false

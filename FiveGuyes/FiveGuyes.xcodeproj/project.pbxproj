@@ -14,8 +14,9 @@
 		1A010EBE2CD8DA2400FBE3B3 /* BookListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A010EBD2CD8DA2400FBE3B3 /* BookListView.swift */; };
 		1A010EC02CD8DA3800FBE3B3 /* BookLowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A010EBF2CD8DA3800FBE3B3 /* BookLowView.swift */; };
 		1A010EC22CD8DA4300FBE3B3 /* TotalPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A010EC12CD8DA4300FBE3B3 /* TotalPageView.swift */; };
+		1A6C6B492CD9F4C2003F8ED3 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A6C6B482CD9F4C2003F8ED3 /* ContentView.swift */; };
 		26890B952CAE811A008DFF49 /* FiveGuyesApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26890B942CAE811A008DFF49 /* FiveGuyesApp.swift */; };
-		26890B972CAE811A008DFF49 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26890B962CAE811A008DFF49 /* ContentView.swift */; };
+		26890B972CAE811A008DFF49 /* BookSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26890B962CAE811A008DFF49 /* BookSearchView.swift */; };
 		26890B992CAE811D008DFF49 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 26890B982CAE811D008DFF49 /* Assets.xcassets */; };
 		26890B9C2CAE811D008DFF49 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 26890B9B2CAE811D008DFF49 /* Preview Assets.xcassets */; };
 		26890BBD2CAE98E2008DFF49 /* .swiftlint.yml in Resources */ = {isa = PBXBuildFile; fileRef = 26890BBC2CAE98E2008DFF49 /* .swiftlint.yml */; };
@@ -30,9 +31,10 @@
 		1A010EBD2CD8DA2400FBE3B3 /* BookListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookListView.swift; sourceTree = "<group>"; };
 		1A010EBF2CD8DA3800FBE3B3 /* BookLowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookLowView.swift; sourceTree = "<group>"; };
 		1A010EC12CD8DA4300FBE3B3 /* TotalPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TotalPageView.swift; sourceTree = "<group>"; };
+		1A6C6B482CD9F4C2003F8ED3 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		26890B912CAE811A008DFF49 /* FiveGuyes.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FiveGuyes.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		26890B942CAE811A008DFF49 /* FiveGuyesApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FiveGuyesApp.swift; sourceTree = "<group>"; };
-		26890B962CAE811A008DFF49 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		26890B962CAE811A008DFF49 /* BookSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookSearchView.swift; sourceTree = "<group>"; };
 		26890B982CAE811D008DFF49 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		26890B9B2CAE811D008DFF49 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		26890BBC2CAE98E2008DFF49 /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
@@ -110,6 +112,7 @@
 		26890BB12CAE90E4008DFF49 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				1A6C6B482CD9F4C2003F8ED3 /* ContentView.swift */,
 				26D852FB2CCE40BC0016239A /* Screen */,
 				26D852F92CCE40930016239A /* Navigation */,
 				26D853052CCE44970016239A /* Components */,
@@ -128,7 +131,7 @@
 		26D852FB2CCE40BC0016239A /* Screen */ = {
 			isa = PBXGroup;
 			children = (
-				26890B962CAE811A008DFF49 /* ContentView.swift */,
+				26890B962CAE811A008DFF49 /* BookSearchView.swift */,
 				1A010EBD2CD8DA2400FBE3B3 /* BookListView.swift */,
 				1A010EBF2CD8DA3800FBE3B3 /* BookLowView.swift */,
 				1A010EC12CD8DA4300FBE3B3 /* TotalPageView.swift */,
@@ -262,7 +265,8 @@
 				1A010EC22CD8DA4300FBE3B3 /* TotalPageView.swift in Sources */,
 				1A010EC02CD8DA3800FBE3B3 /* BookLowView.swift in Sources */,
 				1A010EAC2CD8A7E500FBE3B3 /* APIBooksModel.swift in Sources */,
-				26890B972CAE811A008DFF49 /* ContentView.swift in Sources */,
+				1A6C6B492CD9F4C2003F8ED3 /* ContentView.swift in Sources */,
+				26890B972CAE811A008DFF49 /* BookSearchView.swift in Sources */,
 				1A010EB62CD8AF9800FBE3B3 /* GetBookStore.swift in Sources */,
 				26890B952CAE811A008DFF49 /* FiveGuyesApp.swift in Sources */,
 			);
@@ -407,7 +411,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"FiveGuyes/Preview Content\"";
-				DEVELOPMENT_TEAM = KH2J34Z4ZK;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FiveGuyes/Info.plist;
@@ -443,7 +447,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"FiveGuyes/Preview Content\"";
-				DEVELOPMENT_TEAM = KH2J34Z4ZK;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FiveGuyes/Info.plist;
