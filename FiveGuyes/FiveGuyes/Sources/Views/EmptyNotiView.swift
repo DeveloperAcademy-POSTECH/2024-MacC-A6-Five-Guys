@@ -1,5 +1,5 @@
 //
-//  NotiView.swift
+//  EmptyNotiView.swift
 //  FiveGuyes
 //
 //  Created by 신혜연 on 11/4/24.
