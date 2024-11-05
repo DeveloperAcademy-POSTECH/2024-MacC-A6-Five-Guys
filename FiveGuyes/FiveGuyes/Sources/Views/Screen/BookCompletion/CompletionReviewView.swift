@@ -1,5 +1,5 @@
 //
-//  CompletionReflectionView.swift
+//  CompletionReviewView.swift
 //  FiveGuyes
 //
 //  Created by zaehorang on 11/4/24.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct CompletionReflectionView: View {
+struct CompletionReviewView: View {
     private let bookName = "프리웨이"
     private let placeholder: String = "책 속 한 줄이 남긴 여운은 무엇인가요?"
     
@@ -50,6 +50,7 @@ struct CompletionReflectionView: View {
                 }
             }
         }
+        .customNavigationBackButton()
         .onAppear {
             isFocusedTextEditor = true
         }
@@ -57,5 +58,5 @@ struct CompletionReflectionView: View {
 }
 
 #Preview {
-    CompletionReflectionView()
+    CompletionReviewView()
 }
