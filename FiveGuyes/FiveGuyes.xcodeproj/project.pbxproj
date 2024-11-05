@@ -58,12 +58,12 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		24360D4F2CD9F2D800E83D2B /* RecordProgress */ = {
+		24360D4F2CD9F2D800E83D2B /* BookProgress */ = {
 			isa = PBXGroup;
 			children = (
 				24360D522CD9F3AF00E83D2B /* DailyProgressView.swift */,
 			);
-			path = RecordProgress;
+			path = BookProgress;
 			sourceTree = "<group>";
 		};
 		264440512CD8A3B50031A290 /* BookCompletion */ = {
@@ -157,7 +157,7 @@
 		26D852FB2CCE40BC0016239A /* Screen */ = {
 			isa = PBXGroup;
 			children = (
-				24360D4F2CD9F2D800E83D2B /* RecordProgress */,
+				24360D4F2CD9F2D800E83D2B /* BookProgress */,
 				264440512CD8A3B50031A290 /* BookCompletion */,
 			);
 			path = Screen;
