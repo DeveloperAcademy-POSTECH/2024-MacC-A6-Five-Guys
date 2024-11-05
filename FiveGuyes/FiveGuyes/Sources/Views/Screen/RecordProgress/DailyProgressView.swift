@@ -8,13 +8,16 @@
 import SwiftUI
 
 struct DailyProgressView: View {
+    @State private var bookTitle: String = "프리웨이"
     @State private var pagesToReadToday: Int = 10
+    @State private var isCompletionDate: Bool = true
     @FocusState private var isInputActive: Bool
     
     var body: some View {
         VStack(spacing: 0) {
             HStack {
-                Text("지금까지 읽은 쪽수를\n알려주세요")
+                Text(isCompletionDate ? "오늘은 <\(bookTitle)>를 완독하는\n마지막 날이에요"
+                     : "지금까지 읽은 쪽수를\n알려주세요")
                     .font(.system(size: 22))
                     .fontWeight(.semibold)
                 Spacer()
