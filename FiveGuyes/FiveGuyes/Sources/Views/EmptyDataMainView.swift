@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct NoDataMainView: View {
+struct EmptyDataMainView: View {
     var body: some View {
         TitleView(title: "세니님, 반가워요\n완독하고 싶은 책이 있나요?")
             .padding(.bottom, 24)
@@ -143,5 +143,5 @@ struct CompletedBookListView: View {
 }
 
 #Preview {
-    NoDataMainView()
+    EmptyDataMainView()
 }

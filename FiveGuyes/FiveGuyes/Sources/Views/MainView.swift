@@ -18,7 +18,7 @@ struct MainView: View {
                 if hasData {
                     // DataMainView()
                 } else {
-                    NoDataMainView()
+                    EmptyDataMainView()
                 }
             }
             .padding(.horizontal, 20)
