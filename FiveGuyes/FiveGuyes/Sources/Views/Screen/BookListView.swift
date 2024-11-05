@@ -16,7 +16,9 @@ struct BookListView: View {
     var body: some View {
         VStack {
             TextField("Search for books", text: $searchText, onCommit: {
-                viewModel.searchBooks(query: searchText)
+                Task {
+                    await viewModel.searchBooks(query: searchText)
+                }
             })
             .textFieldStyle(RoundedBorderTextFieldStyle())
             .padding()

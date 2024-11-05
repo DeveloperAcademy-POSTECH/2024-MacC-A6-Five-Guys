@@ -37,23 +37,16 @@ struct BookRowView: View {
             Spacer()
 
             Button(action: {
-                if !isBookmarked {
-                    isBookmarked = true
-                    viewModel.fetchBookDetails(isbn: book.isbn13) { result in
-                        DispatchQueue.main.async {
-                            switch result {
-                            case .success(let pageCount):
-                                onBookmark(book.title, pageCount)
-                            case .failure(let error):
-                                print("Failed to fetch book details: \(error)")
-                            }
+                Task {
+                    if !isBookmarked {
+                        isBookmarked = true
+                        if let pageCount = await viewModel.fetchBookDetails(isbn: book.isbn13) {
+                            onBookmark(book.title, pageCount)
                         }
                     }
                 }
-            }) {
-                Image(systemName: isBookmarked ? "bookmark.fill" : "bookmark")
-                    .foregroundColor(.blue)
-            }
+            }) { Image(systemName: isBookmarked ? "bookmark.fill" : "bookmark")
+                    .foregroundColor(.blue) }
             .onChange(of: resetBookmark) { newValue in
                 if newValue {
                     isBookmarked = false
