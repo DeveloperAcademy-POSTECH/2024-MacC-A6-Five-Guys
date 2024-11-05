@@ -54,10 +54,6 @@ struct CompletionCelebrationView: View {
             .foregroundStyle(.green)
             .padding(.vertical, 4)
             .padding(.horizontal, 8)
-        //            .background(
-        //                .white,
-        //                in: RoundedRectangle(cornerRadius: 8)
-        //            )
             .background {
                 RoundedRectangle(cornerRadius: 8)
                     .foregroundColor(.white)

@@ -50,6 +50,7 @@ struct CompletionReviewView: View {
                 }
             }
         }
+        .customNavigationBackButton()
         .onAppear {
             isFocusedTextEditor = true
         }
