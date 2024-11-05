@@ -7,6 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1A010EAC2CD8A7E500FBE3B3 /* APIBooksModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A010EAB2CD8A7E500FBE3B3 /* APIBooksModel.swift */; };
+		1A010EAE2CD8A86E00FBE3B3 /* APIStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A010EAD2CD8A86E00FBE3B3 /* APIStore.swift */; };
+		1A010EB12CD8A9B500FBE3B3 /* Config.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 1A010EB02CD8A9B500FBE3B3 /* Config.xcconfig */; };
+		1A010EB62CD8AF9800FBE3B3 /* getBookStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A010EB52CD8AF9800FBE3B3 /* getBookStore.swift */; };
+		1A010EBE2CD8DA2400FBE3B3 /* BookListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A010EBD2CD8DA2400FBE3B3 /* BookListView.swift */; };
+		1A010EC02CD8DA3800FBE3B3 /* BookLowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A010EBF2CD8DA3800FBE3B3 /* BookLowView.swift */; };
+		1A010EC22CD8DA4300FBE3B3 /* TotalPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A010EC12CD8DA4300FBE3B3 /* TotalPageView.swift */; };
 		26890B952CAE811A008DFF49 /* FiveGuyesApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26890B942CAE811A008DFF49 /* FiveGuyesApp.swift */; };
 		26890B972CAE811A008DFF49 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26890B962CAE811A008DFF49 /* ContentView.swift */; };
 		26890B992CAE811D008DFF49 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 26890B982CAE811D008DFF49 /* Assets.xcassets */; };
@@ -15,6 +22,14 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1A010EAB2CD8A7E500FBE3B3 /* APIBooksModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIBooksModel.swift; sourceTree = "<group>"; };
+		1A010EAD2CD8A86E00FBE3B3 /* APIStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIStore.swift; sourceTree = "<group>"; };
+		1A010EB02CD8A9B500FBE3B3 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
+		1A010EB22CD8AA6D00FBE3B3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		1A010EB52CD8AF9800FBE3B3 /* getBookStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = getBookStore.swift; sourceTree = "<group>"; };
+		1A010EBD2CD8DA2400FBE3B3 /* BookListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookListView.swift; sourceTree = "<group>"; };
+		1A010EBF2CD8DA3800FBE3B3 /* BookLowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookLowView.swift; sourceTree = "<group>"; };
+		1A010EC12CD8DA4300FBE3B3 /* TotalPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TotalPageView.swift; sourceTree = "<group>"; };
 		26890B912CAE811A008DFF49 /* FiveGuyes.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FiveGuyes.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		26890B942CAE811A008DFF49 /* FiveGuyesApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FiveGuyesApp.swift; sourceTree = "<group>"; };
 		26890B962CAE811A008DFF49 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -37,6 +52,7 @@
 		26890B882CAE811A008DFF49 = {
 			isa = PBXGroup;
 			children = (
+				1A010EB02CD8A9B500FBE3B3 /* Config.xcconfig */,
 				26890B932CAE811A008DFF49 /* FiveGuyes */,
 				26890B922CAE811A008DFF49 /* Products */,
 			);
@@ -53,6 +69,7 @@
 		26890B932CAE811A008DFF49 /* FiveGuyes */ = {
 			isa = PBXGroup;
 			children = (
+				1A010EB22CD8AA6D00FBE3B3 /* Info.plist */,
 				26890B942CAE811A008DFF49 /* FiveGuyesApp.swift */,
 				26890BBC2CAE98E2008DFF49 /* .swiftlint.yml */,
 				26890BAD2CAE903E008DFF49 /* Resources */,
@@ -93,7 +110,6 @@
 		26890BB12CAE90E4008DFF49 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				26890B962CAE811A008DFF49 /* ContentView.swift */,
 				26D852FB2CCE40BC0016239A /* Screen */,
 				26D852F92CCE40930016239A /* Navigation */,
 				26D853052CCE44970016239A /* Components */,
@@ -112,6 +128,10 @@
 		26D852FB2CCE40BC0016239A /* Screen */ = {
 			isa = PBXGroup;
 			children = (
+				26890B962CAE811A008DFF49 /* ContentView.swift */,
+				1A010EBD2CD8DA2400FBE3B3 /* BookListView.swift */,
+				1A010EBF2CD8DA3800FBE3B3 /* BookLowView.swift */,
+				1A010EC12CD8DA4300FBE3B3 /* TotalPageView.swift */,
 			);
 			path = Screen;
 			sourceTree = "<group>";
@@ -133,6 +153,8 @@
 		26D853022CCE44720016239A /* Stores */ = {
 			isa = PBXGroup;
 			children = (
+				1A010EAD2CD8A86E00FBE3B3 /* APIStore.swift */,
+				1A010EB52CD8AF9800FBE3B3 /* getBookStore.swift */,
 			);
 			path = Stores;
 			sourceTree = "<group>";
@@ -140,6 +162,7 @@
 		26D853032CCE44730016239A /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				1A010EAB2CD8A7E500FBE3B3 /* APIBooksModel.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -220,6 +243,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1A010EB12CD8A9B500FBE3B3 /* Config.xcconfig in Resources */,
 				26890BBD2CAE98E2008DFF49 /* .swiftlint.yml in Resources */,
 				26890B9C2CAE811D008DFF49 /* Preview Assets.xcassets in Resources */,
 				26890B992CAE811D008DFF49 /* Assets.xcassets in Resources */,
@@ -233,7 +257,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1A010EAE2CD8A86E00FBE3B3 /* APIStore.swift in Sources */,
+				1A010EBE2CD8DA2400FBE3B3 /* BookListView.swift in Sources */,
+				1A010EC22CD8DA4300FBE3B3 /* TotalPageView.swift in Sources */,
+				1A010EC02CD8DA3800FBE3B3 /* BookLowView.swift in Sources */,
+				1A010EAC2CD8A7E500FBE3B3 /* APIBooksModel.swift in Sources */,
 				26890B972CAE811A008DFF49 /* ContentView.swift in Sources */,
+				1A010EB62CD8AF9800FBE3B3 /* getBookStore.swift in Sources */,
 				26890B952CAE811A008DFF49 /* FiveGuyesApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -361,6 +391,7 @@
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = NO;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
@@ -369,15 +400,17 @@
 		};
 		26890BA02CAE811D008DFF49 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 1A010EB02CD8A9B500FBE3B3 /* Config.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"FiveGuyes/Preview Content\"";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = KH2J34Z4ZK;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = FiveGuyes/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -403,15 +436,17 @@
 		};
 		26890BA12CAE811D008DFF49 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 1A010EB02CD8A9B500FBE3B3 /* Config.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"FiveGuyes/Preview Content\"";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = KH2J34Z4ZK;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = FiveGuyes/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
