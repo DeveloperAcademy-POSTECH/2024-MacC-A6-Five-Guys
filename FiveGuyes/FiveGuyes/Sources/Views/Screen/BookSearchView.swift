@@ -1,13 +1,13 @@
 //
-//  ContentView.swift
+//  BookSearchView.swift
 //  FiveGuyes
 //
-//  Created by zaehorang on 10/3/24.
+//  Created by Shim Hyeonhee on 11/5/24.
 //
 
 import SwiftUI
 
-struct ContentView: View {
+struct BookSearchView: View {
     @State private var selectedPageCount: Int?
     @State private var isNavigatingToTotalPageView = false
     @State private var resetBookmark = false

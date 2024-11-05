@@ -9,11 +9,11 @@
 /* Begin PBXBuildFile section */
 		1A010EAC2CD8A7E500FBE3B3 /* APIBooksModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A010EAB2CD8A7E500FBE3B3 /* APIBooksModel.swift */; };
 		1A010EAE2CD8A86E00FBE3B3 /* APIStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A010EAD2CD8A86E00FBE3B3 /* APIStore.swift */; };
-		1A010EB12CD8A9B500FBE3B3 /* Config.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 1A010EB02CD8A9B500FBE3B3 /* Config.xcconfig */; };
 		1A010EB62CD8AF9800FBE3B3 /* GetBookStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A010EB52CD8AF9800FBE3B3 /* GetBookStore.swift */; };
 		1A010EBE2CD8DA2400FBE3B3 /* BookListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A010EBD2CD8DA2400FBE3B3 /* BookListView.swift */; };
 		1A010EC02CD8DA3800FBE3B3 /* BookLowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A010EBF2CD8DA3800FBE3B3 /* BookLowView.swift */; };
 		1A010EC22CD8DA4300FBE3B3 /* TotalPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A010EC12CD8DA4300FBE3B3 /* TotalPageView.swift */; };
+		1A54142B2CD9FEF400283FBD /* BookSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A54142A2CD9FEF400283FBD /* BookSearchView.swift */; };
 		26890B952CAE811A008DFF49 /* FiveGuyesApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26890B942CAE811A008DFF49 /* FiveGuyesApp.swift */; };
 		26890B972CAE811A008DFF49 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26890B962CAE811A008DFF49 /* ContentView.swift */; };
 		26890B992CAE811D008DFF49 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 26890B982CAE811D008DFF49 /* Assets.xcassets */; };
@@ -24,12 +24,13 @@
 /* Begin PBXFileReference section */
 		1A010EAB2CD8A7E500FBE3B3 /* APIBooksModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIBooksModel.swift; sourceTree = "<group>"; };
 		1A010EAD2CD8A86E00FBE3B3 /* APIStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIStore.swift; sourceTree = "<group>"; };
-		1A010EB02CD8A9B500FBE3B3 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		1A010EB22CD8AA6D00FBE3B3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		1A010EB52CD8AF9800FBE3B3 /* GetBookStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetBookStore.swift; sourceTree = "<group>"; };
 		1A010EBD2CD8DA2400FBE3B3 /* BookListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookListView.swift; sourceTree = "<group>"; };
 		1A010EBF2CD8DA3800FBE3B3 /* BookLowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookLowView.swift; sourceTree = "<group>"; };
 		1A010EC12CD8DA4300FBE3B3 /* TotalPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TotalPageView.swift; sourceTree = "<group>"; };
+		1A5414292CD9FECC00283FBD /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
+		1A54142A2CD9FEF400283FBD /* BookSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookSearchView.swift; sourceTree = "<group>"; };
 		26890B912CAE811A008DFF49 /* FiveGuyes.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FiveGuyes.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		26890B942CAE811A008DFF49 /* FiveGuyesApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FiveGuyesApp.swift; sourceTree = "<group>"; };
 		26890B962CAE811A008DFF49 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -52,7 +53,7 @@
 		26890B882CAE811A008DFF49 = {
 			isa = PBXGroup;
 			children = (
-				1A010EB02CD8A9B500FBE3B3 /* Config.xcconfig */,
+				1A5414292CD9FECC00283FBD /* Config.xcconfig */,
 				26890B932CAE811A008DFF49 /* FiveGuyes */,
 				26890B922CAE811A008DFF49 /* Products */,
 			);
@@ -110,6 +111,7 @@
 		26890BB12CAE90E4008DFF49 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				26890B962CAE811A008DFF49 /* ContentView.swift */,
 				26D852FB2CCE40BC0016239A /* Screen */,
 				26D852F92CCE40930016239A /* Navigation */,
 				26D853052CCE44970016239A /* Components */,
@@ -128,10 +130,10 @@
 		26D852FB2CCE40BC0016239A /* Screen */ = {
 			isa = PBXGroup;
 			children = (
-				26890B962CAE811A008DFF49 /* ContentView.swift */,
 				1A010EBD2CD8DA2400FBE3B3 /* BookListView.swift */,
 				1A010EBF2CD8DA3800FBE3B3 /* BookLowView.swift */,
 				1A010EC12CD8DA4300FBE3B3 /* TotalPageView.swift */,
+				1A54142A2CD9FEF400283FBD /* BookSearchView.swift */,
 			);
 			path = Screen;
 			sourceTree = "<group>";
@@ -243,7 +245,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1A010EB12CD8A9B500FBE3B3 /* Config.xcconfig in Resources */,
 				26890BBD2CAE98E2008DFF49 /* .swiftlint.yml in Resources */,
 				26890B9C2CAE811D008DFF49 /* Preview Assets.xcassets in Resources */,
 				26890B992CAE811D008DFF49 /* Assets.xcassets in Resources */,
@@ -257,6 +258,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1A54142B2CD9FEF400283FBD /* BookSearchView.swift in Sources */,
 				1A010EAE2CD8A86E00FBE3B3 /* APIStore.swift in Sources */,
 				1A010EBE2CD8DA2400FBE3B3 /* BookListView.swift in Sources */,
 				1A010EC22CD8DA4300FBE3B3 /* TotalPageView.swift in Sources */,
@@ -400,7 +402,6 @@
 		};
 		26890BA02CAE811D008DFF49 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 1A010EB02CD8A9B500FBE3B3 /* Config.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -436,7 +437,6 @@
 		};
 		26890BA12CAE811D008DFF49 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 1A010EB02CD8A9B500FBE3B3 /* Config.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
