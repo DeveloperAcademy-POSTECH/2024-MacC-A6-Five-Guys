@@ -22,7 +22,6 @@ struct ContentView: View {
                     isNavigatingToTotalPageView = true
                     resetBookmark = false
                 }
-
                 NavigationLink(
                     destination: TotalPageView(pageCount: selectedPageCount, title: selectedBookTitle)
                         .onDisappear {

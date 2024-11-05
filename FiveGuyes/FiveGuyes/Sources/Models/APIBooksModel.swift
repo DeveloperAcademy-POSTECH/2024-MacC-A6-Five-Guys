@@ -9,7 +9,7 @@ import Foundation
 
 struct Book: Identifiable, Codable {
     let id = UUID()
-    // 수정을 위해 var 로 변경시 에러발생함
+    // var 로 변경시 에러발생함
     let title: String
     let author: String
     let cover: String?
