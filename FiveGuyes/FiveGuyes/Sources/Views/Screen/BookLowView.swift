@@ -5,15 +5,13 @@
 //  Created by Shim Hyeonhee on 11/4/24.
 //
 
-import Combine
 import SwiftUI
 
 struct BookRowView: View {
     @State private var isBookmarked = false
-    @State private var cancellable: AnyCancellable?
     let book: Book
     @ObservedObject var viewModel: BookViewModel
-    @Binding var resetBookmark: Bool // Receive resetBookmark as a binding
+    @Binding var resetBookmark: Bool
     var onBookmark: (String, Int) -> Void
 
     var body: some View {
@@ -41,23 +39,24 @@ struct BookRowView: View {
             Button(action: {
                 if !isBookmarked {
                     isBookmarked = true
-                    cancellable = viewModel.fetchBookDetails(isbn: book.isbn13)
-                        .receive(on: DispatchQueue.main)
-                        .sink(receiveCompletion: { completion in
-                            if case .failure(let error) = completion {
+                    viewModel.fetchBookDetails(isbn: book.isbn13) { result in
+                        DispatchQueue.main.async {
+                            switch result {
+                            case .success(let pageCount):
+                                onBookmark(book.title, pageCount)
+                            case .failure(let error):
                                 print("Failed to fetch book details: \(error)")
                             }
-                        }, receiveValue: { pageCount in
-                            onBookmark(book.title, pageCount)
-                        })
+                        }
+                    }
                 }
-            }) { Image(systemName: isBookmarked ? "bookmark.fill" : "bookmark")
+            }) {
+                Image(systemName: isBookmarked ? "bookmark.fill" : "bookmark")
                     .foregroundColor(.blue)
             }
             .onChange(of: resetBookmark) { newValue in
                 if newValue {
                     isBookmarked = false
-                    cancellable?.cancel()
                 }
             }
         }

@@ -5,27 +5,24 @@
 //  Created by Shim Hyeonhee on 11/4/24.
 //
 
-import Combine
 import Foundation
 
 class BookViewModel: ObservableObject {
     @Published var books = [Book]()
-    private var cancellables = Set<AnyCancellable>()
     private let apiStore = APIStore()
 
     func searchBooks(query: String) {
-        apiStore.fetchBooks(query: query)
-            .sink(receiveCompletion: { completion in
-                if case .failure(let error) = completion {
-                    print("Failed to fetch books: \(error)")
-                }
-            }, receiveValue: { [weak self] books in
+        apiStore.fetchBooks(query: query) { [weak self] result in
+            switch result {
+            case .success(let books):
                 self?.books = books
-            })
-            .store(in: &cancellables)
+            case .failure(let error):
+                print("Failed to fetch books: \(error)")
+            }
+        }
     }
 
-    func fetchBookDetails(isbn: String) -> AnyPublisher<Int, Error> {
-            return apiStore.fetchBookDetails(isbn: isbn)
-        }
+    func fetchBookDetails(isbn: String, completion: @escaping (Result<Int, Error>) -> Void) {
+        apiStore.fetchBookDetails(isbn: isbn, completion: completion)
+    }
 }
