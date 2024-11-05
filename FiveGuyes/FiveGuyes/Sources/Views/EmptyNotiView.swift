@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct NotiView: View {
+struct EmptyNotiView: View {
     var body: some View {
         VStack(spacing: 0) {
             Image("wandoki2")
@@ -22,5 +22,5 @@ struct NotiView: View {
 }
 
 #Preview {
-    NotiView()
+    EmptyNotiView()
 }

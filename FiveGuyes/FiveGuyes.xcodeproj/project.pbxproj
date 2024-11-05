@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		24360D482CD8BAF100E83D2B /* NotiView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24360D472CD8BAF100E83D2B /* NotiView.swift */; };
+		24360D482CD8BAF100E83D2B /* EmptyNotiView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24360D472CD8BAF100E83D2B /* EmptyNotiView.swift */; };
 		264440502CD8A3AC0031A290 /* CompletionReflectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2644404F2CD8A3AC0031A290 /* CompletionReflectionView.swift */; };
 		264440532CD8B1540031A290 /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 264440522CD8B1540031A290 /* String+Extension.swift */; };
 		264440552CD8E0100031A290 /* KeyboardObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 264440542CD8E0100031A290 /* KeyboardObserver.swift */; };
@@ -20,7 +20,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		24360D472CD8BAF100E83D2B /* NotiView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotiView.swift; sourceTree = "<group>"; };
+		24360D472CD8BAF100E83D2B /* EmptyNotiView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyNotiView.swift; sourceTree = "<group>"; };
 		2644404F2CD8A3AC0031A290 /* CompletionReflectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletionReflectionView.swift; sourceTree = "<group>"; };
 		264440522CD8B1540031A290 /* String+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Extension.swift"; sourceTree = "<group>"; };
 		264440542CD8E0100031A290 /* KeyboardObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardObserver.swift; sourceTree = "<group>"; };
@@ -112,7 +112,7 @@
 			isa = PBXGroup;
 			children = (
 				26890B962CAE811A008DFF49 /* ContentView.swift */,
-				24360D472CD8BAF100E83D2B /* NotiView.swift */,
+				24360D472CD8BAF100E83D2B /* EmptyNotiView.swift */,
 				26D852FB2CCE40BC0016239A /* Screen */,
 				26D852F92CCE40930016239A /* Navigation */,
 				26D853052CCE44970016239A /* Components */,
@@ -259,7 +259,7 @@
 				26890B972CAE811A008DFF49 /* ContentView.swift in Sources */,
 				264440502CD8A3AC0031A290 /* CompletionReflectionView.swift in Sources */,
 				26890B952CAE811A008DFF49 /* FiveGuyesApp.swift in Sources */,
-				24360D482CD8BAF100E83D2B /* NotiView.swift in Sources */,
+				24360D482CD8BAF100E83D2B /* EmptyNotiView.swift in Sources */,
 				264440532CD8B1540031A290 /* String+Extension.swift in Sources */,
 				264440572CD8E0D20031A290 /* CustomTextEditorStyle.swift in Sources */,
 				264440552CD8E0100031A290 /* KeyboardObserver.swift in Sources */,
