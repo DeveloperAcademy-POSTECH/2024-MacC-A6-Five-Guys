@@ -13,12 +13,10 @@
 		1A010EBE2CD8DA2400FBE3B3 /* BookListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A010EBD2CD8DA2400FBE3B3 /* BookListView.swift */; };
 		1A010EC02CD8DA3800FBE3B3 /* BookLowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A010EBF2CD8DA3800FBE3B3 /* BookLowView.swift */; };
 		1A010EC22CD8DA4300FBE3B3 /* TotalPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A010EC12CD8DA4300FBE3B3 /* TotalPageView.swift */; };
+		1A27D9602CDA31EE00D1E14D /* ProgressBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A27D95F2CDA31EE00D1E14D /* ProgressBar.swift */; };
+		1A27D9622CDB05C000D1E14D /* CustomTextFieldStylePageCount.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A27D9612CDB05C000D1E14D /* CustomTextFieldStylePageCount.swift */; };
 		1A54142B2CD9FEF400283FBD /* BookSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A54142A2CD9FEF400283FBD /* BookSearchView.swift */; };
 		1A54142D2CDA006800283FBD /* Config.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 1A54142C2CDA006800283FBD /* Config.xcconfig */; };
-		2644404E2CD8A39E0031A290 /* CompletionCelebrationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2644404D2CD8A39E0031A290 /* CompletionCelebrationView.swift */; };
-		264440502CD8A3AC0031A290 /* CompletionReviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2644404F2CD8A3AC0031A290 /* CompletionReviewView.swift */; };
-		24360D4A2CD8BE3C00E83D2B /* FinishGoalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24360D492CD8BE3C00E83D2B /* FinishGoalView.swift */; };
-		24360D482CD8BAF100E83D2B /* EmptyNotiView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24360D472CD8BAF100E83D2B /* EmptyNotiView.swift */; };
 		24360D462CD8A2F800E83D2B /* EmptyDataMainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24360D452CD8A2F800E83D2B /* EmptyDataMainView.swift */; };
 		24360D482CD8BAF100E83D2B /* EmptyNotiView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24360D472CD8BAF100E83D2B /* EmptyNotiView.swift */; };
 		24360D4A2CD8BE3C00E83D2B /* FinishGoalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24360D492CD8BE3C00E83D2B /* FinishGoalView.swift */; };
@@ -39,7 +37,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-
 		1A010EAB2CD8A7E500FBE3B3 /* APIBooksModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIBooksModel.swift; sourceTree = "<group>"; };
 		1A010EAD2CD8A86E00FBE3B3 /* APIStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIStore.swift; sourceTree = "<group>"; };
 		1A010EB22CD8AA6D00FBE3B3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -47,11 +44,10 @@
 		1A010EBD2CD8DA2400FBE3B3 /* BookListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookListView.swift; sourceTree = "<group>"; };
 		1A010EBF2CD8DA3800FBE3B3 /* BookLowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookLowView.swift; sourceTree = "<group>"; };
 		1A010EC12CD8DA4300FBE3B3 /* TotalPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TotalPageView.swift; sourceTree = "<group>"; };
+		1A27D95F2CDA31EE00D1E14D /* ProgressBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressBar.swift; sourceTree = "<group>"; };
+		1A27D9612CDB05C000D1E14D /* CustomTextFieldStylePageCount.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTextFieldStylePageCount.swift; sourceTree = "<group>"; };
 		1A54142A2CD9FEF400283FBD /* BookSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookSearchView.swift; sourceTree = "<group>"; };
 		1A54142C2CDA006800283FBD /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
-		2644404D2CD8A39E0031A290 /* CompletionCelebrationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletionCelebrationView.swift; sourceTree = "<group>"; };
-		24360D492CD8BE3C00E83D2B /* FinishGoalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinishGoalView.swift; sourceTree = "<group>"; };
-		24360D472CD8BAF100E83D2B /* EmptyNotiView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyNotiView.swift; sourceTree = "<group>"; };
 		24360D452CD8A2F800E83D2B /* EmptyDataMainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyDataMainView.swift; sourceTree = "<group>"; };
 		24360D472CD8BAF100E83D2B /* EmptyNotiView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyNotiView.swift; sourceTree = "<group>"; };
 		24360D492CD8BE3C00E83D2B /* FinishGoalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinishGoalView.swift; sourceTree = "<group>"; };
@@ -64,7 +60,6 @@
 		264440562CD8E0D20031A290 /* CustomTextEditorStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTextEditorStyle.swift; sourceTree = "<group>"; };
 		264440582CD8F6020031A290 /* CustomBackButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomBackButton.swift; sourceTree = "<group>"; };
 		2644405A2CD8F9380031A290 /* UINavigationController+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UINavigationController+Extension.swift"; sourceTree = "<group>"; };
-
 		26890B912CAE811A008DFF49 /* FiveGuyes.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FiveGuyes.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		26890B942CAE811A008DFF49 /* FiveGuyesApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FiveGuyesApp.swift; sourceTree = "<group>"; };
 		26890B962CAE811A008DFF49 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -84,6 +79,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		1A27D95E2CDA155B00D1E14D /* BookSearch */ = {
+			isa = PBXGroup;
+			children = (
+				1A010EBD2CD8DA2400FBE3B3 /* BookListView.swift */,
+				1A010EBF2CD8DA3800FBE3B3 /* BookLowView.swift */,
+				1A54142A2CD9FEF400283FBD /* BookSearchView.swift */,
+			);
+			path = BookSearch;
+			sourceTree = "<group>";
+		};
 		24360D4F2CD9F2D800E83D2B /* BookProgress */ = {
 			isa = PBXGroup;
 			children = (
@@ -185,13 +190,10 @@
 		26D852FB2CCE40BC0016239A /* Screen */ = {
 			isa = PBXGroup;
 			children = (
+				1A27D95E2CDA155B00D1E14D /* BookSearch */,
 				24360D4F2CD9F2D800E83D2B /* BookProgress */,
-				1A010EBD2CD8DA2400FBE3B3 /* BookListView.swift */,
-				1A010EBF2CD8DA3800FBE3B3 /* BookLowView.swift */,
 				1A010EC12CD8DA4300FBE3B3 /* TotalPageView.swift */,
-				1A54142A2CD9FEF400283FBD /* BookSearchView.swift */,
 				264440512CD8A3B50031A290 /* BookCompletion */,
-
 			);
 			path = Screen;
 			sourceTree = "<group>";
@@ -215,12 +217,9 @@
 		26D853022CCE44720016239A /* Stores */ = {
 			isa = PBXGroup;
 			children = (
-
 				1A010EAD2CD8A86E00FBE3B3 /* APIStore.swift */,
 				1A010EB52CD8AF9800FBE3B3 /* GetBookStore.swift */,
-
 				264440542CD8E0100031A290 /* KeyboardObserver.swift */,
-
 			);
 			path = Stores;
 			sourceTree = "<group>";
@@ -245,6 +244,8 @@
 			isa = PBXGroup;
 			children = (
 				264440562CD8E0D20031A290 /* CustomTextEditorStyle.swift */,
+				1A27D95F2CDA31EE00D1E14D /* ProgressBar.swift */,
+				1A27D9612CDB05C000D1E14D /* CustomTextFieldStylePageCount.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -333,6 +334,8 @@
 				1A010EAC2CD8A7E500FBE3B3 /* APIBooksModel.swift in Sources */,
 				26890B972CAE811A008DFF49 /* ContentView.swift in Sources */,
 				24360D532CD9F3AF00E83D2B /* DailyProgressView.swift in Sources */,
+				1A27D9602CDA31EE00D1E14D /* ProgressBar.swift in Sources */,
+				1A27D9622CDB05C000D1E14D /* CustomTextFieldStylePageCount.swift in Sources */,
 				1A010EB62CD8AF9800FBE3B3 /* GetBookStore.swift in Sources */,
 				264440592CD8F6020031A290 /* CustomBackButton.swift in Sources */,
 				24360D4A2CD8BE3C00E83D2B /* FinishGoalView.swift in Sources */,
@@ -340,7 +343,6 @@
 				24360D462CD8A2F800E83D2B /* EmptyDataMainView.swift in Sources */,
 				264440502CD8A3AC0031A290 /* CompletionReviewView.swift in Sources */,
 				264440502CD8A3AC0031A290 /* CompletionReviewView.swift in Sources */,
-
 				26890B952CAE811A008DFF49 /* FiveGuyesApp.swift in Sources */,
 				24360D482CD8BAF100E83D2B /* EmptyNotiView.swift in Sources */,
 				264440532CD8B1540031A290 /* String+Extension.swift in Sources */,
