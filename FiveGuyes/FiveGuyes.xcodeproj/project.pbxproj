@@ -40,6 +40,10 @@
 		26F19A6E2CDA74A600F41D6D /* WeeklyPageCalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F19A6D2CDA74A600F41D6D /* WeeklyPageCalendarView.swift */; };
 		26F19A722CDB267600F41D6D /* NavigationCoodinaotr.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F19A712CDB267600F41D6D /* NavigationCoodinaotr.swift */; };
 		26F19A742CDB271E00F41D6D /* NavigationRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F19A732CDB271E00F41D6D /* NavigationRootView.swift */; };
+		26F19A762CDB2A5C00F41D6D /* Config.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 26F19A752CDB2A5C00F41D6D /* Config.xcconfig */; };
+		26F19A782CDB5D0100F41D6D /* BookModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F19A772CDB5D0100F41D6D /* BookModel.swift */; };
+		26F19A7A2CDB5F3900F41D6D /* ReadingScheduleCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F19A792CDB5F3900F41D6D /* ReadingScheduleCalculator.swift */; };
+		26F19A822CDBE3A600F41D6D /* ReadingTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F19A812CDBE3A600F41D6D /* ReadingTestView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -78,6 +82,10 @@
 		26F19A6D2CDA74A600F41D6D /* WeeklyPageCalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyPageCalendarView.swift; sourceTree = "<group>"; };
 		26F19A712CDB267600F41D6D /* NavigationCoodinaotr.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationCoodinaotr.swift; sourceTree = "<group>"; };
 		26F19A732CDB271E00F41D6D /* NavigationRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationRootView.swift; sourceTree = "<group>"; };
+		26F19A752CDB2A5C00F41D6D /* Config.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
+		26F19A772CDB5D0100F41D6D /* BookModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookModel.swift; sourceTree = "<group>"; };
+		26F19A792CDB5F3900F41D6D /* ReadingScheduleCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadingScheduleCalculator.swift; sourceTree = "<group>"; };
+		26F19A812CDBE3A600F41D6D /* ReadingTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadingTestView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -202,6 +210,7 @@
 		26D852FB2CCE40BC0016239A /* Screen */ = {
 			isa = PBXGroup;
 			children = (
+				26F19A832CDC970D00F41D6D /* Testing */,
 				1A27D95E2CDA155B00D1E14D /* BookSearch */,
 				24360D4F2CD9F2D800E83D2B /* BookProgress */,
 				1A010EC12CD8DA4300FBE3B3 /* TotalPageView.swift */,
@@ -243,6 +252,8 @@
 			isa = PBXGroup;
 			children = (
 				1A010EAB2CD8A7E500FBE3B3 /* APIBooksModel.swift */,
+				26F19A772CDB5D0100F41D6D /* BookModel.swift */,
+				26F19A792CDB5F3900F41D6D /* ReadingScheduleCalculator.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -274,6 +285,14 @@
 				26F19A672CD9EFD800F41D6D /* MainHomeView.swift */,
 			);
 			path = Main;
+			sourceTree = "<group>";
+		};
+		26F19A832CDC970D00F41D6D /* Testing */ = {
+			isa = PBXGroup;
+			children = (
+				26F19A812CDBE3A600F41D6D /* ReadingTestView.swift */,
+			);
+			path = Testing;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -352,6 +371,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				1A54142B2CD9FEF400283FBD /* BookSearchView.swift in Sources */,
+				26F19A782CDB5D0100F41D6D /* BookModel.swift in Sources */,
+				26F19A822CDBE3A600F41D6D /* ReadingTestView.swift in Sources */,
 				1A010EAE2CD8A86E00FBE3B3 /* APIStore.swift in Sources */,
 				24A2063F2CDB180000964FBB /* CompletionCalendarView.swift in Sources */,
 				1A010EBE2CD8DA2400FBE3B3 /* BookListView.swift in Sources */,
@@ -362,6 +383,7 @@
 				24360D532CD9F3AF00E83D2B /* DailyProgressView.swift in Sources */,
 				1A27D9602CDA31EE00D1E14D /* ProgressBar.swift in Sources */,
 				1A27D9622CDB05C000D1E14D /* CustomTextFieldStylePageCount.swift in Sources */,
+				26F19A7A2CDB5F3900F41D6D /* ReadingScheduleCalculator.swift in Sources */,
 				1A010EB62CD8AF9800FBE3B3 /* GetBookStore.swift in Sources */,
 				26F19A722CDB267600F41D6D /* NavigationCoodinaotr.swift in Sources */,
 				264440592CD8F6020031A290 /* CustomBackButton.swift in Sources */,
