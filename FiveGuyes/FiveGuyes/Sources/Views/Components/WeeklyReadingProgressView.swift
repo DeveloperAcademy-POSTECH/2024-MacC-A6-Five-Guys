@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct WeeklyReadingProgressView: View {
-    var isEmpty = false
+    var isEmpty = true
     
     var body: some View {
         if isEmpty {

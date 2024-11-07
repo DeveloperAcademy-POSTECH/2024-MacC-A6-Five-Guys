@@ -8,41 +8,41 @@
 import SwiftUI
 
 struct BookSearchView: View {
-    @State private var selectedPageCount: Int?
-    @State private var isNavigatingToTotalPageView = false
-    @State private var resetBookmark = false
-    @State private var selectedBookTitle: String?
+    @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
+    
+    @StateObject private var bookSearchViewModel = BookSearchViewModel()
+    
     @State private var progress: CGFloat = 0.25
-        
+    
     var body: some View {
-        NavigationView {
-            VStack {
-                ProgressBar(progress: progress)
-                BookListView(resetBookmark: $resetBookmark) { title, pageCount in
-                    selectedBookTitle = title
-                    selectedPageCount = pageCount
-                    isNavigatingToTotalPageView = true
-                    resetBookmark = false
-                    if progress < 1.0 {
-                        progress += 0.25
-                    }
+        VStack(spacing: 24) {
+            ProgressBar(progress: progress)
+            
+            BookListView(bookSearchViewModel: bookSearchViewModel)
+        }
+        .customNavigationBackButton()
+        .navigationTitle("완독할 책 추가하기")
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    // TODO: 페이지 설정 화면으로 넘어가기
+                    navigationCoordinator.push(.empthNoti)
+                } label: {
+                    Text("확인")
+                        .foregroundColor(bookSearchViewModel.selectedBook != nil ?
+                                         Color(red: 0.03, green: 0.68, blue: 0.41) 
+                                         : Color(red: 0.84, green: 0.84, blue: 0.84))
                 }
-                NavigationLink(
-                    destination: TotalPageView(pageCount: selectedPageCount, title: selectedBookTitle, progress: progress)
-                        .onDisappear {
-                            selectedBookTitle = nil
-                            selectedPageCount = nil
-                            resetBookmark = true
-                            if progress > 0.25 {
-                                progress -= 0.25
-                            }
-                        },
-                    isActive: $isNavigatingToTotalPageView
-                    
-                ) {
-                    EmptyView()
-                }
+                .disabled(bookSearchViewModel.selectedBook == nil)
             }
+        }
+    }
+}
+
+#Preview {
+    NavigationStack {
+        NavigationLink("Aa") {
+            BookSearchView()
         }
     }
 }

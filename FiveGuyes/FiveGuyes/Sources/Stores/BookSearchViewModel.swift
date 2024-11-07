@@ -1,5 +1,5 @@
 //
-//  getBooksStore.swift
+//  BookSearchViewModel.swift
 //  FiveGuyes
 //
 //  Created by Shim Hyeonhee on 11/4/24.
@@ -8,8 +8,11 @@
 import Foundation
 
 @MainActor
-class BookViewModel: ObservableObject {
+final class BookSearchViewModel: ObservableObject {
+    
     @Published var books = [Book]()
+    @Published var selectedBook: Book?
+    
     private let apiStore = APIStore()
 
     func searchBooks(query: String) async {
@@ -29,4 +32,8 @@ class BookViewModel: ObservableObject {
             return nil
         }
     }
+    
+    func selectBook(_ book: Book) {
+            selectedBook = book
+        }
 }

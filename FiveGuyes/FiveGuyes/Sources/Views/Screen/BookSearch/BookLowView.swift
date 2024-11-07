@@ -8,12 +8,9 @@
 import SwiftUI
 
 struct BookRowView: View {
-    @State private var isBookmarked = false
+    @ObservedObject var viewModel: BookSearchViewModel
     let book: Book
-    @ObservedObject var viewModel: BookViewModel
-    @Binding var resetBookmark: Bool
-    var onBookmark: (String, Int) -> Void
-
+    
     var body: some View {
         VStack {
             HStack {
@@ -24,13 +21,18 @@ struct BookRowView: View {
                         } placeholder: {
                             ProgressView()
                         }
-                        .frame(width: 115, height: 178)
                         .cornerRadius(6)
                         .shadow(color: Color(red: 0.84, green: 0.84, blue: 0.84).opacity(0.25), radius: 2, x: 0, y: 4)
+                    } else {
+                        // 이미지 없을 때
+                        Rectangle()
+                            .foregroundColor(.green)
                     }
                 }
+                .frame(width: 115, height: 178)
                 .padding(.leading, 20)
-                Spacer()
+                
+                
                 VStack(alignment: .leading) {
                     Text(book.title)
                         .font(.system(size: 16))
@@ -42,33 +44,25 @@ struct BookRowView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .topLeading)
                 .padding(.leading, 16)
-                Button(action: {
-                    Task {
-                        if !isBookmarked {
-                            isBookmarked = true
-                            if let pageCount = await viewModel.fetchBookDetails(isbn: book.isbn13) {
-                                onBookmark(book.title, pageCount)
-                            }
-                        }
-                    }
-                }, label: {
-                    Image(isBookmarked ? "circleButtonFilled" : "circleButton")
-                        .resizable()
-                        .frame(width: 24, height: 24)
-                })
-                .onChange(of: resetBookmark) { _, newValue in
-                    if newValue {
-                        isBookmarked = false
-                    }
-                }
-                .padding(.trailing, 25)
+                
+                
+                Image(systemName: viewModel.selectedBook == book ? "checkmark.circle.fill" : "circle")
+                    .foregroundStyle(Color(red: 0.07, green: 0.87, blue: 0.54))
+                    .padding(.trailing, 25)
+                
+                
+                
             }
-            Rectangle()
-                .stroke(Color(red: 0.94, green: 0.94, blue: 0.94))
-                .fill(Color(red: 0.94, green: 0.94, blue: 0.94))
-                .frame(height: 1)
-                .padding(.vertical, 24)
         }
-       
+        .contentShape(Rectangle()) // 전체 영역이 탭 가능한 영역이 되도록 설정
+        .onTapGesture {
+            viewModel.selectBook(book) // 전체 뷰를 탭하면 선택된 책 업데이트
+        }
+        
+        Rectangle()
+            .stroke(Color(red: 0.94, green: 0.94, blue: 0.94))
+            .fill(Color(red: 0.94, green: 0.94, blue: 0.94))
+            .frame(height: 1)
+            .padding(.vertical, 24)
     }
 }

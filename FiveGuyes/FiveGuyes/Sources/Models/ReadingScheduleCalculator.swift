@@ -18,10 +18,10 @@ struct ReadingRecord {
 // TODO: 완독 날짜 변경하는 상황 고려
 
 final class ReadingScheduleCalculator: ObservableObject {
-    let bookInfo: BookModel
+    let bookInfo: BookDetails
     @Published var dailyTargets: [String: ReadingRecord] = [:] // 날짜를 문자열로 변환하여 키로 사용
     
-    init(bookInfo: BookModel) {
+    init(bookInfo: BookDetails) {
         self.bookInfo = bookInfo
         calculateInitialDailyTargets() // 초기 목표 계산20
     }

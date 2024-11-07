@@ -8,10 +8,11 @@
 import SwiftUI
 
 // TODO: 추가되는 뷰 추가하기
-enum Screens {
+enum Screens: Hashable {
     case mainHome
     case empthNoti
     case bookSearch
+    case bookPageSetting
 }
 
 @Observable
@@ -25,6 +26,7 @@ final class NavigationCoordinator {
         case .mainHome: MainHomeView()
         case .empthNoti: EmptyNotiView()
         case .bookSearch: BookSearchView()
+        case .bookPageSetting: EmptyView()
         }
     }
 

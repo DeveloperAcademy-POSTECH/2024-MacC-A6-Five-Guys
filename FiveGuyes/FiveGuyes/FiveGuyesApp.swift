@@ -11,7 +11,7 @@ import SwiftUI
 struct FiveGuyesApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            NavigationRootView()
         }
     }
 }

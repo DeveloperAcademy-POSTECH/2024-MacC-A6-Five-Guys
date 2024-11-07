@@ -10,6 +10,8 @@ import SwiftUI
 struct MainHomeView: View {
     @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
     
+    var currentReadingBook = BookDetails.dummyBookDetails1()
+    
     var body: some View {
         
             ScrollView {
@@ -33,8 +35,7 @@ struct MainHomeView: View {
                         .font(.system(size: 24, weight: .semibold))
                         .foregroundColor(.black)
                         .padding(.bottom, 193)
-                        
-                        
+                          
                         WeeklyReadingProgressView()
                             .padding(.bottom, 16)
                         
@@ -107,5 +108,7 @@ struct MainHomeView: View {
     }}
 
 #Preview {
+//    @State var coordinator = NavigationCoordinator()
     MainHomeView()
+        .environment(NavigationCoordinator())
 }

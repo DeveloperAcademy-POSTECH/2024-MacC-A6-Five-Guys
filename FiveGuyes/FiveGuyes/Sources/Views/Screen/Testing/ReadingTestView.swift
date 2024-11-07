@@ -40,7 +40,7 @@ struct BookInputView: View {
     
     @State private var nonReadingDays: [Date] = []
     
-    var onBookInfoSubmit: (BookModel) -> Void
+    var onBookInfoSubmit: (BookDetails) -> Void
     
     var body: some View {
         VStack(spacing: 20) {
@@ -93,7 +93,7 @@ struct BookInputView: View {
             
             Button("읽기 목표 설정") {
                 if let total = Int(totalPages) {
-                    let bookInfo = BookModel(
+                    let bookInfo = BookDetails(
                         title: title,
                         author: author,
                         totalPages: total,
