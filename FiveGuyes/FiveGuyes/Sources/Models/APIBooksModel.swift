@@ -15,6 +15,7 @@ struct Book: Identifiable, Codable {
     let cover: String?
     let publisher: String
     let isbn13: String
+    let pubDate: String
 }
 
 struct BookResponse: Codable {
