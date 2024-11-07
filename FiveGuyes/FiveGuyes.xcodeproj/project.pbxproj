@@ -21,6 +21,7 @@
 		24360D4A2CD8BE3C00E83D2B /* FinishGoalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24360D492CD8BE3C00E83D2B /* FinishGoalView.swift */; };
 		24360D4C2CD9CF9700E83D2B /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24360D4B2CD9CF9700E83D2B /* MainView.swift */; };
 		24360D532CD9F3AF00E83D2B /* DailyProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24360D522CD9F3AF00E83D2B /* DailyProgressView.swift */; };
+		24A2063F2CDB180000964FBB /* CompletionCalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24A2063E2CDB180000964FBB /* CompletionCalendarView.swift */; };
 		2644404E2CD8A39E0031A290 /* CompletionCelebrationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2644404D2CD8A39E0031A290 /* CompletionCelebrationView.swift */; };
 		264440502CD8A3AC0031A290 /* CompletionReviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2644404F2CD8A3AC0031A290 /* CompletionReviewView.swift */; };
 		264440532CD8B1540031A290 /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 264440522CD8B1540031A290 /* String+Extension.swift */; };
@@ -61,6 +62,7 @@
 		24360D492CD8BE3C00E83D2B /* FinishGoalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinishGoalView.swift; sourceTree = "<group>"; };
 		24360D4B2CD9CF9700E83D2B /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		24360D522CD9F3AF00E83D2B /* DailyProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyProgressView.swift; sourceTree = "<group>"; };
+		24A2063E2CDB180000964FBB /* CompletionCalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletionCalendarView.swift; sourceTree = "<group>"; };
 		2644404D2CD8A39E0031A290 /* CompletionCelebrationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletionCelebrationView.swift; sourceTree = "<group>"; };
 		2644404F2CD8A3AC0031A290 /* CompletionReviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletionReviewView.swift; sourceTree = "<group>"; };
 		264440522CD8B1540031A290 /* String+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Extension.swift"; sourceTree = "<group>"; };
@@ -127,7 +129,6 @@
 		26890B882CAE811A008DFF49 = {
 			isa = PBXGroup;
 			children = (
-				26F19A752CDB2A5C00F41D6D /* Config.xcconfig */,
 				26890B932CAE811A008DFF49 /* FiveGuyes */,
 				26890B922CAE811A008DFF49 /* Products */,
 			);
@@ -215,6 +216,7 @@
 				1A010EC12CD8DA4300FBE3B3 /* TotalPageView.swift */,
 				26F19A662CD9EF9400F41D6D /* Main */,
 				264440512CD8A3B50031A290 /* BookCompletion */,
+				24A2063E2CDB180000964FBB /* CompletionCalendarView.swift */,
 			);
 			path = Screen;
 			sourceTree = "<group>";
@@ -355,7 +357,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				26F19A762CDB2A5C00F41D6D /* Config.xcconfig in Resources */,
 				26890BBD2CAE98E2008DFF49 /* .swiftlint.yml in Resources */,
 				26890B9C2CAE811D008DFF49 /* Preview Assets.xcassets in Resources */,
 				26890B992CAE811D008DFF49 /* Assets.xcassets in Resources */,
@@ -373,6 +374,7 @@
 				26F19A782CDB5D0100F41D6D /* BookModel.swift in Sources */,
 				26F19A822CDBE3A600F41D6D /* ReadingTestView.swift in Sources */,
 				1A010EAE2CD8A86E00FBE3B3 /* APIStore.swift in Sources */,
+				24A2063F2CDB180000964FBB /* CompletionCalendarView.swift in Sources */,
 				1A010EBE2CD8DA2400FBE3B3 /* BookListView.swift in Sources */,
 				1A010EC22CD8DA4300FBE3B3 /* TotalPageView.swift in Sources */,
 				1A010EC02CD8DA3800FBE3B3 /* BookLowView.swift in Sources */,
@@ -417,7 +419,6 @@
 /* Begin XCBuildConfiguration section */
 		26890B9D2CAE811D008DFF49 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 26F19A752CDB2A5C00F41D6D /* Config.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -481,7 +482,6 @@
 		};
 		26890B9E2CAE811D008DFF49 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 26F19A752CDB2A5C00F41D6D /* Config.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
