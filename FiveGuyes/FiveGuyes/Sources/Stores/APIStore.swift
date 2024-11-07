@@ -33,7 +33,7 @@ class APIStore {
         return bookResponse.item
     }
     
-    func fetchBookDetails(isbn: String) async throws -> Int {
+    func fetchBookTotalPages(isbn: String) async throws -> Int {
         let urlString = "\(lookupBaseUrl)?ttbkey=\(apiKey)&itemIdType=ISBN13&ItemId=\(isbn)&output=js&Version=20131101&OptResult=itemPage"
         
         guard let url = URL(string: urlString) else {
@@ -41,7 +41,10 @@ class APIStore {
         }
         
         let (data, _) = try await URLSession.shared.data(from: url)
+        print(data)
         let bookDetailResponse = try JSONDecoder().decode(BookDetailResponse.self, from: data)
+        print(bookDetailResponse)
+        print(bookDetailResponse.item?.first?.subInfo?.itemPage)
         return bookDetailResponse.item?.first?.subInfo?.itemPage ?? 0
     }
 }

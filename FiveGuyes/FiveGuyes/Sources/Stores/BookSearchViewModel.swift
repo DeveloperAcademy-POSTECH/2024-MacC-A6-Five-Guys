@@ -24,12 +24,12 @@ final class BookSearchViewModel: ObservableObject {
         }
     }
 
-    func fetchBookDetails(isbn: String) async -> Int? {
+    func fetchBookTotalPages(isbn: String) async -> String {
         do {
-            return try await apiStore.fetchBookDetails(isbn: isbn)
+            return try await String(apiStore.fetchBookTotalPages(isbn: isbn))
         } catch {
             print("Failed to fetch book details: \(error)")
-            return nil
+            return "0"
         }
     }
     

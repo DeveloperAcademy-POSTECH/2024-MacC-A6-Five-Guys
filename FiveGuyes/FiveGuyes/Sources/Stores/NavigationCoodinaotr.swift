@@ -9,10 +9,12 @@ import SwiftUI
 
 // TODO: 추가되는 뷰 추가하기
 enum Screens: Hashable {
+    case empty
     case mainHome
     case empthNoti
     case bookSearch
-    case bookPageSetting
+    case bookPageSetting(selectedBook: Book, totalPages: String)
+    case bookDurationSetting
 }
 
 @Observable
@@ -23,10 +25,13 @@ final class NavigationCoordinator {
      func navigate(to screen: Screens) -> some View {
          // TODO: 추가되는 뷰 추가하기
         switch screen {
+        case .empty: EmptyView()
         case .mainHome: MainHomeView()
         case .empthNoti: EmptyNotiView()
         case .bookSearch: BookSearchView()
-        case .bookPageSetting: EmptyView()
+        case .bookPageSetting(let selectedBook, let totalPages):
+            BookPageSettingView(selectedBook: selectedBook, pageCount: totalPages)
+        case .bookDurationSetting: CompletionCalendarView()
         }
     }
 

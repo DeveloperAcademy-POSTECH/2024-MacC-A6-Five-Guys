@@ -25,8 +25,13 @@ struct BookSearchView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
-                    // TODO: 페이지 설정 화면으로 넘어가기
-                    navigationCoordinator.push(.empthNoti)
+                    Task {
+                        guard let selectedBook = bookSearchViewModel.selectedBook else { return }
+                        
+                        let totalPages = await bookSearchViewModel.fetchBookTotalPages(isbn: selectedBook.title)
+                        
+                        navigationCoordinator.push(.bookPageSetting(selectedBook: selectedBook, totalPages: totalPages))
+                    }
                 } label: {
                     Text("확인")
                         .foregroundColor(bookSearchViewModel.selectedBook != nil ?
