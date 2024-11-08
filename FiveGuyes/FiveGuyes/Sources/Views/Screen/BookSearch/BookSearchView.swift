@@ -28,7 +28,7 @@ struct BookSearchView: View {
                     Task {
                         guard let selectedBook = bookSearchViewModel.selectedBook else { return }
                         
-                        let totalPages = await bookSearchViewModel.fetchBookTotalPages(isbn: selectedBook.title)
+                        let totalPages = await bookSearchViewModel.fetchBookTotalPages(isbn: selectedBook.isbn13)
                         
                         navigationCoordinator.push(.bookPageSetting(selectedBook: selectedBook, totalPages: totalPages))
                     }
