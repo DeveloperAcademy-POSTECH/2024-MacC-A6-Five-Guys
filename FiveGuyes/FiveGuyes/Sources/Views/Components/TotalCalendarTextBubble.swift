@@ -5,7 +5,7 @@
 //  Created by Shim Hyeonhee on 11/8/24.
 //
 
-
+// 전체 캘린더를 위한 버블
 import SwiftUI
 
 struct TotalCalendarTextBubble: View {
