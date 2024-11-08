@@ -15,7 +15,6 @@ struct CustomTextFieldStylePageCount: ViewModifier {
     func body(content: Content) -> some View {
         HStack {
             content
-                
                 .overlay(alignment: .leading) {
                     if text.isEmpty {
                         Text(placeholder)

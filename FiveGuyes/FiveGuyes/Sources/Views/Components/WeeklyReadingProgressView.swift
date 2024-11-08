@@ -61,7 +61,6 @@ struct WeeklyReadingProgressView: View {
                 }
                 .shadow(color: Color(red: 0.84, green: 0.84, blue: 0.84).opacity(0.25), radius: 2, x: 0, y: 4)
             
-                
         }
     }
 }
