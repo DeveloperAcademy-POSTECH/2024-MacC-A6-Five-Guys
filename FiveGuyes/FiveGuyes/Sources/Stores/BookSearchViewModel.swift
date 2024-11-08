@@ -5,7 +5,7 @@
 //  Created by Shim Hyeonhee on 11/4/24.
 //
 
-import Foundation
+import SwiftUI
 
 @MainActor
 final class BookSearchViewModel: ObservableObject {

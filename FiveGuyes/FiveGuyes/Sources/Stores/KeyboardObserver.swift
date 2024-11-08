@@ -20,12 +20,16 @@ class KeyboardObserver: ObservableObject {
     }
     
     private func addKeyboardObservers() {
-        NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification, object: nil, queue: .main) { _ in
-            self.keyboardIsVisible = true
+        NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification, object: nil, queue: .main) { [weak self] _ in
+            DispatchQueue.main.async {
+                self?.keyboardIsVisible = true
+            }
         }
         
-        NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillHideNotification, object: nil, queue: .main) { _ in
-            self.keyboardIsVisible = false
+        NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillHideNotification, object: nil, queue: .main) { [weak self] _ in
+            DispatchQueue.main.async {
+                self?.keyboardIsVisible = false
+            }
         }
     }
     

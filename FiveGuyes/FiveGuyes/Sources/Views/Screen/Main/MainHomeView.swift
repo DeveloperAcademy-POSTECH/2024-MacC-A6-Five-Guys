@@ -9,58 +9,65 @@ import SwiftUI
 
 struct MainHomeView: View {
     @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
-    
-    var currentReadingBook = BookDetails.dummyBookDetails1()
+    @State private var topSafeAreaInset: CGFloat = 0
     
     var body: some View {
         
-            ScrollView {
-                ZStack(alignment: .top) {
-                    Color.green.opacity(0.2).frame(height: 448)
-                    
-                    VStack(spacing: 0) {
-                        HStack {
-                            Spacer()
-                            notiButton {
-                                // TODO: 페이지 이동
-                                navigationCoordinator.push(.empthNoti)
-                            }
+        ScrollView {
+            ZStack(alignment: .top) {
+                Color.green.opacity(0.2)
+                    .frame(height: 448)
+                
+                VStack(spacing: 0) {
+                    HStack {
+                        Spacer()
+                        notiButton {
+                            navigationCoordinator.push(.empthNoti)
                         }
-                        .padding(.bottom, 37)
-                        
-                        HStack {
-                            Text("환영해요!\n저와 함께 완독을 시작해볼까요?")
-                            Spacer()
-                        }
-                        .font(.system(size: 24, weight: .semibold))
-                        .foregroundColor(.black)
-                        .padding(.bottom, 193)
-                          
-                        WeeklyReadingProgressView()
-                            .padding(.bottom, 16)
-                        
-                        HStack(spacing: 16) {
-                            calendarFullScreenButton {
-                                // TODO: 페이지 이동
-                            }
-                                .frame(width: 107)
-                            
-                            addBookButton {
-                                // TODO: 페이지 이동
-                                navigationCoordinator.push(.bookSearch)
-                            }
-                        }
-                        .padding(.bottom, 40)
-                        
-                        CompletionListView()
-                        
                     }
-                    .padding(.horizontal, 20)
+                    .padding(.bottom, 37)
+                    
+                    HStack {
+                        Text("환영해요!\n저와 함께 완독을 시작해볼까요?")
+                        Spacer()
+                    }
+                    .font(.system(size: 24, weight: .semibold))
+                    .foregroundColor(.black)
+                    .padding(.bottom, 193)
+                    
+                    WeeklyReadingProgressView()
+                        .padding(.bottom, 16)
+                    
+                    HStack(spacing: 16) {
+                        calendarFullScreenButton {
+                            // TODO: 페이지 이동
+                        }
+                        .frame(width: 107)
+                        
+                        addBookButton {
+                            navigationCoordinator.push(.bookSettingsManager)
+                        }
+                    }
+                    .padding(.bottom, 40)
+                    
+                    CompletionListView()
+                    
                 }
+                .padding(.horizontal, 20)
+                .padding(.top, topSafeAreaInset)
             }
-            .padding(.top, 0.2)
-            .scrollIndicators(.hidden)
         }
+        .ignoresSafeArea(edges: .top)
+        .scrollIndicators(.hidden)
+        .onAppear {
+            // 상단 안전 영역 값 계산
+            if let window = UIApplication.shared.connectedScenes
+                .compactMap({ $0 as? UIWindowScene })
+                .first?.windows.first {
+                topSafeAreaInset = window.safeAreaInsets.top
+            }
+        }
+    }
     
     private func notiButton(action: @escaping () -> Void) -> some View {
         Button(action: action) {
@@ -105,10 +112,10 @@ struct MainHomeView: View {
                         .foregroundColor(.green)
                 }
         }
-    }}
+    }
+}
 
 #Preview {
-//    @State var coordinator = NavigationCoordinator()
     MainHomeView()
         .environment(NavigationCoordinator())
 }

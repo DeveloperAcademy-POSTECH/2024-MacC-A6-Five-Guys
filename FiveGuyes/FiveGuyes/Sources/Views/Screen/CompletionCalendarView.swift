@@ -6,11 +6,23 @@
 //
 
 import SwiftUI
+// 둘 다 눌려있는 상태에서 또 누르면 리셋?
+// 중간을 누르면 뭘 움직여?
+// 그냥 리셋시키는게 가장 편할 듯
+// TODO: 현재 기준으로 이전 날짜는 선택 안되게 하기
 
 struct CompletionCalendarView: View {
+    
+    @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
+    @Environment(BookSettingInputModel.self) var bookSettingInputModel: BookSettingInputModel
+    
     @State private var selectedStartDate: Date?
     @State private var selectedEndDate: Date?
     @State private var currentMonth: Date = Date()
+    
+    @State var totalPages: String = ""
+    
+    @StateObject private var keyboardObserver = KeyboardObserver()
     
     private let monthFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -20,7 +32,52 @@ struct CompletionCalendarView: View {
     }()
     
     var body: some View {
+        let title = bookSettingInputModel.selectedBook?.title ?? ""
+        
         VStack(spacing: 0) {
+            VStack(alignment: .leading) {
+                Text("<\(title)>\(title.subjectParticle())")
+                    .lineLimit(1) // 제목이 길어지면 줄바꿈 허용
+                
+                HStack(spacing: 8) {
+                    Text("총")
+                    
+                    HStack(spacing: 2) {
+                        TextField("", text: $totalPages)
+                            .keyboardType(.numberPad)
+                            .font(.system(size: 20, weight: .medium))
+                            .fixedSize()
+                            .background {
+                                RoundedRectangle(cornerRadius: 7)
+                                    .foregroundColor(.clear)
+                                    .frame(height: 30) // 텍스트 필드 높이 지정
+                            }
+                        
+                        Image(systemName: "pencil") // 원하는 이미지로 변경
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 20, height: 20)
+                        
+                    }
+                    .foregroundColor(Color(red: 0.03, green: 0.68, blue: 0.41))
+                    .padding(.horizontal, 8) // 텍스트 필드와 이미지 주변 패딩
+                    .padding(.vertical, 4)
+                    .background {
+                        RoundedRectangle(cornerRadius: 8)
+                            .foregroundStyle(Color(red: 0.93, green: 0.97, blue: 0.95))
+                    }
+                    
+                    Text("쪽이에요")
+                    
+                    Spacer()
+                }
+                Text("목표기간을 선택해주세요")
+            }
+            .font(.system(size: 22, weight: .semibold))
+            .foregroundColor(.black)
+            .padding(.bottom, 11)
+            .padding(.horizontal, 20)
+            
             weekdayHeader()
             
             Divider()
@@ -31,17 +88,51 @@ struct CompletionCalendarView: View {
             Divider()
                 .padding(.bottom, 14)
             
-            nextButton()
+            if keyboardObserver.keyboardIsVisible {
+                
+                Button {
+                    bookSettingInputModel.totalPages = totalPages
+                    bookSettingInputModel.nextPage()
+                    
+                } label: {
+                    Text("다음")
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 56)
+                        .background(Color(red: 0.07, green: 0.87, blue: 0.54))
+                        .foregroundStyle(.white)
+                    
+                }
+                .ignoresSafeArea(.keyboard, edges: .bottom)
+            } else {
+                nextButton()
+            }
+        }
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    nextButtomAction()
+                } label: {
+                    Text("완료")
+                        .foregroundColor(!(selectedStartDate == nil || selectedEndDate == nil) ?
+                                         Color(red: 0.03, green: 0.68, blue: 0.41)
+                                         : Color(red: 0.84, green: 0.84, blue: 0.84))
+                }
+                .disabled(selectedStartDate == nil || selectedEndDate == nil)
+            }
+        }
+
+        .onAppear {
+            totalPages = bookSettingInputModel.totalPages
         }
     }
     
     private func weekdayHeader() -> some View {
-        HStack {
+        HStack(spacing: 20) {
             ForEach(["일", "월", "화", "수", "목", "금", "토"], id: \.self) { day in
                 Text(day)
                     .frame(maxWidth: .infinity)
-                    .font(.system(size: 13))
-                    .foregroundColor(.gray)
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundColor(Color(red: 0.24, green: 0.24, blue: 0.26).opacity(0.3))
             }
         }
         .padding(.bottom, 12)
@@ -52,6 +143,7 @@ struct CompletionCalendarView: View {
             VStack(spacing: 35) {
                 ForEach(0..<12, id: \.self) { monthOffset in
                     let monthDate = Calendar.current.date(byAdding: .month, value: monthOffset, to: currentMonth)!
+                    
                     let daysInMonth = self.getDaysInMonth(for: monthDate)
                     
                     let adjustedDays = self.adjustDaysForMonth(monthDate: monthDate, daysInMonth: daysInMonth)
@@ -195,9 +287,12 @@ struct CompletionCalendarView: View {
     private func getDaysInMonth(for date: Date) -> [Date] {
         let calendar = Calendar.current
         let range = calendar.range(of: .day, in: .month, for: date)!
+        
         return range.compactMap { day -> Date? in
             let components = calendar.dateComponents([.year, .month], from: date)
+            
             let adjustedDate = calendar.date(bySetting: .day, value: day, of: calendar.date(from: components)!)
+            
             return adjustedDate.flatMap { calendar.startOfDay(for: $0) }
         }
     }
@@ -206,6 +301,10 @@ struct CompletionCalendarView: View {
     private func nextButton() -> some View {
         Button {
             // TODO: 쉬는 날 소거 캘린더로 가기
+            
+            // TODO: 우선 처음과 끝만 선택하고 넘어가기
+            nextButtomAction()
+            
         } label: {
             Text("다음")
                 .font(.system(size: 20, weight: .semibold))
@@ -216,6 +315,13 @@ struct CompletionCalendarView: View {
                 .cornerRadius(16)
         }
     }
+    
+    private func nextButtomAction() {
+        bookSettingInputModel.startData = selectedStartDate
+        bookSettingInputModel.endData = selectedEndDate
+        
+        bookSettingInputModel.nextPage()
+    }
 }
 
 extension Date {
@@ -224,8 +330,4 @@ extension Date {
         let components = calendar.dateComponents([.year, .month], from: self)
         return calendar.date(from: components)!
     }
-}
-
-#Preview {
-    CompletionCalendarView()
 }

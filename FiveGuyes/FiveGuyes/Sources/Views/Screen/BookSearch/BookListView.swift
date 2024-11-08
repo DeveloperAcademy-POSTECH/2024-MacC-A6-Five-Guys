@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+// TODO: 검색 완료 시 키보드 내리기
 struct BookListView: View {
     @ObservedObject var bookSearchViewModel: BookSearchViewModel
     @State private var searchText: String = ""

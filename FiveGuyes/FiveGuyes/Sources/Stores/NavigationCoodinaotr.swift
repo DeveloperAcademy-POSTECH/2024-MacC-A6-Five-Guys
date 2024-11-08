@@ -12,9 +12,7 @@ enum Screens: Hashable {
     case empty
     case mainHome
     case empthNoti
-    case bookSearch
-    case bookPageSetting(selectedBook: Book, totalPages: String)
-    case bookDurationSetting
+    case bookSettingsManager
 }
 
 @Observable
@@ -26,12 +24,12 @@ final class NavigationCoordinator {
          // TODO: 추가되는 뷰 추가하기
         switch screen {
         case .empty: EmptyView()
-        case .mainHome: MainHomeView()
-        case .empthNoti: EmptyNotiView()
-        case .bookSearch: BookSearchView()
-        case .bookPageSetting(let selectedBook, let totalPages):
-            BookPageSettingView(selectedBook: selectedBook, pageCount: totalPages)
-        case .bookDurationSetting: CompletionCalendarView()
+        case .mainHome: 
+            MainHomeView()
+        case .empthNoti:
+            EmptyNotiView()
+        case .bookSettingsManager:
+            BookSettingsManagerView()
         }
     }
 

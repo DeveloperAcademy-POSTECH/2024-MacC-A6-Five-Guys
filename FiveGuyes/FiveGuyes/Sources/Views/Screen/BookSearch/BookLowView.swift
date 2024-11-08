@@ -32,7 +32,6 @@ struct BookRowView: View {
                 .frame(width: 115, height: 178)
                 .padding(.leading, 20)
                 
-                
                 VStack(alignment: .leading) {
                     Text(book.title)
                         .font(.system(size: 16))
@@ -45,13 +44,10 @@ struct BookRowView: View {
                 .frame(maxWidth: .infinity, alignment: .topLeading)
                 .padding(.leading, 16)
                 
-                
                 Image(systemName: viewModel.selectedBook == book ? "checkmark.circle.fill" : "circle")
                     .foregroundStyle(Color(red: 0.07, green: 0.87, blue: 0.54))
                     .padding(.trailing, 25)
-                
-                
-                
+                   
             }
         }
         .contentShape(Rectangle()) // 전체 영역이 탭 가능한 영역이 되도록 설정
