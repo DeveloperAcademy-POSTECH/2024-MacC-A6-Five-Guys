@@ -5,7 +5,6 @@
 //  Created by Shim Hyeonhee on 11/6/24.
 //
 
-
 import SwiftUI
 
 struct TotalCalendarView: View {
@@ -29,14 +28,18 @@ struct TotalCalendarView: View {
     
     // 더미데이터
     // 전체 페이지 수
-    // 여기서는 310 페이지라고 가정
+    // 여기서는 320 페이지라고 가정
     @State private var totalBookPages: Int?
     
-    // 목표한 완독일 수(일부러 뺀 날짜 제외) 여기서는 31일로 가정
+    // 목표한 완독일 수(일부러 뺀 날짜 제외) 여기서는 32일로 가정
     @State private var totalTargetDays: Int?
     
+    // 완독일(내가 정한 기간의 가장 마지막 일을 받아오기)
+    // 여기서는 "2024-12-08"로 가정
+    @State private var completionTargetDay: String? = "2024-12-08"
+    
     // 하루 당 읽어야 하는 페이지 수 계산속성
-    // 여기서는 310/31 = 10 장으로 가정
+    // 여기서는 320/32 = 10 장으로 가정
     private var targetPages: Int? {
         guard let totalBookPages = totalBookPages, let totalTargetDays = totalTargetDays else {
             return nil
@@ -44,22 +47,7 @@ struct TotalCalendarView: View {
         return  totalBookPages / totalTargetDays
     }
     
-    // 완독일을 보여주기 위한 계산속성
-    private var completionDateFormatted: String {
-        let lastReadingData = readingData.filter { $0.targetPages != nil }.last
-        guard let lastDate = lastReadingData?.date else { return "데이터가 없습니다" }
-        
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd"
-        guard let date = dateFormatter.date(from: lastDate) else { return "유효하지 않은 데이터포맷임" }
-        
-        let displayFormatter = DateFormatter()
-        
-        displayFormatter.locale = Locale(identifier: "ko_KR")
-        displayFormatter.dateFormat = "M월 d일 EEEE"
-        return displayFormatter.string(from: date)
-    }
-    
+   
     let todayDate = "2024-11-17" // 오늘은 17일이라고 가정 (더미데이터)
     
     // 직전(오늘 전)에 읽은 페이지 쪽 숫자 기록
@@ -76,7 +64,7 @@ struct TotalCalendarView: View {
         return currentPage - lastPage
     }
     
-    // 310장을 31일동안 읽기 위해 하루에 10페이지를 타겟으로 한다고 가정 한 더미데이터
+    // 320장을 32일동안 읽기 위해 하루에 10페이지를 타겟으로 한다고 가정 한 더미데이터
     @State private var readingData: [ReadingData] = [
         ReadingData(date: "2024-11-01", todayReadPages: nil, targetPages: nil, currentPage: nil), // 안읽기로 한 날
         ReadingData(date: "2024-11-02", todayReadPages: 8, targetPages: 10, currentPage: 8),
@@ -114,28 +102,27 @@ struct TotalCalendarView: View {
         ReadingData(date: "2024-12-04", todayReadPages: nil, targetPages: 290, currentPage: nil),  // 읽기로 했지만 안읽음
         ReadingData(date: "2024-12-05", todayReadPages: nil, targetPages: 300, currentPage: nil),
         ReadingData(date: "2024-12-06", todayReadPages: nil, targetPages: nil, currentPage: nil),  // 안읽기로 한 날
-        ReadingData(date: "2024-12-05", todayReadPages: nil, targetPages: 310, currentPage: nil)
+        ReadingData(date: "2024-12-07", todayReadPages: nil, targetPages: 310, currentPage: nil),
+        ReadingData(date: "2024-12-08", todayReadPages: nil, targetPages: 320, currentPage: 320) // 완독일 12월 8일
     ]
     
     var body: some View {
-        
         // 캘린더
         VStack {
             header
             dayLabels
             calendarDays
         }
-        .padding()
-        
-        // 구분선
-        
+        .padding(.horizontal, 22)
+        .padding(.bottom, 40)
         // 완독종료 표시
         HStack(alignment: .center) {
             
             Text("완독 종료일")
             Spacer()
+            // 완독 종료 날짜 표시
             HStack(alignment: .center, spacing: 0) {
-                Text("\(completionDateFormatted)")
+                Text("\(formattedCompletionDateString(from: completionTargetDay))")
                     .font(.headline)
                     .multilineTextAlignment(.center)
                     .foregroundColor(Color(red: 0.03, green: 0.68, blue: 0.41))
@@ -150,6 +137,7 @@ struct TotalCalendarView: View {
         .padding(.top, 8)
         .padding(.bottom, 16)
         .frame(width: 361, alignment: .center)
+        // 구분선
         .overlay(
             VStack(spacing: 0) {
                 Color(red: 0.94, green: 0.94, blue: 0.94)
@@ -162,18 +150,26 @@ struct TotalCalendarView: View {
     
     // 캘린더 헤더
     private var header: some View {
-        HStack {
-            Text(monthYearString(for: currentMonth))
-                .font(.title2)
-                .bold()
-            Spacer()
-            Button(action: previousMonth) {
-                Image(systemName: "chevron.left")
+        ZStack {
+            Text(calendarHeaderString(for: currentMonth))
+                .font(.system(size: 17, weight: .semibold))
+                .multilineTextAlignment(.center)
+                .foregroundColor(Color(red: 0.12, green: 0.12, blue: 0.12))
+          
+            HStack(alignment: .center, spacing: 28) {
+                Spacer()
+                Button(action: previousMonth) {
+                    Image(systemName: "chevron.left")
+                }
+                Button(action: nextMonth) {
+                    Image(systemName: "chevron.right")
+                }
+                .padding(.trailing, 20)
             }
-            Button(action: nextMonth) {
-                Image(systemName: "chevron.right")
-            }
-        }
+            .foregroundColor(Color(red: 0.03, green: 0.68, blue: 0.41))
+
+        } 
+        .padding(.bottom, 30)
     }
     
     // 캘린더 요일 라벨
@@ -181,11 +177,13 @@ struct TotalCalendarView: View {
         LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7)) {
             ForEach(["일", "월", "화", "수", "목", "금", "토"], id: \.self) { day in
                 Text(day)
-                    .font(.headline)
-                    .frame(maxWidth: .infinity)
-                    .foregroundColor(.gray)
+                    .font(.system(size: 15, weight: .medium))
+                    .foregroundColor(Color(red: 0.74, green: 0.74, blue: 0.74))
+                    .frame(width: 32, height: 18, alignment: .center)
+                    .padding(.horizontal, 16)
             }
         }
+        .padding(.bottom, 23)
     }
     
     private var calendarDays: some View {
@@ -197,67 +195,57 @@ struct TotalCalendarView: View {
             ForEach(0..<totalCells, id: \.self) { index in
                 if index < startDayOfWeek {
                     Text("")
-                        .frame(width: 40, height: 40)
+                        .frame(width: 50, height: 50)
                 } else {
-                    
                     let day = index - startDayOfWeek + 1
                     let dateInfo = formattedDate(year: getCurrentMonthAndYear().year, month: getCurrentMonthAndYear().month, day: day)
                     VStack(spacing: 0) {
                         if let readingInfo = readingData.first(where: { $0.date == dateInfo.formattedString }) {
+                            
+                            // 완독일 인 경우
+                            if dateInfo.formattedString == completionDateFormatted {
+                                ZStack {
+                                    Image("flag")
+                                        .resizable()
+                                        .frame(width: 40, height: 40)
+                                    VStack {
+                                        Text("완독")
+                                            .font(.system(size: 13))
+                                            .multilineTextAlignment(.center)
+                                            .foregroundColor(Color(red: 0.03, green: 0.68, blue: 0.41))
+                                    }
+                                }
+                            }
                             // 오늘인 경우
-                            if dateInfo.formattedString == todayDate {
-                                Circle()
-                                    .fill((Color(red: 0.07, green: 0.87, blue: 0.54)))
-                                    .frame(width: 40, height: 40)
-                                    .overlay(Text("\(readingInfo.targetPages ?? 0)").font(.subheadline).foregroundColor(.white))
+                           else if dateInfo.formattedString == todayDate {
+                                TotalCalendarTextBubble(text: "\(readingInfo.targetPages ?? 0)", textColor: .white, backgroundColor: Color(red: 0.07, green: 0.87, blue: 0.54))
                             }
                             // 오늘이 아니면서
                             else {
                                 // 계획하지 않은 날(타겟도 nil, 읽은 페이지도 nil) - 회색 원
                                 if readingInfo.targetPages == nil && readingInfo.todayReadPages == nil {
-                                    Circle().fill(Color.gray.opacity(0.2)).frame(width: 40, height: 40)
+                                    TotalCalendarTextBubble(text: "", textColor: Color.clear, backgroundColor: Color(red: 0.97, green: 0.98, blue: 0.97))
                                 }
                                 // 계획 했고
                                 else if  readingInfo.targetPages != nil {
                                     
                                     if let pagesRead = readingInfo.todayReadPages, pagesRead > 0 {
-                                        Circle()
                                         // 계획 했고 잘 읽은 날
-                                            .fill(Color.green.opacity(0.2))
-                                            .frame(width: 40, height: 40)
-                                            .overlay(Text("\(readingInfo.currentPage ?? 0)").font(.subheadline).foregroundColor(.black))
-                                    }
-                                    else {
+                                        TotalCalendarTextBubble(text: "\(readingInfo.currentPage ?? 0)", textColor: .black, backgroundColor: Color.green.opacity(0.2))
+                                    } else {
                                         if isFutureDate(day: day, month: dateInfo.month, year: dateInfo.year) {
-                                            Circle()
-                                                .fill(Color.gray.opacity(0.2))
-                                                .frame(width: 40, height: 40)
-                                                .overlay(Text("\(readingInfo.targetPages ?? 0)").font(.subheadline).foregroundColor(.white))
-                                            
+                                            TotalCalendarTextBubble(text: "\(readingInfo.targetPages ?? 0)", textColor: Color(red: 0.84, green: 0.84, blue: 0.84), backgroundColor: .clear)
                                         } else {
-                                            Circle()
-                                                .fill(Color.gray.opacity(0.2))
-                                                .frame(width: 40, height: 40)
-                                                .overlay(Text("•").font(.title).foregroundColor(.gray))
-                                            
+                                            TotalCalendarTextBubble(text: "•", textColor: .gray, backgroundColor: Color(red: 0.97, green: 0.98, blue: 0.97))
                                         }
                                     }
-                                    
                                 }
-                                
-                                
-                                
-                                
                             }
-                            
-                        }
-                        else {
-                            Circle()
-                                .fill(Color.gray.opacity(0.2))
-                                .frame(width: 40, height: 40)
+                        } else {
+                            TotalCalendarTextBubble(text: "", textColor: Color.clear, backgroundColor: Color.gray.opacity(0.2))
                         }
                     }
-                    .frame(width: 40, height: 40)
+                    .frame(width: 50, height: 50, alignment: .center)
                 }
             }
         }
@@ -271,10 +259,11 @@ struct TotalCalendarView: View {
         currentMonth = Calendar.current.date(byAdding: .month, value: 1, to: currentMonth) ?? currentMonth
     }
     
-    private func monthYearString(for date: Date) -> String {
+    // 캘린더 헤더용 스트링 변환 로직
+    private func calendarHeaderString(for date: Date) -> String {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "ko_KR")
-        formatter.dateFormat = "MMMM yyyy"
+        formatter.dateFormat = "yyyy MMMM"
         return formatter.string(from: date)
     }
     
@@ -333,4 +322,42 @@ struct TotalCalendarView: View {
         
         return false
     }
+    
+    // 완독 종료일 스트링을 표시하기 위한 로직
+    // 완료일을 completionTargetDay로 가져오는 경우
+    private func formattedCompletionDateString(from dateString: String?) -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        
+        guard let dateString = dateString else { return "변환하지 못했습니다" }
+        guard let date = dateFormatter.date(from: dateString) else {
+            return "유효하지 않은 날짜 형식입니다"
+        }
+        
+        let displayFormatter = DateFormatter()
+        displayFormatter.locale = Locale(identifier: "ko_KR")
+        displayFormatter.dateFormat = "M월 d일 EEEE"
+        
+        return displayFormatter.string(from: date)
+    }
+    
+    // 캘린더 내 플래그 완독 표시를 위한 로직
+    private var completionDateFormatted: String {
+      
+        let lastReadingData = readingData.last(where: { $0.targetPages == $0.currentPage })
+        
+        guard let lastDate = lastReadingData?.date else {
+            return "완독이 완료되지 않았습니다"
+        }
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+   
+        guard let date = dateFormatter.date(from: lastDate) else {
+            return "유효하지 않은 데이터포맷임"
+        }
+        
+        return dateFormatter.string(from: date)
+    }
+    
 }

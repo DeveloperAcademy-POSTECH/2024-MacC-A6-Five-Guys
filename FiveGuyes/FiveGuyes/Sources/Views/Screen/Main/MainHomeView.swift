@@ -61,8 +61,6 @@ struct MainHomeView: View {
             .scrollIndicators(.hidden)
         }
     
-    
-    
     private func notiButton(action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Image(systemName: "bell")
