@@ -7,6 +7,11 @@
 
 import SwiftUI
 
+// TODO: 전체 페이지 못받아오는 거 해결하기
+// TODO: 책 정보를 다음 페이지로 넘길 방식 찾기 (현재는 한 개씩 보내는데 그러다보면 점점 추가될 듯;) 
+// TODO: 날짜 선택 달력 리팩하기
+// TODO: 프로그레스바 추가하기 (한 화면에서 동작해야지 애니메이션이 돌아갈 듯;)
+
 struct BookPageSettingView: View {
     // TODO: Book 타입 받기
     let selectedBook: Book

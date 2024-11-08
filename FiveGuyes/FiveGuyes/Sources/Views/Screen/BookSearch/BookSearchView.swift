@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+// TODO: 책 검색하면 키보드 내리기
+
 struct BookSearchView: View {
     @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
     
