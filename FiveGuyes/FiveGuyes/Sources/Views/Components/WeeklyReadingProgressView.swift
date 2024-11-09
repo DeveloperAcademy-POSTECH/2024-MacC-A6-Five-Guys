@@ -8,11 +8,11 @@
 import SwiftUI
 
 struct WeeklyReadingProgressView: View {
-    @Environment(UserLibrary.self) var uerLibrary: UserLibrary
+    @Environment(UserLibrary.self) var userLibrary: UserLibrary
     
     var body: some View {
-        if let currentReadingBook = uerLibrary.currentReadingBook {
-            
+        if let currentReadingBook = userLibrary.currentReadingBook {
+            // TODO: 저장된 책의 결과를 보여주기
             VStack(alignment: .leading, spacing: 17) {
                 
                 VStack(alignment: .leading, spacing: 8) {
@@ -28,7 +28,7 @@ struct WeeklyReadingProgressView: View {
                 .padding(.top, 22)
                 .padding(.horizontal, 24)
                 
-                WeeklyPageCalendarView()
+                WeeklyPageCalendarView(currentReadingBook: currentReadingBook)
                     .padding(.horizontal, 15)
                     .padding(.bottom, 21)
                 

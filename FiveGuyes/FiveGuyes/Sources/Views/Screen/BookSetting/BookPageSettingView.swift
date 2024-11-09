@@ -86,9 +86,9 @@ struct BookPageSettingView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
-                    
+                    // 동작을 하지 않는게 맞음
                 } label: {
-                    Text("완료")
+                    Text("다음")
                         .foregroundColor(Color(red: 0.84, green: 0.84, blue: 0.84))
                 }
                 .disabled(true)

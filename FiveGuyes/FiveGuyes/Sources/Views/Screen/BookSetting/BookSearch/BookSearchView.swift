@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+// TODO: 검색 결과 없을 때 화면 추가하기
 struct BookSearchView: View {
     @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
     @Environment(BookSettingInputModel.self) var bookSettingInputModel: BookSettingInputModel

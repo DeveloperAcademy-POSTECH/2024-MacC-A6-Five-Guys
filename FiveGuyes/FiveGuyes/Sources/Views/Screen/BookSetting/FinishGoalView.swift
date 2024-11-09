@@ -12,11 +12,12 @@ import SwiftUI
 struct FinishGoalView: View {
     @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
     @Environment(BookSettingInputModel.self) var bookSettingInputModel: BookSettingInputModel
-    @Environment(UserLibrary.self) var uerLibrary: UserLibrary
+    @Environment(UserLibrary.self) var userLibrary: UserLibrary
     
     @State private var pagesPerDay: Int = 0
-    
     @State var userBook: UserBook?
+    
+    let calculator = ReadingScheduleCalculator()
     
     var body: some View {
         
@@ -135,8 +136,8 @@ struct FinishGoalView: View {
                     
                     Button {
                         // TODO: 책 정보 저장하기
-                        // 유저 라이브러리에 추가하기
-                        uerLibrary.currentReadingBook = userBook
+                        // 유저 라이브러리에 추가 + 초기 페이지 할당량 계산해서 저장
+                        userLibrary.currentReadingBook = userBook
                         navigationCoordinator.popToRoot()
                     } label: {
                         HStack {
@@ -157,11 +158,13 @@ struct FinishGoalView: View {
             }
             .onAppear {
                 // 1일 할당량 계산
-                var book = UserBook(book: BookDetails(title: book.title, author: book.author, coverURL: book.cover, totalPages: totalPages, startDate: startDate, targetEndDate: endDate))
-                
-                let calculator = ReadingScheduleCalculator(userBook: book)
-                pagesPerDay = calculator.calculatePagesPerDay()
-                userBook = calculator.userBook
+                // TODO: 해당 모델 객체를 더 잘 만들 방식 고민하기
+                let bookData = UserBook(book: BookDetails(title: book.title, author: book.author, coverURL: book.cover, totalPages: totalPages, startDate: startDate, targetEndDate: endDate, nonReadingDays: bookSettingInputModel.nonReadingDays))
+                //                bookData.
+                calculator.calculateInitialDailyTargets(for: bookData)
+                print(bookData.readingRecords)
+                userBook = bookData
+                pagesPerDay = calculator.calculatePagesPerDay(for: bookData)
             }
         }
         
