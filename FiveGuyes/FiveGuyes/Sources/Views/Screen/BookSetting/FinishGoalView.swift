@@ -16,7 +16,7 @@ struct FinishGoalView: View {
     
     @State private var pagesPerDay: Int = 0
     
-    var userBook: UserBook?
+    @State var userBook: UserBook?
     
     var body: some View {
         
@@ -71,7 +71,7 @@ struct FinishGoalView: View {
                             AsyncImage(url: url) { image in
                                 image
                                     .resizable()
-                                    .scaledToFit()
+                                    .scaledToFill()
                                     .frame(width: 90, height: 139)
                             } placeholder: {
                                 ProgressView()
@@ -136,6 +136,7 @@ struct FinishGoalView: View {
                     Button {
                         // TODO: 책 정보 저장하기
                         // 유저 라이브러리에 추가하기
+                        uerLibrary.currentReadingBook = userBook
                         navigationCoordinator.popToRoot()
                     } label: {
                         HStack {
@@ -156,10 +157,11 @@ struct FinishGoalView: View {
             }
             .onAppear {
                 // 1일 할당량 계산
-                var userBook = UserBook(book: BookDetails(title: book.title, author: book.author, coverURL: book.cover, totalPages: totalPages, startDate: startDate, targetEndDate: endDate))
+                var book = UserBook(book: BookDetails(title: book.title, author: book.author, coverURL: book.cover, totalPages: totalPages, startDate: startDate, targetEndDate: endDate))
                 
-                let calculator = ReadingScheduleCalculator(userBook: userBook)
+                let calculator = ReadingScheduleCalculator(userBook: book)
                 pagesPerDay = calculator.calculatePagesPerDay()
+                userBook = calculator.userBook
             }
         }
         

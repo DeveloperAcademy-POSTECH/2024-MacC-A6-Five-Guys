@@ -13,7 +13,7 @@ import Foundation
 // TODO: 완독 날짜 변경하는 상황 고려
 
 struct ReadingScheduleCalculator {
-    private var userBook: UserBook
+    var userBook: UserBook
     
     init(userBook: UserBook) {
         self.userBook = userBook

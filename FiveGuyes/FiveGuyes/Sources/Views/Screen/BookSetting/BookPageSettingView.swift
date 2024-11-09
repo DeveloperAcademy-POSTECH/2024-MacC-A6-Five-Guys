@@ -41,7 +41,7 @@ struct BookPageSettingView: View {
                         
                         Image(systemName: "pencil") // 원하는 이미지로 변경
                             .resizable()
-                            .scaledToFit()
+                            .scaledToFill()
                             .frame(width: 20, height: 20)
                         
                     }

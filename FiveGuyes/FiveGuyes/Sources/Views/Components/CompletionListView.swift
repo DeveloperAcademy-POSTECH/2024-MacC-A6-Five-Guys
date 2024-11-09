@@ -25,7 +25,7 @@ struct CompletionListView: View {
                 VStack(alignment: .leading, spacing: 6) {
                     Image("bookCoverDummy")
                         .resizable()
-                        .scaledToFit()
+                        .scaledToFill()
                         .frame(width: 115, height: 178)
                     
                     VStack(alignment: .leading, spacing: 0) {

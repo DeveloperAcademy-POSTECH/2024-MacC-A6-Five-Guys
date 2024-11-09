@@ -65,9 +65,8 @@ struct CompletionCalendarView: View {
                             
                             Image(systemName: "pencil") // 원하는 이미지로 변경
                                 .resizable()
-                                .scaledToFit()
+                                .scaledToFill()
                                 .frame(width: 20, height: 20)
-                            
                         }
                         .foregroundColor(Color(red: 0.03, green: 0.68, blue: 0.41))
                         .padding(.horizontal, 8) // 텍스트 필드와 이미지 주변 패딩
@@ -367,9 +366,6 @@ struct CompletionCalendarView: View {
         bookSettingInputModel.startData = selectedStartDate
         bookSettingInputModel.endData = selectedEndDate
         bookSettingInputModel.nonReadingDays = deletedDates
-        print(selectedStartDate)
-        print(selectedEndDate)
-        print(deletedDates)
         
         // 페이지 이동
         bookSettingInputModel.nextPage()
