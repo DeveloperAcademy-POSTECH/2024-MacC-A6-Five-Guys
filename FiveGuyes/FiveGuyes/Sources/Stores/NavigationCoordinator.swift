@@ -1,5 +1,5 @@
 //
-//  NavigationCoodinaotr.swift
+//  NavigationCoordinator.swift
 //  FiveGuyes
 //
 //  Created by zaehorang on 11/6/24.

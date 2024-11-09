@@ -18,6 +18,7 @@ struct BookSearchView: View {
     var body: some View {
         
         BookListView(bookSearchViewModel: bookSearchViewModel)
+            .padding(.top, 24)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {

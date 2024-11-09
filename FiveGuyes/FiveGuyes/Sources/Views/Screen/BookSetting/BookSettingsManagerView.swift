@@ -14,35 +14,19 @@ enum BookSettingsPage: Int {
     case bookSettingDone
 }
 
-
-@Observable
-final class BookSettingInputModel {
-    var currentPage = BookSettingsPage.bookSearch.rawValue
-    var selectedBook: Book?
-    var totalPages = ""
-    var startData: Date?
-    var endData: Date?
-    var nonReadingDays: [Date] = []
-    
-    func nextPage() {
-        withAnimation {
-            currentPage += 1
-        }
-    }
-
-}
-
 struct BookSettingsManagerView: View {
     @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
     
     @State private var bookSettingInputModel = BookSettingInputModel()
     
     var body: some View {
-        VStack(spacing: 0) {
-//            BookSettingProgressBar(currentPage: bookSettingInputModel.currentPage)
-            ProgressBar(currentPage: bookSettingInputModel.currentPage)
-            
+        ZStack(alignment: .top) {
             pageView
+            
+            // TODO: 캘린더 뷰로 넘어갈 때 새롭게 그려지면서 어색한 동작 수정하기
+            if bookSettingInputModel.currentPage != 4 {
+                ProgressBar(currentPage: bookSettingInputModel.currentPage)
+            }
         }
         .navigationTitle("완독할 책 추가하기")
         .navigationBarBackButtonHidden(true)
@@ -100,13 +84,10 @@ struct BookSettingsManagerView: View {
         switch BookSettingsPage(rawValue: bookSettingInputModel.currentPage) {
         case .bookSearch:
             BookSearchView()
-                .padding(.top, 24)
         case .bookPageSetting:
             BookPageSettingView(totalPages: bookSettingInputModel.totalPages)
-                .padding(.top, 32)
         case .bookDurationSetting:
             CompletionCalendarView()
-                .padding(.top, 32)
         case .bookSettingDone:
             FinishGoalView()
         case .none:

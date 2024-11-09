@@ -12,11 +12,16 @@ import SwiftUI
 struct FinishGoalView: View {
     @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
     @Environment(BookSettingInputModel.self) var bookSettingInputModel: BookSettingInputModel
-
-    var dailypage: Int = 9
+    @Environment(UserLibrary.self) var uerLibrary: UserLibrary
+    
+    @State private var pagesPerDay: Int = 0
+    
+    var userBook: UserBook?
     
     var body: some View {
+        
         if let book = bookSettingInputModel.selectedBook,
+           let totalPages = Int(bookSettingInputModel.totalPages),
            let startDate = bookSettingInputModel.startData,
            let endDate = bookSettingInputModel.endData {
             
@@ -45,7 +50,7 @@ struct FinishGoalView: View {
                     HStack(spacing: 0) {
                         TextView(text: "매일 ")
                         
-                        Text("\(dailypage)")
+                        Text("\(pagesPerDay)")
                             .font(.system(size: 24, weight: .semibold))
                             .padding(.horizontal, 8)
                             .padding(.vertical, 4)
@@ -105,7 +110,7 @@ struct FinishGoalView: View {
                                 .cornerRadius(8)
                             
                             // 하루 권장 독서량
-                            Text("하루 권장 독서량 : \(dailypage)쪽")
+                            Text("하루 권장 독서량 : \(pagesPerDay)쪽")
                                 .foregroundColor(Color(red: 0.03, green: 0.68, blue: 0.41))
                                 .font(.system(size: 16, weight: .medium))
                                 .padding(.horizontal, 8)
@@ -130,6 +135,7 @@ struct FinishGoalView: View {
                     
                     Button {
                         // TODO: 책 정보 저장하기
+                        // 유저 라이브러리에 추가하기
                         navigationCoordinator.popToRoot()
                     } label: {
                         HStack {
@@ -148,7 +154,15 @@ struct FinishGoalView: View {
                 }
                 
             }
+            .onAppear {
+                // 1일 할당량 계산
+                var userBook = UserBook(book: BookDetails(title: book.title, author: book.author, coverURL: book.cover, totalPages: totalPages, startDate: startDate, targetEndDate: endDate))
+                
+                let calculator = ReadingScheduleCalculator(userBook: userBook)
+                pagesPerDay = calculator.calculatePagesPerDay()
+            }
         }
+        
     }
     
     private func formatDateToKorean(_ date: Date) -> String {

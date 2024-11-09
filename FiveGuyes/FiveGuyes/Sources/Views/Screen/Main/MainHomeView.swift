@@ -9,6 +9,7 @@ import SwiftUI
 
 struct MainHomeView: View {
     @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
+    
     @State private var topSafeAreaInset: CGFloat = 0
     
     var body: some View {

@@ -6,9 +6,7 @@
 //
 
 import SwiftUI
-// 둘 다 눌려있는 상태에서 또 누르면 리셋?
-// 중간을 누르면 뭘 움직여?
-// 그냥 리셋시키는게 가장 편할 듯
+
 // TODO: 현재 기준으로 이전 날짜는 선택 안되게 하기
 
 struct CompletionCalendarView: View {
@@ -16,13 +14,22 @@ struct CompletionCalendarView: View {
     @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
     @Environment(BookSettingInputModel.self) var bookSettingInputModel: BookSettingInputModel
     
+    // startDate와 endDate는 1일 당겨진 날짜를 받아옴
+    // selectedStartDate와 selectedEndDate는 1일 더해진, 제대로 된 날짜를 받아옴
+    @State private var startDate: Date?
     @State private var selectedStartDate: Date?
+    @State private var endDate: Date?
     @State private var selectedEndDate: Date?
     @State private var currentMonth: Date = Date()
     
     @State var totalPages: String = ""
     
-    @StateObject private var keyboardObserver = KeyboardObserver()
+    @FocusState private var isTextTextFieldFocused: Bool
+    
+    // MARK: 추가된 변수
+    @State private var deletedDates: [Date] = []
+    @State private var isDateSelectionLocked = false
+    @State private var isFirstClick = true
     
     private let monthFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -32,51 +39,64 @@ struct CompletionCalendarView: View {
     }()
     
     var body: some View {
-        let title = bookSettingInputModel.selectedBook?.title ?? ""
+        let bookTitle = bookSettingInputModel.selectedBook?.title ?? ""
         
         VStack(spacing: 0) {
-            VStack(alignment: .leading) {
-                Text("<\(title)>\(title.subjectParticle())")
-                    .lineLimit(1) // 제목이 길어지면 줄바꿈 허용
-                
-                HStack(spacing: 8) {
-                    Text("총")
+            
+            VStack(alignment: .leading, spacing: 0) {
+                if isFirstClick {
+                    Text("<\(bookTitle)>\(bookTitle.subjectParticle())")
+                        .lineLimit(1) // 제목이 길어지면 줄바꿈 허용
                     
-                    HStack(spacing: 2) {
-                        TextField("", text: $totalPages)
-                            .keyboardType(.numberPad)
-                            .font(.system(size: 20, weight: .medium))
-                            .fixedSize()
-                            .background {
-                                RoundedRectangle(cornerRadius: 7)
-                                    .foregroundColor(.clear)
-                                    .frame(height: 30) // 텍스트 필드 높이 지정
-                            }
+                    HStack(spacing: 8) {
+                        Text("총")
                         
-                        Image(systemName: "pencil") // 원하는 이미지로 변경
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 20, height: 20)
+                        HStack(spacing: 2) {
+                            TextField("", text: $totalPages)
+                                .focused($isTextTextFieldFocused)
+                                .keyboardType(.numberPad)
+                                .font(.system(size: 20, weight: .medium))
+                                .fixedSize()
+                                .background {
+                                    RoundedRectangle(cornerRadius: 7)
+                                        .foregroundColor(.clear)
+                                        .frame(height: 30) // 텍스트 필드 높이 지정
+                                }
+                            
+                            Image(systemName: "pencil") // 원하는 이미지로 변경
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 20, height: 20)
+                            
+                        }
+                        .foregroundColor(Color(red: 0.03, green: 0.68, blue: 0.41))
+                        .padding(.horizontal, 8) // 텍스트 필드와 이미지 주변 패딩
+                        .padding(.vertical, 4)
+                        .background {
+                            RoundedRectangle(cornerRadius: 8)
+                                .foregroundStyle(Color(red: 0.93, green: 0.97, blue: 0.95))
+                        }
                         
+                        Text("쪽이에요")
+                        
+                        Spacer()
                     }
-                    .foregroundColor(Color(red: 0.03, green: 0.68, blue: 0.41))
-                    .padding(.horizontal, 8) // 텍스트 필드와 이미지 주변 패딩
-                    .padding(.vertical, 4)
-                    .background {
-                        RoundedRectangle(cornerRadius: 8)
-                            .foregroundStyle(Color(red: 0.93, green: 0.97, blue: 0.95))
+                    Text("목표기간을 선택해주세요")
+                    
+                } else {
+                    HStack(alignment: .top) {
+                        Text("쉬고싶은 날을 설정할 수 있어요!\n원하지 않는다면 넘어가도 좋아요")
+                        Spacer()
                     }
-                    
-                    Text("쪽이에요")
-                    
-                    Spacer()
                 }
-                Text("목표기간을 선택해주세요")
             }
             .font(.system(size: 22, weight: .semibold))
             .foregroundColor(.black)
+            .padding(.top, 34)
             .padding(.bottom, 11)
             .padding(.horizontal, 20)
+            
+            Spacer()
             
             weekdayHeader()
             
@@ -85,16 +105,15 @@ struct CompletionCalendarView: View {
             
             calendarScrollView()
             
-            Divider()
-                .padding(.bottom, 14)
-            
-            if keyboardObserver.keyboardIsVisible {
+            if isTextTextFieldFocused {
                 
                 Button {
+                    // 페이지 최신화
                     bookSettingInputModel.totalPages = totalPages
-                    bookSettingInputModel.nextPage()
-                    
+                    // 키보드 내리기
+                    isTextTextFieldFocused = false
                 } label: {
+                    // TODO: N일 목표하기로 텍스트 변경하기
                     Text("다음")
                         .frame(maxWidth: .infinity)
                         .frame(height: 56)
@@ -104,13 +123,18 @@ struct CompletionCalendarView: View {
                 }
                 .ignoresSafeArea(.keyboard, edges: .bottom)
             } else {
+                Divider()
+                    .padding(.bottom, 14)
+                
                 nextButton()
+                    .padding(.horizontal, 16)
+                Spacer()
             }
         }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
-                    nextButtomAction()
+                    selectCompletionAction()
                 } label: {
                     Text("완료")
                         .foregroundColor(!(selectedStartDate == nil || selectedEndDate == nil) ?
@@ -120,7 +144,6 @@ struct CompletionCalendarView: View {
                 .disabled(selectedStartDate == nil || selectedEndDate == nil)
             }
         }
-
         .onAppear {
             totalPages = bookSettingInputModel.totalPages
         }
@@ -143,7 +166,6 @@ struct CompletionCalendarView: View {
             VStack(spacing: 35) {
                 ForEach(0..<12, id: \.self) { monthOffset in
                     let monthDate = Calendar.current.date(byAdding: .month, value: monthOffset, to: currentMonth)!
-                    
                     let daysInMonth = self.getDaysInMonth(for: monthDate)
                     
                     let adjustedDays = self.adjustDaysForMonth(monthDate: monthDate, daysInMonth: daysInMonth)
@@ -167,29 +189,56 @@ struct CompletionCalendarView: View {
                 }
             }
         }
-        .frame(maxHeight: 466)
+        .frame(height: 466)
     }
-
+    
+    // MARK: 소거 로직 구현(배경색 조건에 따라 변경)
     private func dateCell(for date: Date) -> some View {
+        let deletedDate = Calendar.current.date(byAdding: .day, value: 1, to: date)!
+        
         let isSelectedDay = isDaySelected(for: date)
-        let isBetweenSelectedDays = isBetweenSelectedDays(for: date)
+        let isBetweenSelectedDays = isBetweenSelectedDays(for: date) && !deletedDates.contains(deletedDate)
         
         return ZStack {
+            // 선택된 기간인 경우 색칠
             if isBetweenSelectedDays {
                 Rectangle()
                     .fill(Color.green.opacity(0.2))
                     .frame(height: 44)
+                // 시작일이나 종료일의 경우
             } else if isSelectedDay {
                 dateSelectionRectangle(for: date)
             }
             
+            // 날짜가 맨 위에 있음
             dateText(for: date, isSelectedDay: isSelectedDay)
-                        .onTapGesture {
-                            handleDateSelection(for: date)
-                        }
+                .onTapGesture {
+                    if isDateSelectionLocked && isBetweenSelectedDays {
+                        toggleDateInDeletedDates(deletedDate)
+                    } else if isDateSelectionLocked && deletedDates.contains(deletedDate) {
+                        toggleDateInDeletedDates(deletedDate)
+                    } else if !isDateSelectionLocked {
+                        handleDateSelection(for: date)
+                    }
+                }
         }
     }
-
+    
+    // MARK: 제외한 날짜를 배열에 추가
+    private func toggleDateInDeletedDates(_ date: Date) {
+        // 삭제된 날짜 목록에 조정된 날짜를 사용
+        if let index = deletedDates.firstIndex(of: date) {
+            deletedDates.remove(at: index)
+            print("Removed adjusted date from deletedDates: \(date)")
+        } else {
+            deletedDates.append(date)
+            print("Added adjusted date to deletedDates: \(date)")
+        }
+        deletedDates.sort()
+        print("Current deletedDates: \(deletedDates)")
+    }
+    
+    // 선택된 날짜(시작일, 종료일)
     private func dateText(for date: Date, isSelectedDay: Bool) -> some View {
         Text("\(Calendar.current.component(.day, from: date))")
             .frame(width: 44, height: 44)
@@ -204,69 +253,63 @@ struct CompletionCalendarView: View {
             )
             .cornerRadius(26)
     }
-
+    
     // 선택된 날짜 범위에 색칠 처리
     private func dateSelectionRectangle(for date: Date) -> some View {
         HStack(spacing: 0) {
             // 선택된 시작 날짜
-            if let start = selectedStartDate, date == start {
+            if let start = startDate, date == start {
                 Spacer()
                 Rectangle()
                     .fill(Color.green.opacity(0.2))
                     .frame(width: 28, height: 44)
             }
             // 선택된 종료 날짜
-            else if let end = selectedEndDate, date == end {
+            else if let end = endDate, date == end {
                 Rectangle()
                     .fill(Color.green.opacity(0.2))
                     .frame(width: 28, height: 44)
                 Spacer()
             }
-            // 시작 날짜와 종료 날짜 사이에 있는 날짜들
-            else if let start = selectedStartDate, let end = selectedEndDate, date > start, date < end {
-                Rectangle()
-                    .fill(Color.green.opacity(0.2))
-                    .frame(width: 44, height: 44)
-            }
         }
     }
-
+    
     // 날짜 선택 처리
     private func handleDateSelection(for date: Date) {
         let startOfDay = date // 날짜만 고려하고 시간은 무시
-
-        if selectedStartDate == nil && selectedEndDate == nil {
-            selectedStartDate = startOfDay
-        } else if selectedStartDate == startOfDay {
-            selectedStartDate = nil
-        } else if selectedEndDate == startOfDay {
-            selectedEndDate = nil
-        } else if let endDate = selectedEndDate, startOfDay <= endDate {
-            selectedStartDate = startOfDay
-        } else if let startDate = selectedStartDate, startOfDay >= startDate {
-            selectedEndDate = startOfDay
+        
+        if startDate == nil && endDate == nil {
+            startDate = startOfDay
+        } else if startDate == startOfDay {
+            startDate = nil
+        } else if endDate == startOfDay {
+            endDate = nil
+        } else if let endDate = endDate, startOfDay <= endDate {
+            startDate = startOfDay
+        } else if let startDate = startDate, startOfDay >= startDate {
+            endDate = startOfDay
         }
         
         // 선택된 날짜를 전달할 때는 하루 더하기
-        if let startDate = selectedStartDate {
-            guard let adjustedStartDate = Calendar.current.date(byAdding: .day, value: 1, to: startDate) else { return }
-            print("Adjusted Start Date: \(String(describing: adjustedStartDate))")
+        if let startDate = startDate {
+            selectedStartDate = Calendar.current.date(byAdding: .day, value: 1, to: startDate)
+            print("Adjusted Start Date: \(String(describing: selectedStartDate))")
         }
-        if let endDate = selectedEndDate {
-            guard let adjustedEndDate = Calendar.current.date(byAdding: .day, value: 1, to: endDate) else { return }
-            print("Adjusted End Date: \(String(describing: adjustedEndDate))")
+        if let endDate = endDate {
+            selectedEndDate = Calendar.current.date(byAdding: .day, value: 1, to: endDate)
+            print("Adjusted End Date: \(String(describing: selectedEndDate))")
         }
     }
-
+    
     // 날짜가 범위 내에 있는지 확인
     private func isBetweenSelectedDays(for date: Date) -> Bool {
-        guard let start = selectedStartDate, let end = selectedEndDate else { return false }
+        guard let start = startDate, let end = endDate else { return false }
         return date > start && date < end
     }
     
-    // 날짜가 선택된 날짜인지 확인
+    // 선택된 날짜가 시작일이나 종료일인지 확인
     private func isDaySelected(for date: Date) -> Bool {
-        return date == selectedStartDate || date == selectedEndDate
+        return date == startDate || date == endDate
     }
     
     // 달의 첫 날짜와 일들을 일요일 기준으로 맞추는 함수
@@ -282,52 +325,53 @@ struct CompletionCalendarView: View {
         let adjustedDays = Array(repeating: nil, count: shiftDays) + daysInMonth
         return adjustedDays
     }
-
+    
     // 날짜 계산
     private func getDaysInMonth(for date: Date) -> [Date] {
         let calendar = Calendar.current
         let range = calendar.range(of: .day, in: .month, for: date)!
-        
         return range.compactMap { day -> Date? in
             let components = calendar.dateComponents([.year, .month], from: date)
-            
             let adjustedDate = calendar.date(bySetting: .day, value: day, of: calendar.date(from: components)!)
-            
             return adjustedDate.flatMap { calendar.startOfDay(for: $0) }
         }
     }
     
-    // 다음 버튼
+    // MARK: 버튼 로직 구현
     private func nextButton() -> some View {
-        Button {
-            // TODO: 쉬는 날 소거 캘린더로 가기
-            
-            // TODO: 우선 처음과 끝만 선택하고 넘어가기
-            nextButtomAction()
-            
-        } label: {
-            Text("다음")
+        Button(action: nextButtonAction) {
+            Text(isFirstClick ? "다음" : "완료")
                 .font(.system(size: 20, weight: .semibold))
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 16)
-                .background(Color.green)
+                .background(startDate != nil && endDate != nil ? Color(red: 0.07, green: 0.87, blue: 0.54) : Color(red: 0.84, green: 0.84, blue: 0.84))
                 .foregroundColor(.white)
                 .cornerRadius(16)
         }
+        .disabled(startDate == nil || endDate == nil)
     }
     
-    private func nextButtomAction() {
+    private func nextButtonAction() {
+        if isFirstClick {
+            // TODO: 문구 변경
+            isDateSelectionLocked = true
+            isFirstClick = false
+            
+        } else {
+            selectCompletionAction()
+        }
+    }
+    
+    private func selectCompletionAction() {
+        // 입력 데이터 추가
         bookSettingInputModel.startData = selectedStartDate
         bookSettingInputModel.endData = selectedEndDate
+        bookSettingInputModel.nonReadingDays = deletedDates
+        print(selectedStartDate)
+        print(selectedEndDate)
+        print(deletedDates)
         
+        // 페이지 이동
         bookSettingInputModel.nextPage()
-    }
-}
-
-extension Date {
-    func startOfMonth() -> Date {
-        let calendar = Calendar.current
-        let components = calendar.dateComponents([.year, .month], from: self)
-        return calendar.date(from: components)!
     }
 }

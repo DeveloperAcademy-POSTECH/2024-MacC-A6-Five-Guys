@@ -14,13 +14,12 @@ struct BookPageSettingView: View {
     @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
     @Environment(BookSettingInputModel.self) var bookSettingInputModel: BookSettingInputModel
     
-    @FocusState private var textFieldActive: Bool
-    @StateObject private var keyboardObserver = KeyboardObserver()
+    @FocusState private var isTextTextFieldFocused: Bool
     
     var body: some View {
         let title = bookSettingInputModel.selectedBook!.title
         
-        VStack {
+        VStack(spacing: 0) {
             VStack(alignment: .leading) {
                 Text("<\(title)>\(title.subjectParticle())")
                     .lineLimit(nil) // 제목이 길어지면 줄바꿈 허용
@@ -31,7 +30,7 @@ struct BookPageSettingView: View {
                     HStack(spacing: 2) {
                         TextField("", text: $totalPages)
                             .keyboardType(.numberPad)
-                            .focused($textFieldActive)
+                            .focused($isTextTextFieldFocused)
                             .font(.system(size: 20, weight: .medium))
                             .fixedSize()
                             .background {
@@ -59,13 +58,15 @@ struct BookPageSettingView: View {
                     Spacer()
                 }
             }
+            .padding(.top, 34)
             .padding(.horizontal, 20)
             
             Spacer()
             
-            if keyboardObserver.keyboardIsVisible {
+            if isTextTextFieldFocused {
                 Button {
                     bookSettingInputModel.totalPages = totalPages
+                    isTextTextFieldFocused = false
                     bookSettingInputModel.nextPage()
                     
                 } label: {
@@ -95,7 +96,7 @@ struct BookPageSettingView: View {
         }
         .onAppear {
             totalPages = bookSettingInputModel.totalPages
-            textFieldActive = true
+            isTextTextFieldFocused = true
         }
     }
 }

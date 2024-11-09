@@ -7,7 +7,8 @@
 
 import UIKit
 
-class KeyboardObserver: ObservableObject {
+//MARK: - 키보드가 올라오는 시점을 알기 위한 모델
+final class KeyboardObserver: ObservableObject {
     @Published var keyboardIsVisible: Bool = false
     
     init() {

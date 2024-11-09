@@ -9,6 +9,7 @@ import SwiftUI
 
 struct NavigationRootView: View {
     @State private var coordinator = NavigationCoordinator()
+    @State private var userLibrary = UserLibrary()
     
     var body: some View {
         NavigationStack(path: $coordinator.paths) {
@@ -19,6 +20,7 @@ struct NavigationRootView: View {
                 }
         }
         .environment(coordinator)
+        .environment(userLibrary)
     }
 }
 
