@@ -14,11 +14,10 @@ struct WeeklyPageCalendarView: View {
     
     // TODO: today로 바꾸기 Date()
     let today = Date()
-//    alendar.current.date(byAdding: .day, value: 3, to: Date())!
     
     // TODO: 특정 날짜 이전 요일들의 UI 수정
     var body: some View {
-        let weeklyRecords = getWeeklyRecordedPages(for: currentReadingBook)
+        let weeklyRecords = getWeeklyRecordedPages(for: currentReadingBook, from: today)
         let todayIndex = Calendar.current.component(.weekday, from: today) - 1
         
         HStack(spacing: 0) { // 셀 간격을 없앰으로써 연결된 배경처럼 보이게 설정
@@ -30,41 +29,47 @@ struct WeeklyPageCalendarView: View {
                     
                     ZStack {
                         // 오늘까지 이어지는 배경 추가
-                        if index <= todayIndex {
-                            if index == 0 {
-                                
-                                HStack(spacing: 0) {
-                                    Rectangle()
-                                        .fill(.white)
+                        if todayIndex != 0 { // 일요일인경우 뒷 배경 필요 없음
+                            if index <= todayIndex {
+                                if index == 0 {
+                                    HStack(spacing: 0) {
+                                        Rectangle()
+                                            .fill(.white)
+                                            .frame(height: 44)
+                                            .shadow(radius: 0)
+                                        
+                                        Rectangle()
+                                            .fill(Color(red: 0.93, green: 0.97, blue: 0.95))
+                                            .frame(height: 44)
+                                            .shadow(radius: 0)
+                                    }
+                                    
+                                    Circle()
+                                        .fill(Color(red: 0.93, green: 0.97, blue: 0.95))
                                         .frame(height: 44)
                                     
+                                } else if index == todayIndex {
+                                    HStack(spacing: 0) {
+                                        Rectangle()
+                                            .fill(Color(red: 0.93, green: 0.97, blue: 0.95))
+                                            .frame(height: 44)
+                                            .shadow(radius: 0)
+                                        
+                                        Rectangle()
+                                            .fill(.white)
+                                            .frame(height: 44)
+                                            .shadow(radius: 0)
+                                    }
+                                    
+                                } else {
                                     Rectangle()
                                         .fill(Color(red: 0.93, green: 0.97, blue: 0.95))
                                         .frame(height: 44)
                                 }
-                                
-                                Circle()
-                                    .fill(Color(red: 0.93, green: 0.97, blue: 0.95))
-                                    .frame(height: 44)
-                                
-                            } else if index == todayIndex {
-                                HStack(spacing: 0) {
-                                    Rectangle()
-                                        .fill(Color(red: 0.93, green: 0.97, blue: 0.95))
-                                        .frame(height: 44)
-                                    
-                                    Rectangle()
-                                        .fill(.white)
-                                        .frame(height: 44)
-                                }
-
-                            } else {
-                                Rectangle()
-                                    .fill(Color(red: 0.93, green: 0.97, blue: 0.95))
-                                    .frame(height: 44)
                             }
                         }
                         
+                        // TODO: 데이터가 없어도 오늘 날짜는 표시가 되어야 한다!
                         if let record = weeklyRecords[index] {
                             if index < todayIndex {
                                 if record.pagesRead == record.targetPages {
@@ -96,6 +101,7 @@ struct WeeklyPageCalendarView: View {
                         } else {
                             Text("")
                                 .frame(height: 44)
+                                .foregroundColor(Color(red: 0.44, green: 0.44, blue: 0.44))
                         }
                     }
                 }
@@ -105,15 +111,13 @@ struct WeeklyPageCalendarView: View {
     }
     
     // 현재 날짜를 기준으로 해당 주의 날짜와 타겟 페이지를 가져오는 함수
-    private func getWeeklyRecordedPages(for userBook: UserBook) -> [ReadingRecord?] {
-        let today = Date()
+    private func getWeeklyRecordedPages(for userBook: UserBook, from today: Date) -> [ReadingRecord?] {
         let calendar = Calendar.current
         let startOfWeek = calendar.dateInterval(of: .weekOfMonth, for: today)?.start ?? today
         
         return (0..<7).map { dayOffset in
             let date = calendar.date(byAdding: .day, value: dayOffset, to: startOfWeek)!
             let dateKey = toYearMonthDayString(date)  // Date를 문자열로 변환
-            print(dateKey)
             return userBook.readingRecords[dateKey]
         }
     }

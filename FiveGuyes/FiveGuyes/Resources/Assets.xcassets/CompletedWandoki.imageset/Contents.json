@@ -1,15 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "wandoki2.png",
+      "filename" : "x1_Completed.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
+      "filename" : "x2_Completed.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
+      "filename" : "x3_Completed.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

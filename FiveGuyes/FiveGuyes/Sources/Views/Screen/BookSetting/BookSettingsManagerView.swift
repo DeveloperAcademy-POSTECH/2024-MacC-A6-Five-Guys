@@ -28,7 +28,9 @@ struct BookSettingsManagerView: View {
                 ProgressBar(currentPage: bookSettingInputModel.currentPage)
             }
         }
+        .background(.white)
         .navigationTitle("완독할 책 추가하기")
+        .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {

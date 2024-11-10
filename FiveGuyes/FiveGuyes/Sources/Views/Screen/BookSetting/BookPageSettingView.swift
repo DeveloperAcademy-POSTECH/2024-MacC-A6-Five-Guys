@@ -83,6 +83,7 @@ struct BookPageSettingView: View {
         }
         .font(.system(size: 22, weight: .semibold))
         .foregroundColor(.black)
+        .background(.white)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {

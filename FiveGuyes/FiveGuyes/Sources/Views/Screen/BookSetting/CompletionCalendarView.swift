@@ -16,10 +16,9 @@ struct CompletionCalendarView: View {
     
     // startDate와 endDate는 1일 당겨진 날짜를 받아옴
     // selectedStartDate와 selectedEndDate는 1일 더해진, 제대로 된 날짜를 받아옴
+    // TODO: 위의 문제 해결하기 -> time zone 문제임
     @State private var startDate: Date?
-    @State private var selectedStartDate: Date?
     @State private var endDate: Date?
-    @State private var selectedEndDate: Date?
     @State private var currentMonth: Date = Date()
     
     @State var totalPages: String = ""
@@ -33,7 +32,6 @@ struct CompletionCalendarView: View {
     
     private let monthFormatter: DateFormatter = {
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "ko_KR")
         formatter.dateFormat = "YYYY년 M월"
         return formatter
     }()
@@ -136,11 +134,11 @@ struct CompletionCalendarView: View {
                     selectCompletionAction()
                 } label: {
                     Text("완료")
-                        .foregroundColor(!(selectedStartDate == nil || selectedEndDate == nil) ?
+                        .foregroundColor(!(startDate == nil || endDate == nil) ?
                                          Color(red: 0.03, green: 0.68, blue: 0.41)
                                          : Color(red: 0.84, green: 0.84, blue: 0.84))
                 }
-                .disabled(selectedStartDate == nil || selectedEndDate == nil)
+                .disabled(startDate == nil || endDate == nil)
             }
         }
         .onAppear {
@@ -193,10 +191,10 @@ struct CompletionCalendarView: View {
     
     // MARK: 소거 로직 구현(배경색 조건에 따라 변경)
     private func dateCell(for date: Date) -> some View {
-        let deletedDate = Calendar.current.date(byAdding: .day, value: 1, to: date)!
+//        let deletedDate = Calendar.current.date(byAdding: .day, value: 1, to: date)!
         
         let isSelectedDay = isDaySelected(for: date)
-        let isBetweenSelectedDays = isBetweenSelectedDays(for: date) && !deletedDates.contains(deletedDate)
+        let isBetweenSelectedDays = isBetweenSelectedDays(for: date) && !deletedDates.contains(date)
         
         return ZStack {
             // 선택된 기간인 경우 색칠
@@ -213,9 +211,9 @@ struct CompletionCalendarView: View {
             dateText(for: date, isSelectedDay: isSelectedDay)
                 .onTapGesture {
                     if isDateSelectionLocked && isBetweenSelectedDays {
-                        toggleDateInDeletedDates(deletedDate)
-                    } else if isDateSelectionLocked && deletedDates.contains(deletedDate) {
-                        toggleDateInDeletedDates(deletedDate)
+                        toggleDateInDeletedDates(date)
+                    } else if isDateSelectionLocked && deletedDates.contains(date) {
+                        toggleDateInDeletedDates(date)
                     } else if !isDateSelectionLocked {
                         handleDateSelection(for: date)
                     }
@@ -288,16 +286,6 @@ struct CompletionCalendarView: View {
         } else if let startDate = startDate, startOfDay >= startDate {
             endDate = startOfDay
         }
-        
-        // 선택된 날짜를 전달할 때는 하루 더하기
-        if let startDate = startDate {
-            selectedStartDate = Calendar.current.date(byAdding: .day, value: 1, to: startDate)
-            print("Adjusted Start Date: \(String(describing: selectedStartDate))")
-        }
-        if let endDate = endDate {
-            selectedEndDate = Calendar.current.date(byAdding: .day, value: 1, to: endDate)
-            print("Adjusted End Date: \(String(describing: selectedEndDate))")
-        }
     }
     
     // 날짜가 범위 내에 있는지 확인
@@ -363,8 +351,8 @@ struct CompletionCalendarView: View {
     
     private func selectCompletionAction() {
         // 입력 데이터 추가
-        bookSettingInputModel.startData = selectedStartDate
-        bookSettingInputModel.endData = selectedEndDate
+        bookSettingInputModel.startData = startDate
+        bookSettingInputModel.endData = endDate
         bookSettingInputModel.nonReadingDays = deletedDates
         
         // 페이지 이동

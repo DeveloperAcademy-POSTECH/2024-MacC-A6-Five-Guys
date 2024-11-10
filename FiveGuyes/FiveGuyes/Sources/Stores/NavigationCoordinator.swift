@@ -15,6 +15,8 @@ enum Screens: Hashable {
     case bookSettingsManager
     case totalCalendar
     case dailyProgress
+    case completionCelebration
+    case completionReview
 }
 
 @Observable
@@ -36,6 +38,10 @@ final class NavigationCoordinator {
             TotalCalendarView()
         case .dailyProgress:
             DailyProgressView()
+        case .completionCelebration:
+            CompletionCelebrationView()
+        case .completionReview:
+            CompletionReviewView()
         }
     }
 

@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+// TODO: 완독이 이미지 바꾸기
 struct EmptyNotiView: View {
     var body: some View {
         VStack(spacing: 0) {

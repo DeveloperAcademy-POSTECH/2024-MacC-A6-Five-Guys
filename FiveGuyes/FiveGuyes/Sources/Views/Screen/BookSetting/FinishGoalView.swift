@@ -164,7 +164,7 @@ struct FinishGoalView: View {
                 calculator.calculateInitialDailyTargets(for: bookData)
                 print(bookData.readingRecords)
                 userBook = bookData
-                pagesPerDay = calculator.calculatePagesPerDay(for: bookData)
+                pagesPerDay = calculator.firstCalculatePagesPerDay(for: bookData)
             }
         }
         
@@ -172,7 +172,7 @@ struct FinishGoalView: View {
     
     private func formatDateToKorean(_ date: Date) -> String {
         let dateFormatter = DateFormatter()
-        dateFormatter.locale = Locale(identifier: "ko_KR")
+//        dateFormatter.locale = Locale(identifier: "ko_KR")
         dateFormatter.dateFormat = "M월 d일"
         return dateFormatter.string(from: date)
     }

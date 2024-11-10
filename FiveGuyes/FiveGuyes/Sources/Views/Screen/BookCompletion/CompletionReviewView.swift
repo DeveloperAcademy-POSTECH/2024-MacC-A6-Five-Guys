@@ -8,47 +8,65 @@
 import SwiftUI
 
 struct CompletionReviewView: View {
-    private let bookName = "프리웨이"
     private let placeholder: String = "책 속 한 줄이 남긴 여운은 무엇인가요?"
     
     @State private var reflectionText: String = ""
+    @State private var showAlert = false
     @FocusState private var isFocusedTextEditor: Bool
     @ObservedObject private var keyboardObserver = KeyboardObserver()
     
+    @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
+    @Environment(UserLibrary.self) var userLibrary: UserLibrary
+    
     // TODO: Font, Color 설정
     var body: some View {
+        // TODO: 더미 지우기
+        let userBook = userLibrary.currentReadingBook ?? UserBook.dummyUserBook
+        let title = userBook.book.title
+        
         ZStack {
             Color.white.ignoresSafeArea()
             
-            VStack(spacing: 0) {
+            VStack(spacing: 24) {
                 VStack(alignment: .leading, spacing: 24) {
-                    Text("<\(bookName)>\(bookName.postPositionParticle()) 완독하고...\n어떤 영감을 얻었나요?")
-                        .font(.system(size: 24, weight: .semibold))
-                        .foregroundStyle(.black)
+                    VStack(alignment: .leading, spacing: 0) {
+                        Text("<\(title)>\(title.postPositionParticle()) 완독하고...")
+                        Text("어떤 영감을 얻었나요?")
+                    }
+                    .font(.system(size: 24, weight: .semibold))
+                    .foregroundStyle(.black)
                     
                     TextEditor(text: $reflectionText)
                         .customStyleEditor(placeholder: placeholder, userInput: $reflectionText)
                         .frame(height: 222)
                         .focused($isFocusedTextEditor)
                 }
-                .padding(20)
+                .padding(.horizontal, 20)
                 
                 Spacer()
                 
                 if keyboardObserver.keyboardIsVisible {
                     Button {
-                        print("clicked")
+                        if reflectionText.isEmpty {
+                            showAlert = true
+                        } else {
+                            userLibrary.completeCurrentBook(userBook, review: reflectionText)
+                            navigationCoordinator.popToRoot()
+                        }
                     } label: {
                         Text("저장")
                             .frame(maxWidth: .infinity)
                             .frame(height: 56)
-                            .background(.green)
+                            .background(Color(red: 0.07, green: 0.87, blue: 0.54))
                             .foregroundStyle(.white)
-                        
                     }
                     .ignoresSafeArea(.keyboard, edges: .bottom)
                 }
             }
+        }
+        .alert(isPresented: $showAlert) {
+            Alert(title: Text("내용을 입력해주세요"),
+                  dismissButton: .default(Text("확인")))
         }
         .customNavigationBackButton()
         .onAppear {

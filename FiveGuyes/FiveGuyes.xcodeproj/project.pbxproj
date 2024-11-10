@@ -18,7 +18,6 @@
 		1A27D9662CDB779000D1E14D /* TotalCalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A27D9652CDB779000D1E14D /* TotalCalendarView.swift */; };
 		1A54142B2CD9FEF400283FBD /* BookSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A54142A2CD9FEF400283FBD /* BookSearchView.swift */; };
 		1AA14A782CDDA30D00B763A6 /* TotalCalendarTextBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AA14A772CDDA30D00B763A6 /* TotalCalendarTextBubble.swift */; };
-		24360D462CD8A2F800E83D2B /* EmptyDataMainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24360D452CD8A2F800E83D2B /* EmptyDataMainView.swift */; };
 		24360D482CD8BAF100E83D2B /* EmptyNotiView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24360D472CD8BAF100E83D2B /* EmptyNotiView.swift */; };
 		24360D4A2CD8BE3C00E83D2B /* FinishGoalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24360D492CD8BE3C00E83D2B /* FinishGoalView.swift */; };
 		24360D532CD9F3AF00E83D2B /* DailyProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24360D522CD9F3AF00E83D2B /* DailyProgressView.swift */; };
@@ -63,7 +62,6 @@
 		1A27D9652CDB779000D1E14D /* TotalCalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TotalCalendarView.swift; sourceTree = "<group>"; };
 		1A54142A2CD9FEF400283FBD /* BookSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = BookSearchView.swift; path = FiveGuyes/Sources/Views/Screen/BookSetting/BookSearch/BookSearchView.swift; sourceTree = SOURCE_ROOT; };
 		1AA14A772CDDA30D00B763A6 /* TotalCalendarTextBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TotalCalendarTextBubble.swift; sourceTree = "<group>"; };
-		24360D452CD8A2F800E83D2B /* EmptyDataMainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyDataMainView.swift; sourceTree = "<group>"; };
 		24360D472CD8BAF100E83D2B /* EmptyNotiView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyNotiView.swift; sourceTree = "<group>"; };
 		24360D492CD8BE3C00E83D2B /* FinishGoalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinishGoalView.swift; sourceTree = "<group>"; };
 		24360D522CD9F3AF00E83D2B /* DailyProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyProgressView.swift; sourceTree = "<group>"; };
@@ -199,7 +197,6 @@
 			children = (
 				26890B962CAE811A008DFF49 /* ContentView.swift */,
 				24360D472CD8BAF100E83D2B /* EmptyNotiView.swift */,
-				24360D452CD8A2F800E83D2B /* EmptyDataMainView.swift */,
 				26D852F92CCE40930016239A /* Navigation */,
 				26D852FB2CCE40BC0016239A /* Screen */,
 				26D853052CCE44970016239A /* Components */,
@@ -415,7 +412,6 @@
 				24360D4A2CD8BE3C00E83D2B /* FinishGoalView.swift in Sources */,
 				26F19A682CD9EFD800F41D6D /* MainHomeView.swift in Sources */,
 				26F19A742CDB271E00F41D6D /* NavigationRootView.swift in Sources */,
-				24360D462CD8A2F800E83D2B /* EmptyDataMainView.swift in Sources */,
 				264440502CD8A3AC0031A290 /* CompletionReviewView.swift in Sources */,
 				264440502CD8A3AC0031A290 /* CompletionReviewView.swift in Sources */,
 				26890B952CAE811A008DFF49 /* FiveGuyesApp.swift in Sources */,
@@ -582,6 +578,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -617,6 +614,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

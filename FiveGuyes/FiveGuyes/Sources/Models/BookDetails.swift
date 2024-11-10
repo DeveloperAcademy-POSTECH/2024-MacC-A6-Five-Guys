@@ -14,8 +14,8 @@ final class BookDetails {
     let coverURL: String?
     let totalPages: Int
     
-    let startDate: Date
-    let targetEndDate: Date
+    var startDate: Date
+    var targetEndDate: Date
     
     var nonReadingDays: [Date]
 
@@ -40,16 +40,48 @@ final class UserBook {
     var book: BookDetails
     var readingRecords: [String: ReadingRecord] = [:] // Keyed by formatted date strings
     
+    // 계산 로직을 더 편하게 하기 위해 마지막으로 읽은 날의 결과를 따로 저장합니다.
+    var lastReadDate: Date? // 마지막 읽은 날짜
+    var lastPagesRead: Int = 0 // 마지막으로 읽은 페이지 수
+    
+    var completionReview = ""
+    
     init(book: BookDetails) {
         self.book = book
+    }
+    
+    /// `pagesRead`가 0이 아닌 날의 수를 반환합니다.
+    /// 지금까지 독서를 한 날의 수
+    func nonZeroReadingDaysCount() -> Int {
+        // 첫 날은 1일 째 도전중이니까 + 1을 해준다.
+        let readingDays = readingRecords.values.filter { $0.pagesRead > 0 }
+        if readingDays.isEmpty {
+            return 1
+        }
+        return readingRecords.values.filter { $0.pagesRead > 0 }.count
     }
 }
 
 @Observable
 final class UserLibrary {
     var currentReadingBook: UserBook?
-    var completedBooks: [BookDetails] = []
+    var completedBooks: [UserBook?] = []
     
+    /// 현재 읽고 있는 책을 완독 처리하고, `completedBooks`에 추가합니다.
+    func completeCurrentBook(_ book: UserBook, review: String) {
+        // 책의 완독 날짜를 오늘로 설정
+        book.book.targetEndDate = Date()
+        book.completionReview = review
+
+        // 시작 날짜가 종료 날짜보다 이후에 있으면 시작 날짜도 완료 날짜로 설정
+        if book.book.startDate > book.book.targetEndDate {
+            book.book.startDate = book.book.targetEndDate
+        }
+        
+        // 완독한 책을 completedBooks에 추가하고 currentReadingBook을 nil로 설정
+        completedBooks.append(book)
+        currentReadingBook = nil
+    }
 }
 
 extension UserBook {
@@ -81,76 +113,3 @@ extension UserBook {
         return userBook
     }
 }
-
-
-//// BookDetails 더미 데이터
-//extension BookDetails {
-//    static func dummyBookDetails1() -> BookDetails {
-//        let dateFormatter = DateFormatter()
-//        dateFormatter.dateFormat = "yyyy-MM-dd"
-//        
-//        return BookDetails(
-//            title: "Swift Programming Basics",
-//            author: "John Doe",
-//            totalPages: 300,
-//            startDate: dateFormatter.date(from: "2024-01-01")!,
-//            targetEndDate: dateFormatter.date(from: "2024-02-01")!,
-//            nonReadingDays: [
-//                dateFormatter.date(from: "2024-01-07")!,
-//                dateFormatter.date(from: "2024-01-14")!,
-//                dateFormatter.date(from: "2024-01-21")!
-//            ]
-//        )
-//    }
-//    
-//    static func dummyBookDetails2() -> BookDetails {
-//        let dateFormatter = DateFormatter()
-//        dateFormatter.dateFormat = "yyyy-MM-dd"
-//        
-//        return BookDetails(
-//            title: "Advanced iOS Development",
-//            author: "Jane Smith",
-//            totalPages: 450,
-//            startDate: dateFormatter.date(from: "2023-11-01")!,
-//            targetEndDate: dateFormatter.date(from: "2023-12-01")!,
-//            nonReadingDays: [
-//                dateFormatter.date(from: "2023-11-10")!,
-//                dateFormatter.date(from: "2023-11-17")!
-//            ]
-//        )
-//    }
-//    
-//    static func dummyBookDetails3() -> BookDetails {
-//        let dateFormatter = DateFormatter()
-//        dateFormatter.dateFormat = "yyyy-MM-dd"
-//        
-//        return BookDetails(
-//            title: "UI/UX Design Principles",
-//            author: "Alex Johnson",
-//            totalPages: 200,
-//            startDate: dateFormatter.date(from: "2023-10-01")!,
-//            targetEndDate: dateFormatter.date(from: "2023-10-15")!,
-//            nonReadingDays: [
-//                dateFormatter.date(from: "2023-10-05")!
-//            ]
-//        )
-//    }
-//}
-//
-//// CurrentBook 더미 데이터
-//extension CurrentBook {
-//    static func dummyCurrentBook() -> CurrentBook {
-//        let dateFormatter = DateFormatter()
-//        dateFormatter.dateFormat = "yyyy-MM-dd"
-//        
-//        return CurrentBook(
-//            details: BookDetails.dummyBookDetails1(),
-//            currentPage: 150,
-//            dailyTargets: [
-//                dateFormatter.date(from: "2024-01-01")!: 100,
-//                dateFormatter.date(from: "2024-01-02")!: 100,
-//                dateFormatter.date(from: "2024-01-03")!: 100
-//            ]
-//        )
-//    }
-//}

@@ -19,6 +19,7 @@ struct NavigationRootView: View {
                     coordinator.navigate(to: screen)
                 }
         }
+        .background(.white)
         .environment(coordinator)
         .environment(userLibrary)
     }

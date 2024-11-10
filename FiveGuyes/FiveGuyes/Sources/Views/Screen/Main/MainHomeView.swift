@@ -9,7 +9,7 @@ import SwiftUI
 
 struct MainHomeView: View {
     @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
-    @Environment(UserLibrary.self) var uerLibrary: UserLibrary
+    @Environment(UserLibrary.self) var userLibrary: UserLibrary
     
     @State private var topSafeAreaInset: CGFloat = 0
     
@@ -37,7 +37,7 @@ struct MainHomeView: View {
                         WeeklyReadingProgressView()
                             .padding(.top, 153)
                         
-                        if let currentReadingBook = uerLibrary.currentReadingBook,
+                        if let currentReadingBook = userLibrary.currentReadingBook,
                            let coverURL = currentReadingBook.book.coverURL,
                            let url = URL(string: coverURL) {
                             // TODO: 옆에 책 제목, 저자 text 추가하기
@@ -46,14 +46,15 @@ struct MainHomeView: View {
                                     .resizable()
                                     .scaledToFill()
                                     .frame(width: 104, height: 161)
+                                    .shadow(color: Color(red: 0.84, green: 0.84, blue: 0.84).opacity(0.25), radius: 2, x: 0, y: 4)
                             } placeholder: {
                                 ProgressView()
                             }
                         } else {
-                            // TODO: 등록된 책이 없을 때 이미지로 대체
                             Rectangle()
-                                .foregroundColor(.gray)
+                                .foregroundColor(.white)
                                 .frame(width: 104, height: 161)
+                                .shadow(color: Color(red: 0.84, green: 0.84, blue: 0.84).opacity(0.25), radius: 2, x: 0, y: 4)
                         }
                         
                     }
@@ -74,6 +75,7 @@ struct MainHomeView: View {
                 .padding(.top, topSafeAreaInset)
             }
         }
+        .background(.white)
         .ignoresSafeArea(edges: .top)
         .scrollIndicators(.hidden)
         .onAppear {
@@ -83,18 +85,25 @@ struct MainHomeView: View {
                 .first?.windows.first {
                 topSafeAreaInset = window.safeAreaInsets.top
             }
+            
+            if let currentReadingBook = userLibrary.currentReadingBook {
+                let readingScheduleCalculator = ReadingScheduleCalculator()
+                print("🌝🌝🌝🌝🌝 재할당!!")
+                readingScheduleCalculator.reassignPagesFromLastReadDate(for: currentReadingBook)
+            }
         }
     }
     
     private var titleDescription: some View {
-        HStack {
-            if let currentReadingBook = uerLibrary.currentReadingBook {
+        let readingScheduleCalculator = ReadingScheduleCalculator()
+        
+        return HStack {
+            if let currentReadingBook = userLibrary.currentReadingBook {
                 
                 VStack(alignment: .leading, spacing: 0) {
                     Text("<\(currentReadingBook.book.title)>")
                         .lineLimit(1)
-                    // TODO: 완독까지 날짜 계산하기
-                    Text("완독까지 20일 남았어요!")
+                    Text("완독까지 \(readingScheduleCalculator.calculateRemainingReadingDays(for: currentReadingBook))일 남았어요!")
                 }
                 
             } else {
@@ -121,7 +130,7 @@ struct MainHomeView: View {
     }
     
     private var calendarFullScreenButton: some View {
-        let isReadingBookAvailable = uerLibrary.currentReadingBook != nil
+        let isReadingBookAvailable = userLibrary.currentReadingBook != nil
         let backgroundColor = isReadingBookAvailable ? Color.white : Color(red: 0.98, green: 1, blue: 0.99)
         let opacity = isReadingBookAvailable ? 1 : 0.2
         
@@ -152,7 +161,7 @@ struct MainHomeView: View {
     }
     
     private var mainActionButton: some View {
-        let isReadingBookAvailable = uerLibrary.currentReadingBook != nil
+        let isReadingBookAvailable = userLibrary.currentReadingBook != nil
         
         return Button {
             if isReadingBookAvailable {
@@ -168,7 +177,7 @@ struct MainHomeView: View {
                 .frame(height: 56)
                 .background {
                     RoundedRectangle(cornerRadius: 16)
-                        .foregroundColor(.green)
+                        .foregroundColor(Color(red: 0.07, green: 0.87, blue: 0.54))
                 }
         }
     }
