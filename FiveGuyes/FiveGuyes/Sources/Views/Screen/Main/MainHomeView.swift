@@ -12,8 +12,13 @@ struct MainHomeView: View {
     @Environment(UserLibrary.self) var userLibrary: UserLibrary
     
     @State private var topSafeAreaInset: CGFloat = 0
+    @State private var showAlert = false
+    
+    let alertMessage = "삭제 후에는 복원할 수 없어요"
     
     var body: some View {
+        let title = userLibrary.currentReadingBook?.book.title ?? "제목 없음"
+        let alertText = "현재 읽고 있는 <\(title)>\(title.postPositionParticle()) 책장에서 삭제할까요?"
         
         ScrollView {
             ZStack(alignment: .top) {
@@ -27,10 +32,25 @@ struct MainHomeView: View {
                             navigationCoordinator.push(.empthNoti)
                         }
                     }
-                    .padding(.bottom, 37)
+                    .padding(.bottom, 42)
                     
-                    titleDescription
-                        .padding(.bottom, 40)
+                    HStack(alignment: .top) {
+                        titleDescription
+                            .padding(.bottom, 40)
+                        Spacer()
+                        
+                        if userLibrary.currentReadingBook != nil {
+                            Button {
+                                showAlert = true
+                            } label: {
+                                Image(systemName: "ellipsis")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 20, height: 22)
+                                    .tint(Color(red: 0.44, green: 0.44, blue: 0.44))
+                            }
+                        }
+                    }
                     
                     ZStack(alignment: .top) {
                         
@@ -78,6 +98,16 @@ struct MainHomeView: View {
         .background(.white)
         .ignoresSafeArea(edges: .top)
         .scrollIndicators(.hidden)
+        .alert(isPresented: $showAlert) {
+            Alert(
+                title: Text(alertText),
+                message: Text(alertMessage),
+                primaryButton: .cancel(Text("취소하기")),
+                secondaryButton: .destructive(Text("삭제")) {
+                    userLibrary.deleteCurrentBook()
+                }
+            )
+        }
         .onAppear {
             // 상단 안전 영역 값 계산
             if let window = UIApplication.shared.connectedScenes
@@ -100,14 +130,14 @@ struct MainHomeView: View {
         return HStack {
             if let currentReadingBook = userLibrary.currentReadingBook {
                 
-                VStack(alignment: .leading, spacing: 0) {
+                VStack(alignment: .leading, spacing: 5) {
                     Text("<\(currentReadingBook.book.title)>")
-                        .lineLimit(1)
+                        .lineLimit(2)
                     Text("완독까지 \(readingScheduleCalculator.calculateRemainingReadingDays(for: currentReadingBook))일 남았어요!")
                 }
                 
             } else {
-                VStack(alignment: .leading, spacing: 0) {
+                VStack(alignment: .leading, spacing: 5) {
                     Text("환영해요!")
                     Text("저와 함께 완독을 시작해볼까요?")
                 }

@@ -82,6 +82,10 @@ final class UserLibrary {
         completedBooks.append(book)
         currentReadingBook = nil
     }
+    
+    func deleteCurrentBook() {
+        currentReadingBook = nil
+    }
 }
 
 extension UserBook {
