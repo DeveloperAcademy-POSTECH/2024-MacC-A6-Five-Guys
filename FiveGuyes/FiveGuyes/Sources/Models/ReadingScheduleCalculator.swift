@@ -98,7 +98,7 @@ struct ReadingScheduleCalculator {
             
             if !currentReadingBook.book.nonReadingDays.map({ toYearMonthDayString($0) }).contains(dateKey) {
                 guard var record = currentReadingBook.readingRecords[dateKey] else { return }
-                
+                print("🦶: \(dateKey) / \(record)")
                 cumulativePages += pagesPerDay
                 record.targetPages = cumulativePages
                 print("🙉🙉🙉: \(cumulativePages)")
@@ -121,14 +121,18 @@ struct ReadingScheduleCalculator {
         }
     }
     
+    // TODO: 여기가 문제!!!!!!!!!!!!!!!!!
     // 이전 할당량을 읽지 않고 새롭게 들어왔을 때 재할당을 위한 메서드
     func reassignPagesFromLastReadDate(for currentReadingBook: UserBook) {
+        // 이미 읽었으면 재분배 x
+        if hasReadPagesToday(for: currentReadingBook) { return }
+        
         // 몇 페이지 남음?
         let totalRemainingPages = calculateRemainingPages(for: currentReadingBook)
-        
+        print("❌re: \(totalRemainingPages)")
         // 오늘부터 며칠 남음?
         let remainingDays = calculateRemainingReadingDays(for: currentReadingBook)
-        
+        print("🐶re: \(remainingDays)")
         // 남은 페이지와 날짜를 기준으로 새롭게 할당량 계산
         let pagesPerDay = totalRemainingPages / remainingDays
         var remainderOffset = totalRemainingPages % remainingDays
@@ -138,7 +142,7 @@ struct ReadingScheduleCalculator {
         
         while toYearMonthDayString(targetDate) <= toYearMonthDayString(currentReadingBook.book.targetEndDate) {
             let dateKey = toYearMonthDayString(targetDate)
-            
+   
             // 비독서일이 아니면 할당량을 새로 설정
             if !currentReadingBook.book.nonReadingDays.map({ toYearMonthDayString($0) }).contains(dateKey) {
                 cumulativePages += pagesPerDay
@@ -159,6 +163,12 @@ struct ReadingScheduleCalculator {
             remainderOffset -= 1
             remainingTargetDate = Calendar.current.date(byAdding: .day, value: -1, to: remainingTargetDate)!
         }
+    }
+    
+    // 오늘 할당량이 읽혔는지 확인하는 메서드
+    private func hasReadPagesToday(for currentReadingBook: UserBook) -> Bool {
+        let todayKey = toYearMonthDayString(Date())
+            return currentReadingBook.readingRecords[todayKey]?.pagesRead != 0
     }
     
     // MARK: - 초기에 페이지를 할당할 때 필요한 메서드
