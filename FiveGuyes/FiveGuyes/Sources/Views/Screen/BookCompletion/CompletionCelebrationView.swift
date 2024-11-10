@@ -5,20 +5,23 @@
 //  Created by zaehorang on 11/4/24.
 //
 
+import SwiftData
 import SwiftUI
 // TODO:  완독 날짜 변경은 최종 저장할 때 수정하기
 
 struct CompletionCelebrationView: View {
     @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
-    @Environment(UserLibrary.self) var userLibrary: UserLibrary
-
+    
+    @Query(filter: #Predicate<UserBook> { $0.isCompleted == false })
+    private var currentlyReadingBooks: [UserBook]  // 현재 읽고 있는 책을 가져오는 쿼리
+    
     private let celebrationTitleText = "완독 완료!"
     private let celebrationMessageText = "한 권을 전부 읽다니...\n대단한걸요?"
     
     // TODO: 컬러, 폰트 수정하기
     var body: some View {
         // TODO: 더미 지우기
-        let userBook = userLibrary.currentReadingBook ?? UserBook.dummyUserBook
+        let userBook = currentlyReadingBooks.first ?? UserBook.dummyUserBook
         
         ZStack {
             // TODO: 확정된 배경 이미지로 변경하기

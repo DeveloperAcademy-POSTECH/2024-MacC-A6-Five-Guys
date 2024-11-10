@@ -5,6 +5,7 @@
 //  Created by 신혜연 on 11/5/24.
 //
 
+import SwiftData
 import SwiftUI
 
 struct DailyProgressView: View {
@@ -12,7 +13,9 @@ struct DailyProgressView: View {
     @State private var showAlert = false
     
     @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
-    @Environment(UserLibrary.self) var userLibrary: UserLibrary
+    
+    @Query(filter: #Predicate<UserBook> { $0.isCompleted == false })
+    private var currentlyReadingBooks: [UserBook]  // 현재 읽고 있는 책을 가져오는 쿼리
     
     let alertText = "전체쪽수를 초과해서 작성했어요!"
     let alertMessage = "끝까지 읽은 게 맞나요?"
@@ -27,7 +30,7 @@ struct DailyProgressView: View {
     
     var body: some View {
         // TODO: 더미 지우기
-        let userBook = userLibrary.currentReadingBook ?? UserBook.dummyUserBook
+        let userBook = currentlyReadingBooks.first ?? UserBook.dummyUserBook
         let book = userBook.book
         let isTodayCompletionDate = book.targetEndDate == today
         

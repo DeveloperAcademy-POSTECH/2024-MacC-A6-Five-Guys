@@ -5,6 +5,7 @@
 //  Created by zaehorang on 11/4/24.
 //
 
+import SwiftData
 import SwiftUI
 
 struct CompletionReviewView: View {
@@ -16,12 +17,13 @@ struct CompletionReviewView: View {
     @ObservedObject private var keyboardObserver = KeyboardObserver()
     
     @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
-    @Environment(UserLibrary.self) var userLibrary: UserLibrary
+    @Query(filter: #Predicate<UserBook> { $0.isCompleted == false })
+    private var currentlyReadingBooks: [UserBook]  // 현재 읽고 있는 책을 가져오는 쿼리
     
     // TODO: Font, Color 설정
     var body: some View {
         // TODO: 더미 지우기
-        let userBook = userLibrary.currentReadingBook ?? UserBook.dummyUserBook
+        let userBook = currentlyReadingBooks.first ?? UserBook.dummyUserBook
         let title = userBook.book.title
         
         ZStack {
@@ -50,7 +52,7 @@ struct CompletionReviewView: View {
                         if reflectionText.isEmpty {
                             showAlert = true
                         } else {
-                            userLibrary.completeCurrentBook(userBook, review: reflectionText)
+                            userBook.markAsCompleted(review: reflectionText)
                             navigationCoordinator.popToRoot()
                         }
                     } label: {

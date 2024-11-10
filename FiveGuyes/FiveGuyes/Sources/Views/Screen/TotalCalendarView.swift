@@ -5,17 +5,19 @@
 //  Created by Shim Hyeonhee on 11/6/24.
 //
 
+import SwiftData
 import SwiftUI
 
 struct TotalCalendarView: View {
-    @Environment(UserLibrary.self) var userLibrary: UserLibrary
+    @Query(filter: #Predicate<UserBook> { $0.isCompleted == false })
+    private var currentlyReadingBooks: [UserBook]  // 현재 읽고 있는 책을 가져오는 쿼리
     
     // 현재 보고 있는 달력의 월
     @State private var currentMonth: Date = Date()
     private let todayDate = Date() // 오늘 날짜
     
     private var currentReadingBook: UserBook? {
-        userLibrary.currentReadingBook
+        currentlyReadingBooks.first
     }
     
     var body: some View {

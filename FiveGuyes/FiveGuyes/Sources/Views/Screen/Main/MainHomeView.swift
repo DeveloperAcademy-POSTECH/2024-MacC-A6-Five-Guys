@@ -5,19 +5,23 @@
 //  Created by zaehorang on 11/5/24.
 //
 
+import SwiftData
 import SwiftUI
 
 struct MainHomeView: View {
     @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
-    @Environment(UserLibrary.self) var userLibrary: UserLibrary
+    @Environment(\.modelContext) private var modelContext
     
     @State private var topSafeAreaInset: CGFloat = 0
     @State private var showAlert = false
     
+    @Query(filter: #Predicate<UserBook> { $0.isCompleted == false })
+    private var currentlyReadingBooks: [UserBook]
+    
     let alertMessage = "삭제 후에는 복원할 수 없어요"
     
     var body: some View {
-        let title = userLibrary.currentReadingBook?.book.title ?? "제목 없음"
+        let title = currentlyReadingBooks.first?.book.title ?? "제목 없음"
         let alertText = "현재 읽고 있는 <\(title)>\(title.postPositionParticle()) 책장에서 삭제할까요?"
         
         ScrollView {
@@ -39,7 +43,7 @@ struct MainHomeView: View {
                             .padding(.bottom, 40)
                         Spacer()
                         
-                        if userLibrary.currentReadingBook != nil {
+                        if !currentlyReadingBooks.isEmpty {
                             Button {
                                 showAlert = true
                             } label: {
@@ -57,7 +61,7 @@ struct MainHomeView: View {
                         WeeklyReadingProgressView()
                             .padding(.top, 153)
                         
-                        if let currentReadingBook = userLibrary.currentReadingBook,
+                        if let currentReadingBook = currentlyReadingBooks.first,
                            let coverURL = currentReadingBook.book.coverURL,
                            let url = URL(string: coverURL) {
                             // TODO: 옆에 책 제목, 저자 text 추가하기
@@ -104,7 +108,10 @@ struct MainHomeView: View {
                 message: Text(alertMessage),
                 primaryButton: .cancel(Text("취소하기")),
                 secondaryButton: .destructive(Text("삭제")) {
-                    userLibrary.deleteCurrentBook()
+                    if let currentReadingBook = currentlyReadingBooks.first {
+                                            // SwiftData 컨텍스트에서 삭제 필요
+                                            modelContext.delete(currentReadingBook)
+                                        }
                 }
             )
         }
@@ -116,7 +123,7 @@ struct MainHomeView: View {
                 topSafeAreaInset = window.safeAreaInsets.top
             }
             
-            if let currentReadingBook = userLibrary.currentReadingBook {
+            if let currentReadingBook = currentlyReadingBooks.first {
                 let readingScheduleCalculator = ReadingScheduleCalculator()
                 print("🌝🌝🌝🌝🌝 재할당!!")
                 readingScheduleCalculator.reassignPagesFromLastReadDate(for: currentReadingBook)
@@ -128,7 +135,7 @@ struct MainHomeView: View {
         let readingScheduleCalculator = ReadingScheduleCalculator()
         
         return HStack {
-            if let currentReadingBook = userLibrary.currentReadingBook {
+            if let currentReadingBook = currentlyReadingBooks.first {
                 
                 VStack(alignment: .leading, spacing: 5) {
                     Text("<\(currentReadingBook.book.title)>")
@@ -160,7 +167,7 @@ struct MainHomeView: View {
     }
     
     private var calendarFullScreenButton: some View {
-        let isReadingBookAvailable = userLibrary.currentReadingBook != nil
+        let isReadingBookAvailable = currentlyReadingBooks.first != nil
         let backgroundColor = isReadingBookAvailable ? Color.white : Color(red: 0.98, green: 1, blue: 0.99)
         let opacity = isReadingBookAvailable ? 1 : 0.2
         
@@ -191,7 +198,7 @@ struct MainHomeView: View {
     }
     
     private var mainActionButton: some View {
-        let isReadingBookAvailable = userLibrary.currentReadingBook != nil
+        let isReadingBookAvailable = currentlyReadingBooks.first != nil
         
         return Button {
             if isReadingBookAvailable {

@@ -5,13 +5,15 @@
 //  Created by zaehorang on 11/5/24.
 //
 
+import SwiftData
 import SwiftUI
 
 struct WeeklyReadingProgressView: View {
-    @Environment(UserLibrary.self) var userLibrary: UserLibrary
+    @Query(filter: #Predicate<UserBook> { $0.isCompleted == false })
+    private var currentlyReadingBooks: [UserBook]  // 현재 읽고 있는 책을 가져오는 쿼리
     
     var body: some View {
-        if let currentReadingBook = userLibrary.currentReadingBook {
+        if let currentReadingBook = currentlyReadingBooks.first {
             VStack(alignment: .leading, spacing: 17) {
                 
                 VStack(alignment: .leading, spacing: 8) {
@@ -39,23 +41,23 @@ struct WeeklyReadingProgressView: View {
             
         } else {
             VStack(spacing: 0) {
-                    HStack {
-                        Text("읽고 있는 책이 없어요!\n읽고 있는 책을 등록해주세요")
-                            .lineSpacing(6)
-                            .font(.system(size: 16))
-                            .foregroundColor(.black)
-                        Spacer()
-                    }
-                    
-                    HStack {
-                        Spacer()
-                        Image("nothingWandoki")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 162)
-                            .padding(.bottom, 8)
-                    }
+                HStack {
+                    Text("읽고 있는 책이 없어요!\n읽고 있는 책을 등록해주세요")
+                        .lineSpacing(6)
+                        .font(.system(size: 16))
+                        .foregroundColor(.black)
+                    Spacer()
                 }
+                
+                HStack {
+                    Spacer()
+                    Image("nothingWandoki")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 162)
+                        .padding(.bottom, 8)
+                }
+            }
             .padding(.top, 22)
             .padding(.horizontal, 24)
             .background {

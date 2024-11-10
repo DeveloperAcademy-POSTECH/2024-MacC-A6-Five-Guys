@@ -147,7 +147,7 @@ struct WeeklyPageCalendarView_Previews: PreviewProvider {
             nonReadingDays: []  // 1주 후 종료일
         )
         
-        var userBook = UserBook(book: bookDetails)
+        let userBook = UserBook(book: bookDetails)
         
         // 더미 읽기 기록 추가
         let calendar = Calendar.current

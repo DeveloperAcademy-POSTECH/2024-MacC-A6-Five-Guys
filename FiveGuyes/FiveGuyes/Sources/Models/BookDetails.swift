@@ -6,8 +6,9 @@
 //
 
 import Foundation
+import SwiftData
 
-@Observable
+@Model
 final class BookDetails {
     let title: String
     let author: String
@@ -18,7 +19,7 @@ final class BookDetails {
     var targetEndDate: Date
     
     var nonReadingDays: [Date]
-
+    
     init(title: String, author: String, coverURL: String? = nil, totalPages: Int, startDate: Date, targetEndDate: Date, nonReadingDays: [Date]) {
         self.title = title
         self.author = author
@@ -27,64 +28,6 @@ final class BookDetails {
         self.startDate = startDate
         self.targetEndDate = targetEndDate
         self.nonReadingDays = nonReadingDays
-    }
-}
-
-struct ReadingRecord {
-    var targetPages: Int   // 목표로 설정된 페이지 수
-    var pagesRead: Int     // 실제 읽은 페이지 수
-}
-
-@Observable
-final class UserBook {
-    var book: BookDetails
-    var readingRecords: [String: ReadingRecord] = [:] // Keyed by formatted date strings
-    
-    // 계산 로직을 더 편하게 하기 위해 마지막으로 읽은 날의 결과를 따로 저장합니다.
-    var lastReadDate: Date? // 마지막 읽은 날짜
-    var lastPagesRead: Int = 0 // 마지막으로 읽은 페이지 수
-    
-    var completionReview = ""
-    
-    init(book: BookDetails) {
-        self.book = book
-    }
-    
-    /// `pagesRead`가 0이 아닌 날의 수를 반환합니다.
-    /// 지금까지 독서를 한 날의 수
-    func nonZeroReadingDaysCount() -> Int {
-        // 첫 날은 1일 째 도전중이니까 + 1을 해준다.
-        let readingDays = readingRecords.values.filter { $0.pagesRead > 0 }
-        if readingDays.isEmpty {
-            return 1
-        }
-        return readingRecords.values.filter { $0.pagesRead > 0 }.count
-    }
-}
-
-@Observable
-final class UserLibrary {
-    var currentReadingBook: UserBook?
-    var completedBooks: [UserBook?] = []
-    
-    /// 현재 읽고 있는 책을 완독 처리하고, `completedBooks`에 추가합니다.
-    func completeCurrentBook(_ book: UserBook, review: String) {
-        // 책의 완독 날짜를 오늘로 설정
-        book.book.targetEndDate = Date()
-        book.completionReview = review
-
-        // 시작 날짜가 종료 날짜보다 이후에 있으면 시작 날짜도 완료 날짜로 설정
-        if book.book.startDate > book.book.targetEndDate {
-            book.book.startDate = book.book.targetEndDate
-        }
-        
-        // 완독한 책을 completedBooks에 추가하고 currentReadingBook을 nil로 설정
-        completedBooks.append(book)
-        currentReadingBook = nil
-    }
-    
-    func deleteCurrentBook() {
-        currentReadingBook = nil
     }
 }
 

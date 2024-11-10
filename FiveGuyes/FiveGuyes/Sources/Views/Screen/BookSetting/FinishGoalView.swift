@@ -7,12 +7,10 @@
 
 import SwiftUI
 
-// TODO: 앞에서 받은 데이터를 기반으로 하나의 모델 타입으로 받고 뷰에 뿌려주기
-// 여기서 페이지 계산한 모델의 데이터를 써야 할 듯
 struct FinishGoalView: View {
     @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
     @Environment(BookSettingInputModel.self) var bookSettingInputModel: BookSettingInputModel
-    @Environment(UserLibrary.self) var userLibrary: UserLibrary
+    @Environment(\.modelContext) private var modelContext
     
     @State private var pagesPerDay: Int = 0
     @State var userBook: UserBook?
@@ -135,10 +133,13 @@ struct FinishGoalView: View {
                     Spacer()
                     
                     Button {
-                        // TODO: 책 정보 저장하기
-                        // 유저 라이브러리에 추가 + 초기 페이지 할당량 계산해서 저장
-                        userLibrary.currentReadingBook = userBook
-                        navigationCoordinator.popToRoot()
+                        // 책 정보 저장하기
+                        if let userBook = userBook {
+                            modelContext.insert(userBook) // SwiftData에 새로운 책 저장
+                            navigationCoordinator.popToRoot()
+                        } else {
+                            print("책 정보 없음")
+                        }
                     } label: {
                         HStack {
                             Text("확인")
@@ -160,9 +161,7 @@ struct FinishGoalView: View {
                 // 1일 할당량 계산
                 // TODO: 해당 모델 객체를 더 잘 만들 방식 고민하기
                 let bookData = UserBook(book: BookDetails(title: book.title, author: book.author, coverURL: book.cover, totalPages: totalPages, startDate: startDate, targetEndDate: endDate, nonReadingDays: bookSettingInputModel.nonReadingDays))
-                //                bookData.
                 calculator.calculateInitialDailyTargets(for: bookData)
-                print(bookData.readingRecords)
                 userBook = bookData
                 pagesPerDay = calculator.firstCalculatePagesPerDay(for: bookData)
             }
@@ -172,7 +171,7 @@ struct FinishGoalView: View {
     
     private func formatDateToKorean(_ date: Date) -> String {
         let dateFormatter = DateFormatter()
-//        dateFormatter.locale = Locale(identifier: "ko_KR")
+        //        dateFormatter.locale = Locale(identifier: "ko_KR")
         dateFormatter.dateFormat = "M월 d일"
         return dateFormatter.string(from: date)
     }
