@@ -7,7 +7,8 @@
 
 import UIKit
 
-class KeyboardObserver: ObservableObject {
+//MARK: - 키보드가 올라오는 시점을 알기 위한 모델
+final class KeyboardObserver: ObservableObject {
     @Published var keyboardIsVisible: Bool = false
     
     init() {
@@ -20,12 +21,16 @@ class KeyboardObserver: ObservableObject {
     }
     
     private func addKeyboardObservers() {
-        NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification, object: nil, queue: .main) { _ in
-            self.keyboardIsVisible = true
+        NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification, object: nil, queue: .main) { [weak self] _ in
+            DispatchQueue.main.async {
+                self?.keyboardIsVisible = true
+            }
         }
         
-        NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillHideNotification, object: nil, queue: .main) { _ in
-            self.keyboardIsVisible = false
+        NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillHideNotification, object: nil, queue: .main) { [weak self] _ in
+            DispatchQueue.main.async {
+                self?.keyboardIsVisible = false
+            }
         }
     }
     

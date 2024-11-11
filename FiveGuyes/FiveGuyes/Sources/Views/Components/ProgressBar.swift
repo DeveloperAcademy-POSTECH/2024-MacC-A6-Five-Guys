@@ -8,15 +8,19 @@
 import SwiftUI
 
 struct ProgressBar: View {
-    var progress: CGFloat
+    private let total = 4.0
+    var currentPage: Int
     
     var body: some View {
+        var progress = CGFloat(Double(currentPage) / total)
+        
         GeometryReader { geometry in
             ZStack(alignment: .leading) {
                 Rectangle()
                     .stroke(Color(red: 0.94, green: 0.94, blue: 0.94))
                     .fill(Color(red: 0.94, green: 0.94, blue: 0.94))
                     .frame(height: 2)
+                
                 Rectangle()
                     .stroke(Color(red: 0.07, green: 0.87, blue: 0.54))
                     .fill(Color(red: 0.07, green: 0.87, blue: 0.54))
@@ -24,6 +28,9 @@ struct ProgressBar: View {
             }
         }
         .frame(height: 0)
-        .padding(.bottom, 24)
     }
+}
+
+#Preview {
+    ProgressBar(currentPage: 2)
 }
