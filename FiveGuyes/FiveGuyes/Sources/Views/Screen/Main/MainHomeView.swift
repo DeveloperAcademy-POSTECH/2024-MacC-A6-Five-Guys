@@ -13,16 +13,17 @@ struct MainHomeView: View {
     @Environment(\.modelContext) private var modelContext
     
     @State private var topSafeAreaInset: CGFloat = 0
-    @State private var showAlert = false
+    @State private var showReadingBookAlert = false
+    @State private var showCompletionAlert = false
+    
+    let mainAlertMessage = "삭제 후에는 복원할 수 없어요"
     
     @Query(filter: #Predicate<UserBook> { $0.isCompleted == false })
     private var currentlyReadingBooks: [UserBook]
     
-    let alertMessage = "삭제 후에는 복원할 수 없어요"
-    
     var body: some View {
         let title = currentlyReadingBooks.first?.book.title ?? "제목 없음"
-        let alertText = "현재 읽고 있는 <\(title)>\(title.postPositionParticle()) 책장에서 삭제할까요?"
+        let mainAlertText = "현재 읽고 있는 <\(title)>\(title.postPositionParticle()) 책장에서 삭제할까요?"
         
         ScrollView {
             ZStack(alignment: .top) {
@@ -45,13 +46,26 @@ struct MainHomeView: View {
                         
                         if !currentlyReadingBooks.isEmpty {
                             Button {
-                                showAlert = true
+                                showReadingBookAlert = true
                             } label: {
                                 Image(systemName: "ellipsis")
                                     .resizable()
                                     .scaledToFit()
                                     .frame(width: 20, height: 22)
                                     .tint(Color(red: 0.44, green: 0.44, blue: 0.44))
+                            }
+                            .alert(isPresented: $showReadingBookAlert) {
+                                Alert(
+                                    title: Text(mainAlertText),
+                                    message: Text(mainAlertMessage),
+                                    primaryButton: .cancel(Text("취소하기")),
+                                    secondaryButton: .destructive(Text("삭제")) {
+                                        if let currentReadingBook = currentlyReadingBooks.first {
+                                                                // SwiftData 컨텍스트에서 삭제 필요
+                                                                modelContext.delete(currentReadingBook)
+                                                            }
+                                    }
+                                )
                             }
                         }
                     }
@@ -92,6 +106,7 @@ struct MainHomeView: View {
                     }
                     .padding(.bottom, 40)
                     
+//                    completionList
                     CompletionListView()
                     
                 }
@@ -102,19 +117,18 @@ struct MainHomeView: View {
         .background(.white)
         .ignoresSafeArea(edges: .top)
         .scrollIndicators(.hidden)
-        .alert(isPresented: $showAlert) {
-            Alert(
-                title: Text(alertText),
-                message: Text(alertMessage),
-                primaryButton: .cancel(Text("취소하기")),
-                secondaryButton: .destructive(Text("삭제")) {
-                    if let currentReadingBook = currentlyReadingBooks.first {
-                                            // SwiftData 컨텍스트에서 삭제 필요
-                                            modelContext.delete(currentReadingBook)
-                                        }
-                }
-            )
-        }
+
+//        .alert(isPresented: $showCompletionAlert) {
+//            Alert(
+//                title: Text(completionAlertText),
+//                message: Text(completionAlertMessage),
+//                primaryButton: .cancel(Text("취소하기")),
+//                secondaryButton: .destructive(Text("삭제")) {
+//                    let book = completedBooks[selectedBookIndex]
+//                    modelContext.delete(book)
+//                }
+//            )
+//        }
         .onAppear {
             // 상단 안전 영역 값 계산
             if let window = UIApplication.shared.connectedScenes

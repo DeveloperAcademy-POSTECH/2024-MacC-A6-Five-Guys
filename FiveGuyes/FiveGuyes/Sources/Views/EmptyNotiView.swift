@@ -11,14 +11,18 @@ import SwiftUI
 struct EmptyNotiView: View {
     var body: some View {
         VStack(spacing: 0) {
-            Image("wandoki2")
+            Image("nothingWandoki")
                 .resizable()
-                .frame(width: 194, height: 194)
+                .scaledToFit()
+                .frame(width: 194)
                 .padding(.bottom, 10)
             Text("아직 도착한 알림이 없어요")
-                .font(.system(size: 24))
-                .fontWeight(.semibold)
+                .font(.system(size: 24, weight: .semibold))
         }
+        .navigationTitle("알림")
+        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(true)
+        .customNavigationBackButton()
     }
 }
 

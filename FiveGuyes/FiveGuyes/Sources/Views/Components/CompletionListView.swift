@@ -9,7 +9,10 @@ import SwiftData
 import SwiftUI
 
 struct CompletionListView: View {
+    @Environment(\.modelContext) private var modelContext
+    
     @State private var selectedBookIndex: Int = 0
+    @State var showCompletionAlert: Bool = false
     
     // 완독한 책을 가져오는 쿼리
     @Query(
@@ -17,6 +20,9 @@ struct CompletionListView: View {
         sort: [SortDescriptor(\UserBook.book.targetEndDate, order: .reverse)]
     )
     private var completedBooks: [UserBook]
+    
+    let completionAlertMessage = "정말로 내용을 삭제할까요?"
+    let completionAlertText = "삭제 후에는 복원할 수 없어요"
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -55,14 +61,13 @@ struct CompletionListView: View {
                                     }
                                     
                                     VStack(alignment: .leading, spacing: 0) {
-                                        Text(book.book.title ?? "")
+                                        Text(book.book.title )
                                             .font(.system(size: 14, weight: .semibold))
                                             .foregroundColor(.black)
-                                        Text(book.book.author ?? "")
+                                        Text(book.book.author)
                                             .font(.system(size: 12, weight: .medium))
                                             .foregroundColor(Color(red: 0.44, green: 0.44, blue: 0.44))
                                     }
-                                    //
                                 }
                                 .frame(width: 115)
                                 .onTapGesture {
@@ -85,6 +90,18 @@ struct CompletionListView: View {
                         HStack {
                             Text("\(selectedBook.book.targetEndDate.toKoreanDateStringWithoutYear()) 완독완료")
                             Spacer()
+                            // TODO: 수정하기 기능 추가
+                            Button {
+                                showCompletionAlert = true
+                            } label: {
+                                Image(systemName: "ellipsis")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 20, height: 22)
+                                    .tint(Color(red: 0.44, green: 0.44, blue: 0.44))
+                                    .padding(.trailing, 3)
+                            }
+
                         }
                         .font(.system(size: 12, weight: .medium))
                         .foregroundColor(Color(red: 0.44, green: 0.44, blue: 0.44))
@@ -103,9 +120,16 @@ struct CompletionListView: View {
                     .foregroundColor(Color(red: 0.93, green: 0.97, blue: 0.95))
             }
         }
+        .alert(isPresented: $showCompletionAlert) {
+            Alert(
+                title: Text(completionAlertText),
+                message: Text(completionAlertMessage),
+                primaryButton: .cancel(Text("취소하기")),
+                secondaryButton: .destructive(Text("삭제")) {
+                    let book = completedBooks[selectedBookIndex]
+                    modelContext.delete(book)
+                }
+            )
+        }
     }
-}
-
-#Preview {
-    CompletionListView()
 }
