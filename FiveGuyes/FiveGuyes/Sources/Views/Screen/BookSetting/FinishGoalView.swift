@@ -15,7 +15,8 @@ struct FinishGoalView: View {
     @State private var pagesPerDay: Int = 0
     @State var userBook: UserBook?
     
-    let calculator = ReadingScheduleCalculator()
+    private let calculator = ReadingScheduleCalculator()
+    private let notificationManager = NotificationManager()
     
     var body: some View {
         
@@ -136,6 +137,9 @@ struct FinishGoalView: View {
                         // 책 정보 저장하기
                         if let userBook = userBook {
                             modelContext.insert(userBook) // SwiftData에 새로운 책 저장
+                            
+                            // 노티 세팅하기
+                            setNotification(userBook)
                             navigationCoordinator.popToRoot()
                         } else {
                             print("책 정보 없음")
@@ -163,7 +167,7 @@ struct FinishGoalView: View {
                 let bookData = UserBook(book: BookDetails(title: book.title, author: book.author, coverURL: book.cover, totalPages: totalPages, startDate: startDate, targetEndDate: endDate, nonReadingDays: bookSettingInputModel.nonReadingDays))
                 calculator.calculateInitialDailyTargets(for: bookData)
                 userBook = bookData
-                pagesPerDay = calculator.firstCalculatePagesPerDay(for: bookData)
+                pagesPerDay = calculator.firstCalculatePagesPerDay(for: bookData).pagesPerDay
             }
         }
         
@@ -176,6 +180,14 @@ struct FinishGoalView: View {
         return dateFormatter.string(from: date)
     }
     
+    private func setNotification(_ readingBook: UserBook) {
+        notificationManager.clearRequests()
+        Task {
+            await self.notificationManager.setupNotifications(notificationType: .morning(readingBook: readingBook))
+            
+            await self.notificationManager.setupNotifications(notificationType: .night(readingBook: readingBook))
+        }
+    }
 }
 
 struct TextView: View {

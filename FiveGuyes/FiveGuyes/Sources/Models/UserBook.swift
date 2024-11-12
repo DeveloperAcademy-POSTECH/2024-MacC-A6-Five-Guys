@@ -30,7 +30,9 @@ final class UserBook {
     init(book: BookDetails) {
         self.book = book
     }
-    
+}
+
+extension UserBook {
     func markAsCompleted(review: String) {
         // 책을 완독 상태로 설정
         book.targetEndDate = Date()
@@ -52,5 +54,28 @@ final class UserBook {
             return 1
         }
         return readingRecords.values.filter { $0.pagesRead > 0 }.count
+    }
+    
+    /// 오늘 이후 다음 읽기 예정일을 반환하는 메서드
+    func findNextReadingDay() -> Date? {
+        let today = lastReadDate ?? Date()
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        let todayString = dateFormatter.string(from: today)
+        print("today⭐️: \(today)")
+        
+        // 오늘 이후 날짜들 중 비독서일을 제외한 첫 읽기 예정일을 찾음
+        for dateString in readingRecords.keys.sorted()
+        where dateString > todayString {
+            return dateFormatter.date(from: dateString)
+        }
+        // 모든 읽기 예정일이 지난 경우 nil 반환
+        return nil
+    }
+    
+    func findNextReadingPagesPerDay() -> Int {
+        let readingScheduleCalculator = ReadingScheduleCalculator()
+
+        return readingScheduleCalculator.calculatePagesPerDay(for: self).pagesPerDay
     }
 }
