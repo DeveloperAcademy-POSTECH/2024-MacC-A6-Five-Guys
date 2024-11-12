@@ -6,10 +6,8 @@
 //
 
 import Foundation
-import SwiftData
 
-@Model
-final class BookDetails {
+struct BookDetails: Codable {
     let title: String
     let author: String
     let coverURL: String?

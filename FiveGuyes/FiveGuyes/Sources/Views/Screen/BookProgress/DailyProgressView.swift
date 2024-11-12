@@ -31,7 +31,7 @@ struct DailyProgressView: View {
     var body: some View {
         // TODO: 더미 지우기
         let userBook = currentlyReadingBooks.first ?? UserBook.dummyUserBook
-        let book = userBook.book
+        var book = userBook.book
         let isTodayCompletionDate = book.targetEndDate == today
         
         VStack(spacing: 0) {
