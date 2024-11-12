@@ -16,8 +16,8 @@ struct CompletionListView: View {
     
     // 완독한 책을 가져오는 쿼리
     @Query(
-        filter: #Predicate<UserBook> { $0.isCompleted == true },
-        sort: [SortDescriptor(\UserBook.book.targetEndDate, order: .reverse)]
+        filter: #Predicate<UserBook> { $0.isCompleted == true }
+//        sort: [SortDescriptor(\UserBook.book.targetEndDate, order: .reverse)]
     )
     private var completedBooks: [UserBook]
     
@@ -90,18 +90,18 @@ struct CompletionListView: View {
                         HStack {
                             Text("\(selectedBook.book.targetEndDate.toKoreanDateStringWithoutYear()) 완독완료")
                             Spacer()
-                            // TODO: 수정하기 기능 추가
-                            Button {
-                                showCompletionAlert = true
-                            } label: {
-                                Image(systemName: "ellipsis")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 20, height: 22)
-                                    .tint(Color(red: 0.44, green: 0.44, blue: 0.44))
-                                    .padding(.trailing, 3)
-                            }
-
+                            // TODO: ❗️❗️❗️ 수정하기 기능 추가
+                            // 데이터를 지우니까 튕김
+//                            Button {
+//                                showCompletionAlert = true
+//                            } label: {
+//                                Image(systemName: "ellipsis")
+//                                    .resizable()
+//                                    .scaledToFit()
+//                                    .frame(width: 20, height: 22)
+//                                    .tint(Color(red: 0.44, green: 0.44, blue: 0.44))
+//                                    .padding(.trailing, 3)
+//                            }
                         }
                         .font(.system(size: 12, weight: .medium))
                         .foregroundColor(Color(red: 0.44, green: 0.44, blue: 0.44))
@@ -120,16 +120,18 @@ struct CompletionListView: View {
                     .foregroundColor(Color(red: 0.93, green: 0.97, blue: 0.95))
             }
         }
-        .alert(isPresented: $showCompletionAlert) {
-            Alert(
-                title: Text(completionAlertText),
-                message: Text(completionAlertMessage),
-                primaryButton: .cancel(Text("취소하기")),
-                secondaryButton: .destructive(Text("삭제")) {
-                    let book = completedBooks[selectedBookIndex]
-                    modelContext.delete(book)
-                }
-            )
-        }
+        // TODO: ❗️❗️❗️ 수정하기 기능 추가
+        // 데이터를 지우니까 튕김
+//        .alert(isPresented: $showCompletionAlert) {
+//            Alert(
+//                title: Text(completionAlertText),
+//                message: Text(completionAlertMessage),
+//                primaryButton: .cancel(Text("취소하기")),
+//                secondaryButton: .destructive(Text("삭제")) {
+//                    let book = completedBooks[selectedBookIndex]
+//                    modelContext.delete(book)
+//                }
+//            )
+//        }
     }
 }

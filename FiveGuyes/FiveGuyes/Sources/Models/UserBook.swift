@@ -15,7 +15,7 @@ struct ReadingRecord: Codable {
 
 @Model
 final class UserBook {
-    @Relationship(deleteRule: .cascade)
+    @Attribute(.unique) var id = UUID()
     var book: BookDetails
     
     var readingRecords: [String: ReadingRecord] = [:] // Keyed by formatted date strings
