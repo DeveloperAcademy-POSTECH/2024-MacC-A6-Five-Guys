@@ -18,6 +18,7 @@
 		1A27D9662CDB779000D1E14D /* TotalCalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A27D9652CDB779000D1E14D /* TotalCalendarView.swift */; };
 		1A54142B2CD9FEF400283FBD /* BookSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A54142A2CD9FEF400283FBD /* BookSearchView.swift */; };
 		1AA14A782CDDA30D00B763A6 /* TotalCalendarTextBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AA14A772CDDA30D00B763A6 /* TotalCalendarTextBubble.swift */; };
+		1AA14A7A2CDDD96200B763A6 /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AA14A792CDDD96200B763A6 /* NotificationManager.swift */; };
 		24360D482CD8BAF100E83D2B /* EmptyNotiView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24360D472CD8BAF100E83D2B /* EmptyNotiView.swift */; };
 		24360D4A2CD8BE3C00E83D2B /* FinishGoalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24360D492CD8BE3C00E83D2B /* FinishGoalView.swift */; };
 		24360D532CD9F3AF00E83D2B /* DailyProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24360D522CD9F3AF00E83D2B /* DailyProgressView.swift */; };
@@ -39,6 +40,7 @@
 		26EBDE262CDE3C6000B3A2BC /* BookSettingInputModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDE252CDE3C6000B3A2BC /* BookSettingInputModel.swift */; };
 		26EBDE2A2CDF33D900B3A2BC /* Date+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDE292CDF33D900B3A2BC /* Date+Extension.swift */; };
 		26EBDE2C2CE1341800B3A2BC /* UserBook.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDE2B2CE1341800B3A2BC /* UserBook.swift */; };
+		26EBDE2F2CE3856900B3A2BC /* NotificationType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDE2E2CE3856900B3A2BC /* NotificationType.swift */; };
 		26F19A682CD9EFD800F41D6D /* MainHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F19A672CD9EFD800F41D6D /* MainHomeView.swift */; };
 		26F19A6A2CD9FE5C00F41D6D /* WeeklyReadingProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F19A692CD9FE5C00F41D6D /* WeeklyReadingProgressView.swift */; };
 		26F19A6C2CDA0A2B00F41D6D /* CompletionListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F19A6B2CDA0A2B00F41D6D /* CompletionListView.swift */; };
@@ -47,7 +49,6 @@
 		26F19A742CDB271E00F41D6D /* NavigationRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F19A732CDB271E00F41D6D /* NavigationRootView.swift */; };
 		26F19A782CDB5D0100F41D6D /* BookDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F19A772CDB5D0100F41D6D /* BookDetails.swift */; };
 		26F19A7A2CDB5F3900F41D6D /* ReadingScheduleCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F19A792CDB5F3900F41D6D /* ReadingScheduleCalculator.swift */; };
-		26F19A822CDBE3A600F41D6D /* ReadingTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F19A812CDBE3A600F41D6D /* ReadingTestView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -63,6 +64,8 @@
 		1A27D9652CDB779000D1E14D /* TotalCalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TotalCalendarView.swift; sourceTree = "<group>"; };
 		1A54142A2CD9FEF400283FBD /* BookSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = BookSearchView.swift; path = FiveGuyes/Sources/Views/Screen/BookSetting/BookSearch/BookSearchView.swift; sourceTree = SOURCE_ROOT; };
 		1AA14A772CDDA30D00B763A6 /* TotalCalendarTextBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TotalCalendarTextBubble.swift; sourceTree = "<group>"; };
+		1AA14A792CDDD96200B763A6 /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
+		24360D452CD8A2F800E83D2B /* EmptyDataMainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyDataMainView.swift; sourceTree = "<group>"; };
 		24360D472CD8BAF100E83D2B /* EmptyNotiView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyNotiView.swift; sourceTree = "<group>"; };
 		24360D492CD8BE3C00E83D2B /* FinishGoalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinishGoalView.swift; sourceTree = "<group>"; };
 		24360D522CD9F3AF00E83D2B /* DailyProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyProgressView.swift; sourceTree = "<group>"; };
@@ -85,6 +88,7 @@
 		26EBDE252CDE3C6000B3A2BC /* BookSettingInputModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookSettingInputModel.swift; sourceTree = "<group>"; };
 		26EBDE292CDF33D900B3A2BC /* Date+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Extension.swift"; sourceTree = "<group>"; };
 		26EBDE2B2CE1341800B3A2BC /* UserBook.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserBook.swift; sourceTree = "<group>"; };
+		26EBDE2E2CE3856900B3A2BC /* NotificationType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationType.swift; sourceTree = "<group>"; };
 		26F19A672CD9EFD800F41D6D /* MainHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainHomeView.swift; sourceTree = "<group>"; };
 		26F19A692CD9FE5C00F41D6D /* WeeklyReadingProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyReadingProgressView.swift; sourceTree = "<group>"; };
 		26F19A6B2CDA0A2B00F41D6D /* CompletionListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletionListView.swift; sourceTree = "<group>"; };
@@ -93,7 +97,6 @@
 		26F19A732CDB271E00F41D6D /* NavigationRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationRootView.swift; sourceTree = "<group>"; };
 		26F19A772CDB5D0100F41D6D /* BookDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookDetails.swift; sourceTree = "<group>"; };
 		26F19A792CDB5F3900F41D6D /* ReadingScheduleCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadingScheduleCalculator.swift; sourceTree = "<group>"; };
-		26F19A812CDBE3A600F41D6D /* ReadingTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadingTestView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -142,6 +145,7 @@
 				261714D32CDD27C900A3241D /* Config.xcconfig */,
 				26890B932CAE811A008DFF49 /* FiveGuyes */,
 				26890B922CAE811A008DFF49 /* Products */,
+				26EBDE2D2CE3307C00B3A2BC /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
@@ -218,7 +222,6 @@
 		26D852FB2CCE40BC0016239A /* Screen */ = {
 			isa = PBXGroup;
 			children = (
-				26F19A832CDC970D00F41D6D /* Testing */,
 				26F19A662CD9EF9400F41D6D /* Main */,
 				1A27D95E2CDA155B00D1E14D /* BookSetting */,
 				24360D4F2CD9F2D800E83D2B /* BookProgress */,
@@ -264,6 +267,8 @@
 				26F19A772CDB5D0100F41D6D /* BookDetails.swift */,
 				26EBDE2B2CE1341800B3A2BC /* UserBook.swift */,
 				26F19A792CDB5F3900F41D6D /* ReadingScheduleCalculator.swift */,
+				26EBDE2E2CE3856900B3A2BC /* NotificationType.swift */,
+				1AA14A792CDDD96200B763A6 /* NotificationManager.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -300,20 +305,20 @@
 			path = BookSearch;
 			sourceTree = "<group>";
 		};
+		26EBDE2D2CE3307C00B3A2BC /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+				24360D452CD8A2F800E83D2B /* EmptyDataMainView.swift */,
+			);
+			name = "Recovered References";
+			sourceTree = "<group>";
+		};
 		26F19A662CD9EF9400F41D6D /* Main */ = {
 			isa = PBXGroup;
 			children = (
 				26F19A672CD9EFD800F41D6D /* MainHomeView.swift */,
 			);
 			path = Main;
-			sourceTree = "<group>";
-		};
-		26F19A832CDC970D00F41D6D /* Testing */ = {
-			isa = PBXGroup;
-			children = (
-				26F19A812CDBE3A600F41D6D /* ReadingTestView.swift */,
-			);
-			path = Testing;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -394,7 +399,6 @@
 			files = (
 				1A54142B2CD9FEF400283FBD /* BookSearchView.swift in Sources */,
 				26F19A782CDB5D0100F41D6D /* BookDetails.swift in Sources */,
-				26F19A822CDBE3A600F41D6D /* ReadingTestView.swift in Sources */,
 				1A010EAE2CD8A86E00FBE3B3 /* APIStore.swift in Sources */,
 				24A2063F2CDB180000964FBB /* CompletionCalendarView.swift in Sources */,
 				1A010EBE2CD8DA2400FBE3B3 /* BookListView.swift in Sources */,
@@ -416,6 +420,7 @@
 				24360D4A2CD8BE3C00E83D2B /* FinishGoalView.swift in Sources */,
 				26F19A682CD9EFD800F41D6D /* MainHomeView.swift in Sources */,
 				26F19A742CDB271E00F41D6D /* NavigationRootView.swift in Sources */,
+				1AA14A7A2CDDD96200B763A6 /* NotificationManager.swift in Sources */,
 				264440502CD8A3AC0031A290 /* CompletionReviewView.swift in Sources */,
 				264440502CD8A3AC0031A290 /* CompletionReviewView.swift in Sources */,
 				26890B952CAE811A008DFF49 /* FiveGuyesApp.swift in Sources */,
@@ -425,6 +430,7 @@
 				264440572CD8E0D20031A290 /* CustomTextEditorStyle.swift in Sources */,
 				264440552CD8E0100031A290 /* KeyboardObserver.swift in Sources */,
 				26F19A6C2CDA0A2B00F41D6D /* CompletionListView.swift in Sources */,
+				26EBDE2F2CE3856900B3A2BC /* NotificationType.swift in Sources */,
 				1A27D9662CDB779000D1E14D /* TotalCalendarView.swift in Sources */,
 				2644404E2CD8A39E0031A290 /* CompletionCelebrationView.swift in Sources */,
 				26EBDE262CDE3C6000B3A2BC /* BookSettingInputModel.swift in Sources */,
