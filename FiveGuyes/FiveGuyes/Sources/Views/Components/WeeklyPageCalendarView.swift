@@ -99,6 +99,11 @@ struct WeeklyPageCalendarView: View {
                                     .frame(height: 44)
                             }
                         } else {
+                            if index == todayIndex { // today
+                                Circle()
+                                    .fill(Color(red: 0.07, green: 0.87, blue: 0.54))
+                                    .frame(height: 44)
+                            }
                             Text("")
                                 .frame(height: 44)
                                 .foregroundColor(Color(red: 0.44, green: 0.44, blue: 0.44))

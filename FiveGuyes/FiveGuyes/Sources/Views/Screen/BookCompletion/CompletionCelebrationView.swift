@@ -105,7 +105,7 @@ struct CompletionCelebrationView: View {
         let startDateText = book.startDate.toKoreanDateString()
         // TODO: 완독을 수정할 수도 있기 때문에 완독 날짜가 바뀔 수 있음, 그래서 완독 날짜는 최종에서 업데이트하고 여기서는 오늘 날짜로 보여주기
         let endDateText = Date().toKoreanDateString()
-        let pagesPerDay = readingScheduleCalculator.firstCalculatePagesPerDay(for: userBook)
+        let pagesPerDay = readingScheduleCalculator.firstCalculatePagesPerDay(for: userBook).pagesPerDay
         let totalReadingDays = readingScheduleCalculator.firstCalculateTotalReadingDays(for: userBook)
         
         return Text("\(startDateText)부터 \(endDateText)까지\n꾸준히 \(pagesPerDay)쪽씩 \(totalReadingDays)일동안 읽었어요 🎉")

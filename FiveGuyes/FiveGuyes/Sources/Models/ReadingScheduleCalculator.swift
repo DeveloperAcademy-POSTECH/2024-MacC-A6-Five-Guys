@@ -24,8 +24,7 @@ struct ReadingScheduleCalculator {
     
     // MARK: 첫날을 기준으로 읽어야하는 페이지를 할당하는 메서드 (초기 페이지 계산)
     func calculateInitialDailyTargets(for currentReadingBook: UserBook) {
-        let pagesPerDay = firstCalculatePagesPerDay(for: currentReadingBook)
-        let remainderPages = firstCalculateRemainderPages(for: currentReadingBook)
+        let (pagesPerDay, remainderPages) = firstCalculatePagesPerDay(for: currentReadingBook)
         
         var targetDate = currentReadingBook.book.startDate
         var remainderOffset = remainderPages
@@ -78,7 +77,7 @@ struct ReadingScheduleCalculator {
         }
     }
     
-    //MARK: 더 읽거나, 덜 읽으면 이후 날짜의 할당량을 다시 계산한다.
+    // MARK: 더 읽거나, 덜 읽으면 이후 날짜의 할당량을 다시 계산한다.
     func adjustFutureTargets(for currentReadingBook: UserBook, from date: Date) {
         let totalRemainingPages = calculateRemainingPages(for: currentReadingBook)
         print("❌: \(totalRemainingPages)")
@@ -126,16 +125,10 @@ struct ReadingScheduleCalculator {
     func reassignPagesFromLastReadDate(for currentReadingBook: UserBook) {
         // 이미 읽었으면 재분배 x
         if hasReadPagesToday(for: currentReadingBook) { return }
-        
-        // 몇 페이지 남음?
-        let totalRemainingPages = calculateRemainingPages(for: currentReadingBook)
-        print("❌re: \(totalRemainingPages)")
-        // 오늘부터 며칠 남음?
-        let remainingDays = calculateRemainingReadingDays(for: currentReadingBook)
-        print("🐶re: \(remainingDays)")
-        // 남은 페이지와 날짜를 기준으로 새롭게 할당량 계산
-        let pagesPerDay = totalRemainingPages / remainingDays
-        var remainderOffset = totalRemainingPages % remainingDays
+
+        // 남은 페이지와 일수를 기준으로 새롭게 할당량 계산
+        let (pagesPerDay, remainderPages) = calculatePagesPerDay(for: currentReadingBook)
+        var remainderOffset = remainderPages
         var cumulativePages = currentReadingBook.lastPagesRead
         
         var targetDate = Date() // 오늘 날짜부터 새로 할당 시작
@@ -187,16 +180,12 @@ struct ReadingScheduleCalculator {
     }
     
     // 하루에 몇 페이지 읽는지 계산
-    func firstCalculatePagesPerDay(for currentReadingBook: UserBook) -> Int {
+    func firstCalculatePagesPerDay(for currentReadingBook: UserBook) -> (pagesPerDay: Int, remainder: Int) {
         let totalReadingDays = firstCalculateTotalReadingDays(for: currentReadingBook)
-        return currentReadingBook.book.totalPages / totalReadingDays
-    }
-    
-    
-    // 하루에 몇 페이지 읽는지 계산하고 딱 떨어지지 않는 페이지 수 구하는 메서드
-    func firstCalculateRemainderPages(for currentReadingBook: UserBook) -> Int {
-        let totalReadingDays = firstCalculateTotalReadingDays(for: currentReadingBook)
-        return currentReadingBook.book.totalPages % totalReadingDays
+        let pagesPerDay = currentReadingBook.book.totalPages / totalReadingDays
+        let remainder = currentReadingBook.book.totalPages % totalReadingDays
+        
+        return (pagesPerDay, remainder)
     }
     
     // MARK: - 남은 양을 다시 계산할 때 사용하는 메서드
@@ -220,6 +209,19 @@ struct ReadingScheduleCalculator {
         return remainingDays
     }
     
+    // 남은 페이지와 날짜를 기반으로 일일 할당량을 계산하는 메서드
+    func calculatePagesPerDay(for currentReadingBook: UserBook) -> (pagesPerDay: Int, remainder: Int) {
+        let totalRemainingPages = calculateRemainingPages(for: currentReadingBook)
+        let remainingDays = calculateRemainingReadingDays(for: currentReadingBook)
+        
+        let pagesPerDay = totalRemainingPages / remainingDays
+        let remainder = totalRemainingPages % remainingDays
+        
+        print("❌읽는 중: \(totalRemainingPages)")
+        print("🐶읽는 중: \(remainingDays)")
+        
+        return (pagesPerDay, remainder)
+    }
     
     // 특정 날의 묙표량과 실제 읽은 페이지의 수를 가져오는 메서드
     func getReadingRecord(for currentReadingBook: UserBook, for date: Date) -> ReadingRecord? {
@@ -228,4 +230,3 @@ struct ReadingScheduleCalculator {
         return currentReadingBook.readingRecords[dateKey]
     }
 }
-

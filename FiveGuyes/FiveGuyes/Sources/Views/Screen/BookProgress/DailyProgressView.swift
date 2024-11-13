@@ -17,8 +17,10 @@ struct DailyProgressView: View {
     @Query(filter: #Predicate<UserBook> { $0.isCompleted == false })
     private var currentlyReadingBooks: [UserBook]  // 현재 읽고 있는 책을 가져오는 쿼리
     
-    let alertText = "전체쪽수를 초과해서 작성했어요!"
-    let alertMessage = "끝까지 읽은 게 맞나요?"
+    private let alertText = "전체쪽수를 초과해서 작성했어요!"
+    private let alertMessage = "끝까지 읽은 게 맞나요?"
+    
+    private let notificationManager = NotificationManager()
     
     private var today: Date {
         // TODO: today가 전날로 나와서 일단 하루 더함
@@ -78,10 +80,17 @@ struct DailyProgressView: View {
                         book.targetEndDate = book.targetEndDate.addDays(1)
                         
                         readingScheduleCalculator.updateReadingProgress(for: userBook, pagesRead: pagesToReadToday, from: today)
+                        
+                        // 노티 세팅하기
+                        setNotification(userBook)
+                        
                         navigationCoordinator.popToRoot()
                     } else {
                         // 오늘 할당량 기록
                         readingScheduleCalculator.updateReadingProgress(for: userBook, pagesRead: pagesToReadToday, from: today)
+                        
+                        // 노티 세팅하기
+                        setNotification(userBook)
                         
                         if pagesToReadToday != book.totalPages {
                             navigationCoordinator.popToRoot()
@@ -134,5 +143,14 @@ struct DailyProgressView: View {
             
             isTextTextFieldFocused = true
         }
+    }
+    
+    private func setNotification(_ readingBook: UserBook) {
+        notificationManager.clearRequests()
+            Task {
+                await self.notificationManager.setupNotifications(notificationType: .morning(readingBook: readingBook))
+
+                await self.notificationManager.setupNotifications(notificationType: .night(readingBook: readingBook))
+            }
     }
 }

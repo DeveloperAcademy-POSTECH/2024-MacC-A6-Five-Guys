@@ -41,10 +41,7 @@ class APIStore {
         }
         
         let (data, _) = try await URLSession.shared.data(from: url)
-        print(data)
         let bookDetailResponse = try JSONDecoder().decode(BookDetailResponse.self, from: data)
-        print(bookDetailResponse)
-        print(bookDetailResponse.item?.first?.subInfo?.itemPage)
         return bookDetailResponse.item?.first?.subInfo?.itemPage ?? 0
     }
 }
