@@ -36,8 +36,8 @@ struct WeeklyReadingProgressView: View {
             .background {
                 RoundedRectangle(cornerRadius: 8)
                     .foregroundColor(.white)
+                    .shadow(color: Color(red: 0.84, green: 0.84, blue: 0.84).opacity(0.25), radius: 2, x: 0, y: 4)
             }
-            .shadow(color: Color(red: 0.84, green: 0.84, blue: 0.84).opacity(0.25), radius: 2, x: 0, y: 4)
             
         } else {
             VStack(spacing: 0) {

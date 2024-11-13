@@ -26,7 +26,7 @@ struct WeeklyPageCalendarView: View {
                         .foregroundColor(.black)
                     
                     ZStack {
-                        // 오늘까지 이어지는 배경 추가
+                        // MARK: 뒷 배경 관련 코드
                         if todayIndex != 0 { // 일요일인경우 뒷 배경 필요 없음
                             if index <= todayIndex {
                                 if index == 0 {
@@ -34,12 +34,10 @@ struct WeeklyPageCalendarView: View {
                                         Rectangle()
                                             .fill(.white)
                                             .frame(height: 44)
-                                            .shadow(radius: 0)
                                         
                                         Rectangle()
                                             .fill(Color(red: 0.93, green: 0.97, blue: 0.95))
                                             .frame(height: 44)
-                                            .shadow(radius: 0)
                                     }
                                     
                                     Circle()
@@ -67,6 +65,7 @@ struct WeeklyPageCalendarView: View {
                             }
                         }
                         
+                        // MARK: 페이지 분량 관련 코드
                         if let record = weeklyRecords[index] { // 페이지 할당이 되어있다면
                             let hasCompletedToday = record.pagesRead == record.targetPages
                             
