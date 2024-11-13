@@ -10,19 +10,21 @@ import SwiftUI
 struct CustomBackButton: View {
     @Environment(\.presentationMode) private var presentationMode: Binding<PresentationMode>
     
-    //TODO: tint 색 변경하기
     var body: some View {
-        Button {
-            presentationMode.wrappedValue.dismiss()
-        } label: {
-            HStack {
-                Image(systemName: "chevron.left")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(height: 20)
-                    .tint(.gray)
+        HStack {
+            Button {
+                presentationMode.wrappedValue.dismiss()
+            } label: {
+                HStack {
+                    Image(systemName: "chevron.left")
+                        .resizable()
+                        .scaledToFit()
+                        .tint(Color(red: 0.12, green: 0.12, blue: 0.12))
+                }
             }
+            Spacer()
         }
+        .background(.white)
     }
 }
 
