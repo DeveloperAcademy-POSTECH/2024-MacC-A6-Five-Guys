@@ -8,11 +8,9 @@
 import SwiftUI
 
 struct WeeklyPageCalendarView: View {
-    // 요일과 페이지 수를 저장하는 배열 (임의로 페이지 수 지정)
     let daysOfWeek = ["일", "월", "화", "수", "목", "금", "토"]
     let currentReadingBook: UserBook
     
-    // TODO: today로 바꾸기 Date()
     let today = Date()
     
     // TODO: 특정 날짜 이전 요일들의 UI 수정
@@ -28,7 +26,7 @@ struct WeeklyPageCalendarView: View {
                         .foregroundColor(.black)
                     
                     ZStack {
-                        // 오늘까지 이어지는 배경 추가
+                        // MARK: 뒷 배경 관련 코드
                         if todayIndex != 0 { // 일요일인경우 뒷 배경 필요 없음
                             if index <= todayIndex {
                                 if index == 0 {
@@ -36,12 +34,10 @@ struct WeeklyPageCalendarView: View {
                                         Rectangle()
                                             .fill(.white)
                                             .frame(height: 44)
-                                            .shadow(radius: 0)
                                         
                                         Rectangle()
                                             .fill(Color(red: 0.93, green: 0.97, blue: 0.95))
                                             .frame(height: 44)
-                                            .shadow(radius: 0)
                                     }
                                     
                                     Circle()
@@ -69,36 +65,34 @@ struct WeeklyPageCalendarView: View {
                             }
                         }
                         
-                        // TODO: 데이터가 없어도 오늘 날짜는 표시가 되어야 한다!
-                        if let record = weeklyRecords[index] {
+                        // MARK: 페이지 분량 관련 코드
+                        if let record = weeklyRecords[index] { // 페이지 할당이 되어있다면
+                            let hasCompletedToday = record.pagesRead == record.targetPages
+                            
                             if index < todayIndex {
-                                if record.pagesRead == record.targetPages {
-                                    Text("\(record.pagesRead)")
+                                    Text(hasCompletedToday ? "\(record.pagesRead)" : "•")
                                         .font(.system(size: 20, weight: .medium))
                                         .foregroundColor(.black)
                                         .frame(height: 44)
-                                } else {
-                                    Text("•")
-                                        .font(.system(size: 20, weight: .semibold))
-                                        .foregroundColor(.black)
-                                        .frame(height: 44)
-                                }
                             } else if index == todayIndex { // today
-                                Circle()
-                                    .fill(Color(red: 0.07, green: 0.87, blue: 0.54))
-                                    .frame(height: 44)
-                                
-                                Text("\(record.targetPages)")
-                                    .font(.system(size: 20, weight: .semibold))
-                                    .foregroundColor(.white)
-                                    .frame(height: 44)
+                                    Circle()
+                                        .fill(hasCompletedToday ?
+                                              Color(red: 0.07, green: 0.87, blue: 0.54) :
+                                                Color(red: 0.84, green: 0.97, blue: 0.88)
+                                        )
+                                        .frame(height: 44)
+                                    
+                                    Text("\(record.targetPages)")
+                                        .font(.system(size: 20, weight: .semibold))
+                                        .foregroundColor(.white)
+                                        .frame(height: 44)
                             } else {
                                 Text("\(record.targetPages)")
                                     .font(.system(size: 20, weight: .medium))
                                     .foregroundColor(Color(red: 0.44, green: 0.44, blue: 0.44))
                                     .frame(height: 44)
                             }
-                        } else {
+                        } else { // 페이지 할당이 없다면
                             if index == todayIndex { // today
                                 Circle()
                                     .fill(Color(red: 0.07, green: 0.87, blue: 0.54))
