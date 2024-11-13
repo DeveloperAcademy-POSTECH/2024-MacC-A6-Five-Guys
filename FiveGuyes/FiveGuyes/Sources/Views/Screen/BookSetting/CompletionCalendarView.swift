@@ -191,33 +191,41 @@ struct CompletionCalendarView: View {
     
     // MARK: 소거 로직 구현(배경색 조건에 따라 변경)
     private func dateCell(for date: Date) -> some View {
-//        let deletedDate = Calendar.current.date(byAdding: .day, value: 1, to: date)!
-        
+        let isPastDate = Calendar.current.compare(date, to: Date(), toGranularity: .day) == .orderedAscending
         let isSelectedDay = isDaySelected(for: date)
         let isBetweenSelectedDays = isBetweenSelectedDays(for: date) && !deletedDates.contains(date)
-        
+
         return ZStack {
-            // 선택된 기간인 경우 색칠
-            if isBetweenSelectedDays {
-                Rectangle()
-                    .fill(Color.green.opacity(0.2))
-                    .frame(height: 44)
-                // 시작일이나 종료일의 경우
-            } else if isSelectedDay {
-                dateSelectionRectangle(for: date)
-            }
-            
-            // 날짜가 맨 위에 있음
-            dateText(for: date, isSelectedDay: isSelectedDay)
-                .onTapGesture {
-                    if isDateSelectionLocked && isBetweenSelectedDays {
-                        toggleDateInDeletedDates(date)
-                    } else if isDateSelectionLocked && deletedDates.contains(date) {
-                        toggleDateInDeletedDates(date)
-                    } else if !isDateSelectionLocked {
-                        handleDateSelection(for: date)
+            if isPastDate {
+                dateText(for: date, isSelectedDay: false, textColor: Color(red: 0.84, green: 0.84, blue: 0.84)) // 과거 날짜는 빨간색
+            } else {
+                Group {
+                    if isBetweenSelectedDays {
+                        Rectangle()
+                            .fill(Color.green.opacity(0.2))
+                            .frame(height: 44)
+                    } else if isSelectedDay {
+                        dateSelectionRectangle(for: date)
                     }
+                    dateText(for: date, isSelectedDay: isSelectedDay, textColor: Color(red: 0.44, green: 0.44, blue: 0.44)) // 기본 색상
                 }
+                .onTapGesture {
+                    handleDateTap(for: date, isPastDate: isPastDate)
+                }
+            }
+        }
+    }
+    
+    private func handleDateTap(for date: Date, isPastDate: Bool) {
+        // 과거 날짜에는 탭 제스처를 추가하지 않는다.
+        guard !isPastDate else { return }
+        
+        if isDateSelectionLocked {
+            if isBetweenSelectedDays(for: date) || deletedDates.contains(date) {
+                toggleDateInDeletedDates(date)
+            }
+        } else {
+            handleDateSelection(for: date)
         }
     }
     
@@ -236,15 +244,13 @@ struct CompletionCalendarView: View {
     }
     
     // 선택된 날짜(시작일, 종료일)
-    private func dateText(for date: Date, isSelectedDay: Bool) -> some View {
+    private func dateText(for date: Date, isSelectedDay: Bool, textColor: Color) -> some View {
         Text("\(Calendar.current.component(.day, from: date))")
             .frame(width: 44, height: 44)
             .background(
                 isSelectedDay ? Color.green : Color.clear
             )
-            .foregroundColor(
-                isSelectedDay ? .white : .secondary
-            )
+            .foregroundColor(isSelectedDay ? .white : textColor) // 선택된 경우 화이트, 그렇지 않으면 전달된 색상 사용
             .font(
                 isSelectedDay ? .system(size: 24, weight: .semibold) : .system(size: 16)
             )
