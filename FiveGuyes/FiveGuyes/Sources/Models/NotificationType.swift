@@ -35,9 +35,9 @@ enum NotificationType {
     func timeContent() -> (hour: Int, minute: Int) {
         switch self {
         case .morning:
-            return (11, 0)
+            return (9, 0)
         case .night:
-            return (23, 0)
+            return (21, 0)
         }
     }
     
