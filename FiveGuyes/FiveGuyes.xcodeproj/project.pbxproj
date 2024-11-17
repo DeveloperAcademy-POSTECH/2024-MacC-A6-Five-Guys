@@ -65,7 +65,6 @@
 		1A54142A2CD9FEF400283FBD /* BookSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = BookSearchView.swift; path = FiveGuyes/Sources/Views/Screen/BookSetting/BookSearch/BookSearchView.swift; sourceTree = SOURCE_ROOT; };
 		1AA14A772CDDA30D00B763A6 /* TotalCalendarTextBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TotalCalendarTextBubble.swift; sourceTree = "<group>"; };
 		1AA14A792CDDD96200B763A6 /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
-		24360D452CD8A2F800E83D2B /* EmptyDataMainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyDataMainView.swift; sourceTree = "<group>"; };
 		24360D472CD8BAF100E83D2B /* EmptyNotiView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyNotiView.swift; sourceTree = "<group>"; };
 		24360D492CD8BE3C00E83D2B /* FinishGoalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinishGoalView.swift; sourceTree = "<group>"; };
 		24360D522CD9F3AF00E83D2B /* DailyProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyProgressView.swift; sourceTree = "<group>"; };
@@ -308,7 +307,6 @@
 		26EBDE2D2CE3307C00B3A2BC /* Recovered References */ = {
 			isa = PBXGroup;
 			children = (
-				24360D452CD8A2F800E83D2B /* EmptyDataMainView.swift */,
 			);
 			name = "Recovered References";
 			sourceTree = "<group>";
