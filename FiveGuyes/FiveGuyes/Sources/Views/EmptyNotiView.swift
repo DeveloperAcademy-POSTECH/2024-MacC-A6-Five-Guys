@@ -11,7 +11,7 @@ import SwiftUI
 struct EmptyNotiView: View {
     var body: some View {
         VStack(spacing: 0) {
-            Image("nothingWandoki")
+            Image("NothingWandoki")
                 .resizable()
                 .scaledToFit()
                 .frame(width: 194)
