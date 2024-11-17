@@ -51,7 +51,7 @@ struct WeeklyReadingProgressView: View {
                 
                 HStack {
                     Spacer()
-                    Image("nothingWandoki")
+                    Image("NothingWandoki")
                         .resizable()
                         .scaledToFit()
                         .frame(width: 162)

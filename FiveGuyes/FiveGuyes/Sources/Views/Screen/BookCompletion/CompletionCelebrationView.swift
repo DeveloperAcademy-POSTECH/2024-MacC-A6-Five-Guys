@@ -72,7 +72,7 @@ struct CompletionCelebrationView: View {
     private func celebrationBookImage(_ userBook: UserBook) -> some View {
         let book = userBook.book
         // TODO: 캐릭터 이미지로 변경
-        let overlayImage = Image("completedWandoki")
+        let overlayImage = Image("CompletedWandoki")
             .resizable()
             .scaledToFit()
             .frame(height: 89)
