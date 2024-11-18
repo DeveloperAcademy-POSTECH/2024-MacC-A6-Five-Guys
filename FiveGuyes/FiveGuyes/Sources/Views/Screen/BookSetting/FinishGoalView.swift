@@ -104,6 +104,7 @@ struct FinishGoalView: View {
                             Text("\(formatDateToKorean(startDate)) ~ \(formatDateToKorean(endDate))")
                                 .foregroundColor(Color.black)
                                 .font(.system(size: 16))
+                                .lineLimit(1)
                                 .padding(.horizontal, 8)
                                 .padding(.vertical, 4)
                                 .background(Color(red: 0.93, green: 0.97, blue: 0.95))
@@ -113,6 +114,7 @@ struct FinishGoalView: View {
                             Text("하루 권장 독서량 : \(pagesPerDay)쪽")
                                 .foregroundColor(Color(red: 0.03, green: 0.68, blue: 0.41))
                                 .font(.system(size: 16, weight: .medium))
+                                .lineLimit(1)
                                 .padding(.horizontal, 8)
                                 .padding(.vertical, 4)
                                 .background(Color(red: 0.93, green: 0.97, blue: 0.95))
@@ -122,7 +124,7 @@ struct FinishGoalView: View {
                         }
                         
                     }
-                    .padding(.horizontal, 20)
+                    .padding(.horizontal, 16)
                     .padding(.vertical, 16)
                     .background {
                         RoundedRectangle(cornerRadius: 16)
