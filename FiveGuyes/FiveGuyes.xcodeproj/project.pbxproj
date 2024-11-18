@@ -23,7 +23,7 @@
 		24360D4A2CD8BE3C00E83D2B /* FinishGoalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24360D492CD8BE3C00E83D2B /* FinishGoalView.swift */; };
 		24360D532CD9F3AF00E83D2B /* DailyProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24360D522CD9F3AF00E83D2B /* DailyProgressView.swift */; };
 		24A2063F2CDB180000964FBB /* CompletionCalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24A2063E2CDB180000964FBB /* CompletionCalendarView.swift */; };
-		261714D42CDD27C900A3241D /* Config.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 261714D32CDD27C900A3241D /* Config.xcconfig */; };
+		24F8A2172CEB290B00A01A76 /* Config.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 24F8A2162CEB290B00A01A76 /* Config.xcconfig */; };
 		261714D62CDDDA4000A3241D /* BookSettingsManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 261714D52CDDDA4000A3241D /* BookSettingsManagerView.swift */; };
 		2644404E2CD8A39E0031A290 /* CompletionCelebrationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2644404D2CD8A39E0031A290 /* CompletionCelebrationView.swift */; };
 		264440502CD8A3AC0031A290 /* CompletionReviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2644404F2CD8A3AC0031A290 /* CompletionReviewView.swift */; };
@@ -69,7 +69,7 @@
 		24360D492CD8BE3C00E83D2B /* FinishGoalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinishGoalView.swift; sourceTree = "<group>"; };
 		24360D522CD9F3AF00E83D2B /* DailyProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyProgressView.swift; sourceTree = "<group>"; };
 		24A2063E2CDB180000964FBB /* CompletionCalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletionCalendarView.swift; sourceTree = "<group>"; };
-		261714D32CDD27C900A3241D /* Config.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
+		24F8A2162CEB290B00A01A76 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		261714D52CDDDA4000A3241D /* BookSettingsManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookSettingsManagerView.swift; sourceTree = "<group>"; };
 		2644404D2CD8A39E0031A290 /* CompletionCelebrationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletionCelebrationView.swift; sourceTree = "<group>"; };
 		2644404F2CD8A3AC0031A290 /* CompletionReviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletionReviewView.swift; sourceTree = "<group>"; };
@@ -141,7 +141,7 @@
 		26890B882CAE811A008DFF49 = {
 			isa = PBXGroup;
 			children = (
-				261714D32CDD27C900A3241D /* Config.xcconfig */,
+				24F8A2162CEB290B00A01A76 /* Config.xcconfig */,
 				26890B932CAE811A008DFF49 /* FiveGuyes */,
 				26890B922CAE811A008DFF49 /* Products */,
 				26EBDE2D2CE3307C00B3A2BC /* Recovered References */,
@@ -381,7 +381,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				261714D42CDD27C900A3241D /* Config.xcconfig in Resources */,
+				24F8A2172CEB290B00A01A76 /* Config.xcconfig in Resources */,
 				26890BBD2CAE98E2008DFF49 /* .swiftlint.yml in Resources */,
 				26890B9C2CAE811D008DFF49 /* Preview Assets.xcassets in Resources */,
 				26890B992CAE811D008DFF49 /* Assets.xcassets in Resources */,
@@ -449,7 +449,7 @@
 /* Begin XCBuildConfiguration section */
 		26890B9D2CAE811D008DFF49 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 261714D32CDD27C900A3241D /* Config.xcconfig */;
+			baseConfigurationReference = 24F8A2162CEB290B00A01A76 /* Config.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -513,7 +513,7 @@
 		};
 		26890B9E2CAE811D008DFF49 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 261714D32CDD27C900A3241D /* Config.xcconfig */;
+			baseConfigurationReference = 24F8A2162CEB290B00A01A76 /* Config.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
