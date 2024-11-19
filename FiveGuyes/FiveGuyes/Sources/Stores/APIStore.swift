@@ -22,12 +22,11 @@ class APIStore {
     private let lookupBaseUrl = "https://www.aladin.co.kr/ttb/api/ItemLookUp.aspx"
     
     func fetchBooks(query: String) async throws -> [Book] {
-        let urlString = "\(searchBaseUrl)?ttbkey=\(apiKey)&Query=\(query)&MaxResults=10&Output=js&Version=20131101"
+        let urlString = "\(searchBaseUrl)?ttbkey=\(apiKey)&Query=\(query)&MaxResults=10&Output=js&Cover=Big&Version=20131101"
         
         guard let url = URL(string: urlString) else {
             throw URLError(.badURL)
         }
-        
         let (data, _) = try await URLSession.shared.data(from: url)
         let bookResponse = try JSONDecoder().decode(BookResponse.self, from: data)
         return bookResponse.item
@@ -35,7 +34,7 @@ class APIStore {
     
     func fetchBookTotalPages(isbn: String) async throws -> Int {
         let urlString = "\(lookupBaseUrl)?ttbkey=\(apiKey)&itemIdType=ISBN13&ItemId=\(isbn)&output=js&Version=20131101&OptResult=itemPage"
-        
+    
         guard let url = URL(string: urlString) else {
             throw URLError(.badURL)
         }
