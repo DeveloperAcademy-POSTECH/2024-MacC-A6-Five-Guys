@@ -106,7 +106,6 @@ struct MainHomeView: View {
                     }
                     .padding(.bottom, 40)
                     
-//                    completionList
                     CompletionListView()
                     
                 }
@@ -117,18 +116,6 @@ struct MainHomeView: View {
         .background(.white)
         .ignoresSafeArea(edges: .top)
         .scrollIndicators(.hidden)
-
-//        .alert(isPresented: $showCompletionAlert) {
-//            Alert(
-//                title: Text(completionAlertText),
-//                message: Text(completionAlertMessage),
-//                primaryButton: .cancel(Text("취소하기")),
-//                secondaryButton: .destructive(Text("삭제")) {
-//                    let book = completedBooks[selectedBookIndex]
-//                    modelContext.delete(book)
-//                }
-//            )
-//        }
         .onAppear {
             // 상단 안전 영역 값 계산
             if let window = UIApplication.shared.connectedScenes
