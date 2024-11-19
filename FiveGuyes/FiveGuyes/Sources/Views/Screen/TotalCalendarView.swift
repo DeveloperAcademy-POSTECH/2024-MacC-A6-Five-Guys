@@ -101,7 +101,7 @@ struct TotalCalendarView: View {
                             let isTodayCompletionDate = Calendar.current.isDate(todayDate, inSameDayAs: currentReadingBook.book.targetEndDate)
                             
                             if Calendar.current.isDate(date, inSameDayAs: currentReadingBook.book.targetEndDate) {
-                                Image(isTodayCompletionDate ? "completionFlagToday" : "completionFlag")
+                                Image(isTodayCompletionDate ? "completionGreenFlag" : "completionFlag")
                                     .resizable()
                                     .scaledToFit()
                                     .frame(width: 50, height: 50)
