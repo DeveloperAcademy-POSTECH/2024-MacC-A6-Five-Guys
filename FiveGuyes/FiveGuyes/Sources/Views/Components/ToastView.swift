@@ -14,8 +14,8 @@ struct ToastView: View {
         ZStack {
             VStack {
                 Spacer()
-                if let message = viewModel.message, viewModel.isVisible {
-                    Text(message)
+                if viewModel.isVisible {
+                    Text(viewModel.message)
                         .font(.system(size: 16, weight: .semibold))
                         .padding(.horizontal, 20)
                         .padding(.vertical, 14)

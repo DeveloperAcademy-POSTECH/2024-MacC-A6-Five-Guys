@@ -8,7 +8,7 @@
 import SwiftUI
 
 class ToastViewModel: ObservableObject {
-    @Published var message: String?
+    @Published var message: String = ""
     @Published var isVisible: Bool = false
     private var timer: Timer?
     
@@ -27,8 +27,8 @@ class ToastViewModel: ObservableObject {
         withAnimation {
             self.isVisible = false
         }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            self.message = nil
-        }
+//        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+//            self.message = nil
+//        }
     }
 }
