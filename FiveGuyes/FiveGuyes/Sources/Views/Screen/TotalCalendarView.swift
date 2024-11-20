@@ -98,17 +98,19 @@ struct TotalCalendarView: View {
                         if let currentReadingBook = currentReadingBook,
                            let readingRecord = currentReadingBook.readingRecords[dateKey] {
                             
+                            let isTodayCompletionDate = Calendar.current.isDate(todayDate, inSameDayAs: currentReadingBook.book.targetEndDate)
+                            
                             if Calendar.current.isDate(date, inSameDayAs: currentReadingBook.book.targetEndDate) {
-                                // TODO: 이미지 교체하기 (마지막날, 아닌 날)
-                                // `targetEndDate` 날짜인 경우 - 특정 이미지를 배경으로 표시
-                                Image("completionFlag") // 넣고자 하는 이미지 이름으로 대체
+                                Image(isTodayCompletionDate ? "completionGreenFlag" : "completionFlag")
                                     .resizable()
                                     .scaledToFit()
                                     .frame(width: 50, height: 50)
                                     .overlay(
                                         Text("완독")
-                                            .font(.system(size: 13, weight: .semibold))
-                                            .foregroundColor(Color(red: 0.03, green: 0.68, blue: 0.41))
+                                            .font(.system(size: 14, weight: .semibold))
+                                            .foregroundColor(isTodayCompletionDate ? Color.white : Color(red: 0.03, green: 0.68, blue: 0.41))
+                                            .padding(.bottom, 1)
+                                            .padding(.leading, 2)
                                     )
                             } else if Calendar.current.isDate(date, inSameDayAs: todayDate) {
                                 // 오늘 날짜인 경우 - 초록색 배경에 목표 페이지 수 표시
