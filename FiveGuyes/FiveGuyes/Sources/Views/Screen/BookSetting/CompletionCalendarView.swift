@@ -17,7 +17,7 @@ struct CompletionCalendarView: View {
     // startDate와 endDate는 1일 당겨진 날짜를 받아옴
     // selectedStartDate와 selectedEndDate는 1일 더해진, 제대로 된 날짜를 받아옴
     // TODO: 위의 문제 해결하기 -> time zone 문제임
-    @State private var startDate: Date?
+    @State private var startDate: Date? = Date()
     @State private var endDate: Date?
     @State private var currentMonth: Date = Date()
     
@@ -176,7 +176,13 @@ struct CompletionCalendarView: View {
                             ForEach(adjustedDays.indices, id: \.self) { index in
                                 if let date = adjustedDays[index] {
                                     // 날짜가 현재 달에 속하고, 오늘 또는 선택된 날짜인 경우에만 셀 표시
-                                    dateCell(for: date)
+                                    if let start = startDate, Calendar.current.isDate(date, inSameDayAs: start) {
+                                        // startDate에 초기 값과 date의 날짜를 비교하고,
+                                        // 같은 날에는 date 타입으로 셀을 만들지 않고 startDate로 셀을 추가한다.
+                                        dateCell(for: start)
+                                    } else {
+                                        dateCell(for: date)
+                                    }
                                 } else {
                                     Color.clear.frame(width: 44, height: 44)
                                 }
