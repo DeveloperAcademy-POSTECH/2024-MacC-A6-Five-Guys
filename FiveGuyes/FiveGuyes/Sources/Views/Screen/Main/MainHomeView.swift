@@ -113,6 +113,7 @@ struct MainHomeView: View {
         .background(alignment: .top) {
             LinearGradient(colors: [Color(red: 0.81, green: 1, blue: 0.77), .white], startPoint: .top, endPoint: .bottom)
                 .frame(height: 448)
+                .ignoresSafeArea(edges: .top)
         }
         .onAppear {
             // 상단 안전 영역 값 계산
