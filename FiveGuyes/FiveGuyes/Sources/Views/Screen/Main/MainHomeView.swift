@@ -26,109 +26,95 @@ struct MainHomeView: View {
         let mainAlertText = "현재 읽고 있는 <\(title)>\(title.postPositionParticle()) 책장에서 삭제할까요?"
         
         ScrollView {
-            ZStack(alignment: .top) {
-                Color.green.opacity(0.2)
-                    .frame(height: 448)
+            VStack(spacing: 0) {
+                HStack {
+                    Spacer()
+                    notiButton {
+                        navigationCoordinator.push(.empthNoti)
+                    }
+                }
+                .padding(.bottom, 42)
                 
-                VStack(spacing: 0) {
-                    HStack {
-                        Spacer()
-                        notiButton {
-                            navigationCoordinator.push(.empthNoti)
-                        }
-                    }
-                    .padding(.bottom, 42)
+                HStack(alignment: .top) {
+                    titleDescription
+                        .padding(.bottom, 40)
+                    Spacer()
                     
-                    HStack(alignment: .top) {
-                        titleDescription
-                            .padding(.bottom, 40)
-                        Spacer()
-                        
-                        if !currentlyReadingBooks.isEmpty {
-                            Button {
-                                showReadingBookAlert = true
-                            } label: {
-                                Image(systemName: "ellipsis")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 20, height: 22)
-                                    .tint(Color(red: 0.44, green: 0.44, blue: 0.44))
-                            }
-                            .alert(isPresented: $showReadingBookAlert) {
-                                Alert(
-                                    title: Text(mainAlertText),
-                                    message: Text(mainAlertMessage),
-                                    primaryButton: .cancel(Text("취소하기")),
-                                    secondaryButton: .destructive(Text("삭제")) {
-                                        if let currentReadingBook = currentlyReadingBooks.first {
-                                                                // SwiftData 컨텍스트에서 삭제 필요
-                                                                modelContext.delete(currentReadingBook)
-                                                            }
+                    if !currentlyReadingBooks.isEmpty {
+                        Button {
+                            showReadingBookAlert = true
+                        } label: {
+                            Image(systemName: "ellipsis")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 20, height: 22)
+                                .tint(Color(red: 0.44, green: 0.44, blue: 0.44))
+                        }
+                        .alert(isPresented: $showReadingBookAlert) {
+                            Alert(
+                                title: Text(mainAlertText),
+                                message: Text(mainAlertMessage),
+                                primaryButton: .cancel(Text("취소하기")),
+                                secondaryButton: .destructive(Text("삭제")) {
+                                    if let currentReadingBook = currentlyReadingBooks.first {
+                                        // SwiftData 컨텍스트에서 삭제 필요
+                                        modelContext.delete(currentReadingBook)
                                     }
-                                )
-                            }
+                                }
+                            )
                         }
                     }
+                }
+                
+                ZStack(alignment: .top) {
                     
-                    ZStack(alignment: .top) {
-                        
-                        WeeklyReadingProgressView()
-                            .padding(.top, 153)
-                        
-                        if let currentReadingBook = currentlyReadingBooks.first,
-                           let coverURL = currentReadingBook.book.coverURL,
-                           let url = URL(string: coverURL) {
-                            // TODO: 옆에 책 제목, 저자 text 추가하기
-                            AsyncImage(url: url) { image in
-                                image
-                                    .resizable()
-                                    .scaledToFill()
-                                    .frame(width: 104, height: 161)
-                                    .shadow(color: Color(red: 0.84, green: 0.84, blue: 0.84).opacity(0.25), radius: 2, x: 0, y: 4)
-                            } placeholder: {
-                                ProgressView()
-                            }
-                        } else {
-                            Rectangle()
-                                .foregroundColor(.white)
+                    WeeklyReadingProgressView()
+                        .padding(.top, 153)
+                    
+                    if let currentReadingBook = currentlyReadingBooks.first,
+                       let coverURL = currentReadingBook.book.coverURL,
+                       let url = URL(string: coverURL) {
+                        // TODO: 옆에 책 제목, 저자 text 추가하기
+                        AsyncImage(url: url) { image in
+                            image
+                                .resizable()
+                                .scaledToFill()
                                 .frame(width: 104, height: 161)
                                 .shadow(color: Color(red: 0.84, green: 0.84, blue: 0.84).opacity(0.25), radius: 2, x: 0, y: 4)
+                        } placeholder: {
+                            ProgressView()
                         }
-                        
+                    } else {
+                        Rectangle()
+                            .foregroundColor(.white)
+                            .frame(width: 104, height: 161)
+                            .shadow(color: Color(red: 0.84, green: 0.84, blue: 0.84).opacity(0.25), radius: 2, x: 0, y: 4)
                     }
-                    .padding(.bottom, 16)
-                    
-                    HStack(spacing: 16) {
-                        calendarFullScreenButton
-                            .frame(width: 107)
-                        
-                        mainActionButton
-                    }
-                    .padding(.bottom, 40)
-                    
-//                    completionList
-                    CompletionListView()
                     
                 }
-                .padding(.horizontal, 20)
-                .padding(.top, topSafeAreaInset)
+                .padding(.bottom, 16)
+                
+                HStack(spacing: 16) {
+                    calendarFullScreenButton
+                        .frame(width: 107)
+                    
+                    mainActionButton
+                }
+                .padding(.bottom, 40)
+                
+                CompletionListView()
+                
             }
+            .padding(.horizontal, 20)
+            .padding(.top, topSafeAreaInset)
         }
-        .background(.white)
         .ignoresSafeArea(edges: .top)
         .scrollIndicators(.hidden)
-
-//        .alert(isPresented: $showCompletionAlert) {
-//            Alert(
-//                title: Text(completionAlertText),
-//                message: Text(completionAlertMessage),
-//                primaryButton: .cancel(Text("취소하기")),
-//                secondaryButton: .destructive(Text("삭제")) {
-//                    let book = completedBooks[selectedBookIndex]
-//                    modelContext.delete(book)
-//                }
-//            )
-//        }
+        .background(alignment: .top) {
+            LinearGradient(colors: [Color(red: 0.81, green: 1, blue: 0.77), .white], startPoint: .top, endPoint: .bottom)
+                .frame(height: 448)
+                .ignoresSafeArea(edges: .top)
+        }
         .onAppear {
             // 상단 안전 영역 값 계산
             if let window = UIApplication.shared.connectedScenes
@@ -186,7 +172,7 @@ struct MainHomeView: View {
         let opacity = isReadingBookAvailable ? 1 : 0.2
         
         return Button {
-                navigationCoordinator.push(.totalCalendar)
+            navigationCoordinator.push(.totalCalendar)
         } label: {
             HStack(spacing: 8) {
                 Image(systemName: "calendar")
