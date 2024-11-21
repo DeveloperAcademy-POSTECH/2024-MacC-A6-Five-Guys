@@ -54,11 +54,17 @@ extension Date {
     }
     
     /// 04:00 AM을 기준으로 날짜를 조정하여 "yyyy-MM-dd" 형식으로 반환
-    func toAdjustedYearMonthDayString() -> String {
+    func toAdjustedYearMonthDayString(hourOffset: Int = -4) -> String {
         let calendar = Calendar.current
-        let adjustedDate = calendar.date(byAdding: .hour, value: -4, to: self) ?? self
+        let adjustedDate = calendar.date(byAdding: .hour, value: hourOffset, to: self) ?? self
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
         return formatter.string(from: adjustedDate)
+    }
+    
+    /// 기준 시각으로 조정된 날짜 반환
+    func adjustedDate(hourOffset: Int = -4) -> Date {
+        let calendar = Calendar.current
+        return calendar.date(byAdding: .hour, value: hourOffset, to: self) ?? self
     }
 }
