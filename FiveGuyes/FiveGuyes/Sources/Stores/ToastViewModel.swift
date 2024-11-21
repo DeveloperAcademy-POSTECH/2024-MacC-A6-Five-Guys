@@ -27,8 +27,5 @@ class ToastViewModel: ObservableObject {
         withAnimation {
             self.isVisible = false
         }
-//        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-//            self.message = nil
-//        }
     }
 }
