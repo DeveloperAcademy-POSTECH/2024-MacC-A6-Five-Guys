@@ -122,7 +122,8 @@ struct MainHomeView: View {
                 .first?.windows.first {
                 topSafeAreaInset = window.safeAreaInsets.top
             }
-            
+        }
+        .onAppear {
             if let currentReadingBook = currentlyReadingBooks.first {
                 let readingScheduleCalculator = ReadingScheduleCalculator()
                 print("🌝🌝🌝🌝🌝 재할당!!")
