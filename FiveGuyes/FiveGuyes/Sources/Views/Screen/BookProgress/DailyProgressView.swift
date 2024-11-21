@@ -135,8 +135,8 @@ struct DailyProgressView: View {
         .customNavigationBackButton()
         .onAppear {
             print("🐯🐯🐯🐯🐯: \(today)")
-            
-            if let readingRecord = userBook.getReadingRecord(for: today) {
+            // TODO: 04시 기준으로 등록하기 ⏰
+            if let readingRecord = userBook.getAdjustedReadingRecord(for: today) {
                 pagesToReadToday = readingRecord.targetPages
             }
             
