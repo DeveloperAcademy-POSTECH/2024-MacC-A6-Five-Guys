@@ -25,7 +25,7 @@ struct WeeklyReadingProgressView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     // 텍스트 변경을 위한 추가 코드
                     // todayRecords이 nil이 아니면 todayRecords가 할당
-                        if let todayRecords = todayRecords {
+                        if let todayRecords {
                             // 오늘 페이지를 읽어서 기록이 되면 타겟페이지와 같아지고 hasCompleteToday는 true 할당
                             let hasCompletedToday = todayRecords.pagesRead == todayRecords.targetPages
                                 Text(hasCompletedToday ? "오늘도 성공이에요! 화이팅🤩" : "오늘은 \(todayRecords.targetPages)쪽 까지 읽어야해요!")
