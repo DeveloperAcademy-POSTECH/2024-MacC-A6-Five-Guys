@@ -19,8 +19,8 @@ struct WeeklyReadingProgressView: View {
         // 텍스트 변경 기능을 위한 추가 코드
         // 현재 읽는 책을 가져옵니다
         if let currentReadingBook = currentlyReadingBooks.first {
-            // getTodayRedcrodedPage함수를 통해 오늘 기록을 가져옵니다
-            let todayRecords = getTodayRecordedPage(for: currentReadingBook, from: today)
+            let todayRecords = currentReadingBook.getAdjustedReadingRecord(for: today)
+            
             VStack(alignment: .leading, spacing: 17) {
                 VStack(alignment: .leading, spacing: 8) {
                     // 텍스트 변경을 위한 추가 코드
@@ -38,6 +38,7 @@ struct WeeklyReadingProgressView: View {
                 }
                 .padding(.top, 22)
                 .padding(.horizontal, 24)
+                
                 WeeklyPageCalendarView(currentReadingBook: currentReadingBook)
                     .padding(.horizontal, 15)
                     .padding(.bottom, 21)
@@ -76,19 +77,6 @@ struct WeeklyReadingProgressView: View {
             }
             .shadow(color: Color(red: 0.84, green: 0.84, blue: 0.84).opacity(0.25), radius: 2, x: 0, y: 4)
         }
-    }
-    // 텍스트 변경을 위한 추가함수
-    // 현재 날짜를 기준으로 오늘의 타겟페이지와 읽은 페이지를 가져오는 함수
-    private func getTodayRecordedPage(for userBook: UserBook, from today: Date) -> ReadingRecord? {
-        let dateKey = toYearMonthDayString(today) // 오늘 날짜를 문자열로 변환
-        return userBook.readingRecords[dateKey] // 오늘 독서기록을 반환(타겟페이지, 읽은페이지)
-    }
-    
-    private func toYearMonthDayString(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        formatter.timeZone = TimeZone.current
-        return formatter.string(from: date)
     }
 }
 
