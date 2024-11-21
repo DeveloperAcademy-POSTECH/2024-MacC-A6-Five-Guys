@@ -124,7 +124,7 @@ struct FinishGoalView: View {
                         }
                         
                     }
-                    .padding(.horizontal, 16)
+                    .padding(.horizontal, 12)
                     .padding(.vertical, 16)
                     .background {
                         RoundedRectangle(cornerRadius: 16)
