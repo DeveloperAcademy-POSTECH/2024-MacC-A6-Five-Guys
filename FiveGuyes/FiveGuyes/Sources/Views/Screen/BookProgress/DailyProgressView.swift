@@ -23,7 +23,6 @@ struct DailyProgressView: View {
     private let notificationManager = NotificationManager()
     
     private var today: Date {
-        // TODO: today가 전날로 나와서 일단 하루 더함
         Date()
     }
     let readingScheduleCalculator = ReadingScheduleCalculator()
@@ -137,7 +136,7 @@ struct DailyProgressView: View {
         .onAppear {
             print("🐯🐯🐯🐯🐯: \(today)")
             
-            if let readingRecord = readingScheduleCalculator.getReadingRecord(for: userBook, for: today) {
+            if let readingRecord = userBook.getReadingRecord(for: today) {
                 pagesToReadToday = readingRecord.targetPages
             }
             

@@ -163,13 +163,3 @@ struct WeeklyPageCalendarView_Previews: PreviewProvider {
         return userBook
     }
 }
-
-// Date 확장으로 날짜 문자열 포맷 추가
-extension Date {
-    func toYearMonthDayString() -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        formatter.timeZone = TimeZone.current
-        return formatter.string(from: self)
-    }
-}

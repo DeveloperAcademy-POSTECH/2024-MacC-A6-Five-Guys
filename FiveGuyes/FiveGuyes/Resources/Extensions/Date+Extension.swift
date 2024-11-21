@@ -43,5 +43,22 @@ extension Date {
         formatter.dateFormat = "MM월 dd일"
         return formatter.string(from: self)
     }
+}
 
+// Date 확장으로 날짜 문자열 포맷 추가
+extension Date {
+    func toYearMonthDayString() -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        return formatter.string(from: self)
+    }
+    
+    /// 04:00 AM을 기준으로 날짜를 조정하여 "yyyy-MM-dd" 형식으로 반환
+    func toAdjustedYearMonthDayString() -> String {
+        let calendar = Calendar.current
+        let adjustedDate = calendar.date(byAdding: .hour, value: -4, to: self) ?? self
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        return formatter.string(from: adjustedDate)
+    }
 }

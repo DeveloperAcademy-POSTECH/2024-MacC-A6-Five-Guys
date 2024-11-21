@@ -33,6 +33,9 @@ final class UserBook {
 }
 
 extension UserBook {
+    /// Date 타입의 값을 readingRecords의 키 값으로 사용할 수 있게 변환해주는 메서드
+    func getReadingRecordsKey(_ date: Date) -> String { date.toYearMonthDayString() }
+    
     func markAsCompleted(review: String) {
         // 책을 완독 상태로 설정
         book.targetEndDate = Date()
@@ -75,7 +78,15 @@ extension UserBook {
     
     func findNextReadingPagesPerDay() -> Int {
         let readingScheduleCalculator = ReadingScheduleCalculator()
-
+        
         return readingScheduleCalculator.calculatePagesPerDay(for: self).pagesPerDay
+    }
+    
+    // TODO: 04시 기준으로 등록하기 ⏰
+    /// 특정 날의 묙표량과 실제 읽은 페이지의 수를 가져오는 메서드
+    func getReadingRecord(for date: Date) -> ReadingRecord? {
+        let dateKey = self.getReadingRecordsKey(date)
+        print("💵💵💵💵: \(dateKey)")
+        return self.readingRecords[dateKey]
     }
 }
