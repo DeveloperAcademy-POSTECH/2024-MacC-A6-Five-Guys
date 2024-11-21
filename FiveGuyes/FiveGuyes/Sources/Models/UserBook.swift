@@ -63,15 +63,13 @@ extension UserBook {
     /// 오늘 이후 다음 읽기 예정일을 반환하는 메서드
     func findNextReadingDay() -> Date? {
         let today = lastReadDate ?? Date()
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd"
-        let todayString = dateFormatter.string(from: today)
-        print("today⭐️: \(today)")
+        //⏰
+        let todayString = today.toAdjustedYearMonthDayString()
         
         // 오늘 이후 날짜들 중 비독서일을 제외한 첫 읽기 예정일을 찾음
         for dateString in readingRecords.keys.sorted()
         where dateString > todayString {
-            return dateFormatter.date(from: dateString)
+            return DateFormatter().date(from: dateString)
         }
         // 모든 읽기 예정일이 지난 경우 nil 반환
         return nil
@@ -83,11 +81,24 @@ extension UserBook {
         return readingScheduleCalculator.calculatePagesPerDay(for: self).pagesPerDay
     }
     
-    // TODO: 04시 기준으로 등록하기 ⏰
     /// 특정 날의 묙표량과 실제 읽은 페이지의 수를 가져오는 메서드 ⏰
     func getAdjustedReadingRecord(for date: Date) -> ReadingRecord? {
         let dateKey = self.getAdjustedReadingRecordsKey(date)
         print("💵💵💵💵: \(dateKey)")
         return self.readingRecords[dateKey]
+    }
+    
+    /// 현재 날짜를 기준으로 해당 주의 날짜와 타겟 페이지를 가져오는 메서드 ⏰
+    func getAdjustedWeeklyRecorded(from today: Date) -> [ReadingRecord?] {
+        let calendar = Calendar.current
+        let adjustedToday = calendar.date(byAdding: .hour, value: -4, to: today) ?? today
+       
+        let startOfWeek = calendar.dateInterval(of: .weekOfMonth, for: adjustedToday)?.start ?? adjustedToday
+        
+        return (0..<7).map { dayOffset in
+            let date = calendar.date(byAdding: .day, value: dayOffset, to: startOfWeek)!
+            let dateKey = date.toYearMonthDayString()  // Date를 문자열로 변환
+            return self.readingRecords[dateKey]
+        }
     }
 }
