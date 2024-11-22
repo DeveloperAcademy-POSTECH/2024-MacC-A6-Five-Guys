@@ -17,6 +17,7 @@
 		1A27D9622CDB05C000D1E14D /* CustomTextFieldStylePageCount.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A27D9612CDB05C000D1E14D /* CustomTextFieldStylePageCount.swift */; };
 		1A27D9662CDB779000D1E14D /* TotalCalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A27D9652CDB779000D1E14D /* TotalCalendarView.swift */; };
 		1A54142B2CD9FEF400283FBD /* BookSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A54142A2CD9FEF400283FBD /* BookSearchView.swift */; };
+		1A747F2A2CEF19FF006FA6BA /* NotiView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A747F292CEF19FF006FA6BA /* NotiView.swift */; };
 		1AA14A782CDDA30D00B763A6 /* TotalCalendarTextBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AA14A772CDDA30D00B763A6 /* TotalCalendarTextBubble.swift */; };
 		1AA14A7A2CDDD96200B763A6 /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AA14A792CDDD96200B763A6 /* NotificationManager.swift */; };
 		240445B42CED9074005C3623 /* ToastViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 240445B32CED9074005C3623 /* ToastViewModel.swift */; };
@@ -65,6 +66,7 @@
 		1A27D9612CDB05C000D1E14D /* CustomTextFieldStylePageCount.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTextFieldStylePageCount.swift; sourceTree = "<group>"; };
 		1A27D9652CDB779000D1E14D /* TotalCalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TotalCalendarView.swift; sourceTree = "<group>"; };
 		1A54142A2CD9FEF400283FBD /* BookSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = BookSearchView.swift; path = FiveGuyes/Sources/Views/Screen/BookSetting/BookSearch/BookSearchView.swift; sourceTree = SOURCE_ROOT; };
+		1A747F292CEF19FF006FA6BA /* NotiView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotiView.swift; sourceTree = "<group>"; };
 		1AA14A772CDDA30D00B763A6 /* TotalCalendarTextBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TotalCalendarTextBubble.swift; sourceTree = "<group>"; };
 		1AA14A792CDDD96200B763A6 /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
 		240445B32CED9074005C3623 /* ToastViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastViewModel.swift; sourceTree = "<group>"; };
@@ -230,6 +232,7 @@
 				24360D4F2CD9F2D800E83D2B /* BookProgress */,
 				264440512CD8A3B50031A290 /* BookCompletion */,
 				1A27D9652CDB779000D1E14D /* TotalCalendarView.swift */,
+				1A747F292CEF19FF006FA6BA /* NotiView.swift */,
 			);
 			path = Screen;
 			sourceTree = "<group>";
@@ -433,6 +436,7 @@
 				24360D482CD8BAF100E83D2B /* EmptyNotiView.swift in Sources */,
 				26F19A6E2CDA74A600F41D6D /* WeeklyPageCalendarView.swift in Sources */,
 				264440532CD8B1540031A290 /* String+Extension.swift in Sources */,
+				1A747F2A2CEF19FF006FA6BA /* NotiView.swift in Sources */,
 				264440572CD8E0D20031A290 /* CustomTextEditorStyle.swift in Sources */,
 				264440552CD8E0100031A290 /* KeyboardObserver.swift in Sources */,
 				26F19A6C2CDA0A2B00F41D6D /* CompletionListView.swift in Sources */,
