@@ -44,6 +44,13 @@
 		26EBDE2C2CE1341800B3A2BC /* UserBook.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDE2B2CE1341800B3A2BC /* UserBook.swift */; };
 		26EBDE2F2CE3856900B3A2BC /* NotificationType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDE2E2CE3856900B3A2BC /* NotificationType.swift */; };
 		26EBDE812CEF812A00B3A2BC /* Calendar+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDE802CEF812A00B3A2BC /* Calendar+Extension.swift */; };
+		26EBDE832CF0219300B3A2BC /* FontAsset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDE822CF0219300B3A2BC /* FontAsset.swift */; };
+		26EBDE8F2CF0684900B3A2BC /* View+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDE8E2CF0684900B3A2BC /* View+Extension.swift */; };
+		26EBDE912CF068E600B3A2BC /* FontStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDE902CF068E600B3A2BC /* FontStyle.swift */; };
+		26EBDE932CF0707300B3A2BC /* Pretendard-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = 26EBDE922CF0707300B3A2BC /* Pretendard-Regular.otf */; };
+		26EBDE952CF0707A00B3A2BC /* Pretendard-SemiBold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 26EBDE942CF0707A00B3A2BC /* Pretendard-SemiBold.otf */; };
+		26EBDE972CF0764A00B3A2BC /* FontModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDE962CF0764A00B3A2BC /* FontModifier.swift */; };
+		26EBDE992CF07A7900B3A2BC /* FontWeight.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDE982CF07A7900B3A2BC /* FontWeight.swift */; };
 		26F19A682CD9EFD800F41D6D /* MainHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F19A672CD9EFD800F41D6D /* MainHomeView.swift */; };
 		26F19A6A2CD9FE5C00F41D6D /* WeeklyReadingProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F19A692CD9FE5C00F41D6D /* WeeklyReadingProgressView.swift */; };
 		26F19A6C2CDA0A2B00F41D6D /* CompletionListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F19A6B2CDA0A2B00F41D6D /* CompletionListView.swift */; };
@@ -94,6 +101,13 @@
 		26EBDE2B2CE1341800B3A2BC /* UserBook.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserBook.swift; sourceTree = "<group>"; };
 		26EBDE2E2CE3856900B3A2BC /* NotificationType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationType.swift; sourceTree = "<group>"; };
 		26EBDE802CEF812A00B3A2BC /* Calendar+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Calendar+Extension.swift"; sourceTree = "<group>"; };
+		26EBDE822CF0219300B3A2BC /* FontAsset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontAsset.swift; sourceTree = "<group>"; };
+		26EBDE8E2CF0684900B3A2BC /* View+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Extension.swift"; sourceTree = "<group>"; };
+		26EBDE902CF068E600B3A2BC /* FontStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontStyle.swift; sourceTree = "<group>"; };
+		26EBDE922CF0707300B3A2BC /* Pretendard-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Pretendard-Regular.otf"; sourceTree = "<group>"; };
+		26EBDE942CF0707A00B3A2BC /* Pretendard-SemiBold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Pretendard-SemiBold.otf"; sourceTree = "<group>"; };
+		26EBDE962CF0764A00B3A2BC /* FontModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontModifier.swift; sourceTree = "<group>"; };
+		26EBDE982CF07A7900B3A2BC /* FontWeight.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontWeight.swift; sourceTree = "<group>"; };
 		26F19A672CD9EFD800F41D6D /* MainHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainHomeView.swift; sourceTree = "<group>"; };
 		26F19A692CD9FE5C00F41D6D /* WeeklyReadingProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyReadingProgressView.swift; sourceTree = "<group>"; };
 		26F19A6B2CDA0A2B00F41D6D /* CompletionListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletionListView.swift; sourceTree = "<group>"; };
@@ -187,6 +201,7 @@
 			isa = PBXGroup;
 			children = (
 				26890B982CAE811D008DFF49 /* Assets.xcassets */,
+				26EBDE842CF021D100B3A2BC /* Font */,
 				26D853002CCE44600016239A /* Extensions */,
 			);
 			path = Resources;
@@ -243,6 +258,7 @@
 				2644405A2CD8F9380031A290 /* UINavigationController+Extension.swift */,
 				26EBDE292CDF33D900B3A2BC /* Date+Extension.swift */,
 				26EBDE802CEF812A00B3A2BC /* Calendar+Extension.swift */,
+				26EBDE8E2CF0684900B3A2BC /* View+Extension.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -320,6 +336,27 @@
 			name = "Recovered References";
 			sourceTree = "<group>";
 		};
+		26EBDE842CF021D100B3A2BC /* Font */ = {
+			isa = PBXGroup;
+			children = (
+				26EBDE822CF0219300B3A2BC /* FontAsset.swift */,
+				26EBDE902CF068E600B3A2BC /* FontStyle.swift */,
+				26EBDE962CF0764A00B3A2BC /* FontModifier.swift */,
+				26EBDE982CF07A7900B3A2BC /* FontWeight.swift */,
+				26EBDE872CF024B100B3A2BC /* PretendardFont */,
+			);
+			path = Font;
+			sourceTree = "<group>";
+		};
+		26EBDE872CF024B100B3A2BC /* PretendardFont */ = {
+			isa = PBXGroup;
+			children = (
+				26EBDE922CF0707300B3A2BC /* Pretendard-Regular.otf */,
+				26EBDE942CF0707A00B3A2BC /* Pretendard-SemiBold.otf */,
+			);
+			path = PretendardFont;
+			sourceTree = "<group>";
+		};
 		26F19A662CD9EF9400F41D6D /* Main */ = {
 			isa = PBXGroup;
 			children = (
@@ -390,6 +427,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				26EBDE932CF0707300B3A2BC /* Pretendard-Regular.otf in Resources */,
+				26EBDE952CF0707A00B3A2BC /* Pretendard-SemiBold.otf in Resources */,
 				24F8A2172CEB290B00A01A76 /* Config.xcconfig in Resources */,
 				26890BBD2CAE98E2008DFF49 /* .swiftlint.yml in Resources */,
 				26890B9C2CAE811D008DFF49 /* Preview Assets.xcassets in Resources */,
@@ -414,6 +453,7 @@
 				26EBDE812CEF812A00B3A2BC /* Calendar+Extension.swift in Sources */,
 				1A010EAC2CD8A7E500FBE3B3 /* APIBooksModel.swift in Sources */,
 				240445B42CED9074005C3623 /* ToastViewModel.swift in Sources */,
+				26EBDE832CF0219300B3A2BC /* FontAsset.swift in Sources */,
 				26890B972CAE811A008DFF49 /* ContentView.swift in Sources */,
 				261714D62CDDDA4000A3241D /* BookSettingsManagerView.swift in Sources */,
 				1AA14A782CDDA30D00B763A6 /* TotalCalendarTextBubble.swift in Sources */,
@@ -421,6 +461,7 @@
 				1A27D9602CDA31EE00D1E14D /* ProgressBar.swift in Sources */,
 				1A27D9622CDB05C000D1E14D /* CustomTextFieldStylePageCount.swift in Sources */,
 				26F19A7A2CDB5F3900F41D6D /* ReadingScheduleCalculator.swift in Sources */,
+				26EBDE8F2CF0684900B3A2BC /* View+Extension.swift in Sources */,
 				1A010EB62CD8AF9800FBE3B3 /* BookSearchViewModel.swift in Sources */,
 				26EBDE2C2CE1341800B3A2BC /* UserBook.swift in Sources */,
 				26EBDE2A2CDF33D900B3A2BC /* Date+Extension.swift in Sources */,
@@ -431,9 +472,12 @@
 				26F19A742CDB271E00F41D6D /* NavigationRootView.swift in Sources */,
 				1AA14A7A2CDDD96200B763A6 /* NotificationManager.swift in Sources */,
 				24FAF9452CEC5224004FEC3F /* ToastView.swift in Sources */,
+				26EBDE912CF068E600B3A2BC /* FontStyle.swift in Sources */,
 				264440502CD8A3AC0031A290 /* CompletionReviewView.swift in Sources */,
 				264440502CD8A3AC0031A290 /* CompletionReviewView.swift in Sources */,
 				26890B952CAE811A008DFF49 /* FiveGuyesApp.swift in Sources */,
+				26EBDE992CF07A7900B3A2BC /* FontWeight.swift in Sources */,
+				26EBDE972CF0764A00B3A2BC /* FontModifier.swift in Sources */,
 				24360D482CD8BAF100E83D2B /* EmptyNotiView.swift in Sources */,
 				26F19A6E2CDA74A600F41D6D /* WeeklyPageCalendarView.swift in Sources */,
 				264440532CD8B1540031A290 /* String+Extension.swift in Sources */,
