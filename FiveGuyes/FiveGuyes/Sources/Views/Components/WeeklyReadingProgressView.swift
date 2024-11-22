@@ -23,18 +23,31 @@ struct WeeklyReadingProgressView: View {
             
             VStack(alignment: .leading, spacing: 17) {
                 VStack(alignment: .leading, spacing: 8) {
-                    // 텍스트 변경을 위한 추가 코드
-                    // todayRecords이 nil이 아니면 todayRecords가 할당
-                        if let todayRecords {
-                            // 오늘 페이지를 읽어서 기록이 되면 타겟페이지와 같아지고 hasCompleteToday는 true 할당
-                            let hasCompletedToday = todayRecords.pagesRead == todayRecords.targetPages
-                                Text(hasCompletedToday ? "오늘도 성공이에요! 화이팅🤩" : "오늘은 \(todayRecords.targetPages)쪽 까지 읽어야해요!")
-                                    .font(.system(size: 17, weight: .semibold))
-                                    .foregroundColor(.black)
-                        }
-                    Text("매일 방문하고 기록을 남겨보세요")
+                    if let todayRecords {
+                        // 00~04시 여부 판단 ⏰
+                        let isMidnightToFourAM = today.isInHourRange(start: 0, end: 4)
+                        // 오늘 페이지를 읽어서 기록이 되면 타겟페이지와 같아지고 hasCompleteToday는 true 할당
+                        let hasCompletedToday = todayRecords.pagesRead == todayRecords.targetPages
+                        
+                        // 텍스트 상수 정의
+                        let primaryMessage = hasCompletedToday
+                            ? "오늘도 성공이에요! 화이팅 🤩"
+                            : isMidnightToFourAM
+                                ? "아직 늦지 않았어요! 기록해볼까요?"
+                                : "오늘은 \(todayRecords.targetPages)쪽 까지 읽어야해요!"
+                        
+                        let secondaryMessage = !hasCompletedToday && isMidnightToFourAM
+                            ? "지금 기록해도 어제의 하루로 저장돼요!"
+                            : "매일 방문하고 기록을 남겨보세요"
+                        
+                        Text(primaryMessage)
+                            .font(.system(size: 17, weight: .semibold))
+                            .foregroundColor(.black)
+                        
+                        Text(secondaryMessage)
                         .font(.system(size: 14, weight: .medium))
-                        .foregroundColor(.gray)
+                        .foregroundColor(Color(red: 0.24, green: 0.24, blue: 0.26).opacity(0.6))
+                    }
                 }
                 .padding(.top, 22)
                 .padding(.horizontal, 24)

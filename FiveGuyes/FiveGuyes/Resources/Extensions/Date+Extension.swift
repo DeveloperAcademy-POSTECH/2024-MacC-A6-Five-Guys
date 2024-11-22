@@ -68,3 +68,11 @@ extension Date {
         return calendar.date(byAdding: .hour, value: hourOffset, to: self) ?? self
     }
 }
+
+extension Date {
+    /// 현재 날짜가 특정 시간 범위에 포함되어 있는지 확인하는 메서드
+    func isInHourRange(start: Int, end: Int, calendar: Calendar = Calendar.current) -> Bool {
+        let hour = calendar.component(.hour, from: self)
+        return hour >= start && hour < end
+    }
+}
