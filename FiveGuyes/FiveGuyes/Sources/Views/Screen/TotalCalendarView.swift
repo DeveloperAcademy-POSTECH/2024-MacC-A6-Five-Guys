@@ -43,6 +43,10 @@ struct TotalCalendarView: View {
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
         .customNavigationBackButton()
+        .onAppear {
+            // GA4 Tracking
+            Tracking.Screen.calendarView.setTracking()
+        }
     }
     
     private var header: some View {
