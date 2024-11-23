@@ -6,10 +6,13 @@
 	<string>$(API_KEY)</string>
 	<key>FirebaseAutomaticScreenReportingEnabled</key>
 	<false/>
-	<key>GOOGLE_ANALYTICS_REGISTRATION_WITH_AD_NETWORK_ENABLED</key>
-	<false/>
-	<key>ITSAppUsesNonExemptEncryption</key>
-	<false/>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+		<key>NSAllowsArbitraryLoadsInWebContent</key>
+		<true/>
+	</dict>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Pretendard-Regular.otf</string>
