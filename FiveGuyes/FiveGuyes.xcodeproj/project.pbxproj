@@ -58,6 +58,7 @@
 		26EBDEAE2CF1C5C900B3A2BC /* FirebaseInAppMessaging-Beta in Frameworks */ = {isa = PBXBuildFile; productRef = 26EBDEAD2CF1C5C900B3A2BC /* FirebaseInAppMessaging-Beta */; };
 		26EBDEB02CF1C5C900B3A2BC /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 26EBDEAF2CF1C5C900B3A2BC /* FirebaseMessaging */; };
 		26EBDEB22CF1C5C900B3A2BC /* FirebaseRemoteConfig in Frameworks */ = {isa = PBXBuildFile; productRef = 26EBDEB12CF1C5C900B3A2BC /* FirebaseRemoteConfig */; };
+		26EBDEB42CF1CC8500B3A2BC /* Tracking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDEB32CF1CC8500B3A2BC /* Tracking.swift */; };
 		26F19A682CD9EFD800F41D6D /* MainHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F19A672CD9EFD800F41D6D /* MainHomeView.swift */; };
 		26F19A6A2CD9FE5C00F41D6D /* WeeklyReadingProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F19A692CD9FE5C00F41D6D /* WeeklyReadingProgressView.swift */; };
 		26F19A6C2CDA0A2B00F41D6D /* CompletionListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F19A6B2CDA0A2B00F41D6D /* CompletionListView.swift */; };
@@ -116,6 +117,7 @@
 		26EBDE962CF0764A00B3A2BC /* FontModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontModifier.swift; sourceTree = "<group>"; };
 		26EBDE982CF07A7900B3A2BC /* FontWeight.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontWeight.swift; sourceTree = "<group>"; };
 		26EBDEA42CF1C21E00B3A2BC /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		26EBDEB32CF1CC8500B3A2BC /* Tracking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tracking.swift; sourceTree = "<group>"; };
 		26F19A672CD9EFD800F41D6D /* MainHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainHomeView.swift; sourceTree = "<group>"; };
 		26F19A692CD9FE5C00F41D6D /* WeeklyReadingProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyReadingProgressView.swift; sourceTree = "<group>"; };
 		26F19A6B2CDA0A2B00F41D6D /* CompletionListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletionListView.swift; sourceTree = "<group>"; };
@@ -307,6 +309,7 @@
 				26F19A792CDB5F3900F41D6D /* ReadingScheduleCalculator.swift */,
 				26EBDE2E2CE3856900B3A2BC /* NotificationType.swift */,
 				1AA14A792CDDD96200B763A6 /* NotificationManager.swift */,
+				26EBDEB32CF1CC8500B3A2BC /* Tracking.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -480,6 +483,7 @@
 				240445B42CED9074005C3623 /* ToastViewModel.swift in Sources */,
 				26EBDE832CF0219300B3A2BC /* FontAsset.swift in Sources */,
 				26890B972CAE811A008DFF49 /* ContentView.swift in Sources */,
+				26EBDEB42CF1CC8500B3A2BC /* Tracking.swift in Sources */,
 				261714D62CDDDA4000A3241D /* BookSettingsManagerView.swift in Sources */,
 				1AA14A782CDDA30D00B763A6 /* TotalCalendarTextBubble.swift in Sources */,
 				24360D532CD9F3AF00E83D2B /* DailyProgressView.swift in Sources */,
@@ -586,6 +590,7 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_LDFLAGS = "";
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -644,6 +649,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = "";
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
@@ -676,6 +682,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.1.1;
+				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.FiveNorms.FiveNorms;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -714,6 +721,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.1.1;
+				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.FiveNorms.FiveNorms;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";

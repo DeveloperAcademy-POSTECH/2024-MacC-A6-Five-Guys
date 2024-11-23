@@ -130,6 +130,14 @@ struct MainHomeView: View {
                 readingScheduleCalculator.reassignPagesFromLastReadDate(for: currentReadingBook)
             }
         }
+        .onAppear {
+            // GA4 Tracking
+            if currentlyReadingBooks.isEmpty {
+                Tracking.Screen.homeBeforeBookSetting.setTracking()
+            } else {
+                Tracking.Screen.homeAfterBookSetting.setTracking()
+            }
+        }
     }
     
     private var titleDescription: some View {

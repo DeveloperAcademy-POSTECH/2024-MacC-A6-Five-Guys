@@ -141,6 +141,10 @@ struct DailyProgressView: View {
             
             isTextTextFieldFocused = true
         }
+        .onAppear {
+            // GA4 Tracking
+            Tracking.Screen.dailyProgress.setTracking()
+        }
     }
     
     private func setNotification(_ readingBook: UserBook) {
