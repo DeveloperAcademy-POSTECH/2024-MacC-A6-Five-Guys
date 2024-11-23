@@ -52,6 +52,12 @@
 		26EBDE972CF0764A00B3A2BC /* FontModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDE962CF0764A00B3A2BC /* FontModifier.swift */; };
 		26EBDE992CF07A7900B3A2BC /* FontWeight.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDE982CF07A7900B3A2BC /* FontWeight.swift */; };
 		26EBDEA52CF1C21E00B3A2BC /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 26EBDEA42CF1C21E00B3A2BC /* GoogleService-Info.plist */; };
+		26EBDEA82CF1C5C900B3A2BC /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 26EBDEA72CF1C5C900B3A2BC /* FirebaseAnalytics */; };
+		26EBDEAA2CF1C5C900B3A2BC /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 26EBDEA92CF1C5C900B3A2BC /* FirebaseCrashlytics */; };
+		26EBDEAC2CF1C5C900B3A2BC /* FirebaseDynamicLinks in Frameworks */ = {isa = PBXBuildFile; productRef = 26EBDEAB2CF1C5C900B3A2BC /* FirebaseDynamicLinks */; };
+		26EBDEAE2CF1C5C900B3A2BC /* FirebaseInAppMessaging-Beta in Frameworks */ = {isa = PBXBuildFile; productRef = 26EBDEAD2CF1C5C900B3A2BC /* FirebaseInAppMessaging-Beta */; };
+		26EBDEB02CF1C5C900B3A2BC /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 26EBDEAF2CF1C5C900B3A2BC /* FirebaseMessaging */; };
+		26EBDEB22CF1C5C900B3A2BC /* FirebaseRemoteConfig in Frameworks */ = {isa = PBXBuildFile; productRef = 26EBDEB12CF1C5C900B3A2BC /* FirebaseRemoteConfig */; };
 		26F19A682CD9EFD800F41D6D /* MainHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F19A672CD9EFD800F41D6D /* MainHomeView.swift */; };
 		26F19A6A2CD9FE5C00F41D6D /* WeeklyReadingProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F19A692CD9FE5C00F41D6D /* WeeklyReadingProgressView.swift */; };
 		26F19A6C2CDA0A2B00F41D6D /* CompletionListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F19A6B2CDA0A2B00F41D6D /* CompletionListView.swift */; };
@@ -125,6 +131,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				26EBDEA82CF1C5C900B3A2BC /* FirebaseAnalytics in Frameworks */,
+				26EBDEAA2CF1C5C900B3A2BC /* FirebaseCrashlytics in Frameworks */,
+				26EBDEB02CF1C5C900B3A2BC /* FirebaseMessaging in Frameworks */,
+				26EBDEB22CF1C5C900B3A2BC /* FirebaseRemoteConfig in Frameworks */,
+				26EBDEAC2CF1C5C900B3A2BC /* FirebaseDynamicLinks in Frameworks */,
+				26EBDEAE2CF1C5C900B3A2BC /* FirebaseInAppMessaging-Beta in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -385,6 +397,14 @@
 				26890BBB2CAE9896008DFF49 /* PBXTargetDependency */,
 			);
 			name = FiveGuyes;
+			packageProductDependencies = (
+				26EBDEA72CF1C5C900B3A2BC /* FirebaseAnalytics */,
+				26EBDEA92CF1C5C900B3A2BC /* FirebaseCrashlytics */,
+				26EBDEAB2CF1C5C900B3A2BC /* FirebaseDynamicLinks */,
+				26EBDEAD2CF1C5C900B3A2BC /* FirebaseInAppMessaging-Beta */,
+				26EBDEAF2CF1C5C900B3A2BC /* FirebaseMessaging */,
+				26EBDEB12CF1C5C900B3A2BC /* FirebaseRemoteConfig */,
+			);
 			productName = FiveGuyes;
 			productReference = 26890B912CAE811A008DFF49 /* FiveGuyes.app */;
 			productType = "com.apple.product-type.application";
@@ -415,6 +435,7 @@
 			mainGroup = 26890B882CAE811A008DFF49;
 			packageReferences = (
 				26890BB92CAE9843008DFF49 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */,
+				26EBDEA62CF1C5C900B3A2BC /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
 			productRefGroup = 26890B922CAE811A008DFF49 /* Products */;
 			projectDirPath = "";
@@ -637,7 +658,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"FiveGuyes/Preview Content\"";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = LYC8XX4ZNC;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FiveGuyes/Info.plist;
@@ -675,7 +696,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"FiveGuyes/Preview Content\"";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = LYC8XX4ZNC;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FiveGuyes/Info.plist;
@@ -737,6 +758,14 @@
 				minimumVersion = 0.57.0;
 			};
 		};
+		26EBDEA62CF1C5C900B3A2BC /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 11.5.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -744,6 +773,36 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 26890BB92CAE9843008DFF49 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */;
 			productName = "plugin:SwiftLintBuildToolPlugin";
+		};
+		26EBDEA72CF1C5C900B3A2BC /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 26EBDEA62CF1C5C900B3A2BC /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+		26EBDEA92CF1C5C900B3A2BC /* FirebaseCrashlytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 26EBDEA62CF1C5C900B3A2BC /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCrashlytics;
+		};
+		26EBDEAB2CF1C5C900B3A2BC /* FirebaseDynamicLinks */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 26EBDEA62CF1C5C900B3A2BC /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseDynamicLinks;
+		};
+		26EBDEAD2CF1C5C900B3A2BC /* FirebaseInAppMessaging-Beta */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 26EBDEA62CF1C5C900B3A2BC /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = "FirebaseInAppMessaging-Beta";
+		};
+		26EBDEAF2CF1C5C900B3A2BC /* FirebaseMessaging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 26EBDEA62CF1C5C900B3A2BC /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseMessaging;
+		};
+		26EBDEB12CF1C5C900B3A2BC /* FirebaseRemoteConfig */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 26EBDEA62CF1C5C900B3A2BC /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseRemoteConfig;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
