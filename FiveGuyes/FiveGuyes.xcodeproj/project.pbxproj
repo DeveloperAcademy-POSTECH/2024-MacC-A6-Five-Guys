@@ -44,6 +44,22 @@
 		26EBDE2A2CDF33D900B3A2BC /* Date+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDE292CDF33D900B3A2BC /* Date+Extension.swift */; };
 		26EBDE2C2CE1341800B3A2BC /* UserBook.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDE2B2CE1341800B3A2BC /* UserBook.swift */; };
 		26EBDE2F2CE3856900B3A2BC /* NotificationType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDE2E2CE3856900B3A2BC /* NotificationType.swift */; };
+		26EBDE812CEF812A00B3A2BC /* Calendar+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDE802CEF812A00B3A2BC /* Calendar+Extension.swift */; };
+		26EBDE832CF0219300B3A2BC /* FontAsset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDE822CF0219300B3A2BC /* FontAsset.swift */; };
+		26EBDE8F2CF0684900B3A2BC /* View+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDE8E2CF0684900B3A2BC /* View+Extension.swift */; };
+		26EBDE912CF068E600B3A2BC /* FontStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDE902CF068E600B3A2BC /* FontStyle.swift */; };
+		26EBDE932CF0707300B3A2BC /* Pretendard-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = 26EBDE922CF0707300B3A2BC /* Pretendard-Regular.otf */; };
+		26EBDE952CF0707A00B3A2BC /* Pretendard-SemiBold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 26EBDE942CF0707A00B3A2BC /* Pretendard-SemiBold.otf */; };
+		26EBDE972CF0764A00B3A2BC /* FontModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDE962CF0764A00B3A2BC /* FontModifier.swift */; };
+		26EBDE992CF07A7900B3A2BC /* FontWeight.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDE982CF07A7900B3A2BC /* FontWeight.swift */; };
+		26EBDEA52CF1C21E00B3A2BC /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 26EBDEA42CF1C21E00B3A2BC /* GoogleService-Info.plist */; };
+		26EBDEA82CF1C5C900B3A2BC /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 26EBDEA72CF1C5C900B3A2BC /* FirebaseAnalytics */; };
+		26EBDEAA2CF1C5C900B3A2BC /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 26EBDEA92CF1C5C900B3A2BC /* FirebaseCrashlytics */; };
+		26EBDEAC2CF1C5C900B3A2BC /* FirebaseDynamicLinks in Frameworks */ = {isa = PBXBuildFile; productRef = 26EBDEAB2CF1C5C900B3A2BC /* FirebaseDynamicLinks */; };
+		26EBDEAE2CF1C5C900B3A2BC /* FirebaseInAppMessaging-Beta in Frameworks */ = {isa = PBXBuildFile; productRef = 26EBDEAD2CF1C5C900B3A2BC /* FirebaseInAppMessaging-Beta */; };
+		26EBDEB02CF1C5C900B3A2BC /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 26EBDEAF2CF1C5C900B3A2BC /* FirebaseMessaging */; };
+		26EBDEB22CF1C5C900B3A2BC /* FirebaseRemoteConfig in Frameworks */ = {isa = PBXBuildFile; productRef = 26EBDEB12CF1C5C900B3A2BC /* FirebaseRemoteConfig */; };
+		26EBDEB42CF1CC8500B3A2BC /* Tracking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDEB32CF1CC8500B3A2BC /* Tracking.swift */; };
 		26F19A682CD9EFD800F41D6D /* MainHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F19A672CD9EFD800F41D6D /* MainHomeView.swift */; };
 		26F19A6A2CD9FE5C00F41D6D /* WeeklyReadingProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F19A692CD9FE5C00F41D6D /* WeeklyReadingProgressView.swift */; };
 		26F19A6C2CDA0A2B00F41D6D /* CompletionListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F19A6B2CDA0A2B00F41D6D /* CompletionListView.swift */; };
@@ -94,6 +110,16 @@
 		26EBDE292CDF33D900B3A2BC /* Date+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Extension.swift"; sourceTree = "<group>"; };
 		26EBDE2B2CE1341800B3A2BC /* UserBook.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserBook.swift; sourceTree = "<group>"; };
 		26EBDE2E2CE3856900B3A2BC /* NotificationType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationType.swift; sourceTree = "<group>"; };
+		26EBDE802CEF812A00B3A2BC /* Calendar+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Calendar+Extension.swift"; sourceTree = "<group>"; };
+		26EBDE822CF0219300B3A2BC /* FontAsset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontAsset.swift; sourceTree = "<group>"; };
+		26EBDE8E2CF0684900B3A2BC /* View+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Extension.swift"; sourceTree = "<group>"; };
+		26EBDE902CF068E600B3A2BC /* FontStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontStyle.swift; sourceTree = "<group>"; };
+		26EBDE922CF0707300B3A2BC /* Pretendard-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Pretendard-Regular.otf"; sourceTree = "<group>"; };
+		26EBDE942CF0707A00B3A2BC /* Pretendard-SemiBold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Pretendard-SemiBold.otf"; sourceTree = "<group>"; };
+		26EBDE962CF0764A00B3A2BC /* FontModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontModifier.swift; sourceTree = "<group>"; };
+		26EBDE982CF07A7900B3A2BC /* FontWeight.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontWeight.swift; sourceTree = "<group>"; };
+		26EBDEA42CF1C21E00B3A2BC /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		26EBDEB32CF1CC8500B3A2BC /* Tracking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tracking.swift; sourceTree = "<group>"; };
 		26F19A672CD9EFD800F41D6D /* MainHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainHomeView.swift; sourceTree = "<group>"; };
 		26F19A692CD9FE5C00F41D6D /* WeeklyReadingProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyReadingProgressView.swift; sourceTree = "<group>"; };
 		26F19A6B2CDA0A2B00F41D6D /* CompletionListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletionListView.swift; sourceTree = "<group>"; };
@@ -109,6 +135,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				26EBDEA82CF1C5C900B3A2BC /* FirebaseAnalytics in Frameworks */,
+				26EBDEAA2CF1C5C900B3A2BC /* FirebaseCrashlytics in Frameworks */,
+				26EBDEB02CF1C5C900B3A2BC /* FirebaseMessaging in Frameworks */,
+				26EBDEB22CF1C5C900B3A2BC /* FirebaseRemoteConfig in Frameworks */,
+				26EBDEAC2CF1C5C900B3A2BC /* FirebaseDynamicLinks in Frameworks */,
+				26EBDEAE2CF1C5C900B3A2BC /* FirebaseInAppMessaging-Beta in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -165,6 +197,7 @@
 		26890B932CAE811A008DFF49 /* FiveGuyes */ = {
 			isa = PBXGroup;
 			children = (
+				26EBDEA42CF1C21E00B3A2BC /* GoogleService-Info.plist */,
 				1A010EB22CD8AA6D00FBE3B3 /* Info.plist */,
 				26890B942CAE811A008DFF49 /* FiveGuyesApp.swift */,
 				26890BBC2CAE98E2008DFF49 /* .swiftlint.yml */,
@@ -187,6 +220,7 @@
 			isa = PBXGroup;
 			children = (
 				26890B982CAE811D008DFF49 /* Assets.xcassets */,
+				26EBDE842CF021D100B3A2BC /* Font */,
 				26D853002CCE44600016239A /* Extensions */,
 			);
 			path = Resources;
@@ -243,6 +277,8 @@
 				264440522CD8B1540031A290 /* String+Extension.swift */,
 				2644405A2CD8F9380031A290 /* UINavigationController+Extension.swift */,
 				26EBDE292CDF33D900B3A2BC /* Date+Extension.swift */,
+				26EBDE802CEF812A00B3A2BC /* Calendar+Extension.swift */,
+				26EBDE8E2CF0684900B3A2BC /* View+Extension.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -276,6 +312,7 @@
 				26F19A792CDB5F3900F41D6D /* ReadingScheduleCalculator.swift */,
 				26EBDE2E2CE3856900B3A2BC /* NotificationType.swift */,
 				1AA14A792CDDD96200B763A6 /* NotificationManager.swift */,
+				26EBDEB32CF1CC8500B3A2BC /* Tracking.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -320,6 +357,27 @@
 			name = "Recovered References";
 			sourceTree = "<group>";
 		};
+		26EBDE842CF021D100B3A2BC /* Font */ = {
+			isa = PBXGroup;
+			children = (
+				26EBDE822CF0219300B3A2BC /* FontAsset.swift */,
+				26EBDE902CF068E600B3A2BC /* FontStyle.swift */,
+				26EBDE962CF0764A00B3A2BC /* FontModifier.swift */,
+				26EBDE982CF07A7900B3A2BC /* FontWeight.swift */,
+				26EBDE872CF024B100B3A2BC /* PretendardFont */,
+			);
+			path = Font;
+			sourceTree = "<group>";
+		};
+		26EBDE872CF024B100B3A2BC /* PretendardFont */ = {
+			isa = PBXGroup;
+			children = (
+				26EBDE922CF0707300B3A2BC /* Pretendard-Regular.otf */,
+				26EBDE942CF0707A00B3A2BC /* Pretendard-SemiBold.otf */,
+			);
+			path = PretendardFont;
+			sourceTree = "<group>";
+		};
 		26F19A662CD9EF9400F41D6D /* Main */ = {
 			isa = PBXGroup;
 			children = (
@@ -345,6 +403,14 @@
 				26890BBB2CAE9896008DFF49 /* PBXTargetDependency */,
 			);
 			name = FiveGuyes;
+			packageProductDependencies = (
+				26EBDEA72CF1C5C900B3A2BC /* FirebaseAnalytics */,
+				26EBDEA92CF1C5C900B3A2BC /* FirebaseCrashlytics */,
+				26EBDEAB2CF1C5C900B3A2BC /* FirebaseDynamicLinks */,
+				26EBDEAD2CF1C5C900B3A2BC /* FirebaseInAppMessaging-Beta */,
+				26EBDEAF2CF1C5C900B3A2BC /* FirebaseMessaging */,
+				26EBDEB12CF1C5C900B3A2BC /* FirebaseRemoteConfig */,
+			);
 			productName = FiveGuyes;
 			productReference = 26890B912CAE811A008DFF49 /* FiveGuyes.app */;
 			productType = "com.apple.product-type.application";
@@ -375,6 +441,7 @@
 			mainGroup = 26890B882CAE811A008DFF49;
 			packageReferences = (
 				26890BB92CAE9843008DFF49 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */,
+				26EBDEA62CF1C5C900B3A2BC /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
 			productRefGroup = 26890B922CAE811A008DFF49 /* Products */;
 			projectDirPath = "";
@@ -390,10 +457,13 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				26EBDE932CF0707300B3A2BC /* Pretendard-Regular.otf in Resources */,
+				26EBDE952CF0707A00B3A2BC /* Pretendard-SemiBold.otf in Resources */,
 				24F8A2172CEB290B00A01A76 /* Config.xcconfig in Resources */,
 				26890BBD2CAE98E2008DFF49 /* .swiftlint.yml in Resources */,
 				26890B9C2CAE811D008DFF49 /* Preview Assets.xcassets in Resources */,
 				26890B992CAE811D008DFF49 /* Assets.xcassets in Resources */,
+				26EBDEA52CF1C21E00B3A2BC /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -411,15 +481,19 @@
 				1A010EBE2CD8DA2400FBE3B3 /* BookListView.swift in Sources */,
 				1A010EC22CD8DA4300FBE3B3 /* BookPageSettingView.swift in Sources */,
 				1A010EC02CD8DA3800FBE3B3 /* BookLowView.swift in Sources */,
+				26EBDE812CEF812A00B3A2BC /* Calendar+Extension.swift in Sources */,
 				1A010EAC2CD8A7E500FBE3B3 /* APIBooksModel.swift in Sources */,
 				240445B42CED9074005C3623 /* ToastViewModel.swift in Sources */,
+				26EBDE832CF0219300B3A2BC /* FontAsset.swift in Sources */,
 				26890B972CAE811A008DFF49 /* ContentView.swift in Sources */,
+				26EBDEB42CF1CC8500B3A2BC /* Tracking.swift in Sources */,
 				261714D62CDDDA4000A3241D /* BookSettingsManagerView.swift in Sources */,
 				1AA14A782CDDA30D00B763A6 /* TotalCalendarTextBubble.swift in Sources */,
 				24360D532CD9F3AF00E83D2B /* DailyProgressView.swift in Sources */,
 				1A27D9602CDA31EE00D1E14D /* ProgressBar.swift in Sources */,
 				1A27D9622CDB05C000D1E14D /* CustomTextFieldStylePageCount.swift in Sources */,
 				26F19A7A2CDB5F3900F41D6D /* ReadingScheduleCalculator.swift in Sources */,
+				26EBDE8F2CF0684900B3A2BC /* View+Extension.swift in Sources */,
 				1A010EB62CD8AF9800FBE3B3 /* BookSearchViewModel.swift in Sources */,
 				26EBDE2C2CE1341800B3A2BC /* UserBook.swift in Sources */,
 				26EBDE2A2CDF33D900B3A2BC /* Date+Extension.swift in Sources */,
@@ -430,9 +504,12 @@
 				26F19A742CDB271E00F41D6D /* NavigationRootView.swift in Sources */,
 				1AA14A7A2CDDD96200B763A6 /* NotificationManager.swift in Sources */,
 				24FAF9452CEC5224004FEC3F /* ToastView.swift in Sources */,
+				26EBDE912CF068E600B3A2BC /* FontStyle.swift in Sources */,
 				264440502CD8A3AC0031A290 /* CompletionReviewView.swift in Sources */,
 				264440502CD8A3AC0031A290 /* CompletionReviewView.swift in Sources */,
 				26890B952CAE811A008DFF49 /* FiveGuyesApp.swift in Sources */,
+				26EBDE992CF07A7900B3A2BC /* FontWeight.swift in Sources */,
+				26EBDE972CF0764A00B3A2BC /* FontModifier.swift in Sources */,
 				24360D482CD8BAF100E83D2B /* EmptyNotiView.swift in Sources */,
 				26F19A6E2CDA74A600F41D6D /* WeeklyPageCalendarView.swift in Sources */,
 				264440532CD8B1540031A290 /* String+Extension.swift in Sources */,
@@ -517,6 +594,7 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_LDFLAGS = "";
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -575,6 +653,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = "";
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
@@ -589,12 +668,14 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"FiveGuyes/Preview Content\"";
-				DEVELOPMENT_TEAM = KH2J34Z4ZK;
+
+				DEVELOPMENT_TEAM = LYC8XX4ZNC;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FiveGuyes/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "한입독서";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.books";
+				INFOPLIST_KEY_NSUserTrackingUsageDescription = "사용자에게 맞춤 서비스를 제공하기 위해 사용되며, 서비스 이외에 목적으로는 절대 사용되지 않습니다.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -606,7 +687,8 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1.1;
+				MARKETING_VERSION = 1.2.0;
+				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.FiveNorms.FiveNorms;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -627,12 +709,14 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"FiveGuyes/Preview Content\"";
-				DEVELOPMENT_TEAM = KH2J34Z4ZK;
+
+				DEVELOPMENT_TEAM = LYC8XX4ZNC;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FiveGuyes/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "한입독서";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.books";
+				INFOPLIST_KEY_NSUserTrackingUsageDescription = "사용자에게 맞춤 서비스를 제공하기 위해 사용되며, 서비스 이외에 목적으로는 절대 사용되지 않습니다.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -644,7 +728,8 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1.1;
+				MARKETING_VERSION = 1.2.0;
+				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.FiveNorms.FiveNorms;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -689,6 +774,14 @@
 				minimumVersion = 0.57.0;
 			};
 		};
+		26EBDEA62CF1C5C900B3A2BC /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 11.5.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -696,6 +789,36 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 26890BB92CAE9843008DFF49 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */;
 			productName = "plugin:SwiftLintBuildToolPlugin";
+		};
+		26EBDEA72CF1C5C900B3A2BC /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 26EBDEA62CF1C5C900B3A2BC /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+		26EBDEA92CF1C5C900B3A2BC /* FirebaseCrashlytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 26EBDEA62CF1C5C900B3A2BC /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCrashlytics;
+		};
+		26EBDEAB2CF1C5C900B3A2BC /* FirebaseDynamicLinks */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 26EBDEA62CF1C5C900B3A2BC /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseDynamicLinks;
+		};
+		26EBDEAD2CF1C5C900B3A2BC /* FirebaseInAppMessaging-Beta */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 26EBDEA62CF1C5C900B3A2BC /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = "FirebaseInAppMessaging-Beta";
+		};
+		26EBDEAF2CF1C5C900B3A2BC /* FirebaseMessaging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 26EBDEA62CF1C5C900B3A2BC /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseMessaging;
+		};
+		26EBDEB12CF1C5C900B3A2BC /* FirebaseRemoteConfig */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 26EBDEA62CF1C5C900B3A2BC /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseRemoteConfig;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

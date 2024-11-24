@@ -122,11 +122,20 @@ struct MainHomeView: View {
                 .first?.windows.first {
                 topSafeAreaInset = window.safeAreaInsets.top
             }
-            
+        }
+        .onAppear {
             if let currentReadingBook = currentlyReadingBooks.first {
                 let readingScheduleCalculator = ReadingScheduleCalculator()
                 print("🌝🌝🌝🌝🌝 재할당!!")
                 readingScheduleCalculator.reassignPagesFromLastReadDate(for: currentReadingBook)
+            }
+        }
+        .onAppear {
+            // GA4 Tracking
+            if currentlyReadingBooks.isEmpty {
+                Tracking.Screen.homeBeforeBookSetting.setTracking()
+            } else {
+                Tracking.Screen.homeAfterBookSetting.setTracking()
             }
         }
     }

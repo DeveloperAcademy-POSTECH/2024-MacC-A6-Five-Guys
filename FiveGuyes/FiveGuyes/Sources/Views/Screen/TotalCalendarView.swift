@@ -12,9 +12,9 @@ struct TotalCalendarView: View {
     @Query(filter: #Predicate<UserBook> { $0.isCompleted == false })
     private var currentlyReadingBooks: [UserBook]  // 현재 읽고 있는 책을 가져오는 쿼리
     
-    // 현재 보고 있는 달력의 월
-    @State private var currentMonth: Date = Date()
-    private let todayDate = Date() // 오늘 날짜
+    // 현재 보고 있는 달력의 월 ⏰
+    @State private var currentMonth = Date().adjustedDate()
+    private let todayDate = Date().adjustedDate()
     
     private var currentReadingBook: UserBook? {
         currentlyReadingBooks.first
@@ -43,6 +43,10 @@ struct TotalCalendarView: View {
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
         .customNavigationBackButton()
+        .onAppear {
+            // GA4 Tracking
+            Tracking.Screen.calendarView.setTracking()
+        }
     }
     
     private var header: some View {

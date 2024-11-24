@@ -42,5 +42,9 @@ struct BookSearchView: View {
                     .disabled(bookSearchViewModel.selectedBook == nil)
                 }
             }
+            .onAppear {
+                // GA4 Tracking
+                Tracking.Screen.bookSearch.setTracking()
+            }
     }
 }

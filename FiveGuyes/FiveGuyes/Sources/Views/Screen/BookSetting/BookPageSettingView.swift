@@ -99,5 +99,9 @@ struct BookPageSettingView: View {
             totalPages = bookSettingInputModel.totalPages
             isTextTextFieldFocused = true
         }
+        .onAppear {
+            // GA4 Tracking
+            Tracking.Screen.pageSetting.setTracking()
+        }
     }
 }

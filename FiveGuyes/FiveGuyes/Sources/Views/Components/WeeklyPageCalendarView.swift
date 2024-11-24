@@ -15,8 +15,8 @@ struct WeeklyPageCalendarView: View {
     
     // TODO: 특정 날짜 이전 요일들의 UI 수정
     var body: some View {
-        let weeklyRecords = getWeeklyRecordedPages(for: currentReadingBook, from: today)
-        let todayIndex = Calendar.current.component(.weekday, from: today) - 1
+        let weeklyRecords = currentReadingBook.getAdjustedWeeklyRecorded(from: today)
+        let todayIndex = Calendar.current.getAdjustedWeekdayIndex(from: today)
         
         HStack(spacing: 0) { // 셀 간격을 없앰으로써 연결된 배경처럼 보이게 설정
             ForEach(0..<daysOfWeek.count, id: \.self) { index in
@@ -108,25 +108,6 @@ struct WeeklyPageCalendarView: View {
             }
         }
     }
-    
-    // 현재 날짜를 기준으로 해당 주의 날짜와 타겟 페이지를 가져오는 함수
-    private func getWeeklyRecordedPages(for userBook: UserBook, from today: Date) -> [ReadingRecord?] {
-        let calendar = Calendar.current
-        let startOfWeek = calendar.dateInterval(of: .weekOfMonth, for: today)?.start ?? today
-        
-        return (0..<7).map { dayOffset in
-            let date = calendar.date(byAdding: .day, value: dayOffset, to: startOfWeek)!
-            let dateKey = toYearMonthDayString(date)  // Date를 문자열로 변환
-            return userBook.readingRecords[dateKey]
-        }
-    }
-    
-    private func toYearMonthDayString(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        formatter.timeZone = TimeZone.current
-        return formatter.string(from: date)
-    }
 }
 
 struct WeeklyPageCalendarView_Previews: PreviewProvider {
@@ -161,15 +142,5 @@ struct WeeklyPageCalendarView_Previews: PreviewProvider {
         }
         
         return userBook
-    }
-}
-
-// Date 확장으로 날짜 문자열 포맷 추가
-extension Date {
-    func toYearMonthDayString() -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        formatter.timeZone = TimeZone.current
-        return formatter.string(from: self)
     }
 }

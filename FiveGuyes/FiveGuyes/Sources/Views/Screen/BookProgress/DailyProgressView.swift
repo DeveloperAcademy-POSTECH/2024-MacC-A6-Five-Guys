@@ -21,7 +21,9 @@ struct DailyProgressView: View {
     private let alertMessage = "끝까지 읽은 게 맞나요?"
     
     private let notificationManager = NotificationManager()
+    private let readingScheduleCalculator = ReadingScheduleCalculator()
     
+
     // 선택한 알람 시간 추가
     @State private var selectedStartTime: Date = Date()
     @State private var selectedReminderTime: Date = Date() 
@@ -31,6 +33,7 @@ struct DailyProgressView: View {
         Date()
     }
     let readingScheduleCalculator = ReadingScheduleCalculator()
+
     
     @FocusState private var isTextTextFieldFocused: Bool
     
@@ -38,7 +41,8 @@ struct DailyProgressView: View {
         // TODO: 더미 지우기
         let userBook = currentlyReadingBooks.first ?? UserBook.dummyUserBook
         var book = userBook.book
-        let isTodayCompletionDate = book.targetEndDate == today
+        
+        let isTodayCompletionDate = Calendar.current.isDate(today, inSameDayAs: book.targetEndDate)
         
         VStack(spacing: 0) {
             HStack {
@@ -79,7 +83,7 @@ struct DailyProgressView: View {
                         showAlert = true
                     } else if isTodayCompletionDate && pagesToReadToday < book.totalPages {
                         // 마지막 날이지만 완독하지 못한 경우, 날짜를 하루 늘리고 재조정
-                        //                        book.targetEndDate = book.targetEndDate.addDaysInUTC(1)
+                        // book.targetEndDate = book.targetEndDate.addDaysInUTC(1)
                         // TODO: utc기중으로 바꾸기
                         book.targetEndDate = book.targetEndDate.addDays(1)
                         
@@ -140,12 +144,16 @@ struct DailyProgressView: View {
         .customNavigationBackButton()
         .onAppear {
             print("🐯🐯🐯🐯🐯: \(today)")
-            
-            if let readingRecord = readingScheduleCalculator.getReadingRecord(for: userBook, for: today) {
+            // ⏰
+            if let readingRecord = userBook.getAdjustedReadingRecord(for: today) {
                 pagesToReadToday = readingRecord.targetPages
             }
             
             isTextTextFieldFocused = true
+        }
+        .onAppear {
+            // GA4 Tracking
+            Tracking.Screen.dailyProgress.setTracking()
         }
     }
     

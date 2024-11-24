@@ -144,6 +144,10 @@ struct CompletionCalendarView: View {
         .onAppear {
             totalPages = bookSettingInputModel.totalPages
         }
+        .onAppear {
+            // GA4 Tracking
+            Tracking.Screen.dateSelection.setTracking()
+        }
     }
     
     private func weekdayHeader() -> some View {

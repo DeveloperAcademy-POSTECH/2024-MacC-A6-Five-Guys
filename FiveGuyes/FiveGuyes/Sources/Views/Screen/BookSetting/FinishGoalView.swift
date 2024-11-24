@@ -175,6 +175,10 @@ struct FinishGoalView: View {
                 userBook = bookData
                 pagesPerDay = calculator.firstCalculatePagesPerDay(for: bookData).pagesPerDay
             }
+            .onAppear {
+                // GA4 Tracking
+                Tracking.Screen.registrationResult.setTracking()
+            }
         }
         
     }
