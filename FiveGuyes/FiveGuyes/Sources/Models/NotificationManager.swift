@@ -7,21 +7,26 @@
 
 import UserNotifications
 
-final class NotificationManager {
+final class NotificationManager: ObservableObject {
     private let notificationCenter = UNUserNotificationCenter.current()
     private var isGranted: Bool = false
     
-    func setupNotifications(notificationType: NotificationType) async {
+    func setupNotifications(notificationType: NotificationType, selectedTime: Date? = nil) async {
+        // 확인용 로그
+        print("🔔 requestAuthorization 호출됨: \(notificationType)")
         await requestAuthorization()
         
         if isGranted {
-            await scheduleReminderNotification(notificationType: notificationType)
+            // 확인용 로그
+            print("🔔 scheduleReminderNotification 호출됨: \(notificationType)")
+            await scheduleReminderNotification(notificationType: notificationType, selectedTime: selectedTime)
         }
     }
     
     /// 요청한 Noticifation을 모두 지우는 함수
     func clearRequests() {
         notificationCenter.removeAllPendingNotificationRequests()
+        print("❌노티 취소")
     }
     
     /// Notification 권한 요청 함수
@@ -43,14 +48,13 @@ final class NotificationManager {
         isGranted = (currentSettings.authorizationStatus == .authorized)
     }
 
-    private func scheduleReminderNotification(notificationType: NotificationType) async {
+    private func scheduleReminderNotification(notificationType: NotificationType, selectedTime: Date?) async {
         // dateContent가 nil일 경우 알림을 보내지 않음
         guard let date = notificationType.dateContent() else {
             print("❌ NotificationManager: 다음 읽기 날짜가 없어 알림을 생성하지 않습니다.")
             return
         }
-        
-        let dateComponents = makeDateComponents(date: date, notificationType)
+        let dateComponents = makeDateComponents(date: date, notificationType, selectedTime: selectedTime ?? Date())
         let content = makeNotificationContent(notificationType)
         
         let identifier = notificationType.identifier()
@@ -62,18 +66,24 @@ final class NotificationManager {
         do {
             try await notificationCenter.add(request)
             print("💯 노티 설정 완료")
+            // 확인용 로그
+            print("🌟노티설정 리퀘스트 : ",request)
         } catch {
             print("❌ NotificationManager/schedule: \(error.localizedDescription)")
         }
     }
     
-    private func makeDateComponents(date: Date, _ notificationType: NotificationType) -> DateComponents {
+    private func makeDateComponents(date: Date, _ notificationType: NotificationType, selectedTime: Date?) -> DateComponents {
         let calendar = Calendar.current
         let day = calendar.component(.day, from: date)
         let month = calendar.component(.month, from: date)
         let year = calendar.component(.year, from: date)
-        let (hour, minute) = notificationType.timeContent()
-        print("💯노티 설정: \(date) \(hour): \(minute)")
+        
+        let (hour, minute) = notificationType.timeContent(selectedTime: selectedTime)
+     //   print("💯노티 설정: \(date) \(hour): \(minute)")
+        print("💯노티설정: timeContent() 반환 값: \(hour):\(minute)")
+        print("💯노티설정: selectedTime 반환 값: \(selectedTime)")
+
         return DateComponents(year: year, month: month, day: day, hour: hour, minute: minute)
     }
     
@@ -84,5 +94,21 @@ final class NotificationManager {
         content.body = body
         
         return content
+    }
+    // 노티 설정 확인용 함수
+    func printPendingNotifications() {
+        notificationCenter.getPendingNotificationRequests { requests in
+            if requests.isEmpty {
+                print("❌ 등록된 알림이 없습니다.")
+            } else {
+                print("✅ 등록된 알림 목록:")
+                for request in requests {
+                    print("🔔 \(request.identifier): \(request.content.title)")
+                    if let trigger = request.trigger as? UNCalendarNotificationTrigger {
+                        print("  - Trigger Time: \(trigger.dateComponents)")
+                    }
+                }
+            }
+        }
     }
 }

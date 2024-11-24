@@ -22,6 +22,10 @@ struct DailyProgressView: View {
     
     private let notificationManager = NotificationManager()
     
+    // 선택한 알람 시간 추가
+    @State private var selectedStartTime: Date = Date()
+    @State private var selectedReminderTime: Date = Date() 
+    
     private var today: Date {
         // TODO: today가 전날로 나와서 일단 하루 더함
         Date()
@@ -146,11 +150,17 @@ struct DailyProgressView: View {
     }
     
     private func setNotification(_ readingBook: UserBook) {
-        notificationManager.clearRequests()
-            Task {
-                await self.notificationManager.setupNotifications(notificationType: .morning(readingBook: readingBook))
+        Task {
+               await notificationManager.setupNotifications(
+                   notificationType: .morning(readingBook: readingBook)
+               )
 
-                await self.notificationManager.setupNotifications(notificationType: .night(readingBook: readingBook))
-            }
+               await notificationManager.setupNotifications(
+                   notificationType: .night(readingBook: readingBook)
+               )
+
+               notificationManager.printPendingNotifications()
+           }
     }
+
 }

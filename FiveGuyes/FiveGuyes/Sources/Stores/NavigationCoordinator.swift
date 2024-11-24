@@ -31,7 +31,8 @@ final class NavigationCoordinator {
         case .mainHome: 
             MainHomeView()
         case .empthNoti:
-            EmptyNotiView()
+           // EmptyNotiView()
+            NotiView()
         case .bookSettingsManager:
             BookSettingsManagerView()
         case .totalCalendar:

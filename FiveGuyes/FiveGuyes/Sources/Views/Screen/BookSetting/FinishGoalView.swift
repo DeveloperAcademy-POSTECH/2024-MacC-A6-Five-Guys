@@ -18,6 +18,10 @@ struct FinishGoalView: View {
     private let calculator = ReadingScheduleCalculator()
     private let notificationManager = NotificationManager()
     
+    // 선택한 알람 시간 추가
+    @State private var selectedStartTime: Date = Date()
+    @State private var selectedReminderTime: Date = Date()
+    
     var body: some View {
         
         if let book = bookSettingInputModel.selectedBook,
@@ -183,12 +187,17 @@ struct FinishGoalView: View {
     }
     
     private func setNotification(_ readingBook: UserBook) {
-        notificationManager.clearRequests()
         Task {
-            await self.notificationManager.setupNotifications(notificationType: .morning(readingBook: readingBook))
-            
-            await self.notificationManager.setupNotifications(notificationType: .night(readingBook: readingBook))
-        }
+               await notificationManager.setupNotifications(
+                   notificationType: .morning(readingBook: readingBook)
+               )
+
+               await notificationManager.setupNotifications(
+                   notificationType: .night(readingBook: readingBook)
+               )
+
+               notificationManager.printPendingNotifications()
+           }
     }
 }
 
