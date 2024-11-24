@@ -23,7 +23,17 @@ struct DailyProgressView: View {
     private let notificationManager = NotificationManager()
     private let readingScheduleCalculator = ReadingScheduleCalculator()
     
-    private let today = Date()
+
+    // 선택한 알람 시간 추가
+    @State private var selectedStartTime: Date = Date()
+    @State private var selectedReminderTime: Date = Date() 
+    
+    private var today: Date {
+        // TODO: today가 전날로 나와서 일단 하루 더함
+        Date()
+    }
+    let readingScheduleCalculator = ReadingScheduleCalculator()
+
     
     @FocusState private var isTextTextFieldFocused: Bool
     
@@ -148,11 +158,16 @@ struct DailyProgressView: View {
     }
     
     private func setNotification(_ readingBook: UserBook) {
-        notificationManager.clearRequests()
-            Task {
-                await self.notificationManager.setupNotifications(notificationType: .morning(readingBook: readingBook))
-
-                await self.notificationManager.setupNotifications(notificationType: .night(readingBook: readingBook))
-            }
+        Task {
+               await notificationManager.setupNotifications(
+                   notificationType: .morning(readingBook: readingBook)
+               )
+               await notificationManager.setupNotifications(
+                   notificationType: .night(readingBook: readingBook)
+               )
+               // 알람설정 로그 확인용 함수추가
+               notificationManager.printPendingNotifications()
+           }
     }
+
 }

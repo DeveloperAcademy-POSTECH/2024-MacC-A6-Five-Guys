@@ -31,8 +31,20 @@ enum NotificationType {
             return readingBook.findNextReadingDay()
         }
     }
-    
-    func timeContent() -> (hour: Int, minute: Int) {
+ 
+    // 수정함 
+    func timeContent(selectedTime: Date? = nil) -> (hour: Int, minute: Int) {
+        let calendar = Calendar.current
+
+        // 선택한 시간이 있다면 해당 시간에서 hour, minute을 추출해서 넘겨줍니다
+        if let time = selectedTime {
+            let hour = calendar.component(.hour, from: time)
+            let minute = calendar.component(.minute, from: time)
+            print("😉 선택한 시간이 있어요", hour, minute)
+            return (hour, minute)
+        }
+
+        // 선택한 시간이 없다면 기본값을 반환합니다
         switch self {
         case .morning:
             return (9, 0)
@@ -40,7 +52,6 @@ enum NotificationType {
             return (21, 0)
         }
     }
-    
     /// 고유 identifier 생성 메서드
     func identifier() -> String {
         switch self {
@@ -49,5 +60,5 @@ enum NotificationType {
         case .night(let readingBook):
             return "\(readingBook.book.title)-night"
         }
-    }    
+    }
 }
