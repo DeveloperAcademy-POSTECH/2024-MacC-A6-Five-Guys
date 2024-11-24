@@ -154,11 +154,10 @@ struct DailyProgressView: View {
                await notificationManager.setupNotifications(
                    notificationType: .morning(readingBook: readingBook)
                )
-
                await notificationManager.setupNotifications(
                    notificationType: .night(readingBook: readingBook)
                )
-
+               // 알람설정 로그 확인용 함수추가
                notificationManager.printPendingNotifications()
            }
     }

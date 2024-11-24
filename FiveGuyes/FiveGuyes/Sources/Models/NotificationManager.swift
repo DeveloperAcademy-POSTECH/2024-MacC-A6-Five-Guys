@@ -54,20 +54,19 @@ final class NotificationManager: ObservableObject {
             print("❌ NotificationManager: 다음 읽기 날짜가 없어 알림을 생성하지 않습니다.")
             return
         }
+        // selectedTime 추가
         let dateComponents = makeDateComponents(date: date, notificationType, selectedTime: selectedTime ?? Date())
         let content = makeNotificationContent(notificationType)
         
         let identifier = notificationType.identifier()
         
         // 설정대로 트리거, 요청 셋팅
-        let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: false)
+        let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: true)
         let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
         
         do {
             try await notificationCenter.add(request)
             print("💯 노티 설정 완료")
-            // 확인용 로그
-            print("🌟노티설정 리퀘스트 : ",request)
         } catch {
             print("❌ NotificationManager/schedule: \(error.localizedDescription)")
         }
@@ -78,12 +77,9 @@ final class NotificationManager: ObservableObject {
         let day = calendar.component(.day, from: date)
         let month = calendar.component(.month, from: date)
         let year = calendar.component(.year, from: date)
-        
+        // selectedTime 추가
         let (hour, minute) = notificationType.timeContent(selectedTime: selectedTime)
-     //   print("💯노티 설정: \(date) \(hour): \(minute)")
-        print("💯노티설정: timeContent() 반환 값: \(hour):\(minute)")
-        print("💯노티설정: selectedTime 반환 값: \(selectedTime)")
-
+        print("💯노티 설정: \(date) \(hour): \(minute)")
         return DateComponents(year: year, month: month, day: day, hour: hour, minute: minute)
     }
     
@@ -95,7 +91,8 @@ final class NotificationManager: ObservableObject {
         
         return content
     }
-    // 노티 설정 확인용 함수
+    
+    // 노티 설정 여부 로그 확인용 프린트 함수
     func printPendingNotifications() {
         notificationCenter.getPendingNotificationRequests { requests in
             if requests.isEmpty {
@@ -105,7 +102,7 @@ final class NotificationManager: ObservableObject {
                 for request in requests {
                     print("🔔 \(request.identifier): \(request.content.title)")
                     if let trigger = request.trigger as? UNCalendarNotificationTrigger {
-                        print("  - Trigger Time: \(trigger.dateComponents)")
+                        print("  - Trigger Time: \(trigger.dateComponents.hour ?? 0) : \(trigger.dateComponents.minute ?? 0)")
                     }
                 }
             }

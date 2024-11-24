@@ -32,10 +32,11 @@ enum NotificationType {
         }
     }
  
+    // 수정함 
     func timeContent(selectedTime: Date? = nil) -> (hour: Int, minute: Int) {
         let calendar = Calendar.current
 
-        // 선택한 시간이 있다면 해당 시간에서 hour, minute 추출
+        // 선택한 시간이 있다면 해당 시간에서 hour, minute을 추출해서 넘겨줍니다
         if let time = selectedTime {
             let hour = calendar.component(.hour, from: time)
             let minute = calendar.component(.minute, from: time)
@@ -43,12 +44,12 @@ enum NotificationType {
             return (hour, minute)
         }
 
-        // 선택한 시간이 없다면 기본값 반환
+        // 선택한 시간이 없다면 기본값을 반환합니다
         switch self {
         case .morning:
-            return (9, 0) // 기본값: 오전 9시
+            return (9, 0)
         case .night:
-            return (21, 0) // 기본값: 오후 9시
+            return (21, 0)
         }
     }
     /// 고유 identifier 생성 메서드
