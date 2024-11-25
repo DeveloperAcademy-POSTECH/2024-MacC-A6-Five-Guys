@@ -1,38 +1,43 @@
 //
-//  UserBook.swift
+//  UserBookSchemaV1.swift
 //  FiveGuyes
 //
-//  Created by zaehorang on 11/11/24.
+//  Created by zaehorang on 11/25/24.
 //
 
 import Foundation
 import SwiftData
 
-struct ReadingRecord: Codable {
-    var targetPages: Int   // 목표로 설정된 페이지 수
-    var pagesRead: Int     // 실제 읽은 페이지 수
-}
-
-@Model
-final class UserBook {
-    @Attribute(.unique) var id = UUID()
-    var book: BookDetails
-    
-    var readingRecords: [String: ReadingRecord] = [:] // Keyed by formatted date strings
-    
-    // 계산 로직을 더 편하게 하기 위해 마지막으로 읽은 날의 결과를 따로 저장합니다.
-    var lastReadDate: Date? // 마지막 읽은 날짜
-    var lastPagesRead: Int = 0 // 마지막으로 읽은 페이지 수
-    
-    var completionReview = ""
-    var isCompleted: Bool = false  // 현재 읽는 중인지 완독한 책인지 표시
-    
-    init(book: BookDetails) {
-        self.book = book
+enum UserBookSchemaV1: VersionedSchema {
+    static var versionIdentifier = Schema.Version(1, 0, 0)
+        
+    static var models: [any PersistentModel.Type] {
+        [UserBook.self]
     }
 }
 
-extension UserBook {
+extension UserBookSchemaV1 {
+    @Model
+    final class UserBook {
+        @Attribute(.unique) var id = UUID()
+        var book: BookDetails
+        
+        var readingRecords: [String: ReadingRecord] = [:] // Keyed by formatted date strings
+        
+        // 계산 로직을 더 편하게 하기 위해 마지막으로 읽은 날의 결과를 따로 저장합니다.
+        var lastReadDate: Date? // 마지막 읽은 날짜
+        var lastPagesRead: Int = 0 // 마지막으로 읽은 페이지 수
+        
+        var completionReview = ""
+        var isCompleted: Bool = false  // 현재 읽는 중인지 완독한 책인지 표시
+        
+        init(book: BookDetails) {
+            self.book = book
+        }
+    }
+}
+
+extension UserBookSchemaV1.UserBook {
     /// Date 타입의 값을 readingRecords의 키 값으로 사용할 수 있게 변환해주는 메서드
     func getReadingRecordsKey(_ date: Date) -> String { date.toYearMonthDayString() }
     func getAdjustedReadingRecordsKey(_ date: Date) -> String { date.toAdjustedYearMonthDayString() }

@@ -8,6 +8,7 @@
 import Foundation
 
 struct ReadingScheduleCalculator {
+    typealias UserBook = UserBookSchemaV1.UserBook
     
     // MARK: 첫날을 기준으로 읽어야하는 페이지를 할당하는 메서드 (초기 페이지 계산)
     func calculateInitialDailyTargets(for currentReadingBook: UserBook) {

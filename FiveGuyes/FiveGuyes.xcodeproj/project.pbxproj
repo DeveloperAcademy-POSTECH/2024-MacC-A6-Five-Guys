@@ -41,7 +41,7 @@
 		26890BBD2CAE98E2008DFF49 /* .swiftlint.yml in Resources */ = {isa = PBXBuildFile; fileRef = 26890BBC2CAE98E2008DFF49 /* .swiftlint.yml */; };
 		26EBDE262CDE3C6000B3A2BC /* BookSettingInputModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDE252CDE3C6000B3A2BC /* BookSettingInputModel.swift */; };
 		26EBDE2A2CDF33D900B3A2BC /* Date+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDE292CDF33D900B3A2BC /* Date+Extension.swift */; };
-		26EBDE2C2CE1341800B3A2BC /* UserBook.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDE2B2CE1341800B3A2BC /* UserBook.swift */; };
+		26EBDE2C2CE1341800B3A2BC /* ReadingRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDE2B2CE1341800B3A2BC /* ReadingRecord.swift */; };
 		26EBDE2F2CE3856900B3A2BC /* NotificationType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDE2E2CE3856900B3A2BC /* NotificationType.swift */; };
 		26EBDE812CEF812A00B3A2BC /* Calendar+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDE802CEF812A00B3A2BC /* Calendar+Extension.swift */; };
 		26EBDE832CF0219300B3A2BC /* FontAsset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDE822CF0219300B3A2BC /* FontAsset.swift */; };
@@ -59,6 +59,16 @@
 		26EBDEB02CF1C5C900B3A2BC /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 26EBDEAF2CF1C5C900B3A2BC /* FirebaseMessaging */; };
 		26EBDEB22CF1C5C900B3A2BC /* FirebaseRemoteConfig in Frameworks */ = {isa = PBXBuildFile; productRef = 26EBDEB12CF1C5C900B3A2BC /* FirebaseRemoteConfig */; };
 		26EBDEB42CF1CC8500B3A2BC /* Tracking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDEB32CF1CC8500B3A2BC /* Tracking.swift */; };
+		26EBDEBC2CF238FD00B3A2BC /* ReadingProgressProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDEBB2CF238FD00B3A2BC /* ReadingProgressProtocol.swift */; };
+		26EBDEBE2CF2390C00B3A2BC /* CompletionStatusProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDEBD2CF2390C00B3A2BC /* CompletionStatusProtocol.swift */; };
+		26EBDEC02CF2398F00B3A2BC /* BookMetaDataProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDEBF2CF2398F00B3A2BC /* BookMetaDataProtocol.swift */; };
+		26EBDEC22CF239AE00B3A2BC /* UserSettingsProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDEC12CF239AE00B3A2BC /* UserSettingsProtocol.swift */; };
+		26EBDECA2CF4556300B3A2BC /* UserBookSchemaV2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDEC92CF4556300B3A2BC /* UserBookSchemaV2.swift */; };
+		26EBDECD2CF4558B00B3A2BC /* UserBookSchemaV1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDECC2CF4558B00B3A2BC /* UserBookSchemaV1.swift */; };
+		26EBDED22CF45ACA00B3A2BC /* ReadingProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDED12CF45ACA00B3A2BC /* ReadingProgress.swift */; };
+		26EBDED42CF45B1E00B3A2BC /* UserSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDED32CF45B1E00B3A2BC /* UserSettings.swift */; };
+		26EBDED62CF45B3400B3A2BC /* BookMetaData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDED52CF45B3400B3A2BC /* BookMetaData.swift */; };
+		26EBDED82CF45B9300B3A2BC /* CompletionStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDED72CF45B9300B3A2BC /* CompletionStatus.swift */; };
 		26F19A682CD9EFD800F41D6D /* MainHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F19A672CD9EFD800F41D6D /* MainHomeView.swift */; };
 		26F19A6A2CD9FE5C00F41D6D /* WeeklyReadingProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F19A692CD9FE5C00F41D6D /* WeeklyReadingProgressView.swift */; };
 		26F19A6C2CDA0A2B00F41D6D /* CompletionListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F19A6B2CDA0A2B00F41D6D /* CompletionListView.swift */; };
@@ -106,7 +116,7 @@
 		26890BBC2CAE98E2008DFF49 /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
 		26EBDE252CDE3C6000B3A2BC /* BookSettingInputModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookSettingInputModel.swift; sourceTree = "<group>"; };
 		26EBDE292CDF33D900B3A2BC /* Date+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Extension.swift"; sourceTree = "<group>"; };
-		26EBDE2B2CE1341800B3A2BC /* UserBook.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserBook.swift; sourceTree = "<group>"; };
+		26EBDE2B2CE1341800B3A2BC /* ReadingRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadingRecord.swift; sourceTree = "<group>"; };
 		26EBDE2E2CE3856900B3A2BC /* NotificationType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationType.swift; sourceTree = "<group>"; };
 		26EBDE802CEF812A00B3A2BC /* Calendar+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Calendar+Extension.swift"; sourceTree = "<group>"; };
 		26EBDE822CF0219300B3A2BC /* FontAsset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontAsset.swift; sourceTree = "<group>"; };
@@ -118,6 +128,16 @@
 		26EBDE982CF07A7900B3A2BC /* FontWeight.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontWeight.swift; sourceTree = "<group>"; };
 		26EBDEA42CF1C21E00B3A2BC /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		26EBDEB32CF1CC8500B3A2BC /* Tracking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tracking.swift; sourceTree = "<group>"; };
+		26EBDEBB2CF238FD00B3A2BC /* ReadingProgressProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadingProgressProtocol.swift; sourceTree = "<group>"; };
+		26EBDEBD2CF2390C00B3A2BC /* CompletionStatusProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletionStatusProtocol.swift; sourceTree = "<group>"; };
+		26EBDEBF2CF2398F00B3A2BC /* BookMetaDataProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookMetaDataProtocol.swift; sourceTree = "<group>"; };
+		26EBDEC12CF239AE00B3A2BC /* UserSettingsProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSettingsProtocol.swift; sourceTree = "<group>"; };
+		26EBDEC92CF4556300B3A2BC /* UserBookSchemaV2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserBookSchemaV2.swift; sourceTree = "<group>"; };
+		26EBDECC2CF4558B00B3A2BC /* UserBookSchemaV1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserBookSchemaV1.swift; sourceTree = "<group>"; };
+		26EBDED12CF45ACA00B3A2BC /* ReadingProgress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadingProgress.swift; sourceTree = "<group>"; };
+		26EBDED32CF45B1E00B3A2BC /* UserSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSettings.swift; sourceTree = "<group>"; };
+		26EBDED52CF45B3400B3A2BC /* BookMetaData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookMetaData.swift; sourceTree = "<group>"; };
+		26EBDED72CF45B9300B3A2BC /* CompletionStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletionStatus.swift; sourceTree = "<group>"; };
 		26F19A672CD9EFD800F41D6D /* MainHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainHomeView.swift; sourceTree = "<group>"; };
 		26F19A692CD9FE5C00F41D6D /* WeeklyReadingProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyReadingProgressView.swift; sourceTree = "<group>"; };
 		26F19A6B2CDA0A2B00F41D6D /* CompletionListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletionListView.swift; sourceTree = "<group>"; };
@@ -227,6 +247,7 @@
 		26890BAE2CAE904A008DFF49 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				26EBDEC82CF4553D00B3A2BC /* SwiftDataMigration */,
 				26D853032CCE44730016239A /* Models */,
 				26D853022CCE44720016239A /* Stores */,
 				26890BB12CAE90E4008DFF49 /* Views */,
@@ -283,6 +304,10 @@
 		26D853012CCE446F0016239A /* Protocols */ = {
 			isa = PBXGroup;
 			children = (
+				26EBDEBB2CF238FD00B3A2BC /* ReadingProgressProtocol.swift */,
+				26EBDEBD2CF2390C00B3A2BC /* CompletionStatusProtocol.swift */,
+				26EBDEBF2CF2398F00B3A2BC /* BookMetaDataProtocol.swift */,
+				26EBDEC12CF239AE00B3A2BC /* UserSettingsProtocol.swift */,
 			);
 			path = Protocols;
 			sourceTree = "<group>";
@@ -303,9 +328,8 @@
 		26D853032CCE44730016239A /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				26EBDECF2CF459DB00B3A2BC /* UserBook */,
 				1A010EAB2CD8A7E500FBE3B3 /* APIBooksModel.swift */,
-				26F19A772CDB5D0100F41D6D /* BookDetails.swift */,
-				26EBDE2B2CE1341800B3A2BC /* UserBook.swift */,
 				26F19A792CDB5F3900F41D6D /* ReadingScheduleCalculator.swift */,
 				26EBDE2E2CE3856900B3A2BC /* NotificationType.swift */,
 				1AA14A792CDDD96200B763A6 /* NotificationManager.swift */,
@@ -373,6 +397,52 @@
 				26EBDE942CF0707A00B3A2BC /* Pretendard-SemiBold.otf */,
 			);
 			path = PretendardFont;
+			sourceTree = "<group>";
+		};
+		26EBDEC82CF4553D00B3A2BC /* SwiftDataMigration */ = {
+			isa = PBXGroup;
+			children = (
+				26EBDECB2CF4557800B3A2BC /* UserBookSchema */,
+			);
+			path = SwiftDataMigration;
+			sourceTree = "<group>";
+		};
+		26EBDECB2CF4557800B3A2BC /* UserBookSchema */ = {
+			isa = PBXGroup;
+			children = (
+				26EBDECC2CF4558B00B3A2BC /* UserBookSchemaV1.swift */,
+				26EBDEC92CF4556300B3A2BC /* UserBookSchemaV2.swift */,
+			);
+			path = UserBookSchema;
+			sourceTree = "<group>";
+		};
+		26EBDECE2CF4597100B3A2BC /* UserBookModelV1 */ = {
+			isa = PBXGroup;
+			children = (
+				26F19A772CDB5D0100F41D6D /* BookDetails.swift */,
+			);
+			path = UserBookModelV1;
+			sourceTree = "<group>";
+		};
+		26EBDECF2CF459DB00B3A2BC /* UserBook */ = {
+			isa = PBXGroup;
+			children = (
+				26EBDE2B2CE1341800B3A2BC /* ReadingRecord.swift */,
+				26EBDED02CF45AB300B3A2BC /* UserBookModelV2 */,
+				26EBDECE2CF4597100B3A2BC /* UserBookModelV1 */,
+			);
+			path = UserBook;
+			sourceTree = "<group>";
+		};
+		26EBDED02CF45AB300B3A2BC /* UserBookModelV2 */ = {
+			isa = PBXGroup;
+			children = (
+				26EBDED12CF45ACA00B3A2BC /* ReadingProgress.swift */,
+				26EBDED52CF45B3400B3A2BC /* BookMetaData.swift */,
+				26EBDED32CF45B1E00B3A2BC /* UserSettings.swift */,
+				26EBDED72CF45B9300B3A2BC /* CompletionStatus.swift */,
+			);
+			path = UserBookModelV2;
 			sourceTree = "<group>";
 		};
 		26F19A662CD9EF9400F41D6D /* Main */ = {
@@ -473,6 +543,7 @@
 			files = (
 				1A54142B2CD9FEF400283FBD /* BookSearchView.swift in Sources */,
 				26F19A782CDB5D0100F41D6D /* BookDetails.swift in Sources */,
+				26EBDECA2CF4556300B3A2BC /* UserBookSchemaV2.swift in Sources */,
 				1A010EAE2CD8A86E00FBE3B3 /* APIStore.swift in Sources */,
 				24A2063F2CDB180000964FBB /* CompletionCalendarView.swift in Sources */,
 				1A010EBE2CD8DA2400FBE3B3 /* BookListView.swift in Sources */,
@@ -489,26 +560,35 @@
 				24360D532CD9F3AF00E83D2B /* DailyProgressView.swift in Sources */,
 				1A27D9602CDA31EE00D1E14D /* ProgressBar.swift in Sources */,
 				1A27D9622CDB05C000D1E14D /* CustomTextFieldStylePageCount.swift in Sources */,
+				26EBDEC22CF239AE00B3A2BC /* UserSettingsProtocol.swift in Sources */,
 				26F19A7A2CDB5F3900F41D6D /* ReadingScheduleCalculator.swift in Sources */,
+				26EBDED62CF45B3400B3A2BC /* BookMetaData.swift in Sources */,
 				26EBDE8F2CF0684900B3A2BC /* View+Extension.swift in Sources */,
+				26EBDED82CF45B9300B3A2BC /* CompletionStatus.swift in Sources */,
 				1A010EB62CD8AF9800FBE3B3 /* BookSearchViewModel.swift in Sources */,
-				26EBDE2C2CE1341800B3A2BC /* UserBook.swift in Sources */,
+				26EBDED22CF45ACA00B3A2BC /* ReadingProgress.swift in Sources */,
+				26EBDE2C2CE1341800B3A2BC /* ReadingRecord.swift in Sources */,
 				26EBDE2A2CDF33D900B3A2BC /* Date+Extension.swift in Sources */,
+				26EBDEC02CF2398F00B3A2BC /* BookMetaDataProtocol.swift in Sources */,
 				26F19A722CDB267600F41D6D /* NavigationCoordinator.swift in Sources */,
+				26EBDED42CF45B1E00B3A2BC /* UserSettings.swift in Sources */,
 				264440592CD8F6020031A290 /* CustomBackButton.swift in Sources */,
 				24360D4A2CD8BE3C00E83D2B /* FinishGoalView.swift in Sources */,
+				26EBDECD2CF4558B00B3A2BC /* UserBookSchemaV1.swift in Sources */,
 				26F19A682CD9EFD800F41D6D /* MainHomeView.swift in Sources */,
 				26F19A742CDB271E00F41D6D /* NavigationRootView.swift in Sources */,
 				1AA14A7A2CDDD96200B763A6 /* NotificationManager.swift in Sources */,
 				24FAF9452CEC5224004FEC3F /* ToastView.swift in Sources */,
 				26EBDE912CF068E600B3A2BC /* FontStyle.swift in Sources */,
 				264440502CD8A3AC0031A290 /* CompletionReviewView.swift in Sources */,
+				26EBDEBE2CF2390C00B3A2BC /* CompletionStatusProtocol.swift in Sources */,
 				264440502CD8A3AC0031A290 /* CompletionReviewView.swift in Sources */,
 				26890B952CAE811A008DFF49 /* FiveGuyesApp.swift in Sources */,
 				26EBDE992CF07A7900B3A2BC /* FontWeight.swift in Sources */,
 				26EBDE972CF0764A00B3A2BC /* FontModifier.swift in Sources */,
 				24360D482CD8BAF100E83D2B /* EmptyNotiView.swift in Sources */,
 				26F19A6E2CDA74A600F41D6D /* WeeklyPageCalendarView.swift in Sources */,
+				26EBDEBC2CF238FD00B3A2BC /* ReadingProgressProtocol.swift in Sources */,
 				264440532CD8B1540031A290 /* String+Extension.swift in Sources */,
 				264440572CD8E0D20031A290 /* CustomTextEditorStyle.swift in Sources */,
 				264440552CD8E0100031A290 /* KeyboardObserver.swift in Sources */,

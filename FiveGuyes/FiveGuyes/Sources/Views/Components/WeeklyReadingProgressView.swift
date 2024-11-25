@@ -9,6 +9,8 @@ import SwiftData
 import SwiftUI
 
 struct WeeklyReadingProgressView: View {
+    typealias UserBook = UserBookSchemaV1.UserBook
+    
     @Query(filter: #Predicate<UserBook> { $0.isCompleted == false })
     private var currentlyReadingBooks: [UserBook]  // 현재 읽고 있는 책을 가져오는 쿼리
     

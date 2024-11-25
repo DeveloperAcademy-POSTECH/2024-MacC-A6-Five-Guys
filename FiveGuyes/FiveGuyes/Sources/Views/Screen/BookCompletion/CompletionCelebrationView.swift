@@ -10,6 +10,8 @@ import SwiftUI
 // TODO:  완독 날짜 변경은 최종 저장할 때 수정하기
 
 struct CompletionCelebrationView: View {
+    typealias UserBook = UserBookSchemaV1.UserBook
+    
     @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
     
     @Query(filter: #Predicate<UserBook> { $0.isCompleted == false })

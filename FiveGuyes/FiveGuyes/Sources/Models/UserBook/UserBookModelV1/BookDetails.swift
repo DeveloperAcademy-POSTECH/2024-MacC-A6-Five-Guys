@@ -29,7 +29,8 @@ struct BookDetails: Codable {
     }
 }
 
-extension UserBook {
+extension UserBookSchemaV1.UserBook {
+    typealias UserBook = UserBookSchemaV1.UserBook
     // 더미 데이터 생성
     static var dummyUserBook: UserBook {
         let bookDetails = BookDetails(

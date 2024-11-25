@@ -9,6 +9,8 @@ import SwiftData
 import SwiftUI
 
 struct CompletionReviewView: View {
+    typealias UserBook = UserBookSchemaV1.UserBook
+    
     private let placeholder: String = "책 속 한 줄이 남긴 여운은 무엇인가요?"
     
     @State private var reflectionText: String = ""

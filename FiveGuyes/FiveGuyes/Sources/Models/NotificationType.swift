@@ -8,6 +8,8 @@
 import Foundation
 
 enum NotificationType {
+    typealias UserBook = UserBookSchemaV1.UserBook
+    
     case morning(readingBook: UserBook)
     case night(readingBook: UserBook)
     

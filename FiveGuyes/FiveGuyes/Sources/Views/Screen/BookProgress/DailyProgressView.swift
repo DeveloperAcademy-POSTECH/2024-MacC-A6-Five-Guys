@@ -9,6 +9,8 @@ import SwiftData
 import SwiftUI
 
 struct DailyProgressView: View {
+    typealias UserBook = UserBookSchemaV1.UserBook
+    
     @State private var pagesToReadToday: Int = 0
     @State private var showAlert = false
     

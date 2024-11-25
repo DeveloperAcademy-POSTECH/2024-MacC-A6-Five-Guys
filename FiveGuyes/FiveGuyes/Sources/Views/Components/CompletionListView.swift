@@ -9,6 +9,8 @@ import SwiftData
 import SwiftUI
 
 struct CompletionListView: View {
+    typealias UserBook = UserBookSchemaV1.UserBook
+    
     @Environment(\.modelContext) private var modelContext
     
     @State private var selectedBookIndex: Int = 0

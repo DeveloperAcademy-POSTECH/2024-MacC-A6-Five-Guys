@@ -14,6 +14,8 @@ import FirebaseCore
 
 @main
 struct FiveGuyesApp: App {
+    typealias UserBook = UserBookSchemaV1.UserBook
+    
     // register app delegate for Firebase setup
       @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     

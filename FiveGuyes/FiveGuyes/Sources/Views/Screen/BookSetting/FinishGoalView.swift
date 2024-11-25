@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct FinishGoalView: View {
+    typealias UserBook = UserBookSchemaV1.UserBook
+    
     @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
     @Environment(BookSettingInputModel.self) var bookSettingInputModel: BookSettingInputModel
     @Environment(\.modelContext) private var modelContext

@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct WeeklyPageCalendarView: View {
+    typealias UserBook = UserBookSchemaV1.UserBook
+    
     let daysOfWeek = ["일", "월", "화", "수", "목", "금", "토"]
     let currentReadingBook: UserBook
     
@@ -111,6 +113,8 @@ struct WeeklyPageCalendarView: View {
 }
 
 struct WeeklyPageCalendarView_Previews: PreviewProvider {
+    typealias UserBook = UserBookSchemaV1.UserBook
+    
     static var previews: some View {
         WeeklyPageCalendarView(currentReadingBook: UserBook.dummyUserBook)
     }

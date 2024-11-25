@@ -9,6 +9,8 @@ import SwiftData
 import SwiftUI
 
 struct MainHomeView: View {
+    typealias UserBook = UserBookSchemaV1.UserBook
+    
     @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
     @Environment(\.modelContext) private var modelContext
     
