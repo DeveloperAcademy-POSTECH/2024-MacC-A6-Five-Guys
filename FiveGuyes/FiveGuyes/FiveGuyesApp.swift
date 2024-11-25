@@ -17,7 +17,7 @@ struct FiveGuyesApp: App {
     typealias UserBook = UserBookSchemaV1.UserBook
     
     // register app delegate for Firebase setup
-      @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     
     var body: some Scene {
         WindowGroup {
@@ -30,7 +30,8 @@ struct FiveGuyesApp: App {
 // MARK: - AppDelegate class
 class AppDelegate: NSObject, UIApplicationDelegate {
     func application(_ application: UIApplication,
-                     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil
+    ) -> Bool {
         // Firebase 초기화
         FirebaseApp.configure()
         
@@ -51,7 +52,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         }
         
         if ATTrackingManager.trackingAuthorizationStatus == .notDetermined {
-            let _ = await ATTrackingManager.requestTrackingAuthorization()
+            await ATTrackingManager.requestTrackingAuthorization()
         }
     }
 }
