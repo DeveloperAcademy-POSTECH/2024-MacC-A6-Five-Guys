@@ -30,7 +30,7 @@ struct DailyProgressView: View {
     @FocusState private var isTextTextFieldFocused: Bool
     
     var body: some View {
-        let userBook = currentlyReadingBooks.first!
+        let userBook = currentlyReadingBooks.first ?? UserBook.dummyUserBookV2
         
         let bookMetadata: BookMetaDataProtocol = userBook.bookMetaData
         var userSettings: UserSettingsProtocol = userBook.userSettings

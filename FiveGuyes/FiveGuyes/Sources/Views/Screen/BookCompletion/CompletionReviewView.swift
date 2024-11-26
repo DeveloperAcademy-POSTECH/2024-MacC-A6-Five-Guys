@@ -24,7 +24,7 @@ struct CompletionReviewView: View {
     
     // TODO: Font, Color 설정
     var body: some View {
-        let userBook = currentlyReadingBooks.first!
+        let userBook = currentlyReadingBooks.first ?? UserBook.dummyUserBookV2
         
         let bookMetadata: BookMetaDataProtocol = userBook.bookMetaData
         var completionStatus: CompletionStatusProtocol = userBook.completionStatus

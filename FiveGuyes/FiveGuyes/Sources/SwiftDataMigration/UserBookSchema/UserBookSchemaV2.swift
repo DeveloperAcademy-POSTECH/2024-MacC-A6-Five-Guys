@@ -76,3 +76,30 @@ extension UserBookSchemaV2 {
         }
     }
 }
+
+extension UserBookSchemaV2.UserBookV2 {
+    static let dummyUserBookV2 = UserBookSchemaV2.UserBookV2(
+        bookMetaData: BookMetaData(
+            title: "더미 책 제목",
+            author: "더미 작가",
+            coverURL: "https://dummyimage.com/cover",
+            totalPages: 300
+        ),
+        userSettings: UserSettings(
+            startPage: 1,
+            targetEndPage: 300,
+            startDate: Date(), // 현재 날짜
+            targetEndDate: Calendar.current.date(byAdding: .day, value: 30, to: Date()) ?? Date(), // 30일 후
+            nonReadingDays: []
+        ),
+        readingProgress: ReadingProgress(
+            readingRecords: [:], // 비어 있는 읽기 기록
+            lastReadDate: nil,
+            lastPagesRead: 0
+        ),
+        completionStatus: CompletionStatus(
+            isCompleted: false,
+            completionReview: ""
+        )
+    )
+}

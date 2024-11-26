@@ -22,11 +22,11 @@ struct CompletionCelebrationView: View {
     
     // TODO: 컬러, 폰트 수정하기
     var body: some View {
-        let userBook = currentlyReadingBooks.first!
+        let userBook = currentlyReadingBooks.first ?? UserBook.dummyUserBookV2
         
-        var bookMetadata: BookMetaDataProtocol = userBook.bookMetaData
-        var userSettings: UserSettingsProtocol = userBook.userSettings
-        var readingProgress: any ReadingProgressProtocol = userBook.readingProgress
+        let bookMetadata: BookMetaDataProtocol = userBook.bookMetaData
+        let userSettings: UserSettingsProtocol = userBook.userSettings
+        let readingProgress: any ReadingProgressProtocol = userBook.readingProgress
         
         ZStack {
             Image("completionBackground").ignoresSafeArea()
