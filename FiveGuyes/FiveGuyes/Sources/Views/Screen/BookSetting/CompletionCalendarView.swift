@@ -7,19 +7,17 @@
 
 import SwiftUI
 
-// TODO: 현재 기준으로 이전 날짜는 선택 안되게 하기
-
 struct CompletionCalendarView: View {
     
     @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
     @Environment(BookSettingInputModel.self) var bookSettingInputModel: BookSettingInputModel
     
-    // startDate와 endDate는 1일 당겨진 날짜를 받아옴
-    // selectedStartDate와 selectedEndDate는 1일 더해진, 제대로 된 날짜를 받아옴
-    // TODO: 위의 문제 해결하기 -> time zone 문제임
-    @State private var startDate: Date? = Date()
+    // 00:00 ~ 03:59까지도 전날
+    private var adjustedToday = Calendar.current.date(byAdding: .hour, value: -4, to: Date())!
+    
+    @State private var startDate: Date? = Calendar.current.date(byAdding: .hour, value: -4, to: Date())
     @State private var endDate: Date?
-    @State private var currentMonth: Date = Date()
+    @State private var currentMonth: Date = Calendar.current.date(byAdding: .hour, value: -4, to: Date())!
     
     @State var totalPages: String = ""
     
@@ -29,12 +27,6 @@ struct CompletionCalendarView: View {
     @State private var deletedDates: [Date] = []
     @State private var isDateSelectionLocked = false
     @State private var isFirstClick = true
-    
-    private let monthFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "YYYY년 M월"
-        return formatter
-    }()
     
     var body: some View {
         let bookTitle = bookSettingInputModel.selectedBook?.title ?? ""
@@ -105,8 +97,8 @@ struct CompletionCalendarView: View {
             if isTextTextFieldFocused {
                 
                 Button {
-                    // 페이지 최신화
-                    bookSettingInputModel.totalPages = totalPages
+                    // 변경되 페이지 업데이트
+                    bookSettingInputModel.targetEndPage = totalPages
                     // 키보드 내리기
                     isTextTextFieldFocused = false
                 } label: {
@@ -142,7 +134,7 @@ struct CompletionCalendarView: View {
             }
         }
         .onAppear {
-            totalPages = bookSettingInputModel.totalPages
+            totalPages = bookSettingInputModel.targetEndPage
         }
         .onAppear {
             // GA4 Tracking
@@ -172,7 +164,7 @@ struct CompletionCalendarView: View {
                     let adjustedDays = self.adjustDaysForMonth(monthDate: monthDate, daysInMonth: daysInMonth)
                     
                     VStack(spacing: 0) {
-                        Text(monthFormatter.string(from: monthDate))
+                        Text(monthDate.toKoreanDateStringWithoutDay())
                             .font(.system(size: 18, weight: .semibold))
                             .padding(.bottom, 20)
                         
@@ -201,7 +193,7 @@ struct CompletionCalendarView: View {
     
     // MARK: 소거 로직 구현(배경색 조건에 따라 변경)
     private func dateCell(for date: Date) -> some View {
-        let isPastDate = Calendar.current.compare(date, to: Date(), toGranularity: .day) == .orderedAscending
+        let isPastDate = Calendar.current.compare(date, to: adjustedToday, toGranularity: .day) == .orderedAscending
         let isSelectedDay = isDaySelected(for: date)
         let isBetweenSelectedDays = isBetweenSelectedDays(for: date) && !deletedDates.contains(date)
 

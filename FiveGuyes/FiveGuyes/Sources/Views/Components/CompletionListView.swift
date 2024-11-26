@@ -17,9 +17,9 @@ struct CompletionListView: View {
     @State var showCompletionAlert: Bool = false
     
     // 완독한 책을 가져오는 쿼리
+    // TODO: 책 역순으로 받아오기 🐯🐯🐯🐯🐯
     @Query(
-        filter: #Predicate<UserBook> { $0.completionStatus.isCompleted == true },
-        sort: [SortDescriptor(\.userSettings.targetEndDate, order: .reverse)]
+        filter: #Predicate<UserBook> { $0.completionStatus.isCompleted == true }
     )
     private var completedBooks: [UserBook]
     
@@ -124,7 +124,8 @@ struct CompletionListView: View {
             } else {
                 Rectangle()
                     .frame(width: 115, height: 178)
-                    .foregroundColor(Color(red: 0.93, green: 0.97, blue: 0.95))
+                    .foregroundStyle(Color.Fills.lightGreen)
+                    .padding(.horizontal, 20)
             }
         }
         // TODO: ❗️❗️❗️ 수정하기 기능 추가

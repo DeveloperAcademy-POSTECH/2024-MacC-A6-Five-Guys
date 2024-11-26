@@ -49,6 +49,15 @@ struct WeeklyReadingProgressView: View {
                         Text(secondaryMessage)
                         .font(.system(size: 14, weight: .medium))
                         .foregroundColor(Color(red: 0.24, green: 0.24, blue: 0.26).opacity(0.6))
+                    } else {
+                        // TODO: 쉬는 날 텍스트 수정하기 🐯🐯🐯🐯🐯
+                        Text("쉬는 날")
+                            .font(.system(size: 17, weight: .semibold))
+                            .foregroundColor(.black)
+                        
+                        Text("우아아아아")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundColor(Color(red: 0.24, green: 0.24, blue: 0.26).opacity(0.6))
                     }
                 }
                 .padding(.top, 22)

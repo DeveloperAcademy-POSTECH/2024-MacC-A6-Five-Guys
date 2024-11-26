@@ -23,7 +23,8 @@ struct FinishGoalView: View {
     var body: some View {
         
         if let book = bookSettingInputModel.selectedBook,
-           let totalPages = Int(bookSettingInputModel.totalPages),
+           let startPage = Int(bookSettingInputModel.startPage),
+           let totalPages = Int(bookSettingInputModel.targetEndPage),
            let startDate = bookSettingInputModel.startData,
            let endDate = bookSettingInputModel.endData {
             
@@ -103,7 +104,7 @@ struct FinishGoalView: View {
                             }
                             
                             // 완독 목표 기간
-                            Text("\(formatDateToKorean(startDate)) ~ \(formatDateToKorean(endDate))")
+                            Text("\(startDate.toKoreanDateStringWithoutYear()) ~ \(endDate.toKoreanDateStringWithoutYear())")
                                 .foregroundColor(Color.black)
                                 .font(.system(size: 16))
                                 .lineLimit(1)
@@ -169,7 +170,7 @@ struct FinishGoalView: View {
                 // 1일 할당량 계산
                 // TODO: 해당 모델 객체를 더 잘 만들 방식 고민하기
                 let bookMetaData = BookMetaData(title: book.title, author: book.author, coverURL: book.cover, totalPages: totalPages)
-                var userSettings = UserSettings(startPage: 1, targetEndPage: totalPages, startDate: startDate, targetEndDate: endDate, nonReadingDays: bookSettingInputModel.nonReadingDays)
+                var userSettings = UserSettings(startPage: startPage, targetEndPage: totalPages, startDate: startDate, targetEndDate: endDate, nonReadingDays: bookSettingInputModel.nonReadingDays)
                 var readingProgress = ReadingProgress()
                 let completionStatus = CompletionStatus()
   
@@ -187,14 +188,7 @@ struct FinishGoalView: View {
         }
         
     }
-    
-    private func formatDateToKorean(_ date: Date) -> String {
-        let dateFormatter = DateFormatter()
-        //        dateFormatter.locale = Locale(identifier: "ko_KR")
-        dateFormatter.dateFormat = "M월 d일"
-        return dateFormatter.string(from: date)
-    }
-    
+
     private func setNotification(_ readingBook: UserBook) {
         notificationManager.clearRequests()
         Task {

@@ -9,7 +9,7 @@ import Foundation
 
 struct ReadingScheduleCalculator {
     
-    // MARK: 첫날을 기준으로 읽어야하는 페이지를 할당하는 메서드 (초기 페이지 계산) 🍎
+    /// 첫날을 기준으로 읽어야하는 페이지를 할당하는 메서드 (초기 페이지 계산)
     func calculateInitialDailyTargets<Settings: UserSettingsProtocol, Progress: ReadingProgressProtocol>(
         for settings: Settings,
         progress: Progress
@@ -48,8 +48,7 @@ struct ReadingScheduleCalculator {
         progress.lastPagesRead = 0
     }
     
-    ///  읽은 페이지 입력 메서드 (오늘 날짜에만 값을 넣을 수 있음) ⏰🍎
-    // MARK: - 진행 업데이트 메서드
+    ///  읽은 페이지 입력 메서드 (오늘 날짜에만 값을 넣을 수 있음)
     func updateReadingProgress<Settings: UserSettingsProtocol, Progress: ReadingProgressProtocol>(
         for settings: Settings,
         progress: Progress,
@@ -77,13 +76,14 @@ struct ReadingScheduleCalculator {
         }
     }
     
-    /// 하루 할당량보다 더 읽거나, 덜 읽으면 이후 날짜의 할당량을 다시 계산한다. ⏰ 🍎
+    /// 하루 할당량보다 더 읽거나, 덜 읽으면 이후 날짜의 할당량을 다시 계산한다.
     func adjustFutureTargets<Settings: UserSettingsProtocol, Progress: ReadingProgressProtocol>(
         for settings: Settings,
         progress: Progress,
         from date: Date
     ) {
         let totalRemainingPages = calculateRemainingPages(settings: settings, progress: progress)
+        // 오늘을 남은 일자에서 제외하기 위해 각각 메서드 사용
         let remainingDays = calculateRemainingReadingDays(settings: settings, progress: progress) - 1
         
         guard remainingDays > 0 else { return }
@@ -122,7 +122,7 @@ struct ReadingScheduleCalculator {
         }
     }
     
-    /// 지난 날의 할당량을 읽지 않고, 앱에 새롭게 접속할 때 페이지를 재할당해주는 메서드 ⏰ 🍎
+    /// 지난 날의 할당량을 읽지 않고, 앱에 새롭게 접속할 때 페이지를 재할당해주는 메서드
     func reassignPagesFromLastReadDate<Settings: UserSettingsProtocol, Progress: ReadingProgressProtocol>(
         settings: Settings,
         progress: Progress
@@ -165,7 +165,7 @@ struct ReadingScheduleCalculator {
     }
     
     
-    /// 오늘 할당량이 읽혔는지 확인하는 메서드 ⏰🍎
+    /// 오늘 할당량이 읽혔는지 확인하는 메서드
     private func hasReadPagesAdjustedToday<Progress: ReadingProgressProtocol>(progress: Progress) -> Bool {
         let today = Date()
         let todayKey = progress.getAdjustedReadingRecordsKey(today)
@@ -173,7 +173,7 @@ struct ReadingScheduleCalculator {
     }
     
     // MARK: - 초기에 페이지를 할당할 때 필요한 메서드
-    // 독서를 해야하는 일수 구하기 🍎
+    // 독서를 해야하는 일수 구하기
     func firstCalculateTotalReadingDays<Settings: UserSettingsProtocol, Progress: ReadingProgressProtocol>(
         settings: Settings,
         progress: Progress
@@ -196,7 +196,7 @@ struct ReadingScheduleCalculator {
         return totalDays
     }
     
-    // 하루에 몇 페이지 읽는지 계산 🍎
+    // 하루에 몇 페이지 읽는지 계산
     func firstCalculatePagesPerDay<Settings: UserSettingsProtocol, Progress: ReadingProgressProtocol>(
         settings: Settings,
         progress: Progress
@@ -212,7 +212,7 @@ struct ReadingScheduleCalculator {
     }
     
     // MARK: - 남은 양을 다시 계산할 때 사용하는 메서드
-    // 지금까지 읽은 페이지를 제외하고 남은 페이지 계산 🍎
+    // 지금까지 읽은 페이지를 제외하고 남은 페이지 계산
     func calculateRemainingPages<Settings: UserSettingsProtocol, Progress: ReadingProgressProtocol>(
         settings: Settings,
         progress: Progress
@@ -220,7 +220,7 @@ struct ReadingScheduleCalculator {
         return settings.targetEndPage - progress.lastPagesRead
     }
     
-    // 완독까지 남은 기간을 구하는 메서드 (오늘부터) ⏰ 🍎
+    /// 완독까지 남은 기간을 구하는 메서드 (오늘부터)
     func calculateRemainingReadingDays<Settings: UserSettingsProtocol, Progress: ReadingProgressProtocol>(
         settings: Settings,
         progress: Progress
@@ -240,7 +240,7 @@ struct ReadingScheduleCalculator {
         return remainingDays
     }
     
-    // 🍎
+    ///  하루에 몇 페이지를 읽어야 하는지를 구하는 메서드
     func calculatePagesPerDay<Settings: UserSettingsProtocol, Progress: ReadingProgressProtocol>(
         settings: Settings,
         progress: Progress
