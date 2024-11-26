@@ -28,6 +28,7 @@ struct CompletionReviewView: View {
         
         let bookMetadata: BookMetaDataProtocol = userBook.bookMetaData
         var completionStatus: CompletionStatusProtocol = userBook.completionStatus
+        let userSettings = userBook.userSettings
         
         let title = bookMetadata.title
         
@@ -42,6 +43,7 @@ struct CompletionReviewView: View {
                     }
                     .font(.system(size: 24, weight: .semibold))
                     .foregroundStyle(.black)
+                    .lineLimit(1)
                     
                     TextEditor(text: $reflectionText)
                         .customStyleEditor(placeholder: placeholder, userInput: $reflectionText)
@@ -58,6 +60,13 @@ struct CompletionReviewView: View {
                             showAlert = true
                         } else {
                             completionStatus.markAsCompleted(review: reflectionText)
+                            
+                            // TODO: 해당 로직 모델로 옮기기 🐯
+                            userSettings.targetEndDate = Date()
+                            if userSettings.startDate > userSettings.targetEndDate {
+                                userSettings.startDate = userSettings.targetEndDate
+                            }
+                            
                             navigationCoordinator.popToRoot()
                         }
                     } label: {

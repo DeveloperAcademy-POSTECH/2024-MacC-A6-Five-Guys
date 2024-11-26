@@ -102,10 +102,13 @@ struct CompletionCelebrationView: View {
     
     private func readingSummary(userSettings: UserSettingsProtocol, readingProgress: any ReadingProgressProtocol) -> some View {
         let readingScheduleCalculator = ReadingScheduleCalculator()
-        
-        let startDateText = userSettings.startDate.toKoreanDateString()
-        // TODO: 완독을 수정할 수도 있기 때문에 완독 날짜가 바뀔 수 있음, 그래서 완독 날짜는 최종에서 업데이트하고 여기서는 오늘 날짜로 보여주기
+         
+        // TODO: 완독을 수정할 수도 있기 때문에 완독 날짜가 바뀔 수 있음, 그래서 완독 날짜는 최종에서 업데이트하고 여기서는 오늘 날짜로 보여주기 -> 초기 설정 날보다 빠를 수도 있음 🐯
         let endDateText = Date().toKoreanDateString()
+        var startDateText = userSettings.startDate.toKoreanDateString()
+        if startDateText > endDateText { startDateText = endDateText }
+        
+        // TODO: 위에 이유로 날짜가 바껴서 보이면 아래 로직에 파라미터 값도 바껴야 한다. 🐯
         let pagesPerDay = readingScheduleCalculator.firstCalculatePagesPerDay(settings: userSettings, progress: readingProgress).pagesPerDay
         
         let totalReadingDays = readingScheduleCalculator.firstCalculateTotalReadingDays(settings: userSettings, progress: readingProgress)
