@@ -8,7 +8,7 @@
 import Foundation
 
 enum NotificationType {
-    typealias UserBook = UserBookSchemaV1.UserBook
+    typealias UserBook = UserBookSchemaV2.UserBookV2
     
     case morning(readingBook: UserBook)
     case night(readingBook: UserBook)
@@ -17,7 +17,7 @@ enum NotificationType {
         switch self {
         case .morning(let readingBook):
             let title = "오늘의 한입, 준비됐나요?"
-            let body = "오늘은 \(readingBook.findNextReadingPagesPerDay())페이지만 읽으면 돼요 멍멍!"
+            let body = "오늘은 \(readingBook.readingProgress.findNextReadingPagesPerDay(for: readingBook.userSettings))페이지만 읽으면 돼요 멍멍!"
             return (title, body)
             
         case .night:
@@ -30,7 +30,7 @@ enum NotificationType {
     func dateContent() -> Date? {
         switch self {
         case .morning(let readingBook), .night(let readingBook):
-            return readingBook.findNextReadingDay()
+            return readingBook.readingProgress.findNextReadingDay()
         }
     }
     
@@ -47,9 +47,9 @@ enum NotificationType {
     func identifier() -> String {
         switch self {
         case .morning(let readingBook):
-            return "\(readingBook.book.title)-morning"
+            return "\(readingBook.bookMetaData.title)-morning"
         case .night(let readingBook):
-            return "\(readingBook.book.title)-night"
+            return "\(readingBook.bookMetaData.title)-night"
         }
     }    
 }

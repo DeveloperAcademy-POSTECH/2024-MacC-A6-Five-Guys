@@ -9,7 +9,7 @@ import SwiftData
 import SwiftUI
 
 struct MainHomeView: View {
-    typealias UserBook = UserBookSchemaV1.UserBook
+    typealias UserBook = UserBookSchemaV2.UserBookV2
     
     @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
     @Environment(\.modelContext) private var modelContext
@@ -20,11 +20,17 @@ struct MainHomeView: View {
     
     let mainAlertMessage = "삭제 후에는 복원할 수 없어요"
     
-    @Query(filter: #Predicate<UserBook> { $0.isCompleted == false })
+    @Query(filter: #Predicate<UserBook> { $0.completionStatus.isCompleted == false })
     private var currentlyReadingBooks: [UserBook]
     
     var body: some View {
-        let title = currentlyReadingBooks.first?.book.title ?? "제목 없음"
+//        let userBook = currentlyReadingBooks.first ?? User
+        
+//        let bookMetadata: BookMetaDataProtocol = userBook.bookMetaData
+//        let userSettings: UserSettingsProtocol = userBook.userSettings
+//        let readingProgress: any ReadingProgressProtocol = userBook.readingProgress
+        
+        let title = currentlyReadingBooks.first?.bookMetaData.title ?? ""
         let mainAlertText = "현재 읽고 있는 <\(title)>\(title.postPositionParticle()) 책장에서 삭제할까요?"
         
         ScrollView {
@@ -74,7 +80,7 @@ struct MainHomeView: View {
                         .padding(.top, 153)
                     
                     if let currentReadingBook = currentlyReadingBooks.first,
-                       let coverURL = currentReadingBook.book.coverURL,
+                       let coverURL = currentReadingBook.bookMetaData.coverURL,
                        let url = URL(string: coverURL) {
                         // TODO: 옆에 책 제목, 저자 text 추가하기
                         AsyncImage(url: url) { image in
@@ -129,7 +135,7 @@ struct MainHomeView: View {
             if let currentReadingBook = currentlyReadingBooks.first {
                 let readingScheduleCalculator = ReadingScheduleCalculator()
                 print("🌝🌝🌝🌝🌝 재할당!!")
-                readingScheduleCalculator.reassignPagesFromLastReadDate(for: currentReadingBook)
+                readingScheduleCalculator.reassignPagesFromLastReadDate(settings: currentReadingBook.userSettings, progress: currentReadingBook.readingProgress)
             }
         }
         .onAppear {
@@ -147,11 +153,14 @@ struct MainHomeView: View {
         
         return HStack {
             if let currentReadingBook = currentlyReadingBooks.first {
+                let bookMetadata: BookMetaDataProtocol = currentReadingBook.bookMetaData
+                let userSettings: UserSettingsProtocol = currentReadingBook.userSettings
+                let readingProgress: any ReadingProgressProtocol = currentReadingBook.readingProgress
                 
                 VStack(alignment: .leading, spacing: 5) {
-                    Text("<\(currentReadingBook.book.title)>")
+                    Text("<\(bookMetadata.title)>")
                         .lineLimit(2)
-                    Text("완독까지 \(readingScheduleCalculator.calculateRemainingReadingDays(for: currentReadingBook))일 남았어요!")
+                    Text("완독까지 \(readingScheduleCalculator.calculateRemainingReadingDays(settings: userSettings, progress: readingProgress))일 남았어요!")
                 }
                 
             } else {

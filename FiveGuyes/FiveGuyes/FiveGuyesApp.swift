@@ -14,23 +14,37 @@ import FirebaseCore
 
 @main
 struct FiveGuyesApp: App {
-    typealias UserBook = UserBookSchemaV1.UserBook
+    typealias UserBook = UserBookSchemaV2.UserBookV2
     
     // register app delegate for Firebase setup
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     
+    var container: ModelContainer
+    
+    init() {
+        do {
+            self.container = try ModelContainer(
+                for: UserBook.self,
+                migrationPlan: MigrationPlan.self
+            )
+        } catch {
+            fatalError("Failed to initialize model container.")
+        }
+    }
+    
     var body: some Scene {
         WindowGroup {
             NavigationRootView()
-                .modelContainer(for: UserBook.self)
+                .modelContainer(container)
         }
     }
 }
 
 // MARK: - AppDelegate class
 class AppDelegate: NSObject, UIApplicationDelegate {
-    func application(_ application: UIApplication,
-        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil
+    func application(
+        _ application: UIApplication,
+        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
     ) -> Bool {
         // Firebase 초기화
         FirebaseApp.configure()

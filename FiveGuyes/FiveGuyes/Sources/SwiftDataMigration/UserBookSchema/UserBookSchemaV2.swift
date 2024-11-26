@@ -18,12 +18,16 @@ enum UserBookSchemaV2: VersionedSchema {
 
 extension UserBookSchemaV2 {
     @Model
-    final class UserBookV2 {
+    final class UserBookV2: Identifiable {
         @Attribute(.unique) var id = UUID()
         
-        let bookMetaData: BookMetaData
+        @Relationship(deleteRule: .cascade)
+        var bookMetaData: BookMetaData
+        @Relationship(deleteRule: .cascade)
         var userSettings: UserSettings
+        @Relationship(deleteRule: .cascade)
         var readingProgress: ReadingProgress
+        @Relationship(deleteRule: .cascade)
         var completionStatus: CompletionStatus
         
         // MARK: init

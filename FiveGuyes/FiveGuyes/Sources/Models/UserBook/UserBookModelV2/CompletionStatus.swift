@@ -4,17 +4,24 @@
 //
 //  Created by zaehorang on 11/25/24.
 //
+import SwiftData
 
-struct CompletionStatus: CompletionStatusProtocol, Codable {
-    var isCompleted: Bool = false
-    var completionReview: String = ""
+@Model
+final class CompletionStatus: CompletionStatusProtocol {
+    var isCompleted: Bool
+    var completionReview: String
     
-    mutating func markAsCompleted(review: String) {
-        isCompleted = true
-        completionReview = review
+    init(isCompleted: Bool = false, completionReview: String = "") {
+        self.isCompleted = isCompleted
+        self.completionReview = completionReview
     }
     
-    mutating func updateCompletionReview(reveiw: String) {
-        completionReview = reveiw
+    func markAsCompleted(review: String) {
+        self.isCompleted = true
+        self.completionReview = review
+    }
+    
+    func updateCompletionReview(review: String) {
+        self.completionReview = review
     }
 }

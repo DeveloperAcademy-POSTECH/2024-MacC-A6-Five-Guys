@@ -6,9 +6,8 @@
 //
 
 import Foundation
-import SwiftData
 
-protocol UserSettingsProtocol {
+protocol UserSettingsProtocol: AnyObject {
     var startPage: Int { get set }
     var targetEndPage: Int { get set }
     var startDate: Date { get }

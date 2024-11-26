@@ -9,9 +9,9 @@ import SwiftData
 import SwiftUI
 
 struct WeeklyReadingProgressView: View {
-    typealias UserBook = UserBookSchemaV1.UserBook
+    typealias UserBook = UserBookSchemaV2.UserBookV2
     
-    @Query(filter: #Predicate<UserBook> { $0.isCompleted == false })
+    @Query(filter: #Predicate<UserBook> { $0.completionStatus.isCompleted == false })
     private var currentlyReadingBooks: [UserBook]  // 현재 읽고 있는 책을 가져오는 쿼리
     
     // 텍스트 변경을 위한 추가 필요데이터
@@ -21,7 +21,7 @@ struct WeeklyReadingProgressView: View {
         // 텍스트 변경 기능을 위한 추가 코드
         // 현재 읽는 책을 가져옵니다
         if let currentReadingBook = currentlyReadingBooks.first {
-            let todayRecords = currentReadingBook.getAdjustedReadingRecord(for: today)
+            let todayRecords = currentReadingBook.readingProgress.getAdjustedReadingRecord(for: today)
             
             VStack(alignment: .leading, spacing: 17) {
                 VStack(alignment: .leading, spacing: 8) {

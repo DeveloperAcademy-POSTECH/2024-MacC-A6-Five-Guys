@@ -9,7 +9,7 @@ import SwiftData
 import SwiftUI
 
 struct CompletionReviewView: View {
-    typealias UserBook = UserBookSchemaV1.UserBook
+    typealias UserBook = UserBookSchemaV2.UserBookV2
     
     private let placeholder: String = "책 속 한 줄이 남긴 여운은 무엇인가요?"
     
@@ -19,14 +19,17 @@ struct CompletionReviewView: View {
     @ObservedObject private var keyboardObserver = KeyboardObserver()
     
     @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
-    @Query(filter: #Predicate<UserBook> { $0.isCompleted == false })
+    @Query(filter: #Predicate<UserBook> { $0.completionStatus.isCompleted == false })
     private var currentlyReadingBooks: [UserBook]  // 현재 읽고 있는 책을 가져오는 쿼리
     
     // TODO: Font, Color 설정
     var body: some View {
-        // TODO: 더미 지우기
-        let userBook = currentlyReadingBooks.first ?? UserBook.dummyUserBook
-        let title = userBook.book.title
+        let userBook = currentlyReadingBooks.first!
+        
+        let bookMetadata: BookMetaDataProtocol = userBook.bookMetaData
+        var completionStatus: CompletionStatusProtocol = userBook.completionStatus
+        
+        let title = bookMetadata.title
         
         ZStack {
             Color.white.ignoresSafeArea()
@@ -54,7 +57,7 @@ struct CompletionReviewView: View {
                         if reflectionText.isEmpty {
                             showAlert = true
                         } else {
-                            userBook.markAsCompleted(review: reflectionText)
+                            completionStatus.markAsCompleted(review: reflectionText)
                             navigationCoordinator.popToRoot()
                         }
                     } label: {

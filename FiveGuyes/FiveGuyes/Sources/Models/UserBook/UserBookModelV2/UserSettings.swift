@@ -6,11 +6,21 @@
 //
 
 import Foundation
+import SwiftData
 
-struct UserSettings: UserSettingsProtocol, Codable {
+@Model
+final class UserSettings: UserSettingsProtocol {
     var startPage: Int
     var targetEndPage: Int
     var startDate: Date
     var targetEndDate: Date
     var nonReadingDays: [Date]
+    
+    init(startPage: Int, targetEndPage: Int, startDate: Date, targetEndDate: Date, nonReadingDays: [Date]) {
+        self.startPage = startPage
+        self.targetEndPage = targetEndPage
+        self.startDate = startDate
+        self.targetEndDate = targetEndDate
+        self.nonReadingDays = nonReadingDays
+    }
 }

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct FinishGoalView: View {
-    typealias UserBook = UserBookSchemaV1.UserBook
+    typealias UserBook = UserBookSchemaV2.UserBookV2
     
     @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
     @Environment(BookSettingInputModel.self) var bookSettingInputModel: BookSettingInputModel
@@ -168,10 +168,17 @@ struct FinishGoalView: View {
             .onAppear {
                 // 1일 할당량 계산
                 // TODO: 해당 모델 객체를 더 잘 만들 방식 고민하기
-                let bookData = UserBook(book: BookDetails(title: book.title, author: book.author, coverURL: book.cover, totalPages: totalPages, startDate: startDate, targetEndDate: endDate, nonReadingDays: bookSettingInputModel.nonReadingDays))
-                calculator.calculateInitialDailyTargets(for: bookData)
+                let bookMetaData = BookMetaData(title: book.title, author: book.author, coverURL: book.cover, totalPages: totalPages)
+                var userSettings = UserSettings(startPage: 1, targetEndPage: totalPages, startDate: startDate, targetEndDate: endDate, nonReadingDays: bookSettingInputModel.nonReadingDays)
+                var readingProgress = ReadingProgress()
+                let completionStatus = CompletionStatus()
+  
+                calculator.calculateInitialDailyTargets(for: userSettings, progress: readingProgress)
+                
+                let bookData = UserBook(bookMetaData: bookMetaData, userSettings: userSettings, readingProgress: readingProgress, completionStatus: completionStatus)
+                
                 userBook = bookData
-                pagesPerDay = calculator.firstCalculatePagesPerDay(for: bookData).pagesPerDay
+                pagesPerDay = calculator.firstCalculatePagesPerDay(settings: userSettings, progress: readingProgress).pagesPerDay
             }
             .onAppear {
                 // GA4 Tracking
