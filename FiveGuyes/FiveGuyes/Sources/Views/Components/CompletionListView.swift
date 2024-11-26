@@ -35,6 +35,7 @@ struct CompletionListView: View {
                 
                 Spacer()
             }
+            .padding(.horizontal, 20)
             
             if !completedBooks.isEmpty {
                 VStack(alignment: .leading, spacing: 16) {
@@ -51,6 +52,7 @@ struct CompletionListView: View {
                                                 .resizable()
                                                 .scaledToFill()
                                                 .frame(width: 115, height: 178)
+                                                .clipped() // 넘어간 부분을 잘라냄
                                         } placeholder: {
                                             ProgressView()
                                         }
@@ -79,11 +81,12 @@ struct CompletionListView: View {
                                 .opacity(selectedBookIndex == index ? 1.0 : 0.3)
                             }
                         }
+                        .padding(.horizontal, 20)
                     }
-                    .padding(.horizontal, 20)
                     
                     // 선택된 책의 소감문 및 기타 정보 표시
                     let selectedBook = completedBooks[selectedBookIndex] 
+                    
                     VStack(alignment: .leading, spacing: 10) {
                         Text(selectedBook.completionStatus.completionReview)
                             .font(.system(size: 16, weight: .medium))
@@ -114,6 +117,7 @@ struct CompletionListView: View {
                         RoundedRectangle(cornerRadius: 16)
                             .foregroundColor(Color(red: 0.95, green: 0.98, blue: 0.96))
                     }
+                    .padding(.horizontal, 20)
                     
                 }
                 

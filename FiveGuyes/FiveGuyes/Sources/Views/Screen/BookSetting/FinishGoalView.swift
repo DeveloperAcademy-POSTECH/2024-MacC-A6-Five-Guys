@@ -73,7 +73,7 @@ struct FinishGoalView: View {
                             AsyncImage(url: url) { image in
                                 image
                                     .resizable()
-                                    .scaledToFill()
+                                    .scaledToFit()
                                     .frame(width: 90, height: 139)
                             } placeholder: {
                                 ProgressView()
