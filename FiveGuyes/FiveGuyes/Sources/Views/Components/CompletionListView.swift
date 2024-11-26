@@ -17,7 +17,10 @@ struct CompletionListView: View {
     @State var showCompletionAlert: Bool = false
     
     // 완독한 책을 가져오는 쿼리
-    @Query(filter: #Predicate<UserBook> { $0.completionStatus.isCompleted == true })
+    @Query(
+        filter: #Predicate<UserBook> { $0.completionStatus.isCompleted == true },
+        sort: [SortDescriptor(\.userSettings.targetEndDate, order: .reverse)]
+    )
     private var completedBooks: [UserBook]
     
     let completionAlertMessage = "정말로 내용을 삭제할까요?"
@@ -46,7 +49,7 @@ struct CompletionListView: View {
                                         AsyncImage(url: url) { image in
                                             image
                                                 .resizable()
-                                                .scaledToFit()
+                                                .scaledToFill()
                                                 .frame(width: 115, height: 178)
                                         } placeholder: {
                                             ProgressView()
@@ -67,6 +70,7 @@ struct CompletionListView: View {
                                             .font(.system(size: 12, weight: .medium))
                                             .foregroundColor(Color(red: 0.44, green: 0.44, blue: 0.44))
                                     }
+                                    .lineLimit(1)
                                 }
                                 .frame(width: 115)
                                 .onTapGesture {
