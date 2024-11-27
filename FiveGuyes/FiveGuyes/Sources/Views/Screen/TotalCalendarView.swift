@@ -9,7 +9,9 @@ import SwiftData
 import SwiftUI
 
 struct TotalCalendarView: View {
-    @Query(filter: #Predicate<UserBook> { $0.isCompleted == false })
+    typealias UserBook = UserBookSchemaV2.UserBookV2
+    
+    @Query(filter: #Predicate<UserBook> { $0.completionStatus.isCompleted == false })
     private var currentlyReadingBooks: [UserBook]  // 현재 읽고 있는 책을 가져오는 쿼리
     
     // 현재 보고 있는 달력의 월 ⏰
@@ -100,11 +102,11 @@ struct TotalCalendarView: View {
                     
                     VStack(spacing: 0) {
                         if let currentReadingBook = currentReadingBook,
-                           let readingRecord = currentReadingBook.readingRecords[dateKey] {
+                           let readingRecord = currentReadingBook.readingProgress.readingRecords[dateKey] {
                             
-                            let isTodayCompletionDate = Calendar.current.isDate(todayDate, inSameDayAs: currentReadingBook.book.targetEndDate)
+                            let isTodayCompletionDate = Calendar.current.isDate(todayDate, inSameDayAs: currentReadingBook.userSettings.targetEndDate)
                             
-                            if Calendar.current.isDate(date, inSameDayAs: currentReadingBook.book.targetEndDate) {
+                            if Calendar.current.isDate(date, inSameDayAs: currentReadingBook.userSettings.targetEndDate) {
                                 Image(isTodayCompletionDate ? "completionGreenFlag" : "completionFlag")
                                     .resizable()
                                     .scaledToFit()
@@ -167,7 +169,7 @@ struct TotalCalendarView: View {
                 .font(.system(size: 17, weight: .medium))
             
             Spacer()
-            if let targetEndDate = currentReadingBook?.book.targetEndDate {
+            if let targetEndDate = currentReadingBook?.userSettings.targetEndDate {
                 Text("\(formattedCompletionDateString(from: targetEndDate))")
                     .font(.system(size: 17, weight: .medium))
                     .multilineTextAlignment(.center)

@@ -13,7 +13,7 @@ class ToastViewModel: ObservableObject {
     private var timer: Timer?
     
     // 타이머 1.5초
-    func showToast(message: String, duration: TimeInterval = 1.0) {
+    func showToast(message: String, duration: TimeInterval = 2.0) {
         self.message = message
         self.isVisible = true
         

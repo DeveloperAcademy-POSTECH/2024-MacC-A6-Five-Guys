@@ -72,7 +72,8 @@ struct BookSettingsManagerView: View {
                 bookSettingInputModel.endData = nil
                 bookSettingInputModel.startData = nil
             case .bookPageSetting:
-                bookSettingInputModel.totalPages = ""
+                bookSettingInputModel.startPage = ""
+                bookSettingInputModel.targetEndPage = ""
             case .bookSearch:
                 return
             case .bookSettingDone:
@@ -87,7 +88,7 @@ struct BookSettingsManagerView: View {
         case .bookSearch:
             BookSearchView()
         case .bookPageSetting:
-            BookPageSettingView(totalPages: bookSettingInputModel.totalPages)
+            BookPageSettingView()
         case .bookDurationSetting:
             CompletionCalendarView()
         case .bookSettingDone:

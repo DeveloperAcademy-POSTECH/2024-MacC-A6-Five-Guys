@@ -9,6 +9,8 @@ import SwiftData
 import SwiftUI
 
 struct MainHomeView: View {
+    typealias UserBook = UserBookSchemaV2.UserBookV2
+    
     @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
     @Environment(\.modelContext) private var modelContext
     
@@ -18,94 +20,96 @@ struct MainHomeView: View {
     
     let mainAlertMessage = "삭제 후에는 복원할 수 없어요"
     
-    @Query(filter: #Predicate<UserBook> { $0.isCompleted == false })
+    @Query(filter: #Predicate<UserBook> { $0.completionStatus.isCompleted == false })
     private var currentlyReadingBooks: [UserBook]
     
     var body: some View {
-        let title = currentlyReadingBooks.first?.book.title ?? "제목 없음"
+        
+        let title = currentlyReadingBooks.first?.bookMetaData.title ?? ""
         let mainAlertText = "현재 읽고 있는 <\(title)>\(title.postPositionParticle()) 책장에서 삭제할까요?"
         
         ScrollView {
             VStack(spacing: 0) {
-                HStack {
-                    Spacer()
-                    notiButton {
-                        navigationCoordinator.push(.empthNoti)
-                    }
-                }
-                .padding(.bottom, 42)
-                
-                HStack(alignment: .top) {
-                    titleDescription
-                        .padding(.bottom, 40)
-                    Spacer()
-                    
-                    if !currentlyReadingBooks.isEmpty {
-                        Button {
-                            showReadingBookAlert = true
-                        } label: {
-                            Image(systemName: "ellipsis")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 20, height: 22)
-                                .tint(Color(red: 0.44, green: 0.44, blue: 0.44))
+                VStack(spacing: 0) {
+                    HStack {
+                        Spacer()
+                        notiButton {
+                            navigationCoordinator.push(.empthNoti)
                         }
-                        .alert(isPresented: $showReadingBookAlert) {
-                            Alert(
-                                title: Text(mainAlertText),
-                                message: Text(mainAlertMessage),
-                                primaryButton: .cancel(Text("취소하기")),
-                                secondaryButton: .destructive(Text("삭제")) {
-                                    if let currentReadingBook = currentlyReadingBooks.first {
-                                        // SwiftData 컨텍스트에서 삭제 필요
-                                        modelContext.delete(currentReadingBook)
+                    }
+                    .padding(.bottom, 42)
+                    
+                    HStack(alignment: .top) {
+                        titleDescription
+                            .padding(.bottom, 40)
+                        Spacer()
+                        
+                        if !currentlyReadingBooks.isEmpty {
+                            Button {
+                                showReadingBookAlert = true
+                            } label: {
+                                Image(systemName: "ellipsis")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 20, height: 22)
+                                    .tint(Color(red: 0.44, green: 0.44, blue: 0.44))
+                            }
+                            .alert(isPresented: $showReadingBookAlert) {
+                                Alert(
+                                    title: Text(mainAlertText),
+                                    message: Text(mainAlertMessage),
+                                    primaryButton: .cancel(Text("취소하기")),
+                                    secondaryButton: .destructive(Text("삭제")) {
+                                        if let currentReadingBook = currentlyReadingBooks.first {
+                                            // SwiftData 컨텍스트에서 삭제 필요
+                                            modelContext.delete(currentReadingBook)
+                                        }
                                     }
-                                }
-                            )
+                                )
+                            }
                         }
                     }
-                }
-                
-                ZStack(alignment: .top) {
                     
-                    WeeklyReadingProgressView()
-                        .padding(.top, 153)
-                    
-                    if let currentReadingBook = currentlyReadingBooks.first,
-                       let coverURL = currentReadingBook.book.coverURL,
-                       let url = URL(string: coverURL) {
-                        // TODO: 옆에 책 제목, 저자 text 추가하기
-                        AsyncImage(url: url) { image in
-                            image
-                                .resizable()
-                                .scaledToFill()
+                    ZStack(alignment: .top) {
+                        
+                        WeeklyReadingProgressView()
+                            .padding(.top, 153)
+                        
+                        if let currentReadingBook = currentlyReadingBooks.first,
+                           let coverURL = currentReadingBook.bookMetaData.coverURL,
+                           let url = URL(string: coverURL) {
+                            // TODO: 옆에 책 제목, 저자 text 추가하기
+                            AsyncImage(url: url) { image in
+                                image
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(width: 104, height: 161)
+                                    .shadow(color: Color(red: 0.84, green: 0.84, blue: 0.84).opacity(0.25), radius: 2, x: 0, y: 4)
+                            } placeholder: {
+                                ProgressView()
+                            }
+                        } else {
+                            Rectangle()
+                                .foregroundColor(.white)
                                 .frame(width: 104, height: 161)
                                 .shadow(color: Color(red: 0.84, green: 0.84, blue: 0.84).opacity(0.25), radius: 2, x: 0, y: 4)
-                        } placeholder: {
-                            ProgressView()
                         }
-                    } else {
-                        Rectangle()
-                            .foregroundColor(.white)
-                            .frame(width: 104, height: 161)
-                            .shadow(color: Color(red: 0.84, green: 0.84, blue: 0.84).opacity(0.25), radius: 2, x: 0, y: 4)
+                        
                     }
+                    .padding(.bottom, 16)
                     
+                    HStack(spacing: 16) {
+                        calendarFullScreenButton
+                            .frame(width: 107)
+                        
+                        mainActionButton
+                    }
+                    .padding(.bottom, 40)
                 }
-                .padding(.bottom, 16)
-                
-                HStack(spacing: 16) {
-                    calendarFullScreenButton
-                        .frame(width: 107)
-                    
-                    mainActionButton
-                }
-                .padding(.bottom, 40)
+                .padding(.horizontal, 20)
                 
                 CompletionListView()
-                
             }
-            .padding(.horizontal, 20)
             .padding(.top, topSafeAreaInset)
         }
         .ignoresSafeArea(edges: .top)
@@ -127,7 +131,7 @@ struct MainHomeView: View {
             if let currentReadingBook = currentlyReadingBooks.first {
                 let readingScheduleCalculator = ReadingScheduleCalculator()
                 print("🌝🌝🌝🌝🌝 재할당!!")
-                readingScheduleCalculator.reassignPagesFromLastReadDate(for: currentReadingBook)
+                readingScheduleCalculator.reassignPagesFromLastReadDate(settings: currentReadingBook.userSettings, progress: currentReadingBook.readingProgress)
             }
         }
         .onAppear {
@@ -145,11 +149,14 @@ struct MainHomeView: View {
         
         return HStack {
             if let currentReadingBook = currentlyReadingBooks.first {
+                let bookMetadata: BookMetaDataProtocol = currentReadingBook.bookMetaData
+                let userSettings: UserSettingsProtocol = currentReadingBook.userSettings
+                let readingProgress: any ReadingProgressProtocol = currentReadingBook.readingProgress
                 
                 VStack(alignment: .leading, spacing: 5) {
-                    Text("<\(currentReadingBook.book.title)>")
+                    Text("<\(bookMetadata.title)>")
                         .lineLimit(2)
-                    Text("완독까지 \(readingScheduleCalculator.calculateRemainingReadingDays(for: currentReadingBook))일 남았어요!")
+                    Text("완독까지 \(readingScheduleCalculator.calculateRemainingReadingDays(settings: userSettings, progress: readingProgress))일 남았어요!")
                 }
                 
             } else {

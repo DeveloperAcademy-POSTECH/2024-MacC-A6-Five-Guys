@@ -42,7 +42,7 @@ final class NotificationManager {
         
         isGranted = (currentSettings.authorizationStatus == .authorized)
     }
-
+    
     private func scheduleReminderNotification(notificationType: NotificationType) async {
         // dateContent가 nil일 경우 알림을 보내지 않음
         guard let date = notificationType.dateContent() else {

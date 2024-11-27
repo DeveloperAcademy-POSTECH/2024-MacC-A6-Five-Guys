@@ -27,7 +27,7 @@ struct BookSearchView: View {
                         guard let selectedBook = bookSearchViewModel.selectedBook else { return }
                         
                         Task {
-                            bookSettingInputModel.totalPages =  await bookSearchViewModel.fetchBookTotalPages(isbn: selectedBook.isbn13)
+                            bookSettingInputModel.targetEndPage =  await bookSearchViewModel.fetchBookTotalPages(isbn: selectedBook.isbn13)
                             
                             bookSettingInputModel.selectedBook = selectedBook
                             bookSettingInputModel.nextPage()

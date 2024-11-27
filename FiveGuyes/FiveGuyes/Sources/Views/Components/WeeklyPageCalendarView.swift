@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct WeeklyPageCalendarView: View {
+    typealias UserBook = UserBookSchemaV2.UserBookV2
+    
     let daysOfWeek = ["일", "월", "화", "수", "목", "금", "토"]
     let currentReadingBook: UserBook
     
@@ -15,7 +17,7 @@ struct WeeklyPageCalendarView: View {
     
     // TODO: 특정 날짜 이전 요일들의 UI 수정
     var body: some View {
-        let weeklyRecords = currentReadingBook.getAdjustedWeeklyRecorded(from: today)
+        let weeklyRecords = currentReadingBook.readingProgress.getAdjustedWeeklyRecorded(from: today)
         let todayIndex = Calendar.current.getAdjustedWeekdayIndex(from: today)
         
         HStack(spacing: 0) { // 셀 간격을 없앰으로써 연결된 배경처럼 보이게 설정
@@ -107,40 +109,5 @@ struct WeeklyPageCalendarView: View {
                 .frame(maxWidth: .infinity)
             }
         }
-    }
-}
-
-struct WeeklyPageCalendarView_Previews: PreviewProvider {
-    static var previews: some View {
-        WeeklyPageCalendarView(currentReadingBook: UserBook.dummyUserBook)
-    }
-    
-    // 더미 데이터 생성
-    static var dummyUserBook: UserBook {
-        let bookDetails = BookDetails(
-            title: "더미 책 제목",
-            author: "저자 이름",
-            coverURL: nil,
-            totalPages: 300,
-            startDate: Calendar.current.date(byAdding: .day, value: -14, to: Date())!,  // 2주 전 시작일
-            targetEndDate: Calendar.current.date(byAdding: .day, value: 7, to: Date())!,
-            nonReadingDays: []  // 1주 후 종료일
-        )
-        
-        let userBook = UserBook(book: bookDetails)
-        
-        // 더미 읽기 기록 추가
-        let calendar = Calendar.current
-        for dayOffset in -6...6 {  // 지난주 일요일부터 다음 주 토요일까지
-            let date = calendar.date(byAdding: .day, value: dayOffset, to: Date())!
-            let dateKey = date.toYearMonthDayString()
-            
-            let targetPages = 20
-            let pagesRead = dayOffset < 0 ? targetPages : (dayOffset == 0 ? 15 : 0)  // 과거에는 목표를 달성, 오늘은 일부 읽음, 미래는 읽지 않음
-            
-            userBook.readingRecords[dateKey] = ReadingRecord(targetPages: targetPages, pagesRead: pagesRead)
-        }
-        
-        return userBook
     }
 }

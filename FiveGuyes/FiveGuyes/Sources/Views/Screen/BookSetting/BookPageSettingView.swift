@@ -8,16 +8,24 @@
 import SwiftUI
 
 struct BookPageSettingView: View {
-    
-    @State var totalPages: String
+    private enum FieldFocus {
+        case firstField
+        case secondField
+    }
     
     @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
     @Environment(BookSettingInputModel.self) var bookSettingInputModel: BookSettingInputModel
     
-    @FocusState private var isTextTextFieldFocused: Bool
+    @State private var startPage: String = "1"
+    @State private var targetEndPage: String = ""
+    
+    @FocusState private var focusedField: FieldFocus?
+    
+    @StateObject private var toastViewModel = ToastViewModel()
+    
     
     var body: some View {
-        let title = bookSettingInputModel.selectedBook!.title
+        let title = bookSettingInputModel.selectedBook?.title ?? "제목 없음"
         
         VStack(spacing: 0) {
             VStack(alignment: .leading) {
@@ -27,31 +35,21 @@ struct BookPageSettingView: View {
                 HStack(spacing: 8) {
                     Text("총")
                     
-                    HStack(spacing: 2) {
-                        TextField("", text: $totalPages)
-                            .keyboardType(.numberPad)
-                            .focused($isTextTextFieldFocused)
-                            .font(.system(size: 20, weight: .medium))
-                            .fixedSize()
-                            .background {
-                                RoundedRectangle(cornerRadius: 7)
-                                    .foregroundColor(.clear)
-                                    .frame(height: 30) // 텍스트 필드 높이 지정
-                            }
-                        
-                        Image(systemName: "pencil") // 원하는 이미지로 변경
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: 20, height: 20)
-                        
-                    }
-                    .foregroundColor(Color(red: 0.03, green: 0.68, blue: 0.41))
-                    .padding(.horizontal, 8) // 텍스트 필드와 이미지 주변 패딩
-                    .padding(.vertical, 4)
-                    .background {
-                        RoundedRectangle(cornerRadius: 8)
-                            .foregroundStyle(Color(red: 0.93, green: 0.97, blue: 0.95))
-                    }
+                    // 첫 번째 텍스트 필드
+                    pageNumberTextField(
+                        page: $startPage,
+                        isFocused: $focusedField,
+                        field: .firstField
+                    )
+                    
+                    Text("쪽 부터")
+                    
+                    // 두 번째 텍스트 필드
+                    pageNumberTextField(
+                        page: $targetEndPage,
+                        isFocused: $focusedField,
+                        field: .secondField
+                    )
                     
                     Text("쪽이에요")
                     
@@ -63,45 +61,89 @@ struct BookPageSettingView: View {
             
             Spacer()
             
-            if isTextTextFieldFocused {
-                Button {
-                    bookSettingInputModel.totalPages = totalPages
-                    isTextTextFieldFocused = false
-                    bookSettingInputModel.nextPage()
+            if focusedField != nil {
+                VStack(spacing: 22) {
+                    ToastView(viewModel: toastViewModel)
                     
-                } label: {
-                    Text("다음")
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 56)
-                        .background(Color(red: 0.07, green: 0.87, blue: 0.54))
-                        .foregroundStyle(.white)
-                    
+                    Button(action: nextButtonTapped) {
+                        Text("다음")
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 56)
+                            .background(Color.Colors.green1)
+                            .foregroundStyle(Color.Fills.white)
+                    }
                 }
                 .ignoresSafeArea(.keyboard, edges: .bottom)
             }
             
         }
-        .font(.system(size: 22, weight: .semibold))
-        .foregroundColor(.black)
+        .fontStyle(.title2, weight: .semibold)
+        .foregroundStyle(Color.Labels.primaryBlack1)
         .background(.white)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    // 동작을 하지 않는게 맞음
-                } label: {
-                    Text("다음")
-                        .foregroundColor(Color(red: 0.84, green: 0.84, blue: 0.84))
-                }
-                .disabled(true)
+                Text("다음")
+                    .fontStyle(.body)
+                    .foregroundStyle(Color.Labels.tertiaryBlack3)
             }
         }
         .onAppear {
-            totalPages = bookSettingInputModel.totalPages
-            isTextTextFieldFocused = true
+            initializePageSettings()
+            trackPageSettingScreen()
         }
-        .onAppear {
-            // GA4 Tracking
-            Tracking.Screen.pageSetting.setTracking()
+    }
+    
+    // 텍스트 필드 생성 메서드
+    private func pageNumberTextField(
+        page: Binding<String>,
+        isFocused: FocusState<FieldFocus?>.Binding,
+        field: FieldFocus
+    ) -> some View {
+        TextField("", text: page)
+            .keyboardType(.numberPad)
+            .focused(isFocused, equals: field)
+            .fontStyle(.title2, weight: .semibold)
+            .foregroundStyle(Color.Colors.green2)
+            .fixedSize()
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background {
+                RoundedRectangle(cornerRadius: 8)
+                    .foregroundStyle(Color.Fills.lightGreen)
+            }
+    }
+    
+    private func nextButtonTapped() {
+        if targetEndPage > bookSettingInputModel.targetEndPage {
+            targetEndPage = bookSettingInputModel.targetEndPage
+            toastViewModel.showToast(message: "앗! 마지막 페이지를 초과했어요!")
+            return
         }
+        
+        if targetEndPage > startPage {
+            bookSettingInputModel.targetEndPage = targetEndPage
+            bookSettingInputModel.startPage = startPage
+            
+            focusedField = nil
+            bookSettingInputModel.nextPage()
+            return
+        }
+        
+        let message = startPage > targetEndPage
+            ? "앗! 시작 페이지는 마지막 페이지를 초과할 수 없어요!"
+            : "시작 페이지는 마지막 페이지와 같을 수 없어요!"
+        
+        toastViewModel.showToast(message: message)
+    }
+    
+    private func initializePageSettings() {
+        targetEndPage = bookSettingInputModel.startPage
+        targetEndPage = bookSettingInputModel.targetEndPage
+        
+        focusedField = .secondField
+    }
+    
+    private func trackPageSettingScreen() {
+        Tracking.Screen.pageSetting.setTracking()
     }
 }
