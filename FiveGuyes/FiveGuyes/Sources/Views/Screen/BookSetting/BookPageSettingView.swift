@@ -23,7 +23,7 @@ struct BookPageSettingView: View {
     
     @StateObject private var toastViewModel = ToastViewModel()
     
-    // TODO: 사용자 입력 값 유효성 검사 로직 추가 (ex. 시작 페이지 < 끝 페이지) 🐯🐯🐯🐯🐯
+    
     var body: some View {
         let title = bookSettingInputModel.selectedBook?.title ?? "제목 없음"
         
@@ -114,6 +114,12 @@ struct BookPageSettingView: View {
     }
     
     private func nextButtonTapped() {
+        if targetEndPage > bookSettingInputModel.targetEndPage {
+            targetEndPage = bookSettingInputModel.targetEndPage
+            toastViewModel.showToast(message: "앗! 마지막 페이지를 초과했어요!")
+            return
+        }
+        
         if targetEndPage > startPage {
             bookSettingInputModel.targetEndPage = targetEndPage
             bookSettingInputModel.startPage = startPage
@@ -133,6 +139,7 @@ struct BookPageSettingView: View {
     private func initializePageSettings() {
         targetEndPage = bookSettingInputModel.startPage
         targetEndPage = bookSettingInputModel.targetEndPage
+        
         focusedField = .secondField
     }
     
