@@ -21,6 +21,8 @@ struct BookPageSettingView: View {
     
     @FocusState private var focusedField: FieldFocus?
     
+    @StateObject private var toastViewModel = ToastViewModel()
+    
     // TODO: 사용자 입력 값 유효성 검사 로직 추가 (ex. 시작 페이지 < 끝 페이지) 🐯🐯🐯🐯🐯
     var body: some View {
         let title = bookSettingInputModel.selectedBook?.title ?? "제목 없음"
@@ -60,12 +62,16 @@ struct BookPageSettingView: View {
             Spacer()
             
             if focusedField != nil {
-                Button(action: nextButtonTapped) {
-                    Text("다음")
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 56)
-                        .background(Color.Colors.green1)
-                        .foregroundStyle(Color.Fills.white)
+                VStack(spacing: 22) {
+                    ToastView(viewModel: toastViewModel)
+                    
+                    Button(action: nextButtonTapped) {
+                        Text("다음")
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 56)
+                            .background(Color.Colors.green1)
+                            .foregroundStyle(Color.Fills.white)
+                    }
                 }
                 .ignoresSafeArea(.keyboard, edges: .bottom)
             }
@@ -108,11 +114,20 @@ struct BookPageSettingView: View {
     }
     
     private func nextButtonTapped() {
-        bookSettingInputModel.targetEndPage = targetEndPage
-        bookSettingInputModel.startPage = startPage
+        if targetEndPage > startPage {
+            bookSettingInputModel.targetEndPage = targetEndPage
+            bookSettingInputModel.startPage = startPage
+            
+            focusedField = nil
+            bookSettingInputModel.nextPage()
+            return
+        }
         
-        focusedField = nil
-        bookSettingInputModel.nextPage()
+        let message = startPage > targetEndPage
+            ? "앗! 시작 페이지는 마지막 페이지를 초과할 수 없어요!"
+            : "시작 페이지는 마지막 페이지와 같을 수 없어요!"
+        
+        toastViewModel.showToast(message: message)
     }
     
     private func initializePageSettings() {
@@ -120,7 +135,7 @@ struct BookPageSettingView: View {
         targetEndPage = bookSettingInputModel.targetEndPage
         focusedField = .secondField
     }
-
+    
     private func trackPageSettingScreen() {
         Tracking.Screen.pageSetting.setTracking()
     }
