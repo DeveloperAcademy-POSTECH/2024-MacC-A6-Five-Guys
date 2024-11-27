@@ -171,7 +171,7 @@ struct FinishGoalView: View {
                 // TODO: 해당 모델 객체를 더 잘 만들 방식 고민하기
                 let bookMetaData = BookMetaData(title: book.title, author: book.author, coverURL: book.cover, totalPages: totalPages)
                 var userSettings = UserSettings(startPage: startPage, targetEndPage: totalPages, startDate: startDate, targetEndDate: endDate, nonReadingDays: bookSettingInputModel.nonReadingDays)
-                var readingProgress = ReadingProgress()
+                let readingProgress = ReadingProgress(lastPagesRead: startPage)
                 let completionStatus = CompletionStatus()
   
                 calculator.calculateInitialDailyTargets(for: userSettings, progress: readingProgress)
