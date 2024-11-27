@@ -18,7 +18,7 @@ struct ReadingScheduleCalculator {
         
         var targetDate = settings.startDate
         var remainderOffset = remainderPages
-        var cumulativePages = 0
+        var cumulativePages = settings.startPage
         
         // 비독서일을 제외하고 읽어야 할 페이지를 초기 할당
         while progress.getReadingRecordsKey(targetDate) <= progress.getReadingRecordsKey(settings.targetEndDate) {
@@ -37,15 +37,11 @@ struct ReadingScheduleCalculator {
         while remainderOffset > 0 {
             let dateKey = progress.getReadingRecordsKey(remainderTargetDate)
             guard var record = progress.readingRecords[dateKey] else { return }
-            record.targetPages += 1
+            record.targetPages += remainderOffset
             progress.readingRecords[dateKey] = record
             remainderOffset -= 1
             remainderTargetDate = Calendar.current.date(byAdding: .day, value: -1, to: remainderTargetDate)!
         }
-        
-        // 초기화 시 읽은 페이지 관련 데이터 초기 설정
-        progress.lastReadDate = nil
-        progress.lastPagesRead = 0
     }
     
     ///  읽은 페이지 입력 메서드 (오늘 날짜에만 값을 넣을 수 있음)
@@ -114,7 +110,7 @@ struct ReadingScheduleCalculator {
             let dateKey = progress.getReadingRecordsKey(remainingTargetDate)
             
             guard var record = progress.readingRecords[dateKey] else { return }
-            record.targetPages += 1
+            record.targetPages += remainderOffset
             progress.readingRecords[dateKey] = record
             remainderOffset -= 1
             
@@ -157,7 +153,7 @@ struct ReadingScheduleCalculator {
             let dateKey = progress.getReadingRecordsKey(remainingTargetDate)
             guard var record = progress.readingRecords[dateKey] else { return }
             
-            record.targetPages += 1
+            record.targetPages += remainderOffset
             progress.readingRecords[dateKey] = record
             remainderOffset -= 1
             remainingTargetDate = Calendar.current.date(byAdding: .day, value: -1, to: remainingTargetDate)!
@@ -204,7 +200,7 @@ struct ReadingScheduleCalculator {
         let totalReadingDays = firstCalculateTotalReadingDays(settings: settings, progress: progress)
         
         // 총 페이지 수와 하루 할당량 계산
-        let totalPages = settings.targetEndPage - settings.startPage + 1
+        let totalPages = settings.targetEndPage - settings.startPage
         let pagesPerDay = totalPages / totalReadingDays
         let remainder = totalPages % totalReadingDays
         
