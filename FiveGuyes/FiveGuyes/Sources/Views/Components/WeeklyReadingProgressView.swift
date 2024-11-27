@@ -33,31 +33,21 @@ struct WeeklyReadingProgressView: View {
                         
                         // 텍스트 상수 정의
                         let primaryMessage = hasCompletedToday
-                            ? "오늘도 성공이에요! 화이팅 🤩"
-                            : isMidnightToFourAM
-                                ? "아직 늦지 않았어요! 기록해볼까요?"
-                                : "오늘은 \(todayRecords.targetPages)쪽 까지 읽어야해요!"
+                        ? "오늘도 성공이에요! 화이팅 🤩"
+                        : isMidnightToFourAM
+                        ? "아직 늦지 않았어요! 기록해볼까요?"
+                        : "오늘은 \(todayRecords.targetPages)쪽 까지 읽어야해요!"
                         
                         let secondaryMessage = !hasCompletedToday && isMidnightToFourAM
-                            ? "지금 기록해도 어제의 하루로 저장돼요!"
-                            : "매일 방문하고 기록을 남겨보세요"
+                        ? "지금 기록해도 어제의 하루로 저장돼요!"
+                        : "매일 방문하고 기록을 남겨보세요"
                         
-                        Text(primaryMessage)
-                            .font(.system(size: 17, weight: .semibold))
-                            .foregroundColor(.black)
+                        primaryMessageText(primaryMessage)
+                        secondaryMessageText(secondaryMessage)
                         
-                        Text(secondaryMessage)
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundColor(Color(red: 0.24, green: 0.24, blue: 0.26).opacity(0.6))
                     } else {
-                        // TODO: 쉬는 날 텍스트 수정하기 🐯🐯🐯🐯🐯
-                        Text("쉬는 날")
-                            .font(.system(size: 17, weight: .semibold))
-                            .foregroundColor(.black)
-                        
-                        Text("우아아아아")
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundColor(Color(red: 0.24, green: 0.24, blue: 0.26).opacity(0.6))
+                        primaryMessageText("오늘은 쉬는 날이에요! 잠시 쉬어가요 📖💤")
+                        secondaryMessageText("하루 쉬어가도 괜찮아요. 꾸준함이 중요하니까요!")
                     }
                 }
                 .padding(.top, 22)
@@ -102,6 +92,19 @@ struct WeeklyReadingProgressView: View {
             .shadow(color: Color(red: 0.84, green: 0.84, blue: 0.84).opacity(0.25), radius: 2, x: 0, y: 4)
         }
     }
+    
+    private func primaryMessageText(_ message: String) -> some View {
+        Text(message)
+            .fontStyle(.body, weight: .semibold)
+            .foregroundStyle(Color.Labels.primaryBlack1)
+    }
+    
+    private func secondaryMessageText(_ message: String) -> some View {
+        Text(message)
+            .font(.system(size: 14, weight: .medium))
+            .foregroundStyle(Color.Labels.secondaryBlack2)
+    }
+    
 }
 
 #Preview {
