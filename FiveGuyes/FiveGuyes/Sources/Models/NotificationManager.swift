@@ -6,15 +6,12 @@
 //
 
 import UserNotifications
-
+// TODO: 노티 시간을 바꿀 수 있으니 요청한 노티를 찾아서 시간을 바꿔주는 로직 추가하기
 final class NotificationManager {
     private let notificationCenter = UNUserNotificationCenter.current()
-    private var isGranted: Bool = false
     
     func setupNotifications(notificationType: NotificationType) async {
-        await requestAuthorization()
-        
-        if isGranted {
+        if await requestAuthorization() {
             await scheduleReminderNotification(notificationType: notificationType)
         }
     }
@@ -25,22 +22,23 @@ final class NotificationManager {
     }
     
     /// Notification 권한 요청 함수
-    private func requestAuthorization() async {
+     func requestAuthorization() async -> Bool {
         do {
             try await notificationCenter
                 .requestAuthorization(options: [.sound, .badge, .alert])
+            return await getCurrentSettings()
         } catch {
             print("❌ NotificationManager/requestAuthorization: \(error.localizedDescription)")
+            return false
         }
-        
-        await getCurrentSettings()
     }
     
     /// 현재 Notification 권한 설정을 가져오는 함수
-    private func getCurrentSettings() async {
+     private func getCurrentSettings() async -> Bool {
         let currentSettings = await notificationCenter.notificationSettings()
+        let isAuthorized = (currentSettings.authorizationStatus == .authorized)
         
-        isGranted = (currentSettings.authorizationStatus == .authorized)
+        return isAuthorized
     }
     
     private func scheduleReminderNotification(notificationType: NotificationType) async {

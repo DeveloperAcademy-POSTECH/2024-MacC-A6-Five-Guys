@@ -5,50 +5,59 @@
 //  Created by zaehorang on 11/27/24.
 //
 
-import SwiftData
 import SwiftUI
 
 struct NotiSettingView: View {
-    @State private var isNotiDisabled: Bool = false // 모든 알람 수신 토글
+    @Environment(\.scenePhase) private var scenePhase // 앱 상태 감지
+    
     @State private var selectedTime: Date = Date() // 데이트 피커에 사용될 시간
+    
+    @State private var isNotificationDisabled: Bool = false // 모든 알람 수신 토글
     @State private var isReminderTimePickerVisible: Bool = false // 데이트 피커 표시 여부
+    @State private var isSystemNotificationEnabled = true // 시스템 노티 권한 여부
     
-    // TODO: 실제 노티 설정 값 불러오기
-    @State private var isNotificationDisabled = true
+    private let notificationManager = NotificationManager()
     
+    // Toggle 바인딩 변수
+    private var isNotificationToggleEnabled: Binding<Bool> {
+        Binding(
+            get: { !isNotificationDisabled },
+            set: { isNotificationDisabled = !$0 }
+        )
+    }
+    
+    // 시간 범위 설정: 04:00 ~ 23:55
+    private var timeSelectionRange: ClosedRange<Date> {
+        let calendar = Calendar.current
+        let now = Date()
+        let startOfDay = calendar.startOfDay(for: now)
+        let start = calendar.date(bySettingHour: 4, minute: 0, second: 0, of: startOfDay)!
+        let end = calendar.date(bySettingHour: 23, minute: 55, second: 0, of: startOfDay)!
+        return start...end
+    }
+
     var body: some View {
         ZStack {
             Color.white // 배경색 지정
                 .ignoresSafeArea()
             
             VStack(alignment: .leading, spacing: .zero) {
-                if isNotificationDisabled {
+                if !isSystemNotificationEnabled {
                     notificationDisabledView
                 }
                 
-                VStack(alignment: .leading, spacing: .zero) {
-                    Toggle("알림 끄기", isOn: $isNotiDisabled)
-                        .toggleStyle(.switch)
-                        .fontStyle(.title2, weight: .semibold)
-                        .foregroundStyle(Color.Labels.primaryBlack1)
-                    secondaryTitle("한입독서와 관련된 알림 수신이 중단돼요")
-                }
+                toggleSection
                 
-                Rectangle()
-                    .stroke(lineWidth: 2)
-                    .frame(height: 1)
-                    .foregroundStyle(Color.Separators.gray)
+                dividerLine
                     .padding(.top, 12)
                 
                 // 하루 독서 미완료 알림
-                timePickerSection(
-                    title: "리마인드 알림",
-                    description: "지정된 시간에 오늘의 독서 목표를 알릴게요",
-                    selectedTime: $selectedTime,
-                    isPickerVisible: $isReminderTimePickerVisible,
-                    allowedRange: timeSelectionRange
-                )
-                .padding(.top, 16)
+                timePickerSection
+                    .padding(.top, 16)
+                
+                if isReminderTimePickerVisible {
+                    timePicker
+                }
                 
                 Spacer()
             }
@@ -59,18 +68,31 @@ struct NotiSettingView: View {
         .navigationBarBackButtonHidden(true)
         .customNavigationBackButton()
         .navigationTitle("알림 설정")
-        .onChange(of: isNotiDisabled) {
-            UserDefaults.standard.set(isNotiDisabled, forKey: UserDefaultsKeys.isNotificationDisabled.rawValue)
-        }
-        .onChange(of: selectedTime) {
-            saveTime(selectedTime) // 시간과 분 저장
+        .task {
+            isSystemNotificationEnabled = await notificationManager.requestAuthorization()
         }
         .onAppear {
-            loadInitialTime()
-            isNotiDisabled = UserDefaults.standard.bool(forKey: UserDefaultsKeys.isNotificationDisabled.rawValue)
+            loadInitialNotificationTime()
+            // 초기에 값이 없으면 false 리턴
+            isNotificationDisabled = UserDefaults.standard.bool(forKey: UserDefaultsKeys.isNotificationDisabled.rawValue)
+        }
+        
+        .onChange(of: isNotificationDisabled) {
+            saveNotificationStatus() // 노티 상태 저장
+        }
+        .onChange(of: selectedTime) {
+            saveNotificationTime(selectedTime) // 시간과 분 저장
+        }
+        .onChange(of: scenePhase) {
+            if scenePhase == .active { // 시스템 설정에 갔다가 다시 오는 상황 체크
+                Task {
+                    isSystemNotificationEnabled = await notificationManager.requestAuthorization()
+                }
+            }
         }
     }
     
+    // MARK: - View Property
     private func primaryTitle(_ title: String) -> some View {
         Text(title)
             .fontStyle(.title2, weight: .semibold)
@@ -86,12 +108,7 @@ struct NotiSettingView: View {
     }
     
     private var notificationDisabledView: some View {
-        Button {
-            // TODO: 노티 설정 화면으로 넘어가기
-            withAnimation(.easeIn) {
-                isNotificationDisabled.toggle()
-            }
-        } label: {
+        Button(action: SystemSettingsManager.openSettings) {
             HStack {
                 VStack(alignment: .leading, spacing: .zero) {
                     primaryTitle("기기의 알림 설정이 꺼져 있어요!")
@@ -116,54 +133,61 @@ struct NotiSettingView: View {
         }
     }
     
-    // 데이터 피커를 포함한 알림 리스트 row
-    private func timePickerSection (
-        title: String,
-        description: String,
-        selectedTime: Binding<Date>,
-        isPickerVisible: Binding<Bool>,
-        allowedRange: ClosedRange<Date>
-    ) -> some View {
-        
+    private var toggleSection: some View {
+        VStack(alignment: .leading, spacing: .zero) {
+            Toggle("알림 끄기", isOn: isNotificationToggleEnabled)
+                .toggleStyle(.switch)
+                .fontStyle(.title2, weight: .semibold)
+                .foregroundStyle(Color.Labels.primaryBlack1)
+            
+            secondaryTitle("한입독서와 관련된 알림 수신이 중단돼요")
+        }
+    }
+    
+    private var dividerLine: some View {
+        Rectangle()
+            .frame(height: 1)
+            .foregroundStyle(Color.Separators.gray)
+    }
+    
+    // 데이터 피커를 포함한 섹션
+    private var timePickerSection: some View {
         VStack(alignment: .leading, spacing: .zero) {
             HStack {
-                primaryTitle(title)
-                
+                primaryTitle("리마인드 알림")
                 Spacer()
-                
-                Button {
-                    withAnimation(.easeIn) {
-                        isPickerVisible.wrappedValue.toggle()
-                    }
-                } label: {
-                    Text(selectedTime.wrappedValue, style: .time)
-                        .fontStyle(.body)
-                        .foregroundStyle(Color.Colors.green2)
-                        .multilineTextAlignment(.center)
-                        .frame(width: 80, alignment: .center)
-                }
-                .padding(4)
-                .background {
-                    RoundedRectangle(cornerRadius: 6)
-                        .foregroundStyle(Color.Fills.lightGreen)
-                }
+                timerPickerButton
             }
-            
-            secondaryTitle(description)
-            
-            if isPickerVisible.wrappedValue {
-                timePicker(selectedTime: selectedTime, allowedRange: allowedRange)
+            secondaryTitle("지정된 시간에 오늘의 독서 목표를 알릴게요")
+        }
+    }
+    
+    private var timerPickerButton: some View {
+        Button {
+            withAnimation(.easeIn) {
+                isReminderTimePickerVisible.toggle()
             }
+        } label: {
+            Text(selectedTime, style: .time)
+                .fontStyle(.body)
+                .foregroundStyle(Color.Colors.green2)
+                .multilineTextAlignment(.center)
+                .frame(width: 80, alignment: .center)
+        }
+        .padding(4)
+        .background {
+            RoundedRectangle(cornerRadius: 6)
+                .foregroundStyle(Color.Fills.lightGreen)
         }
     }
     
     // 실제로 데이터 피커가 보이는곳에 쓰이는 피커 컴포넌트
-    private func timePicker(selectedTime: Binding<Date>, allowedRange: ClosedRange<Date>) -> some View {
+    private var timePicker: some View {
         VStack {
             DatePicker(
                 "",
-                selection: selectedTime,
-                in: allowedRange,
+                selection: $selectedTime,
+                in: timeSelectionRange,
                 displayedComponents: .hourAndMinute
             )
             .datePickerStyle(WheelDatePickerStyle())
@@ -177,29 +201,25 @@ struct NotiSettingView: View {
             UIDatePicker.appearance().minuteInterval = 1
         }
     }
-    
-    // 시간 범위 설정: 04:00 ~ 23:55
-    private var timeSelectionRange: ClosedRange<Date> {
-        let calendar = Calendar.current
-        let now = Date()
-        let startOfDay = calendar.startOfDay(for: now)
-        let start = calendar.date(bySettingHour: 4, minute: 0, second: 0, of: startOfDay)!
-        let end = calendar.date(bySettingHour: 23, minute: 55, second: 0, of: startOfDay)!
-        return start...end
-    }
-    
+        
+    // MARK: - Method
     // 시간과 분만 저장
-    private func saveTime(_ time: Date) {
+    private func saveNotificationTime(_ time: Date) {
         let calendar = Calendar.current
         let hour = calendar.component(.hour, from: time)
         let minute = calendar.component(.minute, from: time)
         print("Save: \(hour): \(minute)")
+        
         UserDefaults.standard.set(hour, forKey: UserDefaultsKeys.reminderHour.rawValue)
         UserDefaults.standard.set(minute, forKey: UserDefaultsKeys.reminderMinute.rawValue)
     }
     
+    private func saveNotificationStatus() {
+        UserDefaults.standard.set(isNotificationDisabled, forKey: UserDefaultsKeys.isNotificationDisabled.rawValue)
+    }
+ 
     // 저장된 시간과 분 불러오기
-    private func loadInitialTime() {
+    private func loadInitialNotificationTime() {
         let calendar = Calendar.current
         let hour = UserDefaults.standard.integer(forKey: UserDefaultsKeys.reminderHour.rawValue) // 저장된 시간
         let minute = UserDefaults.standard.integer(forKey: UserDefaultsKeys.reminderMinute.rawValue) // 저장된 분

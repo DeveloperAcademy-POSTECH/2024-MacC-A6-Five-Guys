@@ -34,6 +34,7 @@
 		264440592CD8F6020031A290 /* CustomBackButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 264440582CD8F6020031A290 /* CustomBackButton.swift */; };
 		2644405B2CD8F9380031A290 /* UINavigationController+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2644405A2CD8F9380031A290 /* UINavigationController+Extension.swift */; };
 		264443E82CF85277009422BA /* UserDefaultsKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 264443E72CF85277009422BA /* UserDefaultsKey.swift */; };
+		264443EA2CF861E5009422BA /* SystemSettingsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 264443E92CF861E5009422BA /* SystemSettingsManager.swift */; };
 		2655532F2CF6D73900288037 /* NotiSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2655532E2CF6D73900288037 /* NotiSettingView.swift */; };
 		26890B952CAE811A008DFF49 /* FiveGuyesApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26890B942CAE811A008DFF49 /* FiveGuyesApp.swift */; };
 		26890B972CAE811A008DFF49 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26890B962CAE811A008DFF49 /* ContentView.swift */; };
@@ -110,6 +111,7 @@
 		264440582CD8F6020031A290 /* CustomBackButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomBackButton.swift; sourceTree = "<group>"; };
 		2644405A2CD8F9380031A290 /* UINavigationController+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UINavigationController+Extension.swift"; sourceTree = "<group>"; };
 		264443E72CF85277009422BA /* UserDefaultsKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsKey.swift; sourceTree = "<group>"; };
+		264443E92CF861E5009422BA /* SystemSettingsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemSettingsManager.swift; sourceTree = "<group>"; };
 		2655532E2CF6D73900288037 /* NotiSettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotiSettingView.swift; sourceTree = "<group>"; };
 		26890B912CAE811A008DFF49 /* FiveGuyes.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FiveGuyes.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		26890B942CAE811A008DFF49 /* FiveGuyesApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FiveGuyesApp.swift; sourceTree = "<group>"; };
@@ -444,6 +446,7 @@
 				26EBDE2B2CE1341800B3A2BC /* ReadingRecord.swift */,
 				26EBDED02CF45AB300B3A2BC /* UserBookModelV2 */,
 				26EBDECE2CF4597100B3A2BC /* UserBookModelV1 */,
+				264443E92CF861E5009422BA /* SystemSettingsManager.swift */,
 			);
 			path = UserBook;
 			sourceTree = "<group>";
@@ -579,6 +582,7 @@
 				26EBDED62CF45B3400B3A2BC /* BookMetaData.swift in Sources */,
 				26EBDE8F2CF0684900B3A2BC /* View+Extension.swift in Sources */,
 				26EBDED82CF45B9300B3A2BC /* CompletionStatus.swift in Sources */,
+				264443EA2CF861E5009422BA /* SystemSettingsManager.swift in Sources */,
 				264443E82CF85277009422BA /* UserDefaultsKey.swift in Sources */,
 				1A010EB62CD8AF9800FBE3B3 /* BookSearchViewModel.swift in Sources */,
 				26EBDED22CF45ACA00B3A2BC /* ReadingProgress.swift in Sources */,
