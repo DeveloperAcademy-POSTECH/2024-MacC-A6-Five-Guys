@@ -11,7 +11,7 @@ import SwiftUI
 enum Screens: Hashable {
     case empty
     case mainHome
-    case empthNoti
+    case notiSetting
     case bookSettingsManager
     case totalCalendar
     case dailyProgress
@@ -30,8 +30,8 @@ final class NavigationCoordinator {
         case .empty: EmptyView()
         case .mainHome: 
             MainHomeView()
-        case .empthNoti:
-            EmptyNotiView()
+        case .notiSetting:
+            NotiSettingView()
         case .bookSettingsManager:
             BookSettingsManagerView()
         case .totalCalendar:

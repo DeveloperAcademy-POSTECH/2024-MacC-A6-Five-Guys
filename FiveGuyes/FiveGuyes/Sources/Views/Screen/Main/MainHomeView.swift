@@ -34,7 +34,7 @@ struct MainHomeView: View {
                     HStack {
                         Spacer()
                         notiButton {
-                            navigationCoordinator.push(.empthNoti)
+                            navigationCoordinator.push(.notiSetting)
                         }
                     }
                     .padding(.bottom, 42)
