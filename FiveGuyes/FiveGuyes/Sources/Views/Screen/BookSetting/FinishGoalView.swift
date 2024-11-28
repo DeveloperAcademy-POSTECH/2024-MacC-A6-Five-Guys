@@ -190,8 +190,9 @@ struct FinishGoalView: View {
     }
 
     private func setNotification(_ readingBook: UserBook) {
-        notificationManager.clearRequests()
         Task {
+            await notificationManager.clearRequests()
+            
             await self.notificationManager.setupNotifications(notificationType: .morning(readingBook: readingBook))
             
             await self.notificationManager.setupNotifications(notificationType: .night(readingBook: readingBook))

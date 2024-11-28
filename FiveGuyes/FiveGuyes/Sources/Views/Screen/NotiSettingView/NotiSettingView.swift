@@ -5,9 +5,12 @@
 //  Created by zaehorang on 11/27/24.
 //
 
+import SwiftData
 import SwiftUI
 
 struct NotiSettingView: View {
+    typealias UserBook = UserBookSchemaV2.UserBookV2
+    
     @Environment(\.scenePhase) private var scenePhase // 앱 상태 감지
     
     @State private var selectedTime: Date = Date() // 데이트 피커에 사용될 시간
@@ -15,6 +18,12 @@ struct NotiSettingView: View {
     @State private var isNotificationDisabled: Bool = false // 모든 알람 수신 토글
     @State private var isReminderTimePickerVisible: Bool = false // 데이트 피커 표시 여부
     @State private var isSystemNotificationEnabled = true // 시스템 노티 권한 여부
+    
+    @State private var notificationStatusTask: Task<Void, Never>?
+    @State private var notificationTimeTask: Task<Void, Never>?
+    
+    @Query(filter: #Predicate<UserBook> { $0.completionStatus.isCompleted == false })
+    private var currentlyReadingBooks: [UserBook]  // 현재 읽고 있는 책을 가져오는 쿼리
     
     private let notificationManager = NotificationManager()
     
@@ -35,8 +44,10 @@ struct NotiSettingView: View {
         let end = calendar.date(bySettingHour: 23, minute: 55, second: 0, of: startOfDay)!
         return start...end
     }
-
+    
     var body: some View {
+        let userBook = currentlyReadingBooks.first ?? UserBook.dummyUserBookV2
+        
         ZStack {
             Color.white // 배경색 지정
                 .ignoresSafeArea()
@@ -72,16 +83,26 @@ struct NotiSettingView: View {
             isSystemNotificationEnabled = await notificationManager.requestAuthorization()
         }
         .onAppear {
-            loadInitialNotificationTime()
-            // 초기에 값이 없으면 false 리턴
-            isNotificationDisabled = UserDefaults.standard.bool(forKey: UserDefaultsKeys.isNotificationDisabled.rawValue)
+            fetchNotificationTime()
+            fetchNotificationDisabled()
         }
-        
         .onChange(of: isNotificationDisabled) {
-            saveNotificationStatus() // 노티 상태 저장
+            // 기존 Task 취소
+            notificationStatusTask?.cancel()
+            
+            // 새로운 Task 생성
+            notificationStatusTask = Task {
+                await handleNotificationStatusChange(isDisabled: isNotificationDisabled, userBook: userBook)
+            }
         }
         .onChange(of: selectedTime) {
-            saveNotificationTime(selectedTime) // 시간과 분 저장
+            // 기존 Task 취소
+            notificationTimeTask?.cancel()
+            
+            // 새로운 Task 생성
+            notificationTimeTask = Task {
+                await handleNotificationTimeChange(newTime: selectedTime, userBook: userBook)
+            }
         }
         .onChange(of: scenePhase) {
             if scenePhase == .active { // 시스템 설정에 갔다가 다시 오는 상황 체크
@@ -201,7 +222,7 @@ struct NotiSettingView: View {
             UIDatePicker.appearance().minuteInterval = 1
         }
     }
-        
+    
     // MARK: - Method
     // 시간과 분만 저장
     private func saveNotificationTime(_ time: Date) {
@@ -210,25 +231,41 @@ struct NotiSettingView: View {
         let minute = calendar.component(.minute, from: time)
         print("Save: \(hour): \(minute)")
         
-        UserDefaults.standard.set(hour, forKey: UserDefaultsKeys.reminderHour.rawValue)
-        UserDefaults.standard.set(minute, forKey: UserDefaultsKeys.reminderMinute.rawValue)
+        UserDefaultsManager.saveNotificationTime(hour: hour, minute: minute)
     }
     
-    private func saveNotificationStatus() {
-        UserDefaults.standard.set(isNotificationDisabled, forKey: UserDefaultsKeys.isNotificationDisabled.rawValue)
+    private func saveNotificationStatus(_ isNotificationDisabled: Bool) {
+        UserDefaultsManager.saveNotificationDisabled(isNotificationDisabled)
     }
- 
+    
     // 저장된 시간과 분 불러오기
-    private func loadInitialNotificationTime() {
+    private func fetchNotificationTime() {
         let calendar = Calendar.current
-        let hour = UserDefaults.standard.integer(forKey: UserDefaultsKeys.reminderHour.rawValue) // 저장된 시간
-        let minute = UserDefaults.standard.integer(forKey: UserDefaultsKeys.reminderMinute.rawValue) // 저장된 분
+        let (hour, minute) = UserDefaultsManager.fetchNotificationReminderTime()
         
-        if hour != 0 || minute != 0 { // 저장된 값이 있을 경우
-            selectedTime = calendar.date(bySettingHour: hour, minute: minute, second: 0, of: Date()) ?? Date()
-        } else { // 기본값 설정 (오후 9:00)
-            selectedTime = calendar.date(bySettingHour: 09, minute: 0, second: 0, of: Date()) ?? Date()
+        selectedTime =
+        calendar.date(bySettingHour: hour, minute: minute, second: 0, of: Date()) ?? Date()
+    }
+    
+    private func fetchNotificationDisabled() {
+        isNotificationDisabled = UserDefaultsManager.fetchNotificationDisabled()
+    }
+    
+    private func handleNotificationStatusChange(isDisabled: Bool, userBook: UserBook) async {
+        saveNotificationStatus(isDisabled)
+        
+        if isDisabled {
+            await notificationManager.clearRequests()
+        } else {
+            await notificationManager.setupNotifications(notificationType: .morning(readingBook: userBook))
+            await notificationManager.setupNotifications(notificationType: .night(readingBook: userBook))
         }
+    }
+    
+    private func handleNotificationTimeChange(newTime: Date, userBook: UserBook) async {
+        saveNotificationTime(newTime)
+        
+        await notificationManager.updateNotification(notificationType: .morning(readingBook: userBook))
     }
 }
 

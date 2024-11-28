@@ -33,8 +33,8 @@ struct DailyProgressView: View {
         let userBook = currentlyReadingBooks.first ?? UserBook.dummyUserBookV2
         
         let bookMetadata: BookMetaDataProtocol = userBook.bookMetaData
-        var userSettings: UserSettingsProtocol = userBook.userSettings
-        var readingProgress: any ReadingProgressProtocol = userBook.readingProgress
+        let userSettings: UserSettingsProtocol = userBook.userSettings
+        let readingProgress: any ReadingProgressProtocol = userBook.readingProgress
         
         let isTodayCompletionDate = Calendar.current.isDate(today, inSameDayAs: userSettings.targetEndDate)
         
@@ -161,8 +161,9 @@ struct DailyProgressView: View {
     }
     
     private func setNotification(_ readingBook: UserBook) {
-        notificationManager.clearRequests()
         Task {
+            await notificationManager.clearRequests()
+            
             await self.notificationManager.setupNotifications(notificationType: .morning(readingBook: readingBook))
             
             await self.notificationManager.setupNotifications(notificationType: .night(readingBook: readingBook))
