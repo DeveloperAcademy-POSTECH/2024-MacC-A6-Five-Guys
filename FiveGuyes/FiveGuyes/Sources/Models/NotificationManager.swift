@@ -9,38 +9,51 @@ import UserNotifications
 
 final class NotificationManager {
     private let notificationCenter = UNUserNotificationCenter.current()
-    private var isGranted: Bool = false
     
+    /// 알림을 보낼 수 있는지 확인
+    private func canSendNotifications() async -> Bool {
+        let isSystemAuthorized = await requestAuthorization()
+        let isAppEnabled = !UserDefaultsManager.fetchNotificationDisabled()
+        return isSystemAuthorized && isAppEnabled
+    }
+    
+    /// 노티를 요청하는 메서드
     func setupNotifications(notificationType: NotificationType) async {
-        await requestAuthorization()
-        
-        if isGranted {
+        if await canSendNotifications() {
             await scheduleReminderNotification(notificationType: notificationType)
         }
     }
     
-    /// 요청한 Noticifation을 모두 지우는 함수
-    func clearRequests() {
-        notificationCenter.removeAllPendingNotificationRequests()
-    }
-    
     /// Notification 권한 요청 함수
-    private func requestAuthorization() async {
+     func requestAuthorization() async -> Bool {
         do {
             try await notificationCenter
                 .requestAuthorization(options: [.sound, .badge, .alert])
+            return await getCurrentSettings()
         } catch {
             print("❌ NotificationManager/requestAuthorization: \(error.localizedDescription)")
+            return false
         }
-        
-        await getCurrentSettings()
+    }
+    
+    /// 요청한 Noticifation을 모두 지우는 함수
+    func clearRequests() async {
+        notificationCenter.removeAllPendingNotificationRequests()
+    }
+    
+    /// 알림 요청을 삭제 후 재등록
+    func updateNotification(notificationType: NotificationType) async {
+        let identifier = notificationType.identifier()
+        notificationCenter.removePendingNotificationRequests(withIdentifiers: [identifier]) // 기존 알림 삭제
+        await scheduleReminderNotification(notificationType: notificationType) // 새로운 알림 등록
     }
     
     /// 현재 Notification 권한 설정을 가져오는 함수
-    private func getCurrentSettings() async {
+     private func getCurrentSettings() async -> Bool {
         let currentSettings = await notificationCenter.notificationSettings()
+        let isAuthorized = (currentSettings.authorizationStatus == .authorized)
         
-        isGranted = (currentSettings.authorizationStatus == .authorized)
+        return isAuthorized
     }
     
     private func scheduleReminderNotification(notificationType: NotificationType) async {
