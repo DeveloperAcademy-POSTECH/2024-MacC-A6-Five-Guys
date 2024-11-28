@@ -6,19 +6,22 @@
 //
 
 import UserNotifications
-// TODO: 노티 시간을 바꿀 수 있으니 요청한 노티를 찾아서 시간을 바꿔주는 로직 추가하기
+
 final class NotificationManager {
     private let notificationCenter = UNUserNotificationCenter.current()
     
-    func setupNotifications(notificationType: NotificationType) async {
-        if await requestAuthorization() {
-            await scheduleReminderNotification(notificationType: notificationType)
-        }
+    /// 알림을 보낼 수 있는지 확인
+    private func canSendNotifications() async -> Bool {
+        let isSystemAuthorized = await requestAuthorization()
+        let isAppEnabled = !UserDefaultsManager.fetchNotificationDisabled()
+        return isSystemAuthorized && isAppEnabled
     }
     
-    /// 요청한 Noticifation을 모두 지우는 함수
-    func clearRequests() {
-        notificationCenter.removeAllPendingNotificationRequests()
+    /// 노티를 요청하는 메서드
+    func setupNotifications(notificationType: NotificationType) async {
+        if await canSendNotifications() {
+            await scheduleReminderNotification(notificationType: notificationType)
+        }
     }
     
     /// Notification 권한 요청 함수
@@ -31,6 +34,18 @@ final class NotificationManager {
             print("❌ NotificationManager/requestAuthorization: \(error.localizedDescription)")
             return false
         }
+    }
+    
+    /// 요청한 Noticifation을 모두 지우는 함수
+    func clearRequests() async {
+        notificationCenter.removeAllPendingNotificationRequests()
+    }
+    
+    /// 알림 요청을 삭제 후 재등록
+    func updateNotification(notificationType: NotificationType) async {
+        let identifier = notificationType.identifier()
+        notificationCenter.removePendingNotificationRequests(withIdentifiers: [identifier]) // 기존 알림 삭제
+        await scheduleReminderNotification(notificationType: notificationType) // 새로운 알림 등록
     }
     
     /// 현재 Notification 권한 설정을 가져오는 함수
