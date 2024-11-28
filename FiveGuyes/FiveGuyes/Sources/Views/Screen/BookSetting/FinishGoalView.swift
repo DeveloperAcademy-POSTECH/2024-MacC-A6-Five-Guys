@@ -42,7 +42,7 @@ struct FinishGoalView: View {
                         .padding(.bottom, 14)
                     
                     Text("완독 목표 설정 완료")
-                        .font(.system(size: 16, weight: .medium))
+                        .fontStyle(.title2, weight: .semibold)
                         .foregroundColor(Color(red: 0.03, green: 0.68, blue: 0.41))
                         .padding(.horizontal, 8)
                         .padding(.vertical, 4)
@@ -54,7 +54,7 @@ struct FinishGoalView: View {
                         TextView(text: "매일 ")
                         
                         Text("\(pagesPerDay)")
-                            .font(.system(size: 24, weight: .semibold))
+                            .fontStyle(.title1, weight: .semibold)
                             .padding(.horizontal, 8)
                             .padding(.vertical, 4)
                             .foregroundColor(Color(red: 0.03, green: 0.68, blue: 0.41))
@@ -92,7 +92,7 @@ struct FinishGoalView: View {
                                 // 책 제목
                                 
                                 Text(book.title)
-                                    .font(.system(size: 16, weight: .semibold))
+                                    .fontStyle(.body, weight: .semibold)
                                     .padding(.top, 17)
                                     .lineLimit(1)
                                 
@@ -106,7 +106,7 @@ struct FinishGoalView: View {
                             // 완독 목표 기간
                             Text("\(startDate.toKoreanDateStringWithoutYear()) ~ \(endDate.toKoreanDateStringWithoutYear())")
                                 .foregroundColor(Color.black)
-                                .font(.system(size: 16))
+                                .fontStyle(.body)
                                 .lineLimit(1)
                                 .padding(.horizontal, 8)
                                 .padding(.vertical, 4)
@@ -116,7 +116,7 @@ struct FinishGoalView: View {
                             // 하루 권장 독서량
                             Text("하루 권장 독서량 : \(pagesPerDay)쪽")
                                 .foregroundColor(Color(red: 0.03, green: 0.68, blue: 0.41))
-                                .font(.system(size: 16, weight: .medium))
+                                .fontStyle(.body)
                                 .lineLimit(1)
                                 .padding(.horizontal, 8)
                                 .padding(.vertical, 4)

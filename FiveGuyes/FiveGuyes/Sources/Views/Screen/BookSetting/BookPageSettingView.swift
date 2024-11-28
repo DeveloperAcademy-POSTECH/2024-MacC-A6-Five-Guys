@@ -34,7 +34,6 @@ struct BookPageSettingView: View {
                 
                 HStack(spacing: 8) {
                     Text("총")
-                    
                     // 첫 번째 텍스트 필드
                     pageNumberTextField(
                         page: $startPage,
@@ -56,6 +55,7 @@ struct BookPageSettingView: View {
                     Spacer()
                 }
             }
+            .fontStyle(.title2, weight: .semibold)
             .padding(.top, 34)
             .padding(.horizontal, 20)
             
@@ -147,3 +147,4 @@ struct BookPageSettingView: View {
         Tracking.Screen.pageSetting.setTracking()
     }
 }
+

@@ -34,11 +34,11 @@ struct BookRowView: View {
                 
                 VStack(alignment: .leading) {
                     Text(book.title)
-                        .font(.system(size: 16))
+                        .fontStyle(.body, weight: .semibold)
                         .foregroundColor(Color(red: 0.12, green: 0.12, blue: 0.12))
                     
                     Text("\(book.author.removingParenthesesContent()) | \(book.pubDate.extractYear()) | \(book.publisher)")
-                        .font(.system(size: 14))
+                        .fontStyle(.caption1)
                         .foregroundColor(Color(red: 0.44, green: 0.44, blue: 0.44))
                 }
                 .frame(maxWidth: .infinity, alignment: .topLeading)

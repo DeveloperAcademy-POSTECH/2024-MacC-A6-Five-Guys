@@ -56,7 +56,7 @@ struct CompletionCelebrationView: View {
     
     private var celebrationTitle: some View {
         Text(celebrationTitleText)
-            .font(.system(size: 16, weight: .medium))
+            .fontStyle(.body, weight: .semibold)
             .foregroundStyle(.green)
             .padding(.vertical, 4)
             .padding(.horizontal, 8)
@@ -68,7 +68,7 @@ struct CompletionCelebrationView: View {
     
     private var celebrationMessage: some View {
         Text(celebrationMessageText)
-            .font(.system(size: 24, weight: .semibold))
+            .fontStyle(.title1, weight: .semibold)
             .foregroundStyle(.black)
             .multilineTextAlignment(.center)
     }
@@ -129,7 +129,7 @@ struct CompletionCelebrationView: View {
             navigationCoordinator.push(.completionReview)
         } label: {
             Text("완독 소감 작성하기")
-                .font(.system(size: 20, weight: .semibold))
+                .fontStyle(.title2, weight: .semibold)
                 .foregroundStyle(.white)
                 .frame(maxWidth: .infinity)
                 .frame(height: 56)

@@ -69,7 +69,7 @@ struct WeeklyReadingProgressView: View {
                 HStack {
                     Text("읽고 있는 책이 없어요!\n읽고 있는 책을 등록해주세요")
                         .lineSpacing(6)
-                        .font(.system(size: 16))
+                        .fontStyle(.body)
                         .foregroundColor(.black)
                     Spacer()
                 }
@@ -101,7 +101,7 @@ struct WeeklyReadingProgressView: View {
     
     private func secondaryMessageText(_ message: String) -> some View {
         Text(message)
-            .font(.system(size: 14, weight: .medium))
+            .fontStyle(.caption1)
             .foregroundStyle(Color.Labels.secondaryBlack2)
     }
     

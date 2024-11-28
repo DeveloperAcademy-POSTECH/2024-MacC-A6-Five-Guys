@@ -58,13 +58,13 @@ struct DailyProgressView: View {
                     .cornerRadius(16)
                     .keyboardType(.numberPad)
                     .multilineTextAlignment(.center)
-                    .font(.system(size: 24, weight: .semibold))
+                    .fontStyle(.title1, weight: .semibold)
                     .tint(Color.black)
                     .focused($isTextTextFieldFocused)
                 
                 Text("쪽")
                     .padding(.top, 20)
-                    .font(.system(size: 24, weight: .semibold))
+                    .fontStyle(.title1, weight: .semibold)
                 Spacer()
             }
             .padding(.horizontal, 20)
@@ -123,9 +123,12 @@ struct DailyProgressView: View {
             
         }
         .alert(isPresented: $showAlert) {
+            // TODO: 커스텀스타일 적용 어려워서 임의로 스타일 지정함 확인필요
             Alert(
-                title: Text(alertText),
-                message: Text(alertMessage),
+                title: Text(alertText)
+                    .alertFontStyle(.title3, weight: .semibold),
+                message: Text(alertMessage)
+                    .alertFontStyle(.caption1),
                 primaryButton: .cancel(Text("다시 작성하기")) {
                     // "다시 작성하기" 로직 (입력값 초기화)
                     pagesToReadToday = 0

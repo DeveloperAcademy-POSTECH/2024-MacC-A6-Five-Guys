@@ -26,7 +26,7 @@ struct CustomTextEditorStyle: ViewModifier {
             .foregroundStyle(.black)
             .clipShape(RoundedRectangle(cornerRadius: 16))
             .scrollContentBackground(.hidden)
-            .font(.system(size: 14))
+            .fontStyle(.body) // 수정 적용
     }
     
     @ViewBuilder
@@ -35,7 +35,7 @@ struct CustomTextEditorStyle: ViewModifier {
             Text(placeholder)
                 .padding(.top, 30)
                 .padding(.leading, 27)
-                .font(.system(size: 14))
+                .fontStyle(.body) // 수정 적용
                 .foregroundColor(.gray)
         }
     }

@@ -56,8 +56,10 @@ struct MainHomeView: View {
                             }
                             .alert(isPresented: $showReadingBookAlert) {
                                 Alert(
-                                    title: Text(mainAlertText),
-                                    message: Text(mainAlertMessage),
+                                    title: Text(mainAlertText)
+                                        .alertFontStyle(.title3, weight: .semibold),
+                                    message: Text(mainAlertMessage)
+                                        .alertFontStyle(.caption1),
                                     primaryButton: .cancel(Text("취소하기")),
                                     secondaryButton: .destructive(Text("삭제")) {
                                         if let currentReadingBook = currentlyReadingBooks.first {
@@ -79,6 +81,8 @@ struct MainHomeView: View {
                            let coverURL = currentReadingBook.bookMetaData.coverURL,
                            let url = URL(string: coverURL) {
                             // TODO: 옆에 책 제목, 저자 text 추가하기
+                            // 책제목 .fontStyle(.body, weight: .semibold)
+                            // 저자 .fontStyle(.caption1)
                             AsyncImage(url: url) { image in
                                 image
                                     .resizable()
@@ -168,7 +172,7 @@ struct MainHomeView: View {
             
             Spacer()
         }
-        .font(.system(size: 24, weight: .semibold))
+        .fontStyle(.title1, weight: .semibold)
         .foregroundColor(.black)
     }
     
@@ -194,7 +198,7 @@ struct MainHomeView: View {
                 Image(systemName: "calendar")
                 Text("전체")
             }
-            .font(.system(size: 20, weight: .medium))
+            .fontStyle(.title2, weight: .semibold)
             .frame(maxWidth: .infinity)
             .frame(height: 56)
             .foregroundColor(Color(red: 0.12, green: 0.12, blue: 0.12))
@@ -224,7 +228,7 @@ struct MainHomeView: View {
             }
         } label: {
             Text(isReadingBookAvailable ? "오늘 독서 현황 기록하기" : "+ 완독할 책 추가하기")
-                .font(.system(size: 20, weight: .semibold))
+                .fontStyle(.title2, weight: .semibold)
                 .foregroundColor(.white)
                 .frame(maxWidth: .infinity)
                 .frame(height: 56)

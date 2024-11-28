@@ -41,7 +41,7 @@ struct CompletionReviewView: View {
                         Text("<\(title)>\(title.postPositionParticle()) 완독하고...")
                         Text("어떤 영감을 얻었나요?")
                     }
-                    .font(.system(size: 24, weight: .semibold))
+                    .fontStyle(.title1, weight: .semibold)
                     .foregroundStyle(.black)
                     .lineLimit(1)
                     
@@ -81,7 +81,8 @@ struct CompletionReviewView: View {
             }
         }
         .alert(isPresented: $showAlert) {
-            Alert(title: Text("내용을 입력해주세요"),
+            Alert(title: Text("내용을 입력해주세요")
+                .alertFontStyle(.title3, weight: .semibold),
                   dismissButton: .default(Text("확인")))
         }
         .customNavigationBackButton()

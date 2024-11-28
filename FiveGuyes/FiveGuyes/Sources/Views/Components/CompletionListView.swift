@@ -30,7 +30,7 @@ struct CompletionListView: View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
                 Text("완독 리스트")
-                    .font(.system(size: 24, weight: .semibold))
+                    .fontStyle(.title1, weight: .semibold)
                     .foregroundColor(.black)
                 
                 Spacer()
@@ -66,10 +66,10 @@ struct CompletionListView: View {
                                     
                                     VStack(alignment: .leading, spacing: 0) {
                                         Text(book.bookMetaData.title)
-                                            .font(.system(size: 14, weight: .semibold))
+                                            .fontStyle(.caption1, weight: .semibold)
                                             .foregroundColor(.black)
                                         Text(book.bookMetaData.author)
-                                            .font(.system(size: 12, weight: .medium))
+                                            .fontStyle(.caption2)
                                             .foregroundColor(Color(red: 0.44, green: 0.44, blue: 0.44))
                                     }
                                     .lineLimit(1)
@@ -89,7 +89,7 @@ struct CompletionListView: View {
                     
                     VStack(alignment: .leading, spacing: 10) {
                         Text(selectedBook.completionStatus.completionReview)
-                            .font(.system(size: 16, weight: .medium))
+                            .fontStyle(.body)
                             .foregroundColor(.black)
                             .padding(.bottom, 10)
                         // TODO: 수정 버튼 추가하기
@@ -109,7 +109,7 @@ struct CompletionListView: View {
 //                                    .padding(.trailing, 3)
 //                            }
                         }
-                        .font(.system(size: 12, weight: .medium))
+                        .fontStyle(.caption2)
                         .foregroundColor(Color(red: 0.44, green: 0.44, blue: 0.44))
                     }
                     .padding(20)
@@ -130,10 +130,13 @@ struct CompletionListView: View {
         }
         // TODO: ❗️❗️❗️ 수정하기 기능 추가
         // 데이터를 지우니까 튕김
+        // FontStyle 적용해놓음
 //        .alert(isPresented: $showCompletionAlert) {
 //            Alert(
-//                title: Text(completionAlertText),
-//                message: Text(completionAlertMessage),
+//                title: Text(completionAlertText)
+//                    .alertFontStyle(.title3, weight: .semibold),
+//                message: Text(completionAlertMessage)
+//                    .alertFontStyle(.caption1),
 //                primaryButton: .cancel(Text("취소하기")),
 //                secondaryButton: .destructive(Text("삭제")) {
 //                    let book = completedBooks[selectedBookIndex]

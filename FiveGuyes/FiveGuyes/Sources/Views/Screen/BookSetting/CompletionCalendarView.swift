@@ -45,7 +45,7 @@ struct CompletionCalendarView: View {
                             TextField("", text: $totalPages)
                                 .focused($isTextTextFieldFocused)
                                 .keyboardType(.numberPad)
-                                .font(.system(size: 20, weight: .medium))
+                                .fontStyle(.title2, weight: .semibold)
                                 .fixedSize()
                                 .background {
                                     RoundedRectangle(cornerRadius: 7)
@@ -165,7 +165,8 @@ struct CompletionCalendarView: View {
                     
                     VStack(spacing: 0) {
                         Text(monthDate.toKoreanDateStringWithoutDay())
-                            .font(.system(size: 18, weight: .semibold))
+                        // TODO: 폰트 확인하기
+                            .fontStyle(.title3, weight: .semibold)
                             .padding(.bottom, 20)
                         
                         LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 0), count: 7), spacing: 16) {
@@ -253,8 +254,9 @@ struct CompletionCalendarView: View {
                 isSelectedDay ? Color.green : Color.clear
             )
             .foregroundColor(isSelectedDay ? .white : textColor) // 선택된 경우 화이트, 그렇지 않으면 전달된 색상 사용
-            .font(
-                isSelectedDay ? .system(size: 24, weight: .semibold) : .system(size: 16)
+            .fontStyle(
+                isSelectedDay ? .title2 : .body,
+                weight: isSelectedDay ? .semibold : .regular
             )
             .cornerRadius(26)
     }
@@ -336,7 +338,7 @@ struct CompletionCalendarView: View {
     private func nextButton() -> some View {
         Button(action: nextButtonAction) {
             Text(isFirstClick ? "다음" : "완료")
-                .font(.system(size: 20, weight: .semibold))
+                .fontStyle(.title2, weight: .semibold)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 16)
                 .background(startDate != nil && endDate != nil ? Color(red: 0.07, green: 0.87, blue: 0.54) : Color(red: 0.84, green: 0.84, blue: 0.84))

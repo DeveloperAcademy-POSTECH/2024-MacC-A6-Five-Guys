@@ -26,7 +26,7 @@ struct BookListView: View {
                     .onSubmit {
                         requestSearchBooks()
                     }
-                    .font(.system(size: 16))
+                    .fontStyle(.body)
                     .foregroundColor(.black)
                     
                     Spacer()

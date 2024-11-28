@@ -16,7 +16,7 @@ struct ToastView: View {
                 Spacer()
                 if viewModel.isVisible {
                     Text(viewModel.message)
-                        .font(.system(size: 16, weight: .semibold))
+                        .fontStyle(.body, weight: .semibold)
                         .padding(.horizontal, 20)
                         .padding(.vertical, 14)
                         .foregroundColor(.white)
