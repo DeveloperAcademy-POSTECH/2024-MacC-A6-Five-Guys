@@ -343,6 +343,7 @@
 			isa = PBXGroup;
 			children = (
 				26EBDECF2CF459DB00B3A2BC /* UserBook */,
+				264443E92CF861E5009422BA /* SystemSettingsManager.swift */,
 				1A010EAB2CD8A7E500FBE3B3 /* APIBooksModel.swift */,
 				26F19A792CDB5F3900F41D6D /* ReadingScheduleCalculator.swift */,
 				26EBDE2E2CE3856900B3A2BC /* NotificationType.swift */,
@@ -446,7 +447,6 @@
 				26EBDE2B2CE1341800B3A2BC /* ReadingRecord.swift */,
 				26EBDED02CF45AB300B3A2BC /* UserBookModelV2 */,
 				26EBDECE2CF4597100B3A2BC /* UserBookModelV1 */,
-				264443E92CF861E5009422BA /* SystemSettingsManager.swift */,
 			);
 			path = UserBook;
 			sourceTree = "<group>";
