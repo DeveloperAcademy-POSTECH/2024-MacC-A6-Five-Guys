@@ -24,7 +24,7 @@ struct WeeklyReadingProgressView: View {
             let todayRecords = currentReadingBook.readingProgress.getAdjustedReadingRecord(for: today)
             
             VStack(alignment: .leading, spacing: 17) {
-                VStack(alignment: .leading, spacing: 8) {
+                VStack(alignment: .leading, spacing: 0) {
                     if let todayRecords {
                         // 00~04시 여부 판단 ⏰
                         let isMidnightToFourAM = today.isInHourRange(start: 0, end: 4)
@@ -54,8 +54,8 @@ struct WeeklyReadingProgressView: View {
                 .padding(.horizontal, 24)
                 
                 WeeklyPageCalendarView(currentReadingBook: currentReadingBook)
-                    .padding(.horizontal, 15)
-                    .padding(.bottom, 21)
+                    .padding(.horizontal, 14)
+                    .padding(.bottom, 18)
                 
             }
             .background {
