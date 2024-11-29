@@ -35,15 +35,35 @@ final class ReadingProgress: ReadingProgressProtocol {
         return readingRecords[dateKey]
     }
     
+    /// 특정 주의 기록 가져오기
     func getAdjustedWeeklyRecorded(from today: Date) -> [ReadingRecord?] {
         let calendar = Calendar.current
-        let adjustedToday = calendar.date(byAdding: .hour, value: -4, to: today) ?? today
-        let startOfWeek = calendar.dateInterval(of: .weekOfMonth, for: adjustedToday)?.start ?? adjustedToday
+        let startOfWeek = calendar.dateInterval(of: .weekOfMonth, for: today)?.start ?? today
         
         return (0..<7).map { dayOffset in
             let date = calendar.date(byAdding: .day, value: dayOffset, to: startOfWeek)!
             return readingRecords[date.toYearMonthDayString()]
         }
+    }
+    
+    // 모든 주 시작 날짜를 계산
+    func getAllWeekStartDates(for settings: Settings) -> [Date] {
+        let firstDate = settings.startDate
+        let lastDate = settings.targetEndDate
+        
+        let calendar = Calendar.current
+        let firstWeekStart = calendar.dateInterval(of: .weekOfMonth, for: firstDate)?.start ?? firstDate
+        let lastWeekStart = calendar.dateInterval(of: .weekOfMonth, for: lastDate)?.start ?? lastDate
+        
+        var startDates: [Date] = []
+        var currentStart = firstWeekStart
+        
+        while currentStart <= lastWeekStart {
+            startDates.append(currentStart)
+            currentStart = calendar.date(byAdding: .weekOfMonth, value: 1, to: currentStart) ?? currentStart
+        }
+        
+        return startDates
     }
     
     // ReadingProgressCalculatable 구현
