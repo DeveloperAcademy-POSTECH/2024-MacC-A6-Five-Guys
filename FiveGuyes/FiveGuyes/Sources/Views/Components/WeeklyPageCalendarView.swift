@@ -18,8 +18,12 @@ struct WeeklyPageCalendarView: View {
     @State private var allWeekStartDates: [Date] = []
     @State private var currentWeekPageIndex: Int = 0
     
+    let todayIndex = Calendar.current.getAdjustedWeekdayIndex(from: Date())
+    
+    @State private var lastWeekIndex = 0
+    @State private var lastDayIndex = 0
+    
     var body: some View {
-        let todayIndex = Calendar.current.getAdjustedWeekdayIndex(from: today)
         
         ScrollViewReader { proxy in
             ScrollView(.horizontal, showsIndicators: false) {
@@ -31,6 +35,7 @@ struct WeeklyPageCalendarView: View {
                         
                         HStack(spacing: 0) { // 셀 간격을 없앰으로써 연결된 배경처럼 보이게 설정
                             ForEach(0..<daysOfWeek.count, id: \.self) { dayIndex in
+                                let record = weeklyRecords[dayIndex]
                                 VStack(spacing: 10) {
                                     
                                     // 요일 셀
@@ -38,14 +43,14 @@ struct WeeklyPageCalendarView: View {
                                     
                                     // 페이지 셀
                                     if weekPageIndex == currentWeekPageIndex { // 이번 주
-                                        currentWeekView(dayIndex: dayIndex, todayIndex: todayIndex, record: weeklyRecords[dayIndex])
+                                        currentWeekView(dayIndex: dayIndex, todayIndex: todayIndex, weekPageIndex: weekPageIndex, record: record)
                                             .frame(height: 40)
                                     } else if weekPageIndex < currentWeekPageIndex { // 과거
-                                        pastWeekView(dayIndex: dayIndex, record: weeklyRecords[dayIndex])
+                                        pastWeekView(dayIndex: dayIndex, record: record)
                                             .frame(height: 40)
                                         
                                     } else { // 미래
-                                        futureWeekView(record: weeklyRecords[dayIndex])
+                                        futureWeekView(dayIndex: dayIndex, weekPageIndex: weekPageIndex, record: record)
                                             .frame(height: 40)
                                         
                                     }
@@ -75,7 +80,14 @@ struct WeeklyPageCalendarView: View {
                     currentWeekPageIndex = todayWeekIndex
                 }
                 
-            // TODO: 마지막 날의 페이지 인덱스와 요일 인덱스 찾기
+                // TODO: 마지막 날의 페이지 인덱스와 요일 인덱스 찾기
+                calculateLastWeekAndDayIndex(
+                    totalWeeks: allWeekStartDates.count,
+                    targetEndDate: currentReadingBook.userSettings.targetEndDate
+                )
+                
+                print("🐯🐯🐯: \(lastWeekIndex) & \(lastDayIndex)")
+                
             }
             .onChange(of: currentWeekPageIndex) {
                 DispatchQueue.main.async {
@@ -101,24 +113,57 @@ struct WeeklyPageCalendarView: View {
         }
     }
     
-    private func currentWeekView(dayIndex: Int, todayIndex: Int, record: ReadingRecord?) -> some View {
+    private func currentWeekView(
+        dayIndex: Int,
+        todayIndex: Int,
+        weekPageIndex: Int,
+        record: ReadingRecord?
+    ) -> some View {
         ZStack {
             // 배경 처리
             backgroundForCurrentWeek(dayIndex: dayIndex, todayIndex: todayIndex)
-            // 텍스트
-            if let record {
+            
+            if isLastDay(weekPageIndex: weekPageIndex, dayIndex: dayIndex) {
+                // 마지막 날 이미지 표시
+                completionImage
+            } else if let record {
+                // 일반 텍스트 표시
                 textForCurrentWeek(record, dayIndex: dayIndex, todayIndex: todayIndex)
             }
         }
     }
     
-    private func futureWeekView(record: ReadingRecord?) -> some View {
+    private func futureWeekView(
+        dayIndex: Int,
+        weekPageIndex: Int,
+        record: ReadingRecord?
+    ) -> some View {
         ZStack {
             backgroundForFutureWeek()
-            futureWeekText(record: record)
+            
+            if isLastDay(weekPageIndex: weekPageIndex, dayIndex: dayIndex) {
+                // 마지막 날 이미지 표시
+                completionImage
+            } else {
+                // 일반 텍스트 표시
+                futureWeekText(record: record)
+            }
         }
     }
-
+    
+    private var completionImage: some View {
+        Image("completionGreenFlag")
+            .resizable()
+            .scaledToFit()
+            .overlay(
+                Text("완독")
+                    .fontStyle(.caption1, weight: .semibold)
+                    .foregroundStyle(.white)
+                    .padding(.bottom, 1)
+                    .padding(.leading, 2)
+            )
+    }
+    
     // MARK: - Background Handlers
     private func backgroundForPastWeek(dayIndex: Int) -> some View {
         Group {
@@ -223,5 +268,26 @@ struct WeeklyPageCalendarView: View {
         }
         .fontStyle(.title3)
         .foregroundStyle(Color.Labels.secondaryBlack2)
+    }
+    
+    // MARK: - Method
+    /// 마지막 독서일의 주 인덱스와 요일 인덱스를 계산하여 저장합니다.
+    /// - Parameters:
+    ///   - totalWeeks: 전체 주의 개수.
+    ///   - targetEndDate: 목표 종료 날짜.
+    private func calculateLastWeekAndDayIndex(totalWeeks: Int, targetEndDate: Date) {
+        lastWeekIndex = totalWeeks - 1
+        
+        // 목표 종료 날짜의 요일 인덱스 계산
+        lastDayIndex = Calendar.current.getWeekdayIndex(from: targetEndDate)
+    }
+    
+    /// 특정 주와 요일 인덱스가 마지막 독서일과 일치하는지 확인합니다.
+    /// - Parameters:
+    ///   - weekPageIndex: 현재 주의 페이지 인덱스.
+    ///   - dayIndex: 현재 요일의 인덱스.
+    /// - Returns: 주와 요일 인덱스가 마지막 독서일과 동일하면 `true`, 그렇지 않으면 `false`.
+    private func isLastDay(weekPageIndex: Int, dayIndex: Int) -> Bool {
+        return weekPageIndex == lastWeekIndex && dayIndex == lastDayIndex
     }
 }
