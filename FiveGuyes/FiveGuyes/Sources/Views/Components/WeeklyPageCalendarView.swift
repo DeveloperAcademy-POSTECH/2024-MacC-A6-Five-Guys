@@ -80,14 +80,10 @@ struct WeeklyPageCalendarView: View {
                     currentWeekPageIndex = todayWeekIndex
                 }
                 
-                // TODO: 마지막 날의 페이지 인덱스와 요일 인덱스 찾기
                 calculateLastWeekAndDayIndex(
                     totalWeeks: allWeekStartDates.count,
                     targetEndDate: currentReadingBook.userSettings.targetEndDate
                 )
-                
-                print("🐯🐯🐯: \(lastWeekIndex) & \(lastDayIndex)")
-                
             }
             .onChange(of: currentWeekPageIndex) {
                 DispatchQueue.main.async {
