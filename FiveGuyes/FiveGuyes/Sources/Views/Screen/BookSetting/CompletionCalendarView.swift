@@ -19,18 +19,32 @@ struct CompletionCalendarView: View {
     @State private var endDate: Date?
     @State private var currentMonth: Date = Calendar.current.date(byAdding: .hour, value: -4, to: Date())!
     
-    @State var totalPages: String = ""
+    @State var totalPages = 0
     
-    @FocusState private var isTextTextFieldFocused: Bool
-    
-    // MARK: 추가된 변수
     @State private var deletedDates: [Date] = []
     @State private var isDateSelectionLocked = false
     @State private var isFirstClick = true
     
+    // MARK: 추가된 변수
+//    @State private var pagesPerDay = 0
+//    @State private var dayCount = 0
+    
+    private var dayCount: Int {
+        Calendar.current.getDateGap(from: startDate, to: endDate)
+    }
+    
+    private var pagesPerDay: Int {
+        get {
+            if dayCount == 0 {
+                return totalPages
+            }
+            return totalPages / dayCount
+        }
+    }
+    
     var body: some View {
         let bookTitle = bookSettingInputModel.selectedBook?.title ?? ""
-        
+
         VStack(spacing: 0) {
             
             VStack(alignment: .leading, spacing: 0) {
@@ -41,30 +55,15 @@ struct CompletionCalendarView: View {
                     HStack(spacing: 8) {
                         Text("총")
                         
-                        HStack(spacing: 2) {
-                            TextField("", text: $totalPages)
-                                .focused($isTextTextFieldFocused)
-                                .keyboardType(.numberPad)
-                                .fontStyle(.title2, weight: .semibold)
-                                .fixedSize()
-                                .background {
-                                    RoundedRectangle(cornerRadius: 7)
-                                        .foregroundStyle(.clear)
-                                        .frame(height: 30) // 텍스트 필드 높이 지정
-                                }
-                            
-                            Image(systemName: "pencil") // 원하는 이미지로 변경
-                                .resizable()
-                                .scaledToFill()
-                                .frame(width: 20, height: 20)
-                        }
-                        .foregroundStyle(Color(Color.Colors.green2))
-                        .padding(.horizontal, 8) // 텍스트 필드와 이미지 주변 패딩
-                        .padding(.vertical, 4)
-                        .background {
-                            RoundedRectangle(cornerRadius: 8)
-                                .foregroundStyle(Color(Color.Fills.lightGreen))
-                        }
+                        Text("\(totalPages)")
+                            .fontStyle(.title2, weight: .semibold)
+                            .foregroundStyle(Color.Colors.green2)
+                            .padding(.horizontal, 8) // 텍스트 필드와 이미지 주변 패딩
+                            .padding(.vertical, 4)
+                            .background {
+                                RoundedRectangle(cornerRadius: 8)
+                                    .foregroundStyle(Color(Color.Fills.lightGreen))
+                            }
                         
                         Text("쪽이에요")
                         
@@ -72,53 +71,54 @@ struct CompletionCalendarView: View {
                     }
                     Text("목표기간을 선택해주세요")
                     
+                    HStack(spacing: 8) {
+                        Text("매일")
+                        
+                        // TODO: 페이지 할당량 계산
+                        Text("\(pagesPerDay)")
+                            .fontStyle(.title2, weight: .semibold)
+                            .foregroundStyle(Color.Colors.green2)
+                            .padding(.horizontal, 8) // 텍스트 필드와 이미지 주변 패딩
+                            .padding(.vertical, 4)
+                            .background {
+                                RoundedRectangle(cornerRadius: 8)
+                                    .foregroundStyle(Color(Color.Fills.lightGreen))
+                            }
+                        
+                        Text("쪽만 읽으면 돼요")
+                        
+                        Spacer()
+                    }
+                    
                 } else {
                     HStack(alignment: .top) {
-                        Text("쉬고싶은 날을 설정할 수 있어요!\n원하지 않는다면 넘어가도 좋아요")
+                        Text("쉬는 날을 선택할 수 있어요!\n원하지 않는다면 넘어가도 좋아요")
                         Spacer()
                     }
                 }
             }
-            .font(.system(size: 22, weight: .semibold))
-            .foregroundStyle(Color(Color.Labels.primaryBlack1))
+            .fontStyle(.title2, weight: .semibold)
+            .foregroundStyle(Color.Labels.primaryBlack1)
             .padding(.top, 34)
-            .padding(.bottom, 11)
+            .padding(.bottom, 17)
             .padding(.horizontal, 20)
             
-            Spacer()
-            
             weekdayHeader()
+                .padding(.horizontal, 20)
             
             Divider()
                 .padding(.bottom, 20)
             
             calendarScrollView()
+                .padding(.horizontal, 20)
             
-            if isTextTextFieldFocused {
-                
-                Button {
-                    // 변경되 페이지 업데이트
-                    bookSettingInputModel.targetEndPage = totalPages
-                    // 키보드 내리기
-                    isTextTextFieldFocused = false
-                } label: {
-                    // TODO: N일 목표하기로 텍스트 변경하기
-                    Text("다음")
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 56)
-                        .background(Color.Colors.green1)
-                        .foregroundStyle(.white)
-                    
-                }
-                .ignoresSafeArea(.keyboard, edges: .bottom)
-            } else {
-                Divider()
-                    .padding(.bottom, 14)
-                
-                nextButton()
-                    .padding(.horizontal, 16)
-                Spacer()
-            }
+            Spacer()
+            
+            Divider()
+                .padding(.bottom, 14)
+            
+            nextButton()
+                .padding(.horizontal, 16)
         }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
@@ -134,7 +134,9 @@ struct CompletionCalendarView: View {
             }
         }
         .onAppear {
-            totalPages = bookSettingInputModel.targetEndPage
+            let (tartgetEndPage, startPage) = (Int(bookSettingInputModel.targetEndPage)!, Int(bookSettingInputModel.startPage)!)
+            
+            totalPages = tartgetEndPage - startPage + 1
         }
         .onAppear {
             // GA4 Tracking
@@ -152,6 +154,7 @@ struct CompletionCalendarView: View {
             }
         }
         .padding(.bottom, 12)
+        
     }
     
     private func calendarScrollView() -> some View {
@@ -189,7 +192,7 @@ struct CompletionCalendarView: View {
                 }
             }
         }
-        .frame(height: 466)
+        .scrollIndicators(.hidden)
     }
     
     // MARK: 소거 로직 구현(배경색 조건에 따라 변경)
@@ -250,34 +253,42 @@ struct CompletionCalendarView: View {
     private func dateText(for date: Date, isSelectedDay: Bool, textColor: Color) -> some View {
         Text("\(Calendar.current.component(.day, from: date))")
             .frame(width: 44, height: 44)
-            .background(
-                isSelectedDay ? Color.green : Color.clear
-            )
+//            .background(
+//                isSelectedDay ? Color.green : Color.clear
+//            )
             .foregroundStyle(isSelectedDay ? .white : textColor) // 선택된 경우 화이트, 그렇지 않으면 전달된 색상 사용
             .fontStyle(
                 isSelectedDay ? .title2 : .body,
                 weight: isSelectedDay ? .semibold : .regular
             )
-            .cornerRadius(26)
+//            .cornerRadius(26)
     }
     
     // 선택된 날짜 범위에 색칠 처리
     private func dateSelectionRectangle(for date: Date) -> some View {
-        HStack(spacing: 0) {
-            // 선택된 시작 날짜
-            if let start = startDate, date == start {
-                Spacer()
-                Rectangle()
-                    .fill(Color.green.opacity(0.2))
-                    .frame(width: 28, height: 44)
+        ZStack {
+            HStack(spacing: 0) {
+                // 선택된 시작 날짜
+                if let start = startDate, date == start {
+                    Spacer()
+                    
+                    Rectangle()
+                        .fill(Color.Fills.lightGreen)
+                        .frame(height: 44)
+                }
+                // 선택된 종료 날짜
+                else if let end = endDate, date == end {
+                    Rectangle()
+                        .fill(Color.Fills.lightGreen)
+                        .frame(height: 44)
+                    
+                    Spacer()
+                }
             }
-            // 선택된 종료 날짜
-            else if let end = endDate, date == end {
-                Rectangle()
-                    .fill(Color.Fills.lightGreen)
-                    .frame(width: 28, height: 44)
-                Spacer()
-            }
+            
+            Circle()
+                .fill(Color.Colors.green1)
+                .frame(height: 44)
         }
     }
     
@@ -337,11 +348,11 @@ struct CompletionCalendarView: View {
     // MARK: 버튼 로직 구현
     private func nextButton() -> some View {
         Button(action: nextButtonAction) {
-            Text(isFirstClick ? "다음" : "완료")
+            Text(isFirstClick ? "\(dayCount)일 동안 목표하기" : "완료")
                 .fontStyle(.title2, weight: .semibold)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 16)
-                .background(startDate != nil && endDate != nil ? Color(Color.Colors.green1) : Color(Color.Fills.lightGreen))
+                .background(startDate != nil && endDate != nil ? Color.Colors.green1 : Color.Fills.lightGreen)
                 .foregroundStyle(.white)
                 .cornerRadius(16)
         }

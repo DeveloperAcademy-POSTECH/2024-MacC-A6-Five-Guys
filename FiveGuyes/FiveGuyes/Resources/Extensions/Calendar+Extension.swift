@@ -28,3 +28,20 @@ extension Calendar {
         return self.component(.weekday, from: date) - 1
     }
 }
+
+extension Calendar {
+    /// 두 날짜 사이의 날짜 차이를 계산하고, 값이 없으면 0, 하나라도 값이 있으면 1을 반환
+    func getDateGap(from: Date?, to: Date?) -> Int {
+        if from == nil && to == nil {
+            return 0 // 둘 다 값이 없으면 0
+        } else if let from, let to {
+            let fromDateOnly = from.onlyDate
+            let toDateOnly = to.onlyDate
+            
+            // 두 날짜가 존재하면 차이를 계산
+            return self.dateComponents([.day], from: fromDateOnly, to: toDateOnly).day! + 1
+        } else {
+            return 1 // 하나라도 값이 있으면 1
+        }
+    }
+}

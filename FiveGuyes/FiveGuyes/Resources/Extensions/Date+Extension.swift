@@ -83,3 +83,12 @@ extension Date {
         return hour >= start && hour < end
     }
 }
+
+
+extension Date {
+    /// 시간 부분을 버리기
+    var onlyDate: Date {
+        let component = Calendar.current.dateComponents([.year, .month, .day], from: self)
+        return Calendar.current.date(from: component) ?? Date()
+    }
+}
