@@ -78,7 +78,7 @@ final class ReadingProgress: ReadingProgressProtocol {
         
         for dateString in readingRecords.keys.sorted()
         where dateString > todayString {
-            return DateFormatter().date(from: dateString)
+            return dateString.toDate()
         }
         return nil
     }
