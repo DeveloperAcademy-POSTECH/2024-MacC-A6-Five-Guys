@@ -101,24 +101,27 @@ struct ReadingScheduleCalculator {
             if !settings.nonReadingDays
                 .map({ progress.getReadingRecordsKey($0) })
                 .contains(dateKey) {
-                guard var record = progress.readingRecords[dateKey] else { return }
+                guard var record = progress.readingRecords[dateKey] else {
+                    nextDate = Calendar.current.date(byAdding: .day, value: 1, to: nextDate)!
+                    continue
+                }
                 cumulativePages += pagesPerDay
                 record.targetPages = cumulativePages
                 progress.readingRecords[dateKey] = record
             }
-            
             nextDate = Calendar.current.date(byAdding: .day, value: 1, to: nextDate)!
         }
         
         var remainingTargetDate = settings.targetEndDate
         while remainderOffset > 0 {
             let dateKey = progress.getReadingRecordsKey(remainingTargetDate)
-            
-            guard var record = progress.readingRecords[dateKey] else { return }
+            guard var record = progress.readingRecords[dateKey] else {
+                remainingTargetDate = Calendar.current.date(byAdding: .day, value: -1, to: nextDate)!
+                continue
+            }
             record.targetPages += remainderOffset
             progress.readingRecords[dateKey] = record
             remainderOffset -= 1
-            
             remainingTargetDate = Calendar.current.date(byAdding: .day, value: -1, to: remainingTargetDate)!
         }
     }
@@ -156,7 +159,10 @@ struct ReadingScheduleCalculator {
         var remainingTargetDate = settings.targetEndDate
         while remainderOffset > 0 {
             let dateKey = progress.getReadingRecordsKey(remainingTargetDate)
-            guard var record = progress.readingRecords[dateKey] else { return }
+            guard var record = progress.readingRecords[dateKey] else {
+                remainingTargetDate = Calendar.current.date(byAdding: .day, value: -1, to: remainingTargetDate)!
+                continue
+            }
             
             record.targetPages += remainderOffset
             progress.readingRecords[dateKey] = record
@@ -230,6 +236,11 @@ struct ReadingScheduleCalculator {
         
         while progress.getAdjustedReadingRecordsKey(targetDate) <= progress.getReadingRecordsKey(settings.targetEndDate) {
             let dateKey = progress.getAdjustedReadingRecordsKey(targetDate)
+            guard progress.readingRecords[dateKey] != nil else {
+                targetDate = Calendar.current.date(byAdding: .day, value: 1, to: targetDate)!
+                continue
+            }
+            
             if !settings.nonReadingDays
                 .map({ progress.getReadingRecordsKey($0) })
                 .contains(dateKey) {
