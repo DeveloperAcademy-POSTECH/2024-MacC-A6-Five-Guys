@@ -53,7 +53,7 @@ struct WeeklyReadingProgressView: View {
                 .padding(.top, 22)
                 .padding(.horizontal, 24)
                 
-                WeeklyPageCalendarView(currentReadingBook: currentReadingBook)
+                WeeklyPageCalendarView()
                     .padding(.horizontal, 14)
                     .padding(.bottom, 18)
                 

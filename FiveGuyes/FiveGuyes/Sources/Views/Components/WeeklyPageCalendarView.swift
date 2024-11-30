@@ -5,15 +5,17 @@
 //  Created by zaehorang on 11/6/24.
 //
 
+import SwiftData
 import SwiftUI
 
 struct WeeklyPageCalendarView: View {
     typealias UserBook = UserBookSchemaV2.UserBookV2
     
     let daysOfWeek = ["일", "월", "화", "수", "목", "금", "토"]
-    let currentReadingBook: UserBook
+    @Query(filter: #Predicate<UserBook> { $0.completionStatus.isCompleted == false })
+    private var currentlyReadingBooks: [UserBook]  // 현재 읽고 있는 책을 가져오는 쿼리
     
-    let today = Date()
+    let today = Date().adjustedDate()
     
     @State private var allWeekStartDates: [Date] = []
     @State private var currentWeekPageIndex: Int = 0
@@ -24,6 +26,7 @@ struct WeeklyPageCalendarView: View {
     @State private var lastDayIndex = 0
     
     var body: some View {
+        let currentReadingBook = currentlyReadingBooks.first ?? UserBook.dummyUserBookV2
         
         ScrollViewReader { proxy in
             ScrollView(.horizontal, showsIndicators: false) {

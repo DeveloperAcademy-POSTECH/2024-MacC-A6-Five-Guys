@@ -137,6 +137,13 @@ struct MainHomeView: View {
                 let readingScheduleCalculator = ReadingScheduleCalculator()
                 print("🌝🌝🌝🌝🌝 재할당!!")
                 readingScheduleCalculator.reassignPagesFromLastReadDate(settings: currentReadingBook.userSettings, progress: currentReadingBook.readingProgress)
+                
+                // 데이저 저장이 느려서 직접 저장해주기
+                do {
+                    try modelContext.save()
+                } catch {
+                    print(error.localizedDescription)
+                }
             }
         }
         .onAppear {

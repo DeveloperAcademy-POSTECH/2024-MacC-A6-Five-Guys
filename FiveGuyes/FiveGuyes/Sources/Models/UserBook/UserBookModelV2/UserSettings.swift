@@ -23,4 +23,8 @@ final class UserSettings: UserSettingsProtocol {
         self.targetEndDate = targetEndDate
         self.nonReadingDays = nonReadingDays
     }
+    
+    func changeStartDate(for date: Date) {
+        self.startDate = date
+    }
 }
