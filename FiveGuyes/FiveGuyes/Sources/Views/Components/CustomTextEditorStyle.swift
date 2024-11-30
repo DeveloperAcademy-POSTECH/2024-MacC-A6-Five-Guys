@@ -21,9 +21,9 @@ struct CustomTextEditorStyle: ViewModifier {
             }
             .textInputAutocapitalization(.none) // 첫 시작 대문자 막기
             .autocorrectionDisabled()
-            .background(Color(Color.Fills.lightGreen))
+            .background(Color.Fills.lightGreen)
             .opacity(0.8)
-            .foregroundStyle(Color(Color.Labels.primaryBlack1))
+            .foregroundStyle(Color.Labels.primaryBlack1)
             .clipShape(RoundedRectangle(cornerRadius: 16))
             .scrollContentBackground(.hidden)
             .fontStyle(.body) // 수정 적용
@@ -36,7 +36,7 @@ struct CustomTextEditorStyle: ViewModifier {
                 .padding(.top, 30)
                 .padding(.leading, 27)
                 .fontStyle(.body) // 수정 적용
-                .foregroundStyle(Color(Color.Labels.tertiaryBlack3))
+                .foregroundStyle(Color.Labels.tertiaryBlack3)
         }
     }
 }

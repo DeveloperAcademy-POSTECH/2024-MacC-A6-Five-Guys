@@ -35,11 +35,11 @@ struct BookRowView: View {
                 VStack(alignment: .leading) {
                     Text(book.title)
                         .fontStyle(.body, weight: .semibold)
-                        .foregroundStyle(Color(red: 0.12, green: 0.12, blue: 0.12))
+                        .foregroundStyle(Color.Labels.primaryBlack1)
                     
                     Text("\(book.author.removingParenthesesContent()) | \(book.pubDate.extractYear()) | \(book.publisher)")
                         .fontStyle(.caption1)
-                        .foregroundStyle(Color(red: 0.44, green: 0.44, blue: 0.44))
+                        .foregroundStyle(Color.Labels.secondaryBlack2)
                 }
                 .frame(maxWidth: .infinity, alignment: .topLeading)
                 .padding(.leading, 16)
@@ -56,8 +56,8 @@ struct BookRowView: View {
         }
         
         Rectangle()
-            .stroke(Color(red: 0.94, green: 0.94, blue: 0.94))
-            .fill(Color(red: 0.94, green: 0.94, blue: 0.94))
+            .stroke(Color.Separators.gray)
+            .fill(Color.Separators.gray)
             .frame(height: 1)
             .padding(.vertical, 24)
     }

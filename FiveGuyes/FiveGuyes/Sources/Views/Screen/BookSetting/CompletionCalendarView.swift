@@ -62,7 +62,7 @@ struct CompletionCalendarView: View {
                             .padding(.vertical, 4)
                             .background {
                                 RoundedRectangle(cornerRadius: 8)
-                                    .foregroundStyle(Color(Color.Fills.lightGreen))
+                                    .foregroundStyle(Color.Fills.lightGreen)
                             }
                         
                         Text("쪽이에요")
@@ -82,7 +82,7 @@ struct CompletionCalendarView: View {
                             .padding(.vertical, 4)
                             .background {
                                 RoundedRectangle(cornerRadius: 8)
-                                    .foregroundStyle(Color(Color.Fills.lightGreen))
+                                    .foregroundStyle(Color.Fills.lightGreen)
                             }
                         
                         Text("쪽만 읽으면 돼요")
@@ -127,8 +127,8 @@ struct CompletionCalendarView: View {
                 } label: {
                     Text("완료")
                         .foregroundStyle(!(startDate == nil || endDate == nil) ?
-                                         Color(Color.Colors.green2)
-                                         : Color(Color.Labels.tertiaryBlack3))
+                                         Color.Colors.green2
+                                         : Color.Labels.tertiaryBlack3)
                 }
                 .disabled(startDate == nil || endDate == nil)
             }
@@ -149,8 +149,8 @@ struct CompletionCalendarView: View {
             ForEach(["일", "월", "화", "수", "목", "금", "토"], id: \.self) { day in
                 Text(day)
                     .frame(maxWidth: .infinity)
-                    .font(.system(size: 13, weight: .medium))
-                    .foregroundStyle(Color(Color.Labels.tertiaryBlack3))
+                    .fontStyle(.caption1, weight: .semibold)
+                    .foregroundStyle(Color.Labels.tertiaryBlack3)
             }
         }
         .padding(.bottom, 12)
@@ -203,7 +203,7 @@ struct CompletionCalendarView: View {
 
         return ZStack {
             if isPastDate {
-                dateText(for: date, isSelectedDay: false, textColor: Color(Color.Labels.quaternaryBlack4)) // 과거 날짜는 빨간색(//지금은 회색)
+                dateText(for: date, isSelectedDay: false, textColor: Color.Labels.quaternaryBlack4) // 과거 날짜는 빨간색(//지금은 회색)
             } else {
                 Group {
                     if isBetweenSelectedDays {
@@ -213,7 +213,7 @@ struct CompletionCalendarView: View {
                     } else if isSelectedDay {
                         dateSelectionRectangle(for: date)
                     }
-                    dateText(for: date, isSelectedDay: isSelectedDay, textColor: Color(Color.Labels.secondaryBlack2)) // 기본 색상
+                    dateText(for: date, isSelectedDay: isSelectedDay, textColor: Color.Labels.secondaryBlack2) // 기본 색상
                 }
                 .onTapGesture {
                     handleDateTap(for: date, isPastDate: isPastDate)

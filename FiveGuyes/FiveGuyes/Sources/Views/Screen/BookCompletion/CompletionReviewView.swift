@@ -32,7 +32,7 @@ struct CompletionReviewView: View {
         let title = bookMetadata.title
         
         ZStack {
-            Color.white.ignoresSafeArea()
+            Color.Fills.white.ignoresSafeArea()
             
             VStack(spacing: 24) {
                 VStack(alignment: .leading, spacing: 24) {
@@ -41,7 +41,7 @@ struct CompletionReviewView: View {
                         Text("어떤 영감을 얻었나요?")
                     }
                     .fontStyle(.title1, weight: .semibold)
-                    .foregroundStyle(Color(Color.Labels.primaryBlack1))
+                    .foregroundStyle(Color.Labels.primaryBlack1)
                     .lineLimit(1)
                     
                     TextEditor(text: $reflectionText)
@@ -73,7 +73,7 @@ struct CompletionReviewView: View {
                             .frame(maxWidth: .infinity)
                             .frame(height: 56)
                             .background(Color.Colors.green1)
-                            .foregroundStyle(.white)
+                            .foregroundStyle(Color.Fills.white)
                     }
                     .ignoresSafeArea(.keyboard, edges: .bottom)
                 }

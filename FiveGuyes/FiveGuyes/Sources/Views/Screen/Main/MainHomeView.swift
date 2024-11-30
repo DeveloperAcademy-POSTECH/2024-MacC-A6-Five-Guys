@@ -53,7 +53,7 @@ struct MainHomeView: View {
                                     .resizable()
                                     .scaledToFit()
                                     .frame(width: 20, height: 22)
-                                    .tint(Color(Color.Labels.primaryBlack1))
+                                    .tint(Color.Labels.primaryBlack1)
                             }
                             .alert(isPresented: $showReadingBookAlert) {
                                 Alert(
@@ -95,7 +95,7 @@ struct MainHomeView: View {
                             }
                         } else {
                             Rectangle()
-                                .foregroundColor(.white)
+                                .foregroundStyle(Color.Fills.white)
                                 .frame(width: 104, height: 161)
                                 .shadow(color: Color(red: 0.84, green: 0.84, blue: 0.84).opacity(0.25), radius: 2, x: 0, y: 4)
                         }
@@ -120,7 +120,7 @@ struct MainHomeView: View {
         .ignoresSafeArea(edges: .top)
         .scrollIndicators(.hidden)
         .background(alignment: .top) {
-            LinearGradient(colors: [Color(red: 0.81, green: 1, blue: 0.77), .white], startPoint: .top, endPoint: .bottom)
+            LinearGradient(colors: [Color(red: 0.81, green: 1, blue: 0.77), Color.Fills.white], startPoint: .top, endPoint: .bottom)
                 .frame(height: 448)
                 .ignoresSafeArea(edges: .top)
         }
@@ -181,7 +181,7 @@ struct MainHomeView: View {
             Spacer()
         }
         .fontStyle(.title1, weight: .semibold)
-        .foregroundColor(Color(Color.Labels.primaryBlack1))
+        .foregroundStyle(Color.Labels.primaryBlack1)
     }
     
     private func notiButton(action: @escaping () -> Void) -> some View {
@@ -190,13 +190,13 @@ struct MainHomeView: View {
                 .resizable()
                 .scaledToFill()
                 .frame(width: 17, height: 19)
-                .tint(Color(Color.Labels.primaryBlack1))
+                .tint(Color.Labels.primaryBlack1)
         }
     }
     
     private var calendarFullScreenButton: some View {
         let isReadingBookAvailable = currentlyReadingBooks.first != nil
-        let backgroundColor = isReadingBookAvailable ? Color(Color.Fills.white) : Color(Color.Fills.lightGreen)
+        let backgroundColor = isReadingBookAvailable ? Color.Fills.white : Color.Fills.lightGreen
         let opacity = isReadingBookAvailable ? 1 : 0.2
         
         return Button {
@@ -209,17 +209,17 @@ struct MainHomeView: View {
             .fontStyle(.title2, weight: .semibold)
             .frame(maxWidth: .infinity)
             .frame(height: 56)
-            .foregroundColor(Color(Color.Labels.primaryBlack1))
+            .foregroundStyle(Color.Labels.primaryBlack1)
             .opacity(opacity)
             .background {
                 RoundedRectangle(cornerRadius: 16)
-                    .foregroundColor(backgroundColor)
+                    .foregroundStyle(backgroundColor)
             }
             .shadow(color: isReadingBookAvailable ? Color(red: 0.84, green: 0.84, blue: 0.84).opacity(0.25) : .clear, radius: 2, x: 0, y: 4)
             .overlay(
                 isReadingBookAvailable ? nil : RoundedRectangle(cornerRadius: 16)
                     .inset(by: 0.5)
-                    .stroke(Color(Color.Separators.green), lineWidth: 1)
+                    .stroke(Color.Separators.green, lineWidth: 1)
             )
         }
         .disabled(!isReadingBookAvailable)
@@ -237,12 +237,12 @@ struct MainHomeView: View {
         } label: {
             Text(isReadingBookAvailable ? "오늘 독서 현황 기록하기" : "+ 완독할 책 추가하기")
                 .fontStyle(.title2, weight: .semibold)
-                .foregroundColor(.white)
+                .foregroundStyle(Color.Fills.white)
                 .frame(maxWidth: .infinity)
                 .frame(height: 56)
                 .background {
                     RoundedRectangle(cornerRadius: 16)
-                        .foregroundColor(Color.Colors.green1)
+                        .foregroundStyle(Color.Colors.green1)
                 }
         }
     }

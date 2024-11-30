@@ -78,7 +78,7 @@ struct BookPageSettingView: View {
         }
         .fontStyle(.title2, weight: .semibold)
         .foregroundStyle(Color.Labels.primaryBlack1)
-        .background(.white)
+        .background(Color.Fills.white)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Text("다음")

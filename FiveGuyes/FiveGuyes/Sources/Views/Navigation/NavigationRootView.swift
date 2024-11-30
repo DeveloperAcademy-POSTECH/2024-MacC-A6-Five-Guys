@@ -19,7 +19,7 @@ struct NavigationRootView: View {
                     coordinator.navigate(to: screen)
                 }
         }
-        .background(.white)
+        .background(Color.Fills.white)
         .environment(coordinator)
     }
 }

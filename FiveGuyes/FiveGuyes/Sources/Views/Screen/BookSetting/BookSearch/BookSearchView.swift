@@ -19,7 +19,7 @@ struct BookSearchView: View {
     var body: some View {
         
         BookListView(bookSearchViewModel: bookSearchViewModel)
-            .background(.white)
+            .background(Color.Fills.white)
             .padding(.top, 24)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -36,8 +36,8 @@ struct BookSearchView: View {
                     } label: {
                         Text("완료")
                             .foregroundStyle(bookSearchViewModel.selectedBook != nil ?
-                                             Color(Color.Colors.green2)
-                                             : Color(Color.Labels.tertiaryBlack3))
+                                             Color.Colors.green2
+                                             : Color.Labels.tertiaryBlack3)
                     }
                     .disabled(bookSearchViewModel.selectedBook == nil)
                 }

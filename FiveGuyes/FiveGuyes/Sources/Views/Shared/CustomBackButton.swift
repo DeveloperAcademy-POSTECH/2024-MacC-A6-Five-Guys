@@ -19,12 +19,12 @@ struct CustomBackButton: View {
                     Image(systemName: "chevron.left")
                         .resizable()
                         .scaledToFit()
-                        .tint(Color(Color.Labels.primaryBlack1))
+                        .tint(Color.Labels.primaryBlack1)
                 }
             }
             Spacer()
         }
-        .background(.white)
+        .background(Color.Fills.white)
     }
 }
 
