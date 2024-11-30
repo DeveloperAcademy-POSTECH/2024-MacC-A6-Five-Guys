@@ -53,6 +53,11 @@ struct ReadingScheduleCalculator {
     ) {
         let dateKey = progress.getAdjustedReadingRecordsKey(today)
         
+        // 시작날짜보다 오늘 날짜가 이전이면
+        if settings.startDate > today {
+            settings.changeStartDate(for: today)
+        }
+        
         var record = progress.readingRecords[dateKey, default: ReadingRecord(targetPages: 0, pagesRead: 0)]
         
         // 비독서일에서 해당 날짜 제거

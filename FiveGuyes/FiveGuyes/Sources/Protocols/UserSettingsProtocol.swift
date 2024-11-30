@@ -13,4 +13,6 @@ protocol UserSettingsProtocol: AnyObject {
     var startDate: Date { get }
     var targetEndDate: Date { get set }
     var nonReadingDays: [Date] { get set }
+    
+    func changeStartDate(for date: Date)
 }
