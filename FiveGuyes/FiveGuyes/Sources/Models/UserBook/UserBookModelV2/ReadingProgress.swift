@@ -77,8 +77,11 @@ final class ReadingProgress: ReadingProgressProtocol {
         let todayString = today.toAdjustedYearMonthDayString()
         
         for dateString in readingRecords.keys.sorted()
-        where dateString > todayString {
-            return DateFormatter().date(from: dateString)
+        where dateString >= todayString {
+            let record = readingRecords[dateString]
+            if record?.pagesRead == 0 {
+                return dateString.toDate()
+            }
         }
         return nil
     }

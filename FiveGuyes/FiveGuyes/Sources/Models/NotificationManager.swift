@@ -8,13 +8,26 @@
 import UserNotifications
 
 final class NotificationManager {
+    typealias UserBook = UserBookSchemaV2.UserBookV2
+    
     private let notificationCenter = UNUserNotificationCenter.current()
     
-    /// 알림을 보낼 수 있는지 확인
-    private func canSendNotifications() async -> Bool {
+    /// 모든 노티를 요청하는 메서드
+    func canSendNotifications() async -> Bool {
         let isSystemAuthorized = await requestAuthorization()
         let isAppEnabled = !UserDefaultsManager.fetchNotificationDisabled()
         return isSystemAuthorized && isAppEnabled
+    }
+    
+    /// 노티를 요청하는 메서드
+    func setupAllNotifications(_ readingBook: UserBook) async {
+        Task {
+            await self.clearRequests()
+            
+            await self.setupNotifications(notificationType: .morning(readingBook: readingBook))
+            
+            await self.setupNotifications(notificationType: .night(readingBook: readingBook))
+        }
     }
     
     /// 노티를 요청하는 메서드

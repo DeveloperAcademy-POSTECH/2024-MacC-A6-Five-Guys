@@ -69,3 +69,14 @@ extension String {
              .trimmingCharacters(in: .whitespacesAndNewlines)
      }
 }
+
+extension String {
+    /// 문자열을 `yyyy-MM-dd` 형식으로 `Date` 객체로 변환합니다.
+    /// - Returns: 변환된 `Date` 객체 또는 변환이 실패한 경우 `nil`.
+    func toDate() -> Date? {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd" // 날짜 포맷 지정
+
+        return dateFormatter.date(from: self) // 문자열을 Date로 변환
+    }
+}

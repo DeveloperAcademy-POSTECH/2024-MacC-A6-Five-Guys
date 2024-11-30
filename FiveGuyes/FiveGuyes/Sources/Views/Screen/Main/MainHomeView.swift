@@ -19,6 +19,7 @@ struct MainHomeView: View {
     @State private var showCompletionAlert = false
     
     let mainAlertMessage = "삭제 후에는 복원할 수 없어요"
+    private let notificationManager = NotificationManager()
     
     @Query(filter: #Predicate<UserBook> { $0.completionStatus.isCompleted == false })
     private var currentlyReadingBooks: [UserBook]
@@ -144,6 +145,13 @@ struct MainHomeView: View {
                 Tracking.Screen.homeBeforeBookSetting.setTracking()
             } else {
                 Tracking.Screen.homeAfterBookSetting.setTracking()
+            }
+        }
+        .task {
+            if let currentReadingBook = currentlyReadingBooks.first {
+                await notificationManager.setupAllNotifications(currentReadingBook)
+            } else {
+                print("노티 설정 실패 ❗️❗️❗️")
             }
         }
     }

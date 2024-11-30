@@ -75,6 +75,7 @@ struct DailyProgressView: View {
                 Button {
                     if pagesToReadToday > userSettings.targetEndPage {
                         showAlert = true
+                        return
                     } else if isTodayCompletionDate && pagesToReadToday < userSettings.targetEndPage {
                         
                         userSettings.targetEndDate = userSettings.targetEndDate.addDays(1)
@@ -86,7 +87,9 @@ struct DailyProgressView: View {
                         )
                         
                         // 노티 세팅하기
-                        setNotification(userBook)
+                        Task {
+                            await notificationManager.setupAllNotifications(userBook)
+                        }
                         
                         navigationCoordinator.popToRoot()
                     } else {
@@ -99,7 +102,9 @@ struct DailyProgressView: View {
                         )
                         
                         // 노티 세팅하기
-                        setNotification(userBook)
+                        Task {
+                            await notificationManager.setupAllNotifications(userBook)
+                        }
                         
                         if pagesToReadToday != userSettings.targetEndPage {
                             navigationCoordinator.popToRoot()
@@ -160,16 +165,6 @@ struct DailyProgressView: View {
         .onAppear {
             // GA4 Tracking
             Tracking.Screen.dailyProgress.setTracking()
-        }
-    }
-    
-    private func setNotification(_ readingBook: UserBook) {
-        Task {
-            await notificationManager.clearRequests()
-            
-            await self.notificationManager.setupNotifications(notificationType: .morning(readingBook: readingBook))
-            
-            await self.notificationManager.setupNotifications(notificationType: .night(readingBook: readingBook))
         }
     }
 }
