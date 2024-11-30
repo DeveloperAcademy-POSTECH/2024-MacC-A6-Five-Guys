@@ -25,10 +25,6 @@ struct CompletionCalendarView: View {
     @State private var isDateSelectionLocked = false
     @State private var isFirstClick = true
     
-    // MARK: 추가된 변수
-//    @State private var pagesPerDay = 0
-//    @State private var dayCount = 0
-    
     private var dayCount: Int {
         Calendar.current.getDateGap(from: startDate, to: endDate)
     }
@@ -120,6 +116,7 @@ struct CompletionCalendarView: View {
             nextButton()
                 .padding(.horizontal, 16)
         }
+        .animation(.easeIn, value: isFirstClick)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {

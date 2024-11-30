@@ -122,7 +122,7 @@ struct WeeklyPageCalendarView: View {
             if isLastDay(weekPageIndex: weekPageIndex, dayIndex: dayIndex) {
                 // 마지막 날 이미지 표시
                 completionImage
-            } else if let record {
+            } else {
                 // 일반 텍스트 표시
                 textForCurrentWeek(record, dayIndex: dayIndex, todayIndex: todayIndex)
             }
@@ -249,7 +249,9 @@ struct WeeklyPageCalendarView: View {
                         .foregroundStyle(Color.Labels.secondaryBlack2)
                 }
             } else {
-                Text("")
+                    if dayIndex == todayIndex {
+                        Circle().fill(Color.Separators.green)
+                }
             }
         }
     }
