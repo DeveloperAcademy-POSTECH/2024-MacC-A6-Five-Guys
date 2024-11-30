@@ -21,13 +21,13 @@ struct BookListView: View {
                     TextField("",
                               text: $searchText,
                               prompt: Text(placeholder)
-                        .foregroundColor(Color(red: 0.74, green: 0.74, blue: 0.74))
+                        .foregroundStyle(Color(red: 0.74, green: 0.74, blue: 0.74))
                     )
                     .onSubmit {
                         requestSearchBooks()
                     }
-                    .font(.system(size: 16))
-                    .foregroundColor(.black)
+                    .fontStyle(.body)
+                    .foregroundStyle(Color(Color.Labels.primaryBlack1))
                     
                     Spacer()
                     
@@ -35,7 +35,7 @@ struct BookListView: View {
                         requestSearchBooks()
                     } label: {
                         Image(systemName: "magnifyingglass")
-                            .foregroundColor(Color(red: 0.74, green: 0.74, blue: 0.74))
+                            .foregroundStyle(Color(red: 0.74, green: 0.74, blue: 0.74))
                             .padding(.leading, 20)
                     }
                     

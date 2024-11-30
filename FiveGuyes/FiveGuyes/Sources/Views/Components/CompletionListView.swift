@@ -30,8 +30,8 @@ struct CompletionListView: View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
                 Text("완독 리스트")
-                    .font(.system(size: 24, weight: .semibold))
-                    .foregroundColor(.black)
+                    .fontStyle(.title1, weight: .semibold)
+                    .foregroundStyle(Color(Color.Labels.primaryBlack1))
                 
                 Spacer()
             }
@@ -66,11 +66,11 @@ struct CompletionListView: View {
                                     
                                     VStack(alignment: .leading, spacing: 0) {
                                         Text(book.bookMetaData.title)
-                                            .font(.system(size: 14, weight: .semibold))
-                                            .foregroundColor(.black)
+                                            .fontStyle(.caption1, weight: .semibold)
+                                            .foregroundStyle(Color(Color.Labels.primaryBlack1))
                                         Text(book.bookMetaData.author)
-                                            .font(.system(size: 12, weight: .medium))
-                                            .foregroundColor(Color(red: 0.44, green: 0.44, blue: 0.44))
+                                            .fontStyle(.caption2)
+                                            .foregroundStyle(Color(Color.Labels.secondaryBlack2))
                                     }
                                     .lineLimit(1)
                                 }
@@ -89,8 +89,8 @@ struct CompletionListView: View {
                     
                     VStack(alignment: .leading, spacing: 10) {
                         Text(selectedBook.completionStatus.completionReview)
-                            .font(.system(size: 16, weight: .medium))
-                            .foregroundColor(.black)
+                            .fontStyle(.body)
+                            .foregroundStyle(Color(Color.Labels.primaryBlack1))
                             .padding(.bottom, 10)
                         // TODO: 수정 버튼 추가하기
                         HStack {
@@ -105,17 +105,17 @@ struct CompletionListView: View {
 //                                    .resizable()
 //                                    .scaledToFit()
 //                                    .frame(width: 20, height: 22)
-//                                    .tint(Color(red: 0.44, green: 0.44, blue: 0.44))
+//                                    .tint(Color(Color.Labels.secondaryBlack2)) // 디자인 시스템으로 수정
 //                                    .padding(.trailing, 3)
 //                            }
                         }
-                        .font(.system(size: 12, weight: .medium))
-                        .foregroundColor(Color(red: 0.44, green: 0.44, blue: 0.44))
+                        .fontStyle(.caption2)
+                        .foregroundStyle(Color(Color.Labels.secondaryBlack2))
                     }
                     .padding(20)
                     .background {
                         RoundedRectangle(cornerRadius: 16)
-                            .foregroundColor(Color(red: 0.95, green: 0.98, blue: 0.96))
+                            .foregroundStyle(Color(Color.Fills.lightGreen))
                     }
                     .padding(.horizontal, 20)
                     
@@ -130,10 +130,13 @@ struct CompletionListView: View {
         }
         // TODO: ❗️❗️❗️ 수정하기 기능 추가
         // 데이터를 지우니까 튕김
+        // FontStyle 적용해놓음
 //        .alert(isPresented: $showCompletionAlert) {
 //            Alert(
-//                title: Text(completionAlertText),
-//                message: Text(completionAlertMessage),
+//                title: Text(completionAlertText)
+//                    .alertFontStyle(.title3, weight: .semibold),
+//                message: Text(completionAlertMessage)
+//                    .alertFontStyle(.caption1),
 //                primaryButton: .cancel(Text("취소하기")),
 //                secondaryButton: .destructive(Text("삭제")) {
 //                    let book = completedBooks[selectedBookIndex]

@@ -12,18 +12,18 @@ struct ProgressBar: View {
     var currentPage: Int
     
     var body: some View {
-        var progress = CGFloat(Double(currentPage) / total)
+        let progress = CGFloat(Double(currentPage) / total)
         
         GeometryReader { geometry in
             ZStack(alignment: .leading) {
                 Rectangle()
-                    .stroke(Color(red: 0.94, green: 0.94, blue: 0.94))
-                    .fill(Color(red: 0.94, green: 0.94, blue: 0.94))
+                    .stroke(Color(Color.Separators.gray))
+                    .fill(Color(Color.Separators.gray))
                     .frame(height: 2)
                 
                 Rectangle()
-                    .stroke(Color(red: 0.07, green: 0.87, blue: 0.54))
-                    .fill(Color(red: 0.07, green: 0.87, blue: 0.54))
+                    .stroke(Color.Colors.green1)
+                    .fill(Color.Colors.green1)
                     .frame(width: geometry.size.width * progress, height: 2)
             }
         }

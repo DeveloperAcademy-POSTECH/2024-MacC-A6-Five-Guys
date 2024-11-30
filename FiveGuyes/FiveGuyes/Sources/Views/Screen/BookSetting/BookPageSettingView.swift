@@ -23,7 +23,6 @@ struct BookPageSettingView: View {
     
     @StateObject private var toastViewModel = ToastViewModel()
     
-    
     var body: some View {
         let title = bookSettingInputModel.selectedBook?.title ?? "제목 없음"
         
@@ -34,7 +33,6 @@ struct BookPageSettingView: View {
                 
                 HStack(spacing: 8) {
                     Text("총")
-                    
                     // 첫 번째 텍스트 필드
                     pageNumberTextField(
                         page: $startPage,
@@ -56,6 +54,7 @@ struct BookPageSettingView: View {
                     Spacer()
                 }
             }
+            .fontStyle(.title2, weight: .semibold)
             .padding(.top, 34)
             .padding(.horizontal, 20)
             

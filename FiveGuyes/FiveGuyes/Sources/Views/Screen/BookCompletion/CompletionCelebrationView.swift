@@ -56,20 +56,20 @@ struct CompletionCelebrationView: View {
     
     private var celebrationTitle: some View {
         Text(celebrationTitleText)
-            .font(.system(size: 16, weight: .medium))
+            .fontStyle(.body, weight: .semibold)
             .foregroundStyle(.green)
             .padding(.vertical, 4)
             .padding(.horizontal, 8)
             .background {
                 RoundedRectangle(cornerRadius: 8)
-                    .foregroundColor(.white)
+                    .foregroundStyle(.white)
             }
     }
     
     private var celebrationMessage: some View {
         Text(celebrationMessageText)
-            .font(.system(size: 24, weight: .semibold))
-            .foregroundStyle(.black)
+            .fontStyle(.title1, weight: .semibold)
+            .foregroundStyle(Color(Color.Labels.primaryBlack1))
             .multilineTextAlignment(.center)
     }
     
@@ -115,12 +115,12 @@ struct CompletionCelebrationView: View {
         
         return Text("\(startDateText)부터 \(endDateText)까지\n꾸준히 \(pagesPerDay)쪽씩 \(totalReadingDays)일동안 읽었어요 🎉")
             .font(.system(size: 15, weight: .medium))
-            .foregroundStyle(.black)
+            .foregroundStyle(Color(Color.Labels.primaryBlack1))
             .padding(.vertical, 4)
             .padding(.horizontal, 10)
             .background {
                 RoundedRectangle(cornerRadius: 8)
-                    .foregroundColor(.white)
+                    .foregroundStyle(.white)
             }
     }
     
@@ -129,13 +129,13 @@ struct CompletionCelebrationView: View {
             navigationCoordinator.push(.completionReview)
         } label: {
             Text("완독 소감 작성하기")
-                .font(.system(size: 20, weight: .semibold))
+                .fontStyle(.title2, weight: .semibold)
                 .foregroundStyle(.white)
                 .frame(maxWidth: .infinity)
                 .frame(height: 56)
                 .background {
                     RoundedRectangle(cornerRadius: 16)
-                        .foregroundColor(Color(red: 0.07, green: 0.87, blue: 0.54))
+                        .foregroundStyle(Color.Colors.green1)
                 }
         }
     }

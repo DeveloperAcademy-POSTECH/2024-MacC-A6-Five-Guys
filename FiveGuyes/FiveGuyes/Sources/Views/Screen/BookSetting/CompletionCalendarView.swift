@@ -45,11 +45,11 @@ struct CompletionCalendarView: View {
                             TextField("", text: $totalPages)
                                 .focused($isTextTextFieldFocused)
                                 .keyboardType(.numberPad)
-                                .font(.system(size: 20, weight: .medium))
+                                .fontStyle(.title2, weight: .semibold)
                                 .fixedSize()
                                 .background {
                                     RoundedRectangle(cornerRadius: 7)
-                                        .foregroundColor(.clear)
+                                        .foregroundStyle(.clear)
                                         .frame(height: 30) // 텍스트 필드 높이 지정
                                 }
                             
@@ -58,12 +58,12 @@ struct CompletionCalendarView: View {
                                 .scaledToFill()
                                 .frame(width: 20, height: 20)
                         }
-                        .foregroundColor(Color(red: 0.03, green: 0.68, blue: 0.41))
+                        .foregroundStyle(Color(Color.Colors.green2))
                         .padding(.horizontal, 8) // 텍스트 필드와 이미지 주변 패딩
                         .padding(.vertical, 4)
                         .background {
                             RoundedRectangle(cornerRadius: 8)
-                                .foregroundStyle(Color(red: 0.93, green: 0.97, blue: 0.95))
+                                .foregroundStyle(Color(Color.Fills.lightGreen))
                         }
                         
                         Text("쪽이에요")
@@ -80,7 +80,7 @@ struct CompletionCalendarView: View {
                 }
             }
             .font(.system(size: 22, weight: .semibold))
-            .foregroundColor(.black)
+            .foregroundStyle(Color(Color.Labels.primaryBlack1))
             .padding(.top, 34)
             .padding(.bottom, 11)
             .padding(.horizontal, 20)
@@ -106,7 +106,7 @@ struct CompletionCalendarView: View {
                     Text("다음")
                         .frame(maxWidth: .infinity)
                         .frame(height: 56)
-                        .background(Color(red: 0.07, green: 0.87, blue: 0.54))
+                        .background(Color.Colors.green1)
                         .foregroundStyle(.white)
                     
                 }
@@ -126,9 +126,9 @@ struct CompletionCalendarView: View {
                     selectCompletionAction()
                 } label: {
                     Text("완료")
-                        .foregroundColor(!(startDate == nil || endDate == nil) ?
-                                         Color(red: 0.03, green: 0.68, blue: 0.41)
-                                         : Color(red: 0.84, green: 0.84, blue: 0.84))
+                        .foregroundStyle(!(startDate == nil || endDate == nil) ?
+                                         Color(Color.Colors.green2)
+                                         : Color(Color.Labels.tertiaryBlack3))
                 }
                 .disabled(startDate == nil || endDate == nil)
             }
@@ -148,7 +148,7 @@ struct CompletionCalendarView: View {
                 Text(day)
                     .frame(maxWidth: .infinity)
                     .font(.system(size: 13, weight: .medium))
-                    .foregroundColor(Color(red: 0.24, green: 0.24, blue: 0.26).opacity(0.3))
+                    .foregroundStyle(Color(Color.Labels.tertiaryBlack3))
             }
         }
         .padding(.bottom, 12)
@@ -165,7 +165,8 @@ struct CompletionCalendarView: View {
                     
                     VStack(spacing: 0) {
                         Text(monthDate.toKoreanDateStringWithoutDay())
-                            .font(.system(size: 18, weight: .semibold))
+                        // TODO: 폰트 확인하기
+                            .fontStyle(.title3, weight: .semibold)
                             .padding(.bottom, 20)
                         
                         LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 0), count: 7), spacing: 16) {
@@ -199,17 +200,17 @@ struct CompletionCalendarView: View {
 
         return ZStack {
             if isPastDate {
-                dateText(for: date, isSelectedDay: false, textColor: Color(red: 0.84, green: 0.84, blue: 0.84)) // 과거 날짜는 빨간색
+                dateText(for: date, isSelectedDay: false, textColor: Color(Color.Labels.quaternaryBlack4)) // 과거 날짜는 빨간색(//지금은 회색)
             } else {
                 Group {
                     if isBetweenSelectedDays {
                         Rectangle()
-                            .fill(Color.green.opacity(0.2))
+                            .fill(Color.Fills.lightGreen)
                             .frame(height: 44)
                     } else if isSelectedDay {
                         dateSelectionRectangle(for: date)
                     }
-                    dateText(for: date, isSelectedDay: isSelectedDay, textColor: Color(red: 0.44, green: 0.44, blue: 0.44)) // 기본 색상
+                    dateText(for: date, isSelectedDay: isSelectedDay, textColor: Color(Color.Labels.secondaryBlack2)) // 기본 색상
                 }
                 .onTapGesture {
                     handleDateTap(for: date, isPastDate: isPastDate)
@@ -252,9 +253,10 @@ struct CompletionCalendarView: View {
             .background(
                 isSelectedDay ? Color.green : Color.clear
             )
-            .foregroundColor(isSelectedDay ? .white : textColor) // 선택된 경우 화이트, 그렇지 않으면 전달된 색상 사용
-            .font(
-                isSelectedDay ? .system(size: 24, weight: .semibold) : .system(size: 16)
+            .foregroundStyle(isSelectedDay ? .white : textColor) // 선택된 경우 화이트, 그렇지 않으면 전달된 색상 사용
+            .fontStyle(
+                isSelectedDay ? .title2 : .body,
+                weight: isSelectedDay ? .semibold : .regular
             )
             .cornerRadius(26)
     }
@@ -272,7 +274,7 @@ struct CompletionCalendarView: View {
             // 선택된 종료 날짜
             else if let end = endDate, date == end {
                 Rectangle()
-                    .fill(Color.green.opacity(0.2))
+                    .fill(Color.Fills.lightGreen)
                     .frame(width: 28, height: 44)
                 Spacer()
             }
@@ -336,11 +338,11 @@ struct CompletionCalendarView: View {
     private func nextButton() -> some View {
         Button(action: nextButtonAction) {
             Text(isFirstClick ? "다음" : "완료")
-                .font(.system(size: 20, weight: .semibold))
+                .fontStyle(.title2, weight: .semibold)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 16)
-                .background(startDate != nil && endDate != nil ? Color(red: 0.07, green: 0.87, blue: 0.54) : Color(red: 0.84, green: 0.84, blue: 0.84))
-                .foregroundColor(.white)
+                .background(startDate != nil && endDate != nil ? Color(Color.Colors.green1) : Color(Color.Fills.lightGreen))
+                .foregroundStyle(.white)
                 .cornerRadius(16)
         }
         .disabled(startDate == nil || endDate == nil)

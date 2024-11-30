@@ -43,7 +43,7 @@ struct BookSettingsManagerView: View {
                                 .resizable()
                                 .scaledToFit()
                                 .frame(height: 20)
-                                .tint(.gray)
+                                .tint(Color.Labels.tertiaryBlack3)
                         }
                     }
                 }

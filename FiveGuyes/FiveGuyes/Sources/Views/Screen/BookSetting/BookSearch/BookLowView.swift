@@ -26,7 +26,7 @@ struct BookRowView: View {
                     } else {
                         // 이미지 없을 때
                         Rectangle()
-                            .foregroundColor(.green)
+                            .foregroundStyle(.green)
                     }
                 }
                 .frame(width: 115, height: 178)
@@ -34,18 +34,18 @@ struct BookRowView: View {
                 
                 VStack(alignment: .leading) {
                     Text(book.title)
-                        .font(.system(size: 16))
-                        .foregroundColor(Color(red: 0.12, green: 0.12, blue: 0.12))
+                        .fontStyle(.body, weight: .semibold)
+                        .foregroundStyle(Color(red: 0.12, green: 0.12, blue: 0.12))
                     
                     Text("\(book.author.removingParenthesesContent()) | \(book.pubDate.extractYear()) | \(book.publisher)")
-                        .font(.system(size: 14))
-                        .foregroundColor(Color(red: 0.44, green: 0.44, blue: 0.44))
+                        .fontStyle(.caption1)
+                        .foregroundStyle(Color(red: 0.44, green: 0.44, blue: 0.44))
                 }
                 .frame(maxWidth: .infinity, alignment: .topLeading)
                 .padding(.leading, 16)
                 
                 Image(systemName: viewModel.selectedBook == book ? "checkmark.circle.fill" : "circle")
-                    .foregroundStyle(Color(red: 0.07, green: 0.87, blue: 0.54))
+                    .foregroundStyle(Color.Colors.green1)
                     .padding(.trailing, 25)
                    
             }

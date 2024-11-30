@@ -22,12 +22,11 @@ struct CompletionReviewView: View {
     @Query(filter: #Predicate<UserBook> { $0.completionStatus.isCompleted == false })
     private var currentlyReadingBooks: [UserBook]  // 현재 읽고 있는 책을 가져오는 쿼리
     
-    // TODO: Font, Color 설정
     var body: some View {
         let userBook = currentlyReadingBooks.first ?? UserBook.dummyUserBookV2
         
         let bookMetadata: BookMetaDataProtocol = userBook.bookMetaData
-        var completionStatus: CompletionStatusProtocol = userBook.completionStatus
+        let completionStatus: CompletionStatusProtocol = userBook.completionStatus
         let userSettings = userBook.userSettings
         
         let title = bookMetadata.title
@@ -41,8 +40,8 @@ struct CompletionReviewView: View {
                         Text("<\(title)>\(title.postPositionParticle()) 완독하고...")
                         Text("어떤 영감을 얻었나요?")
                     }
-                    .font(.system(size: 24, weight: .semibold))
-                    .foregroundStyle(.black)
+                    .fontStyle(.title1, weight: .semibold)
+                    .foregroundStyle(Color(Color.Labels.primaryBlack1))
                     .lineLimit(1)
                     
                     TextEditor(text: $reflectionText)
@@ -73,7 +72,7 @@ struct CompletionReviewView: View {
                         Text("저장")
                             .frame(maxWidth: .infinity)
                             .frame(height: 56)
-                            .background(Color(red: 0.07, green: 0.87, blue: 0.54))
+                            .background(Color.Colors.green1)
                             .foregroundStyle(.white)
                     }
                     .ignoresSafeArea(.keyboard, edges: .bottom)
@@ -81,7 +80,8 @@ struct CompletionReviewView: View {
             }
         }
         .alert(isPresented: $showAlert) {
-            Alert(title: Text("내용을 입력해주세요"),
+            Alert(title: Text("내용을 입력해주세요")
+                .alertFontStyle(.title3, weight: .semibold),
                   dismissButton: .default(Text("확인")))
         }
         .customNavigationBackButton()

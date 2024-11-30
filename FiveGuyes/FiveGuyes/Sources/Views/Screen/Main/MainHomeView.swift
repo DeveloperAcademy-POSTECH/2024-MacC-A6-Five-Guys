@@ -52,12 +52,14 @@ struct MainHomeView: View {
                                     .resizable()
                                     .scaledToFit()
                                     .frame(width: 20, height: 22)
-                                    .tint(Color(red: 0.44, green: 0.44, blue: 0.44))
+                                    .tint(Color(Color.Labels.primaryBlack1))
                             }
                             .alert(isPresented: $showReadingBookAlert) {
                                 Alert(
-                                    title: Text(mainAlertText),
-                                    message: Text(mainAlertMessage),
+                                    title: Text(mainAlertText)
+                                        .alertFontStyle(.title3, weight: .semibold),
+                                    message: Text(mainAlertMessage)
+                                        .alertFontStyle(.caption1),
                                     primaryButton: .cancel(Text("취소하기")),
                                     secondaryButton: .destructive(Text("삭제")) {
                                         if let currentReadingBook = currentlyReadingBooks.first {
@@ -79,6 +81,8 @@ struct MainHomeView: View {
                            let coverURL = currentReadingBook.bookMetaData.coverURL,
                            let url = URL(string: coverURL) {
                             // TODO: 옆에 책 제목, 저자 text 추가하기
+                            // 책제목 .fontStyle(.body, weight: .semibold)
+                            // 저자 .fontStyle(.caption1)
                             AsyncImage(url: url) { image in
                                 image
                                     .resizable()
@@ -168,8 +172,8 @@ struct MainHomeView: View {
             
             Spacer()
         }
-        .font(.system(size: 24, weight: .semibold))
-        .foregroundColor(.black)
+        .fontStyle(.title1, weight: .semibold)
+        .foregroundColor(Color(Color.Labels.primaryBlack1))
     }
     
     private func notiButton(action: @escaping () -> Void) -> some View {
@@ -178,13 +182,13 @@ struct MainHomeView: View {
                 .resizable()
                 .scaledToFill()
                 .frame(width: 17, height: 19)
-                .tint(.black)
+                .tint(Color(Color.Labels.primaryBlack1))
         }
     }
     
     private var calendarFullScreenButton: some View {
         let isReadingBookAvailable = currentlyReadingBooks.first != nil
-        let backgroundColor = isReadingBookAvailable ? Color.white : Color(red: 0.98, green: 1, blue: 0.99)
+        let backgroundColor = isReadingBookAvailable ? Color(Color.Fills.white) : Color(Color.Fills.lightGreen)
         let opacity = isReadingBookAvailable ? 1 : 0.2
         
         return Button {
@@ -194,10 +198,10 @@ struct MainHomeView: View {
                 Image(systemName: "calendar")
                 Text("전체")
             }
-            .font(.system(size: 20, weight: .medium))
+            .fontStyle(.title2, weight: .semibold)
             .frame(maxWidth: .infinity)
             .frame(height: 56)
-            .foregroundColor(Color(red: 0.12, green: 0.12, blue: 0.12))
+            .foregroundColor(Color(Color.Labels.primaryBlack1))
             .opacity(opacity)
             .background {
                 RoundedRectangle(cornerRadius: 16)
@@ -207,7 +211,7 @@ struct MainHomeView: View {
             .overlay(
                 isReadingBookAvailable ? nil : RoundedRectangle(cornerRadius: 16)
                     .inset(by: 0.5)
-                    .stroke(Color.green.opacity(0.2), lineWidth: 1)
+                    .stroke(Color(Color.Separators.green), lineWidth: 1)
             )
         }
         .disabled(!isReadingBookAvailable)
@@ -224,13 +228,13 @@ struct MainHomeView: View {
             }
         } label: {
             Text(isReadingBookAvailable ? "오늘 독서 현황 기록하기" : "+ 완독할 책 추가하기")
-                .font(.system(size: 20, weight: .semibold))
+                .fontStyle(.title2, weight: .semibold)
                 .foregroundColor(.white)
                 .frame(maxWidth: .infinity)
                 .frame(height: 56)
                 .background {
                     RoundedRectangle(cornerRadius: 16)
-                        .foregroundColor(Color(red: 0.07, green: 0.87, blue: 0.54))
+                        .foregroundColor(Color.Colors.green1)
                 }
         }
     }

@@ -17,6 +17,8 @@
 		1A27D9622CDB05C000D1E14D /* CustomTextFieldStylePageCount.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A27D9612CDB05C000D1E14D /* CustomTextFieldStylePageCount.swift */; };
 		1A27D9662CDB779000D1E14D /* TotalCalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A27D9652CDB779000D1E14D /* TotalCalendarView.swift */; };
 		1A54142B2CD9FEF400283FBD /* BookSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A54142A2CD9FEF400283FBD /* BookSearchView.swift */; };
+		1A9E3D502CF85C5700C7B27A /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 26EBDEA42CF1C21E00B3A2BC /* GoogleService-Info.plist */; };
+		1A9E3D542CF88BA400C7B27A /* Text+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A9E3D532CF88BA400C7B27A /* Text+Extension.swift */; };
 		1AA14A782CDDA30D00B763A6 /* TotalCalendarTextBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AA14A772CDDA30D00B763A6 /* TotalCalendarTextBubble.swift */; };
 		1AA14A7A2CDDD96200B763A6 /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AA14A792CDDD96200B763A6 /* NotificationManager.swift */; };
 		240445B42CED9074005C3623 /* ToastViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 240445B32CED9074005C3623 /* ToastViewModel.swift */; };
@@ -53,7 +55,6 @@
 		26EBDE952CF0707A00B3A2BC /* Pretendard-SemiBold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 26EBDE942CF0707A00B3A2BC /* Pretendard-SemiBold.otf */; };
 		26EBDE972CF0764A00B3A2BC /* FontModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDE962CF0764A00B3A2BC /* FontModifier.swift */; };
 		26EBDE992CF07A7900B3A2BC /* FontWeight.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDE982CF07A7900B3A2BC /* FontWeight.swift */; };
-		26EBDEA52CF1C21E00B3A2BC /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 26EBDEA42CF1C21E00B3A2BC /* GoogleService-Info.plist */; };
 		26EBDEA82CF1C5C900B3A2BC /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 26EBDEA72CF1C5C900B3A2BC /* FirebaseAnalytics */; };
 		26EBDEAA2CF1C5C900B3A2BC /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 26EBDEA92CF1C5C900B3A2BC /* FirebaseCrashlytics */; };
 		26EBDEAC2CF1C5C900B3A2BC /* FirebaseDynamicLinks in Frameworks */ = {isa = PBXBuildFile; productRef = 26EBDEAB2CF1C5C900B3A2BC /* FirebaseDynamicLinks */; };
@@ -94,6 +95,7 @@
 		1A27D9612CDB05C000D1E14D /* CustomTextFieldStylePageCount.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTextFieldStylePageCount.swift; sourceTree = "<group>"; };
 		1A27D9652CDB779000D1E14D /* TotalCalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TotalCalendarView.swift; sourceTree = "<group>"; };
 		1A54142A2CD9FEF400283FBD /* BookSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = BookSearchView.swift; path = FiveGuyes/Sources/Views/Screen/BookSetting/BookSearch/BookSearchView.swift; sourceTree = SOURCE_ROOT; };
+		1A9E3D532CF88BA400C7B27A /* Text+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Text+Extension.swift"; sourceTree = "<group>"; };
 		1AA14A772CDDA30D00B763A6 /* TotalCalendarTextBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TotalCalendarTextBubble.swift; sourceTree = "<group>"; };
 		1AA14A792CDDD96200B763A6 /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
 		240445B32CED9074005C3623 /* ToastViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastViewModel.swift; sourceTree = "<group>"; };
@@ -319,6 +321,7 @@
 				26EBDE292CDF33D900B3A2BC /* Date+Extension.swift */,
 				26EBDE802CEF812A00B3A2BC /* Calendar+Extension.swift */,
 				26EBDE8E2CF0684900B3A2BC /* View+Extension.swift */,
+				1A9E3D532CF88BA400C7B27A /* Text+Extension.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -549,13 +552,13 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1A9E3D502CF85C5700C7B27A /* GoogleService-Info.plist in Resources */,
 				26EBDE932CF0707300B3A2BC /* Pretendard-Regular.otf in Resources */,
 				26EBDE952CF0707A00B3A2BC /* Pretendard-SemiBold.otf in Resources */,
 				24F8A2172CEB290B00A01A76 /* Config.xcconfig in Resources */,
 				26890BBD2CAE98E2008DFF49 /* .swiftlint.yml in Resources */,
 				26890B9C2CAE811D008DFF49 /* Preview Assets.xcassets in Resources */,
 				26890B992CAE811D008DFF49 /* Assets.xcassets in Resources */,
-				26EBDEA52CF1C21E00B3A2BC /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -596,6 +599,7 @@
 				26EBDED22CF45ACA00B3A2BC /* ReadingProgress.swift in Sources */,
 				26EBDE2C2CE1341800B3A2BC /* ReadingRecord.swift in Sources */,
 				26EBDE2A2CDF33D900B3A2BC /* Date+Extension.swift in Sources */,
+				1A9E3D542CF88BA400C7B27A /* Text+Extension.swift in Sources */,
 				26EBDEC02CF2398F00B3A2BC /* BookMetaDataProtocol.swift in Sources */,
 				26F19A722CDB267600F41D6D /* NavigationCoordinator.swift in Sources */,
 				26EBDED42CF45B1E00B3A2BC /* UserSettings.swift in Sources */,

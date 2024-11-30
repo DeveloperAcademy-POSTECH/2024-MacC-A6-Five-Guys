@@ -19,7 +19,7 @@ struct CustomBackButton: View {
                     Image(systemName: "chevron.left")
                         .resizable()
                         .scaledToFit()
-                        .tint(Color(red: 0.12, green: 0.12, blue: 0.12))
+                        .tint(Color(Color.Labels.primaryBlack1))
                 }
             }
             Spacer()
