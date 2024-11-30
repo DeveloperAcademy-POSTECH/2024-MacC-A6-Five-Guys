@@ -49,7 +49,7 @@ struct CompletionCalendarView: View {
                                 .fixedSize()
                                 .background {
                                     RoundedRectangle(cornerRadius: 7)
-                                        .foregroundColor(.clear)
+                                        .foregroundStyle(.clear)
                                         .frame(height: 30) // 텍스트 필드 높이 지정
                                 }
                             
@@ -58,7 +58,7 @@ struct CompletionCalendarView: View {
                                 .scaledToFill()
                                 .frame(width: 20, height: 20)
                         }
-                        .foregroundColor(Color(Color.Colors.green2))
+                        .foregroundStyle(Color(Color.Colors.green2))
                         .padding(.horizontal, 8) // 텍스트 필드와 이미지 주변 패딩
                         .padding(.vertical, 4)
                         .background {
@@ -80,7 +80,7 @@ struct CompletionCalendarView: View {
                 }
             }
             .font(.system(size: 22, weight: .semibold))
-            .foregroundColor(Color(Color.Labels.primaryBlack1))
+            .foregroundStyle(Color(Color.Labels.primaryBlack1))
             .padding(.top, 34)
             .padding(.bottom, 11)
             .padding(.horizontal, 20)
@@ -126,7 +126,7 @@ struct CompletionCalendarView: View {
                     selectCompletionAction()
                 } label: {
                     Text("완료")
-                        .foregroundColor(!(startDate == nil || endDate == nil) ?
+                        .foregroundStyle(!(startDate == nil || endDate == nil) ?
                                          Color(Color.Colors.green2)
                                          : Color(Color.Labels.tertiaryBlack3))
                 }
@@ -148,7 +148,7 @@ struct CompletionCalendarView: View {
                 Text(day)
                     .frame(maxWidth: .infinity)
                     .font(.system(size: 13, weight: .medium))
-                    .foregroundColor(Color(Color.Labels.tertiaryBlack3))
+                    .foregroundStyle(Color(Color.Labels.tertiaryBlack3))
             }
         }
         .padding(.bottom, 12)
@@ -253,7 +253,7 @@ struct CompletionCalendarView: View {
             .background(
                 isSelectedDay ? Color.green : Color.clear
             )
-            .foregroundColor(isSelectedDay ? .white : textColor) // 선택된 경우 화이트, 그렇지 않으면 전달된 색상 사용
+            .foregroundStyle(isSelectedDay ? .white : textColor) // 선택된 경우 화이트, 그렇지 않으면 전달된 색상 사용
             .fontStyle(
                 isSelectedDay ? .title2 : .body,
                 weight: isSelectedDay ? .semibold : .regular
@@ -342,7 +342,7 @@ struct CompletionCalendarView: View {
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 16)
                 .background(startDate != nil && endDate != nil ? Color(Color.Colors.green1) : Color(Color.Fills.lightGreen))
-                .foregroundColor(.white)
+                .foregroundStyle(.white)
                 .cornerRadius(16)
         }
         .disabled(startDate == nil || endDate == nil)

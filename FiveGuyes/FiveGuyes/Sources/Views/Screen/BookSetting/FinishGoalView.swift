@@ -38,12 +38,12 @@ struct FinishGoalView: View {
                     Image(systemName: "checkmark.circle.fill")
                         .resizable()
                         .frame(width: 56, height: 56)
-                        .foregroundColor(Color(Color.Colors.green1))
+                        .foregroundStyle(Color(Color.Colors.green1))
                         .padding(.bottom, 14)
                     
                     Text("완독 목표 설정 완료")
                         .fontStyle(.title2, weight: .semibold)
-                        .foregroundColor(Color(Color.Colors.green2))
+                        .foregroundStyle(Color(Color.Colors.green2))
                         .padding(.horizontal, 8)
                         .padding(.vertical, 4)
                         .background(Color.white)
@@ -57,7 +57,7 @@ struct FinishGoalView: View {
                             .fontStyle(.title1, weight: .semibold)
                             .padding(.horizontal, 8)
                             .padding(.vertical, 4)
-                            .foregroundColor(Color(Color.Colors.green2))
+                            .foregroundStyle(Color(Color.Colors.green2))
                             .background(Color.white)
                             .cornerRadius(8)
                         
@@ -82,7 +82,7 @@ struct FinishGoalView: View {
                         } else {
                             // 이미지 없을 때
                             Rectangle()
-                                .foregroundColor(Color(Color.Colors.green)) // TODO: 확인필요 / 일반 .green 으로 되어있었음
+                                .foregroundStyle(Color(Color.Colors.green)) // TODO: 확인필요 / 일반 .green 으로 되어있었음
                                 .frame(width: 90, height: 139)
                                 .padding(.leading, 20)
                         }
@@ -94,19 +94,19 @@ struct FinishGoalView: View {
                                 Text(book.title)
                                     .fontStyle(.body, weight: .semibold)
                                     .padding(.top, 17)
-                                    .foregroundColor(Color(Color.Labels.primaryBlack1))
+                                    .foregroundStyle(Color(Color.Labels.primaryBlack1))
                                     .lineLimit(1)
                                 
                                 // 저자
                                 Text(book.author.removingParenthesesContent())
                                     .font(.system(size: 14, weight: .medium))
-                                    .foregroundColor(Color(Color.Labels.secondaryBlack2))
+                                    .foregroundStyle(Color(Color.Labels.secondaryBlack2))
                                     .lineLimit(1)
                             }
                             
                             // 완독 목표 기간
                             Text("\(startDate.toKoreanDateStringWithoutYear()) ~ \(endDate.toKoreanDateStringWithoutYear())")
-                                .foregroundColor(Color(Color.Labels.primaryBlack1))
+                                .foregroundStyle(Color(Color.Labels.primaryBlack1))
                                 .fontStyle(.body)
                                 .lineLimit(1)
                                 .padding(.horizontal, 8)
@@ -116,7 +116,7 @@ struct FinishGoalView: View {
                             
                             // 하루 권장 독서량
                             Text("하루 권장 독서량 : \(pagesPerDay)쪽")
-                                .foregroundColor(Color(Color.Colors.green2))
+                                .foregroundStyle(Color(Color.Colors.green2))
                                 .fontStyle(.body)
                                 .lineLimit(1)
                                 .padding(.horizontal, 8)
@@ -155,7 +155,7 @@ struct FinishGoalView: View {
                             Text("확인")
                                 .font(.system(size: 20))
                                 .fontWeight(.bold)
-                                .foregroundColor(.white)
+                                .foregroundStyle(.white)
                         }
                         .frame(maxWidth: .infinity)
                         .frame(height: 64)
@@ -171,7 +171,7 @@ struct FinishGoalView: View {
                 // 1일 할당량 계산
                 // TODO: 해당 모델 객체를 더 잘 만들 방식 고민하기
                 let bookMetaData = BookMetaData(title: book.title, author: book.author, coverURL: book.cover, totalPages: totalPages)
-                var userSettings = UserSettings(startPage: startPage, targetEndPage: totalPages, startDate: startDate, targetEndDate: endDate, nonReadingDays: bookSettingInputModel.nonReadingDays)
+                let userSettings = UserSettings(startPage: startPage, targetEndPage: totalPages, startDate: startDate, targetEndDate: endDate, nonReadingDays: bookSettingInputModel.nonReadingDays)
                 let readingProgress = ReadingProgress(lastPagesRead: startPage)
                 let completionStatus = CompletionStatus()
   

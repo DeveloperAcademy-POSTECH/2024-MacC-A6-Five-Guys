@@ -56,7 +56,7 @@ struct TotalCalendarView: View {
             Text(calendarHeaderString(for: currentMonth))
                 .font(.system(size: 17, weight: .semibold))
                 .multilineTextAlignment(.center)
-                .foregroundColor(Color(Color.Labels.primaryBlack1))
+                .foregroundStyle(Color(Color.Labels.primaryBlack1))
             
             HStack(alignment: .center, spacing: 28) {
                 Spacer()
@@ -68,7 +68,7 @@ struct TotalCalendarView: View {
                 }
                 .padding(.trailing, 20)
             }
-            .foregroundColor(Color(Color.Labels.primaryBlack1))
+            .foregroundStyle(Color(Color.Labels.primaryBlack1))
         }
         
     }
@@ -78,7 +78,7 @@ struct TotalCalendarView: View {
             ForEach(["일", "월", "화", "수", "목", "금", "토"], id: \.self) { day in
                 Text(day)
                     .font(.system(size: 15, weight: .medium))
-                    .foregroundColor(Color(Color.Labels.tertiaryBlack3))
+                    .foregroundStyle(Color(Color.Labels.tertiaryBlack3))
                     .frame(width: 32, height: 18, alignment: .center)
                     .padding(.horizontal, 16)
             }
@@ -114,7 +114,7 @@ struct TotalCalendarView: View {
                                     .overlay(
                                         Text("완독")
                                             .font(.system(size: 14, weight: .semibold))
-                                            .foregroundColor(isTodayCompletionDate ? Color.white : Color(Color.Colors.green2))
+                                            .foregroundStyle(isTodayCompletionDate ? Color.white : Color(Color.Colors.green2))
                                             .padding(.bottom, 1)
                                             .padding(.leading, 2)
                                     )
@@ -173,7 +173,7 @@ struct TotalCalendarView: View {
                 Text("\(formattedCompletionDateString(from: targetEndDate))")
                     .font(.system(size: 17, weight: .medium))
                     .multilineTextAlignment(.center)
-                    .foregroundColor(Color(Color.Colors.green2))
+                    .foregroundStyle(Color(Color.Colors.green2))
                     .padding(.horizontal, 11)
                     .padding(.vertical, 6)
                     .background(Color(Color.Fills.lightGreen))

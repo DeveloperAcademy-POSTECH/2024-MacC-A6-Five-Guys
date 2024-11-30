@@ -26,7 +26,7 @@ struct BookRowView: View {
                     } else {
                         // 이미지 없을 때
                         Rectangle()
-                            .foregroundColor(.green)
+                            .foregroundStyle(.green)
                     }
                 }
                 .frame(width: 115, height: 178)
@@ -35,11 +35,11 @@ struct BookRowView: View {
                 VStack(alignment: .leading) {
                     Text(book.title)
                         .fontStyle(.body, weight: .semibold)
-                        .foregroundColor(Color(red: 0.12, green: 0.12, blue: 0.12))
+                        .foregroundStyle(Color(red: 0.12, green: 0.12, blue: 0.12))
                     
                     Text("\(book.author.removingParenthesesContent()) | \(book.pubDate.extractYear()) | \(book.publisher)")
                         .fontStyle(.caption1)
-                        .foregroundColor(Color(red: 0.44, green: 0.44, blue: 0.44))
+                        .foregroundStyle(Color(red: 0.44, green: 0.44, blue: 0.44))
                 }
                 .frame(maxWidth: .infinity, alignment: .topLeading)
                 .padding(.leading, 16)

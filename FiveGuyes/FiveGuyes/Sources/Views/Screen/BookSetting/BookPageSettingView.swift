@@ -23,7 +23,6 @@ struct BookPageSettingView: View {
     
     @StateObject private var toastViewModel = ToastViewModel()
     
-    
     var body: some View {
         let title = bookSettingInputModel.selectedBook?.title ?? "제목 없음"
         
@@ -147,4 +146,3 @@ struct BookPageSettingView: View {
         Tracking.Screen.pageSetting.setTracking()
     }
 }
-

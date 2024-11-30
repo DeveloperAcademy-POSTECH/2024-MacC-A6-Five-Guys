@@ -22,12 +22,11 @@ struct CompletionReviewView: View {
     @Query(filter: #Predicate<UserBook> { $0.completionStatus.isCompleted == false })
     private var currentlyReadingBooks: [UserBook]  // 현재 읽고 있는 책을 가져오는 쿼리
     
-    // TODO: Font, Color 설정
     var body: some View {
         let userBook = currentlyReadingBooks.first ?? UserBook.dummyUserBookV2
         
         let bookMetadata: BookMetaDataProtocol = userBook.bookMetaData
-        var completionStatus: CompletionStatusProtocol = userBook.completionStatus
+        let completionStatus: CompletionStatusProtocol = userBook.completionStatus
         let userSettings = userBook.userSettings
         
         let title = bookMetadata.title

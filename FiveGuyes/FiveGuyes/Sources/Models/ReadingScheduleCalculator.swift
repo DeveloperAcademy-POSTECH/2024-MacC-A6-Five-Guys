@@ -160,7 +160,6 @@ struct ReadingScheduleCalculator {
         }
     }
     
-    
     /// 오늘 할당량이 읽혔는지 확인하는 메서드
     private func hasReadPagesAdjustedToday<Progress: ReadingProgressProtocol>(progress: Progress) -> Bool {
         let today = Date()

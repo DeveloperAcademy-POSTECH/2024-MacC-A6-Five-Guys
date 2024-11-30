@@ -31,7 +31,7 @@ struct CompletionListView: View {
             HStack {
                 Text("완독 리스트")
                     .fontStyle(.title1, weight: .semibold)
-                    .foregroundColor(Color(Color.Labels.primaryBlack1))
+                    .foregroundStyle(Color(Color.Labels.primaryBlack1))
                 
                 Spacer()
             }
@@ -67,10 +67,10 @@ struct CompletionListView: View {
                                     VStack(alignment: .leading, spacing: 0) {
                                         Text(book.bookMetaData.title)
                                             .fontStyle(.caption1, weight: .semibold)
-                                            .foregroundColor(Color(Color.Labels.primaryBlack1))
+                                            .foregroundStyle(Color(Color.Labels.primaryBlack1))
                                         Text(book.bookMetaData.author)
                                             .fontStyle(.caption2)
-                                            .foregroundColor(Color(Color.Labels.secondaryBlack2))
+                                            .foregroundStyle(Color(Color.Labels.secondaryBlack2))
                                     }
                                     .lineLimit(1)
                                 }
@@ -90,7 +90,7 @@ struct CompletionListView: View {
                     VStack(alignment: .leading, spacing: 10) {
                         Text(selectedBook.completionStatus.completionReview)
                             .fontStyle(.body)
-                            .foregroundColor(Color(Color.Labels.primaryBlack1))
+                            .foregroundStyle(Color(Color.Labels.primaryBlack1))
                             .padding(.bottom, 10)
                         // TODO: 수정 버튼 추가하기
                         HStack {
@@ -110,12 +110,12 @@ struct CompletionListView: View {
 //                            }
                         }
                         .fontStyle(.caption2)
-                        .foregroundColor(Color(Color.Labels.secondaryBlack2))
+                        .foregroundStyle(Color(Color.Labels.secondaryBlack2))
                     }
                     .padding(20)
                     .background {
                         RoundedRectangle(cornerRadius: 16)
-                            .foregroundColor(Color(Color.Fills.lightGreen))
+                            .foregroundStyle(Color(Color.Fills.lightGreen))
                     }
                     .padding(.horizontal, 20)
                     

@@ -19,7 +19,7 @@ struct ToastView: View {
                         .fontStyle(.body, weight: .semibold)
                         .padding(.horizontal, 20)
                         .padding(.vertical, 14)
-                        .foregroundColor(.white)
+                        .foregroundStyle(.white)
                         .background(Color(Color.Backgrounds.gray))
                         .cornerRadius(16)
                         .transition(.opacity)

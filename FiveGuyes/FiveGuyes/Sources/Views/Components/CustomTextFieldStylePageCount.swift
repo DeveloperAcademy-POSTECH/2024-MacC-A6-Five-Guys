@@ -18,17 +18,17 @@ struct CustomTextFieldStylePageCount: ViewModifier {
                 .overlay(alignment: .leading) {
                     if text.isEmpty {
                         Text(placeholder)
-                            .foregroundColor(Color(Color.Labels.tertiaryBlack3)) // TODO: .gray 여서 다른 textfiled 의 placeholder 색상과 맞춤
+                            .foregroundStyle(Color(Color.Labels.tertiaryBlack3)) // TODO: .gray 여서 다른 textfiled 의 placeholder 색상과 맞춤
                             .font(.system(size: 20))
                             .padding(.leading, 8)
                     }
                    
                 }
             Image(systemName: "pencil")
-                .foregroundColor(Color(Color.Colors.green2))
+                .foregroundStyle(Color(Color.Colors.green2))
                           
         }.font(.system(size: 20))
-            .foregroundColor(Color(Color.Colors.green2))
+            .foregroundStyle(Color(Color.Colors.green2))
             .padding(.horizontal, 8)
             .padding(.vertical, 4)
             .background(Color(Color.Fills.lightGreen))

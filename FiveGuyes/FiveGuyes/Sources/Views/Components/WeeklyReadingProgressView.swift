@@ -60,7 +60,7 @@ struct WeeklyReadingProgressView: View {
             }
             .background {
                 RoundedRectangle(cornerRadius: 8)
-                    .foregroundColor(.white)
+                    .foregroundStyle(.white)
                     .shadow(color: Color(red: 0.84, green: 0.84, blue: 0.84).opacity(0.25), radius: 2, x: 0, y: 4)
             }
             
@@ -70,7 +70,7 @@ struct WeeklyReadingProgressView: View {
                     Text("읽고 있는 책이 없어요!\n읽고 있는 책을 등록해주세요")
                         .lineSpacing(6)
                         .fontStyle(.body)
-                        .foregroundColor(Color(Color.Labels.secondaryBlack2))
+                        .foregroundStyle(Color(Color.Labels.secondaryBlack2))
                     Spacer()
                 }
                 
@@ -87,7 +87,7 @@ struct WeeklyReadingProgressView: View {
             .padding(.horizontal, 24)
             .background {
                 RoundedRectangle(cornerRadius: 16)
-                    .foregroundColor(Color(Color.Fills.white)) // 피그마대로 white 로 변경
+                    .foregroundStyle(Color(Color.Fills.white)) // 피그마대로 white 로 변경
             }
             .shadow(color: Color(red: 0.84, green: 0.84, blue: 0.84).opacity(0.25), radius: 2, x: 0, y: 4)
         }

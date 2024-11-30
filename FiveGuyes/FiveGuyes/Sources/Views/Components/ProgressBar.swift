@@ -12,7 +12,7 @@ struct ProgressBar: View {
     var currentPage: Int
     
     var body: some View {
-        var progress = CGFloat(Double(currentPage) / total)
+        let progress = CGFloat(Double(currentPage) / total)
         
         GeometryReader { geometry in
             ZStack(alignment: .leading) {

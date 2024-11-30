@@ -17,7 +17,7 @@ struct TotalCalendarTextBubble: View {
     var body: some View {
         VStack {
             Text(text)
-                .foregroundColor(textColor)
+                .foregroundStyle(textColor)
                 .fontWeight(fontWeight) // fontWeight 적용
         }
         .padding(.horizontal, 8)

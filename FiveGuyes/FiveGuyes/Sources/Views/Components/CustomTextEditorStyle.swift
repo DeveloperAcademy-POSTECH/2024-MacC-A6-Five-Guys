@@ -36,7 +36,7 @@ struct CustomTextEditorStyle: ViewModifier {
                 .padding(.top, 30)
                 .padding(.leading, 27)
                 .fontStyle(.body) // 수정 적용
-                .foregroundColor(Color(Color.Labels.tertiaryBlack3))
+                .foregroundStyle(Color(Color.Labels.tertiaryBlack3))
         }
     }
 }

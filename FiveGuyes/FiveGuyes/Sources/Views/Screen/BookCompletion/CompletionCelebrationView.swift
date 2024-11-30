@@ -62,7 +62,7 @@ struct CompletionCelebrationView: View {
             .padding(.horizontal, 8)
             .background {
                 RoundedRectangle(cornerRadius: 8)
-                    .foregroundColor(.white)
+                    .foregroundStyle(.white)
             }
     }
     
@@ -120,7 +120,7 @@ struct CompletionCelebrationView: View {
             .padding(.horizontal, 10)
             .background {
                 RoundedRectangle(cornerRadius: 8)
-                    .foregroundColor(.white)
+                    .foregroundStyle(.white)
             }
     }
     
@@ -135,7 +135,7 @@ struct CompletionCelebrationView: View {
                 .frame(height: 56)
                 .background {
                     RoundedRectangle(cornerRadius: 16)
-                        .foregroundColor(Color.Colors.green1)
+                        .foregroundStyle(Color.Colors.green1)
                 }
         }
     }
