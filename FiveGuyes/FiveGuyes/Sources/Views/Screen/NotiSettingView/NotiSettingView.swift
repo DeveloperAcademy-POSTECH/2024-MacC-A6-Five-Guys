@@ -257,8 +257,7 @@ struct NotiSettingView: View {
         if isDisabled {
             await notificationManager.clearRequests()
         } else {
-            await notificationManager.setupNotifications(notificationType: .morning(readingBook: userBook))
-            await notificationManager.setupNotifications(notificationType: .night(readingBook: userBook))
+            await notificationManager.setupAllNotifications(userBook)
         }
     }
     

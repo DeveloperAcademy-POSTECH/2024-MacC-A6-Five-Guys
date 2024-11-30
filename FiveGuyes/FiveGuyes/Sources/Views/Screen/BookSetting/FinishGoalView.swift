@@ -145,7 +145,9 @@ struct FinishGoalView: View {
                             modelContext.insert(userBook) // SwiftData에 새로운 책 저장
                             
                             // 노티 세팅하기
-                            setNotification(userBook)
+                            Task {
+                                await notificationManager.setupAllNotifications(userBook)
+                            }
                             navigationCoordinator.popToRoot()
                         } else {
                             print("책 정보 없음")
@@ -188,16 +190,6 @@ struct FinishGoalView: View {
             }
         }
         
-    }
-
-    private func setNotification(_ readingBook: UserBook) {
-        Task {
-            await notificationManager.clearRequests()
-            
-            await self.notificationManager.setupNotifications(notificationType: .morning(readingBook: readingBook))
-            
-            await self.notificationManager.setupNotifications(notificationType: .night(readingBook: readingBook))
-        }
     }
 }
 
