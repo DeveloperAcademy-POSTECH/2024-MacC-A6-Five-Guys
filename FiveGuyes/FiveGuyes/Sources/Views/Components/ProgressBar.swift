@@ -17,8 +17,8 @@ struct ProgressBar: View {
         GeometryReader { geometry in
             ZStack(alignment: .leading) {
                 Rectangle()
-                    .stroke(Color(Color.Separators.gray))
-                    .fill(Color(Color.Separators.gray))
+                    .stroke(Color.Separators.gray)
+                    .fill(Color.Separators.gray)
                     .frame(height: 2)
                 
                 Rectangle()

@@ -42,7 +42,7 @@ struct DailyProgressView: View {
             HStack {
                 Text(isTodayCompletionDate ? "오늘은 <\(bookMetadata.title)>\(bookMetadata.title.postPositionParticle()) 완독하는\n마지막 날이에요"
                      : "지금까지 읽은 쪽수를\n알려주세요")
-                .font(.system(size: 22, weight: .semibold))
+                .fontStyle(.title2, weight: .semibold)
                 Spacer()
             }
             .padding(.top, 25)
@@ -54,12 +54,12 @@ struct DailyProgressView: View {
                 
                 TextField("", value: $pagesToReadToday, format: .number)
                     .frame(width: 180, height: 68)
-                    .background(Color(Color.Fills.lightGreen))
+                    .background(Color.Fills.lightGreen)
                     .cornerRadius(16)
                     .keyboardType(.numberPad)
                     .multilineTextAlignment(.center)
                     .fontStyle(.title1, weight: .semibold)
-                    .tint(Color(Color.Labels.primaryBlack1))
+                    .tint(Color.Labels.primaryBlack1)
                     .focused($isTextTextFieldFocused)
                 
                 Text("쪽")
@@ -120,7 +120,7 @@ struct DailyProgressView: View {
                         .frame(maxWidth: .infinity)
                         .frame(height: 56)
                         .background(Color.Colors.green2)
-                        .foregroundStyle(.white)
+                        .foregroundStyle(Color.Fills.white)
                     
                 }
                 .ignoresSafeArea(.keyboard, edges: .bottom)

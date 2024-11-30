@@ -54,9 +54,9 @@ struct TotalCalendarView: View {
     private var header: some View {
         ZStack {
             Text(calendarHeaderString(for: currentMonth))
-                .font(.system(size: 17, weight: .semibold))
+                .fontStyle(.body, weight: .semibold)
                 .multilineTextAlignment(.center)
-                .foregroundStyle(Color(Color.Labels.primaryBlack1))
+                .foregroundStyle(Color.Labels.primaryBlack1)
             
             HStack(alignment: .center, spacing: 28) {
                 Spacer()
@@ -68,7 +68,7 @@ struct TotalCalendarView: View {
                 }
                 .padding(.trailing, 20)
             }
-            .foregroundStyle(Color(Color.Labels.primaryBlack1))
+            .foregroundStyle(Color.Labels.primaryBlack1)
         }
         
     }
@@ -77,8 +77,8 @@ struct TotalCalendarView: View {
         LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7)) {
             ForEach(["일", "월", "화", "수", "목", "금", "토"], id: \.self) { day in
                 Text(day)
-                    .font(.system(size: 15, weight: .medium))
-                    .foregroundStyle(Color(Color.Labels.tertiaryBlack3))
+                    .fontStyle(.caption1, weight: .semibold) // TODO: 디자이너 확인중
+                    .foregroundStyle(Color.Labels.tertiaryBlack3)
                     .frame(width: 32, height: 18, alignment: .center)
                     .padding(.horizontal, 16)
             }
@@ -113,8 +113,8 @@ struct TotalCalendarView: View {
                                     .frame(width: 50, height: 50)
                                     .overlay(
                                         Text("완독")
-                                            .font(.system(size: 14, weight: .semibold))
-                                            .foregroundStyle(isTodayCompletionDate ? Color.white : Color(Color.Colors.green2))
+                                            .fontStyle(.caption1, weight: .semibold)
+                                            .foregroundStyle(isTodayCompletionDate ? Color.Fills.white : Color.Colors.green2)
                                             .padding(.bottom, 1)
                                             .padding(.leading, 2)
                                     )
@@ -122,8 +122,8 @@ struct TotalCalendarView: View {
                                 // 오늘 날짜인 경우 - 초록색 배경에 목표 페이지 수 표시
                                 TotalCalendarTextBubble(
                                     text: "\(readingRecord.targetPages)",
-                                    textColor: .white,
-                                    backgroundColor: Color(Color.Colors.green1),
+                                    textColor: Color.Fills.white,
+                                    backgroundColor: Color.Colors.green1,
                                     fontWeight: .semibold
                                 )
                             } else if readingRecord.pagesRead == readingRecord.targetPages {
@@ -131,7 +131,7 @@ struct TotalCalendarView: View {
                                 TotalCalendarTextBubble(
                                     text: "\(readingRecord.pagesRead)",
                                     textColor: Color.Labels.secondaryBlack2,
-                                    backgroundColor: Color(Color.Colors.green)
+                                    backgroundColor: Color.Colors.green
                                 )
                             } else if date > todayDate {
                                 // 미래의 날짜로 계획이 설정된 날 - 회색 텍스트로 목표 페이지 수 표시
@@ -145,7 +145,7 @@ struct TotalCalendarView: View {
                                 TotalCalendarTextBubble(
                                     text: "•",
                                     textColor: Color.Labels.secondaryBlack2,
-                                    backgroundColor: Color(Color.Fills.lightGreen)
+                                    backgroundColor: Color.Fills.lightGreen
                                 )
                             }
                         } else {
@@ -153,7 +153,7 @@ struct TotalCalendarView: View {
                             TotalCalendarTextBubble(
                                 text: "",
                                 textColor: Color.clear,
-                                backgroundColor: Color(Color.Fills.lightGreen)
+                                backgroundColor: Color.Fills.lightGreen
                             )
                         }
                     }
@@ -166,17 +166,17 @@ struct TotalCalendarView: View {
     private var CompletionFooter: some View {
         HStack(alignment: .center) {
             Text("완독 종료일")
-                .font(.system(size: 17, weight: .medium))
+                .fontStyle(.body, weight: .semibold)
             
             Spacer()
             if let targetEndDate = currentReadingBook?.userSettings.targetEndDate {
                 Text("\(formattedCompletionDateString(from: targetEndDate))")
-                    .font(.system(size: 17, weight: .medium))
+                    .fontStyle(.body)
                     .multilineTextAlignment(.center)
-                    .foregroundStyle(Color(Color.Colors.green2))
+                    .foregroundStyle(Color.Colors.green2)
                     .padding(.horizontal, 11)
                     .padding(.vertical, 6)
-                    .background(Color(Color.Fills.lightGreen))
+                    .background(Color.Fills.lightGreen)
                     .cornerRadius(8)
             }
         }

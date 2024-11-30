@@ -154,7 +154,7 @@ struct WeeklyPageCalendarView: View {
             .overlay(
                 Text("완독")
                     .fontStyle(.caption1, weight: .semibold)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(Color.Fills.white)
                     .padding(.bottom, 1)
                     .padding(.leading, 2)
             )
@@ -166,7 +166,7 @@ struct WeeklyPageCalendarView: View {
             if dayIndex == 0 { // 일요일
                 ZStack {
                     HStack(spacing: 0) {
-                        Rectangle().fill(.white)
+                        Rectangle().fill(Color.Fills.white)
                         Rectangle().fill(Color.Fills.lightGreen)
                     }
                     Circle().fill(Color.Fills.lightGreen)
@@ -175,7 +175,7 @@ struct WeeklyPageCalendarView: View {
                 ZStack {
                     HStack(spacing: 0) {
                         Rectangle().fill(Color.Fills.lightGreen)
-                        Rectangle().fill(.white)
+                        Rectangle().fill(Color.Fills.white)
                     }
                     Circle().fill(Color.Fills.lightGreen)
                 }
@@ -190,12 +190,12 @@ struct WeeklyPageCalendarView: View {
             if dayIndex == todayIndex {
                 HStack(spacing: 0) {
                     Rectangle().fill(Color.Fills.lightGreen)
-                    Rectangle().fill(.white)
+                    Rectangle().fill(Color.Fills.white)
                 }
             } else if dayIndex == 0 {
                 ZStack {
                     HStack(spacing: 0) {
-                        Rectangle().fill(.white)
+                        Rectangle().fill(Color.Fills.white)
                         Rectangle().fill(Color.Fills.lightGreen)
                     }
                     Circle().fill(Color.Fills.lightGreen)
@@ -203,13 +203,13 @@ struct WeeklyPageCalendarView: View {
             } else if dayIndex < todayIndex {
                 Rectangle().fill(Color.Fills.lightGreen)
             } else {
-                Rectangle().fill(.white) // 기본 배경
+                Rectangle().fill(Color.Fills.white) // 기본 배경
             }
         }
     }
     
     private func backgroundForFutureWeek() -> some View {
-        Rectangle().fill(.white) // 미래 상태의 기본 배경
+        Rectangle().fill(Color.Fills.white) // 미래 상태의 기본 배경
     }
     
     // MARK: - Text Handlers
@@ -241,7 +241,7 @@ struct WeeklyPageCalendarView: View {
                         
                         Text("\(record.targetPages)")
                             .fontStyle(.title3, weight: .semibold)
-                            .foregroundStyle(.white)
+                            .foregroundStyle(Color.Fills.white)
                     }
                 } else {
                     Text("\(record.targetPages)")

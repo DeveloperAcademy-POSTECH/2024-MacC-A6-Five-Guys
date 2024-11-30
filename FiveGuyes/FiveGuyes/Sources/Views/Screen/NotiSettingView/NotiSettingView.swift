@@ -49,7 +49,7 @@ struct NotiSettingView: View {
         let userBook = currentlyReadingBooks.first ?? UserBook.dummyUserBookV2
         
         ZStack {
-            Color.white // 배경색 지정
+            Color.Fills.white // 배경색 지정
                 .ignoresSafeArea()
             
             VStack(alignment: .leading, spacing: .zero) {

@@ -10,8 +10,8 @@ import SwiftUI
 
 struct TotalCalendarTextBubble: View {
     var text: String
-    var textColor: Color = Color(Color.Labels.primaryBlack1)
-    var backgroundColor: Color = Color(Color.Colors.green)
+    var textColor: Color = Color.Labels.primaryBlack1
+    var backgroundColor: Color = Color.Colors.green
     var fontWeight: Font.Weight = .medium // 기본 글꼴 스타일을 medium으로 설정
 
     var body: some View {

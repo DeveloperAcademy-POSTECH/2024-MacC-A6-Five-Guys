@@ -62,14 +62,14 @@ struct CompletionCelebrationView: View {
             .padding(.horizontal, 8)
             .background {
                 RoundedRectangle(cornerRadius: 8)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(Color.Fills.white)
             }
     }
     
     private var celebrationMessage: some View {
         Text(celebrationMessageText)
             .fontStyle(.title1, weight: .semibold)
-            .foregroundStyle(Color(Color.Labels.primaryBlack1))
+            .foregroundStyle(Color.Labels.primaryBlack1)
             .multilineTextAlignment(.center)
     }
     
@@ -114,13 +114,13 @@ struct CompletionCelebrationView: View {
         let totalReadingDays = readingScheduleCalculator.firstCalculateTotalReadingDays(settings: userSettings, progress: readingProgress)
         
         return Text("\(startDateText)부터 \(endDateText)까지\n꾸준히 \(pagesPerDay)쪽씩 \(totalReadingDays)일동안 읽었어요 🎉")
-            .font(.system(size: 15, weight: .medium))
-            .foregroundStyle(Color(Color.Labels.primaryBlack1))
+            .fontStyle(.caption1)
+            .foregroundStyle(Color.Labels.primaryBlack1)
             .padding(.vertical, 4)
             .padding(.horizontal, 10)
             .background {
                 RoundedRectangle(cornerRadius: 8)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(Color.Fills.white)
             }
     }
     
@@ -130,7 +130,7 @@ struct CompletionCelebrationView: View {
         } label: {
             Text("완독 소감 작성하기")
                 .fontStyle(.title2, weight: .semibold)
-                .foregroundStyle(.white)
+                .foregroundStyle(Color.Fills.white)
                 .frame(maxWidth: .infinity)
                 .frame(height: 56)
                 .background {
