@@ -51,13 +51,13 @@ final class ReadingProgress: ReadingProgressProtocol {
         let firstDate = settings.startDate
         let lastDate = settings.targetEndDate
         
-        let today = Date()
+        let today = Date().adjustedDate()
 
         // 오늘이 시작일보다 이전일 경우 처리
         let effectiveStartDay = today < firstDate ? today : firstDate
         
         let calendar = Calendar.current
-        let firstWeekStart = calendar.dateInterval(of: .weekOfMonth, for: effectiveStartDay)?.start ?? firstDate
+        let firstWeekStart = calendar.dateInterval(of: .weekOfMonth, for: effectiveStartDay)?.start ?? effectiveStartDay
         let lastWeekStart = calendar.dateInterval(of: .weekOfMonth, for: lastDate)?.start ?? lastDate
         
         var startDates: [Date] = []
