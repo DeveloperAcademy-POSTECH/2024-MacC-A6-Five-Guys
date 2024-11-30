@@ -119,7 +119,7 @@ struct DailyProgressView: View {
                     Text("완료")
                         .frame(maxWidth: .infinity)
                         .frame(height: 56)
-                        .background(Color.Colors.green2)
+                        .background(Color.Colors.green1)
                         .foregroundStyle(Color.Fills.white)
                     
                 }

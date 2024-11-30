@@ -62,7 +62,7 @@ struct CompletionCalendarView: View {
                             .padding(.vertical, 4)
                             .background {
                                 RoundedRectangle(cornerRadius: 8)
-                                    .foregroundStyle(Color(Color.Fills.lightGreen))
+                                    .foregroundStyle(Color.Fills.lightGreen)
                             }
                         
                         Text("쪽이에요")
@@ -82,7 +82,7 @@ struct CompletionCalendarView: View {
                             .padding(.vertical, 4)
                             .background {
                                 RoundedRectangle(cornerRadius: 8)
-                                    .foregroundStyle(Color(Color.Fills.lightGreen))
+                                    .foregroundStyle(Color.Fills.lightGreen)
                             }
                         
                         Text("쪽만 읽으면 돼요")
