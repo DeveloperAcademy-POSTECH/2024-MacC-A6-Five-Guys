@@ -27,7 +27,7 @@ struct BookListView: View {
                         requestSearchBooks()
                     }
                     .fontStyle(.body)
-                    .foregroundColor(.black)
+                    .foregroundColor(Color(Color.Labels.primaryBlack1))
                     
                     Spacer()
                     

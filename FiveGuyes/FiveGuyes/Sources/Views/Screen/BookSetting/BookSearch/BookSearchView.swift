@@ -36,8 +36,8 @@ struct BookSearchView: View {
                     } label: {
                         Text("완료")
                             .foregroundColor(bookSearchViewModel.selectedBook != nil ?
-                                             Color(red: 0.03, green: 0.68, blue: 0.41)
-                                             : Color(red: 0.84, green: 0.84, blue: 0.84))
+                                             Color(Color.Colors.green2)
+                                             : Color(Color.Labels.tertiaryBlack3))
                     }
                     .disabled(bookSearchViewModel.selectedBook == nil)
                 }

@@ -22,3 +22,4 @@ final class BookMetaData: BookMetaDataProtocol {
         self.totalPages = totalPages
     }
 }
+

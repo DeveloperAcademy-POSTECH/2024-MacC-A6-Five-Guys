@@ -29,7 +29,7 @@ struct FinishGoalView: View {
            let endDate = bookSettingInputModel.endData {
             
             ZStack {
-                Color(red: 0.96, green: 0.98, blue: 0.97)
+                Color(Color.Fills.lightGreen)
                     .ignoresSafeArea()
                 
                 VStack(spacing: 0) {
@@ -38,12 +38,12 @@ struct FinishGoalView: View {
                     Image(systemName: "checkmark.circle.fill")
                         .resizable()
                         .frame(width: 56, height: 56)
-                        .foregroundColor(Color.green)
+                        .foregroundColor(Color(Color.Colors.green1))
                         .padding(.bottom, 14)
                     
                     Text("완독 목표 설정 완료")
                         .fontStyle(.title2, weight: .semibold)
-                        .foregroundColor(Color(red: 0.03, green: 0.68, blue: 0.41))
+                        .foregroundColor(Color(Color.Colors.green2))
                         .padding(.horizontal, 8)
                         .padding(.vertical, 4)
                         .background(Color.white)
@@ -57,7 +57,7 @@ struct FinishGoalView: View {
                             .fontStyle(.title1, weight: .semibold)
                             .padding(.horizontal, 8)
                             .padding(.vertical, 4)
-                            .foregroundColor(Color(red: 0.03, green: 0.68, blue: 0.41))
+                            .foregroundColor(Color(Color.Colors.green2))
                             .background(Color.white)
                             .cornerRadius(8)
                         
@@ -82,7 +82,7 @@ struct FinishGoalView: View {
                         } else {
                             // 이미지 없을 때
                             Rectangle()
-                                .foregroundColor(.green)
+                                .foregroundColor(Color(Color.Colors.green)) // TODO: 확인필요 / 일반 .green 으로 되어있었음
                                 .frame(width: 90, height: 139)
                                 .padding(.leading, 20)
                         }
@@ -94,33 +94,34 @@ struct FinishGoalView: View {
                                 Text(book.title)
                                     .fontStyle(.body, weight: .semibold)
                                     .padding(.top, 17)
+                                    .foregroundColor(Color(Color.Labels.primaryBlack1))
                                     .lineLimit(1)
                                 
                                 // 저자
                                 Text(book.author.removingParenthesesContent())
                                     .font(.system(size: 14, weight: .medium))
-                                    .foregroundColor(Color(red: 0.44, green: 0.44, blue: 0.44))
+                                    .foregroundColor(Color(Color.Labels.secondaryBlack2))
                                     .lineLimit(1)
                             }
                             
                             // 완독 목표 기간
                             Text("\(startDate.toKoreanDateStringWithoutYear()) ~ \(endDate.toKoreanDateStringWithoutYear())")
-                                .foregroundColor(Color.black)
+                                .foregroundColor(Color(Color.Labels.primaryBlack1))
                                 .fontStyle(.body)
                                 .lineLimit(1)
                                 .padding(.horizontal, 8)
                                 .padding(.vertical, 4)
-                                .background(Color(red: 0.93, green: 0.97, blue: 0.95))
+                                .background(Color(Color.Fills.lightGreen))
                                 .cornerRadius(8)
                             
                             // 하루 권장 독서량
                             Text("하루 권장 독서량 : \(pagesPerDay)쪽")
-                                .foregroundColor(Color(red: 0.03, green: 0.68, blue: 0.41))
+                                .foregroundColor(Color(Color.Colors.green2))
                                 .fontStyle(.body)
                                 .lineLimit(1)
                                 .padding(.horizontal, 8)
                                 .padding(.vertical, 4)
-                                .background(Color(red: 0.93, green: 0.97, blue: 0.95))
+                                .background(Color(Color.Fills.lightGreen))
                                 .cornerRadius(8)
                                 .padding(.bottom, 16)
                             
@@ -158,7 +159,7 @@ struct FinishGoalView: View {
                         }
                         .frame(maxWidth: .infinity)
                         .frame(height: 64)
-                        .background(Color.green)
+                        .background(Color(Color.Colors.green1))
                         .cornerRadius(16)
                         .padding(.horizontal, 16)
                     }

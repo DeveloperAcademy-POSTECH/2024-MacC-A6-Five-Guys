@@ -45,7 +45,7 @@ struct BookRowView: View {
                 .padding(.leading, 16)
                 
                 Image(systemName: viewModel.selectedBook == book ? "checkmark.circle.fill" : "circle")
-                    .foregroundStyle(Color(red: 0.07, green: 0.87, blue: 0.54))
+                    .foregroundStyle(Color.Colors.green1)
                     .padding(.trailing, 25)
                    
             }

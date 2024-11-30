@@ -54,12 +54,12 @@ struct DailyProgressView: View {
                 
                 TextField("", value: $pagesToReadToday, format: .number)
                     .frame(width: 180, height: 68)
-                    .background(Color(red: 0.96, green: 0.98, blue: 0.97))
+                    .background(Color(Color.Fills.lightGreen))
                     .cornerRadius(16)
                     .keyboardType(.numberPad)
                     .multilineTextAlignment(.center)
                     .fontStyle(.title1, weight: .semibold)
-                    .tint(Color.black)
+                    .tint(Color(Color.Labels.primaryBlack1))
                     .focused($isTextTextFieldFocused)
                 
                 Text("쪽")
@@ -114,7 +114,7 @@ struct DailyProgressView: View {
                     Text("완료")
                         .frame(maxWidth: .infinity)
                         .frame(height: 56)
-                        .background(Color(red: 0.07, green: 0.87, blue: 0.54))
+                        .background(Color.Colors.green2)
                         .foregroundStyle(.white)
                     
                 }

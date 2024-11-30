@@ -20,7 +20,7 @@ struct ToastView: View {
                         .padding(.horizontal, 20)
                         .padding(.vertical, 14)
                         .foregroundColor(.white)
-                        .background(Color.gray)
+                        .background(Color(Color.Backgrounds.gray))
                         .cornerRadius(16)
                         .transition(.opacity)
                         .animation(.easeInOut(duration: 0.5), value: viewModel.isVisible)

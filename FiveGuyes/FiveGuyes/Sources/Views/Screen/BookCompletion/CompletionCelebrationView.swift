@@ -69,7 +69,7 @@ struct CompletionCelebrationView: View {
     private var celebrationMessage: some View {
         Text(celebrationMessageText)
             .fontStyle(.title1, weight: .semibold)
-            .foregroundStyle(.black)
+            .foregroundStyle(Color(Color.Labels.primaryBlack1))
             .multilineTextAlignment(.center)
     }
     
@@ -115,7 +115,7 @@ struct CompletionCelebrationView: View {
         
         return Text("\(startDateText)부터 \(endDateText)까지\n꾸준히 \(pagesPerDay)쪽씩 \(totalReadingDays)일동안 읽었어요 🎉")
             .font(.system(size: 15, weight: .medium))
-            .foregroundStyle(.black)
+            .foregroundStyle(Color(Color.Labels.primaryBlack1))
             .padding(.vertical, 4)
             .padding(.horizontal, 10)
             .background {
@@ -135,7 +135,7 @@ struct CompletionCelebrationView: View {
                 .frame(height: 56)
                 .background {
                     RoundedRectangle(cornerRadius: 16)
-                        .foregroundColor(Color(red: 0.07, green: 0.87, blue: 0.54))
+                        .foregroundColor(Color.Colors.green1)
                 }
         }
     }

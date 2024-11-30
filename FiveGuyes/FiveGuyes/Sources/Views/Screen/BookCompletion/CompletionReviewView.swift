@@ -42,7 +42,7 @@ struct CompletionReviewView: View {
                         Text("어떤 영감을 얻었나요?")
                     }
                     .fontStyle(.title1, weight: .semibold)
-                    .foregroundStyle(.black)
+                    .foregroundStyle(Color(Color.Labels.primaryBlack1))
                     .lineLimit(1)
                     
                     TextEditor(text: $reflectionText)
@@ -73,7 +73,7 @@ struct CompletionReviewView: View {
                         Text("저장")
                             .frame(maxWidth: .infinity)
                             .frame(height: 56)
-                            .background(Color(red: 0.07, green: 0.87, blue: 0.54))
+                            .background(Color.Colors.green1)
                             .foregroundStyle(.white)
                     }
                     .ignoresSafeArea(.keyboard, edges: .bottom)
