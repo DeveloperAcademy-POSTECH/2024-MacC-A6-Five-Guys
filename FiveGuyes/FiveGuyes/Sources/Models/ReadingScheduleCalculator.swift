@@ -71,6 +71,9 @@ struct ReadingScheduleCalculator {
         record.pagesRead = pagesRead
         progress.readingRecords[dateKey] = record
         
+        progress.lastPagesRead = pagesRead
+        progress.lastReadDate = today.adjustedDate()
+        
         // 목표량과 실제 읽은 페이지 수가 다르면 이후 날짜 조정
         if record.pagesRead != record.targetPages {
             adjustFutureTargets(for: settings, progress: progress, from: today)
