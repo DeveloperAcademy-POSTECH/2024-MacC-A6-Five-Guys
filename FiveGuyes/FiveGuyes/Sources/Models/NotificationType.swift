@@ -31,20 +31,11 @@ enum NotificationType {
             }
             return (title, body)
             
-        case .night(let readingBook):
+        case .night:
             // 랜덤 타이틀 선택
-            let titleTemplate = NotificationType.nightTitles.randomElement() ?? "오늘 하루가 끝나기 전에 독서를 해보세요."
+            let title = NotificationType.nightTitles.randomElement() ?? "아직 늦지 않았어요!"
             let body = NotificationType.nightBodies.randomElement() ?? "책은 항상 당신의 손길을 기다리고 있어요."
-            
-            // 타이틀에 %d가 있으면 페이지 수 대입
-            var title: String {
-                if titleTemplate.contains("%d") {
-                    let pages = readingBook.readingProgress.findNextReadingPagesPerDay(for: readingBook.userSettings)
-                    return String(format: titleTemplate, pages)
-                } else {
-                    return titleTemplate
-                }
-            }
+
             return (title, body)
         }
     }
@@ -79,9 +70,8 @@ enum NotificationType {
 extension NotificationType {
     /// 알림 문구 데이터
     private static let morningTitles = [
-        "오늘 하루 목표는 %d쪽이에요.",
-        "새로운 하루, 오늘의 목표는 %d쪽이에요.",
-        "오늘도 독서로 좋은 하루를 시작해봐요.",
+        "오늘 목표는 %d쪽이에요!",
+        "독서로 오늘 하루를 시작해 볼까요?",
         "%d쪽으로 오늘을 시작해요!"
     ]
     
@@ -93,9 +83,11 @@ extension NotificationType {
     ]
     
     private static let nightTitles = [
-        "오늘 하루가 끝나기 전에 %d쪽을 읽어보는 건 어떨까요?",
-        "오늘이 아직 끝나지 않았어요! 목표는 %d쪽이에요😊",
-        "오늘 하루를 마무리하기 전에 %d쪽을 읽어볼까요?"
+        "아직 늦지 않았어요!",
+        "지금 시작해도 충분해요!",
+        "한 장만 넘겨보는 건 어때요?",
+        "하루의 끝, 독서로 마음을 정리해보세요",
+        "한 페이지가 내일을 더 빛나게 해줄거에요"
     ]
     
     private static let nightBodies = [
