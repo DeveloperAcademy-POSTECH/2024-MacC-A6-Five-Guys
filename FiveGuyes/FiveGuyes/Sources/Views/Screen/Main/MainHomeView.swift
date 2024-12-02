@@ -66,6 +66,13 @@ struct MainHomeView: View {
                                         if let currentReadingBook = currentlyReadingBooks.first {
                                             // SwiftData 컨텍스트에서 삭제 필요
                                             modelContext.delete(currentReadingBook)
+                                            
+                                            // 데이저 저장이 느려서 직접 저장해주기
+                                            do {
+                                                try modelContext.save()
+                                            } catch {
+                                                print(error.localizedDescription)
+                                            }
                                         }
                                     }
                                 )

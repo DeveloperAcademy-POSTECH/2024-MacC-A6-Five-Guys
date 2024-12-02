@@ -24,7 +24,7 @@ struct CustomBackButton: View {
             }
             Spacer()
         }
-        .background(Color.Fills.white)
+        .background(Color.clear)
     }
 }
 

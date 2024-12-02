@@ -26,6 +26,7 @@ struct BookSettingsManagerView: View {
             // TODO: 캘린더 뷰로 넘어갈 때 새롭게 그려지면서 어색한 동작 수정하기
             if bookSettingInputModel.currentPage != 4 {
                 ProgressBar(currentPage: bookSettingInputModel.currentPage)
+                    .padding(.top, 5)
             }
         }
         .background(Color.Fills.white)
