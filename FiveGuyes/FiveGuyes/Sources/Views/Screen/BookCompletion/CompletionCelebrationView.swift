@@ -28,28 +28,28 @@ struct CompletionCelebrationView: View {
         let userSettings: UserSettingsProtocol = userBook.userSettings
         let readingProgress: any ReadingProgressProtocol = userBook.readingProgress
         
-        ZStack {
-            Image("completionBackground").ignoresSafeArea()
+        VStack(spacing: 0) {
+            Spacer()
+            celebrationTitle
+                .padding(.bottom, 14)
             
-            VStack(spacing: 0) {
-                Spacer()
-                celebrationTitle
-                    .padding(.bottom, 14)
-                
-                celebrationMessage
-                    .padding(.bottom, 80)
-                
-                celebrationBookImage(bookMetadata)
-                    .padding(.bottom, 28)
-                
-                readingSummary(userSettings: userSettings, readingProgress: readingProgress)
-                
-                Spacer()
-                
-                reflectionButton
-                    .padding(.bottom, 42)
-            }
-            .padding(.horizontal, 16)
+            celebrationMessage
+                .padding(.bottom, 80)
+            
+            celebrationBookImage(bookMetadata)
+                .padding(.bottom, 28)
+            
+            readingSummary(userSettings: userSettings, readingProgress: readingProgress)
+            
+            Spacer()
+            
+            reflectionButton
+                .padding(.bottom, 21)
+        }
+        .padding(.horizontal, 16)
+        .background {
+            Image("completionBackground")
+                .ignoresSafeArea()
         }
         .customNavigationBackButton()
     }
@@ -102,16 +102,15 @@ struct CompletionCelebrationView: View {
     
     private func readingSummary(userSettings: UserSettingsProtocol, readingProgress: any ReadingProgressProtocol) -> some View {
         let readingScheduleCalculator = ReadingScheduleCalculator()
-         
+        
         // TODO: 완독을 수정할 수도 있기 때문에 완독 날짜가 바뀔 수 있음, 그래서 완독 날짜는 최종에서 업데이트하고 여기서는 오늘 날짜로 보여주기 -> 초기 설정 날보다 빠를 수도 있음 🐯
         let endDateText = Date().toKoreanDateString()
         var startDateText = userSettings.startDate.toKoreanDateString()
         if startDateText > endDateText { startDateText = endDateText }
         
         // TODO: 위에 이유로 날짜가 바껴서 보이면 아래 로직에 파라미터 값도 바껴야 한다. 🐯
-        let pagesPerDay = readingScheduleCalculator.firstCalculatePagesPerDay(settings: userSettings, progress: readingProgress).pagesPerDay
-        
-        let totalReadingDays = readingScheduleCalculator.firstCalculateTotalReadingDays(settings: userSettings, progress: readingProgress)
+        let totalReadingDays = readingScheduleCalculator.calculateRecordedDays(progress: readingProgress)
+        let pagesPerDay = readingScheduleCalculator.calculateTotalReadingPages(setttings: userSettings) / totalReadingDays
         
         return Text("\(startDateText)부터 \(endDateText)까지\n꾸준히 \(pagesPerDay)쪽씩 \(totalReadingDays)일동안 읽었어요 🎉")
             .fontStyle(.caption1)
