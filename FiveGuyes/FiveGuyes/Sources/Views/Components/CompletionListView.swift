@@ -17,16 +17,17 @@ struct CompletionListView: View {
     @State var showCompletionAlert: Bool = false
     
     // 완독한 책을 가져오는 쿼리
-    // TODO: 책 역순으로 받아오기 🐯🐯🐯🐯🐯
     @Query(
         filter: #Predicate<UserBook> { $0.completionStatus.isCompleted == true }
     )
-    private var completedBooks: [UserBook]
+    private var fetchCompletedBooks: [UserBook]
     
     let completionAlertMessage = "정말로 내용을 삭제할까요?"
     let completionAlertText = "삭제 후에는 복원할 수 없어요"
     
     var body: some View {
+        var completedBooks = Array(fetchCompletedBooks.reversed())
+        
         VStack(alignment: .leading, spacing: 16) {
             HStack {
                 Text("완독 리스트")
@@ -96,18 +97,17 @@ struct CompletionListView: View {
                         HStack {
                             Text("\(selectedBook.userSettings.targetEndDate.toKoreanDateStringWithoutYear()) 완독완료")
                             Spacer()
-                            // TODO: ❗️❗️❗️ 수정하기 기능 추가
-                            // 데이터를 지우니까 튕김
-//                            Button {
-//                                showCompletionAlert = true
-//                            } label: {
-//                                Image(systemName: "ellipsis")
-//                                    .resizable()
-//                                    .scaledToFit()
-//                                    .frame(width: 20, height: 22)
-//                                    .tint(Color.Labels.secondaryBlack2) // 디자인 시스템으로 수정
-//                                    .padding(.trailing, 3)
-//                            }
+                            
+                            Button {
+                                showCompletionAlert = true
+                            } label: {
+                                Image(systemName: "ellipsis")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 20, height: 22)
+                                    .tint(Color.Labels.secondaryBlack2) // 디자인 시스템으로 수정
+                                    .padding(.trailing, 3)
+                            }
                         }
                         .fontStyle(.caption2)
                         .foregroundStyle(Color.Labels.secondaryBlack2)
@@ -128,21 +128,29 @@ struct CompletionListView: View {
                     .padding(.horizontal, 20)
             }
         }
-        // TODO: ❗️❗️❗️ 수정하기 기능 추가
-        // 데이터를 지우니까 튕김
-        // FontStyle 적용해놓음
-//        .alert(isPresented: $showCompletionAlert) {
-//            Alert(
-//                title: Text(completionAlertText)
-//                    .alertFontStyle(.title3, weight: .semibold),
-//                message: Text(completionAlertMessage)
-//                    .alertFontStyle(.caption1),
-//                primaryButton: .cancel(Text("취소하기")),
-//                secondaryButton: .destructive(Text("삭제")) {
-//                    let book = completedBooks[selectedBookIndex]
-//                    modelContext.delete(book)
-//                }
-//            )
-//        }
+        .alert(isPresented: $showCompletionAlert) {
+            Alert(
+                title: Text(completionAlertText)
+                    .alertFontStyle(.title3, weight: .semibold),
+                message: Text(completionAlertMessage)
+                    .alertFontStyle(.caption1),
+                primaryButton: .cancel(Text("취소하기")),
+                secondaryButton: .destructive(Text("삭제")) {
+                    let book = completedBooks[selectedBookIndex]
+                    
+                    modelContext.delete(book)
+                    
+                    // 처음 셀로 선택하기
+                    selectedBookIndex = 0
+                    
+                    // 데이저 저장이 느려서 직접 저장해주기
+                    do {
+                        try modelContext.save()
+                    } catch {
+                        print(error.localizedDescription)
+                    }
+                }
+            )
+        }
     }
 }

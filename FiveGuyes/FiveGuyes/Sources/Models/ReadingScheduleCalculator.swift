@@ -271,3 +271,19 @@ struct ReadingScheduleCalculator {
         return (pagesPerDay, remainder)
     }
 }
+
+extension ReadingScheduleCalculator {
+    /// 기록된 날짜의 수를 계산하는 메서드
+    func calculateRecordedDays<Progress: ReadingProgressProtocol>(
+        progress: Progress
+    ) -> Int {
+        return progress.readingRecords.values.filter { $0.pagesRead > 0 }.count
+    }
+    
+    func calculateTotalReadingPages<Settings: UserSettingsProtocol>(
+        setttings: Settings
+    ) -> Int {
+        return setttings.targetEndPage - setttings.startPage
+    }
+    
+}
