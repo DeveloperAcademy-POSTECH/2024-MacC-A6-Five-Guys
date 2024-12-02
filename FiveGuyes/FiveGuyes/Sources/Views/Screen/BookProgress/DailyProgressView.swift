@@ -9,38 +9,40 @@ import SwiftData
 import SwiftUI
 
 struct DailyProgressView: View {
+    typealias UserBook = UserBookSchemaV2.UserBookV2
+    
     @State private var pagesToReadToday: Int = 0
     @State private var showAlert = false
     
     @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
     
-    @Query(filter: #Predicate<UserBook> { $0.isCompleted == false })
+    @Query(filter: #Predicate<UserBook> { $0.completionStatus.isCompleted == false })
     private var currentlyReadingBooks: [UserBook]  // 현재 읽고 있는 책을 가져오는 쿼리
     
     private let alertText = "전체쪽수를 초과해서 작성했어요!"
     private let alertMessage = "끝까지 읽은 게 맞나요?"
     
     private let notificationManager = NotificationManager()
+    private let readingScheduleCalculator = ReadingScheduleCalculator()
     
-    private var today: Date {
-        // TODO: today가 전날로 나와서 일단 하루 더함
-        Date()
-    }
-    let readingScheduleCalculator = ReadingScheduleCalculator()
+    private let today = Date()
     
     @FocusState private var isTextTextFieldFocused: Bool
     
     var body: some View {
-        // TODO: 더미 지우기
-        let userBook = currentlyReadingBooks.first ?? UserBook.dummyUserBook
-        var book = userBook.book
-        let isTodayCompletionDate = book.targetEndDate == today
+        let userBook = currentlyReadingBooks.first ?? UserBook.dummyUserBookV2
+        
+        let bookMetadata: BookMetaDataProtocol = userBook.bookMetaData
+        let userSettings: UserSettingsProtocol = userBook.userSettings
+        let readingProgress: any ReadingProgressProtocol = userBook.readingProgress
+        
+        let isTodayCompletionDate = Calendar.current.isDate(today, inSameDayAs: userSettings.targetEndDate)
         
         VStack(spacing: 0) {
             HStack {
-                Text(isTodayCompletionDate ? "오늘은 <\(book.title)>\(book.title.postPositionParticle()) 완독하는\n마지막 날이에요"
+                Text(isTodayCompletionDate ? "오늘은 <\(bookMetadata.title)>\(bookMetadata.title.postPositionParticle()) 완독하는\n마지막 날이에요"
                      : "지금까지 읽은 쪽수를\n알려주세요")
-                .font(.system(size: 22, weight: .semibold))
+                .fontStyle(.title2, weight: .semibold)
                 Spacer()
             }
             .padding(.top, 25)
@@ -52,17 +54,17 @@ struct DailyProgressView: View {
                 
                 TextField("", value: $pagesToReadToday, format: .number)
                     .frame(width: 180, height: 68)
-                    .background(Color(red: 0.96, green: 0.98, blue: 0.97))
+                    .background(Color.Fills.lightGreen)
                     .cornerRadius(16)
                     .keyboardType(.numberPad)
                     .multilineTextAlignment(.center)
-                    .font(.system(size: 24, weight: .semibold))
-                    .tint(Color.black)
+                    .fontStyle(.title1, weight: .semibold)
+                    .tint(Color.Labels.primaryBlack1)
                     .focused($isTextTextFieldFocused)
                 
                 Text("쪽")
                     .padding(.top, 20)
-                    .font(.system(size: 24, weight: .semibold))
+                    .fontStyle(.title1, weight: .semibold)
                 Spacer()
             }
             .padding(.horizontal, 20)
@@ -71,28 +73,40 @@ struct DailyProgressView: View {
             
             if isTextTextFieldFocused {
                 Button {
-                    if pagesToReadToday > book.totalPages {
+                    if pagesToReadToday > userSettings.targetEndPage {
                         showAlert = true
-                    } else if isTodayCompletionDate && pagesToReadToday < book.totalPages {
-                        // 마지막 날이지만 완독하지 못한 경우, 날짜를 하루 늘리고 재조정
-                        //                        book.targetEndDate = book.targetEndDate.addDaysInUTC(1)
-                        // TODO: utc기중으로 바꾸기
-                        book.targetEndDate = book.targetEndDate.addDays(1)
+                        return
+                    } else if isTodayCompletionDate && pagesToReadToday < userSettings.targetEndPage {
                         
-                        readingScheduleCalculator.updateReadingProgress(for: userBook, pagesRead: pagesToReadToday, from: today)
+                        userSettings.targetEndDate = userSettings.targetEndDate.addDays(1)
+                        
+                        readingScheduleCalculator.updateReadingProgress(
+                            for: userSettings,
+                            progress: readingProgress,
+                            pagesRead: pagesToReadToday, from: today
+                        )
                         
                         // 노티 세팅하기
-                        setNotification(userBook)
+                        Task {
+                            await notificationManager.setupAllNotifications(userBook)
+                        }
                         
                         navigationCoordinator.popToRoot()
                     } else {
                         // 오늘 할당량 기록
-                        readingScheduleCalculator.updateReadingProgress(for: userBook, pagesRead: pagesToReadToday, from: today)
+                        readingScheduleCalculator.updateReadingProgress(
+                            for: userSettings,
+                            progress: readingProgress,
+                            pagesRead: pagesToReadToday,
+                            from: today
+                        )
                         
                         // 노티 세팅하기
-                        setNotification(userBook)
+                        Task {
+                            await notificationManager.setupAllNotifications(userBook)
+                        }
                         
-                        if pagesToReadToday != book.totalPages {
+                        if pagesToReadToday != userSettings.targetEndPage {
                             navigationCoordinator.popToRoot()
                         } else {
                             // 완독한 경우
@@ -105,8 +119,8 @@ struct DailyProgressView: View {
                     Text("완료")
                         .frame(maxWidth: .infinity)
                         .frame(height: 56)
-                        .background(Color(red: 0.07, green: 0.87, blue: 0.54))
-                        .foregroundStyle(.white)
+                        .background(Color.Colors.green1)
+                        .foregroundStyle(Color.Fills.white)
                     
                 }
                 .ignoresSafeArea(.keyboard, edges: .bottom)
@@ -114,18 +128,23 @@ struct DailyProgressView: View {
             
         }
         .alert(isPresented: $showAlert) {
+            // TODO: 커스텀스타일 적용 어려워서 임의로 스타일 지정함 확인필요
             Alert(
-                title: Text(alertText),
-                message: Text(alertMessage),
+                title: Text(alertText)
+                    .alertFontStyle(.title3, weight: .semibold),
+                message: Text(alertMessage)
+                    .alertFontStyle(.caption1),
                 primaryButton: .cancel(Text("다시 작성하기")) {
                     // "다시 작성하기" 로직 (입력값 초기화)
                     pagesToReadToday = 0
                     isTextTextFieldFocused = true
                 },
                 secondaryButton: .default(Text("확인")) {
-                    // "확인" 버튼 로직 (총 페이지로 수정 및 완독 기록)
-                    pagesToReadToday = book.totalPages
-                    readingScheduleCalculator.updateReadingProgress(for: userBook, pagesRead: book.totalPages, from: today)
+                    // "확인" 버튼 로직 (최종 타켓 페이지로 수정 및 완독 기록)
+                    pagesToReadToday = userSettings.targetEndPage
+                    
+                    readingScheduleCalculator.updateReadingProgress(for: userSettings, progress: readingProgress, pagesRead: pagesToReadToday, from: today)
+                    
                     navigationCoordinator.push(.completionCelebration)
                 }
             )
@@ -136,21 +155,16 @@ struct DailyProgressView: View {
         .customNavigationBackButton()
         .onAppear {
             print("🐯🐯🐯🐯🐯: \(today)")
-            
-            if let readingRecord = readingScheduleCalculator.getReadingRecord(for: userBook, for: today) {
+            // ⏰
+            if let readingRecord = readingProgress.getAdjustedReadingRecord(for: today) {
                 pagesToReadToday = readingRecord.targetPages
             }
             
             isTextTextFieldFocused = true
         }
-    }
-    
-    private func setNotification(_ readingBook: UserBook) {
-        notificationManager.clearRequests()
-            Task {
-                await self.notificationManager.setupNotifications(notificationType: .morning(readingBook: readingBook))
-
-                await self.notificationManager.setupNotifications(notificationType: .night(readingBook: readingBook))
-            }
+        .onAppear {
+            // GA4 Tracking
+            Tracking.Screen.dailyProgress.setTracking()
+        }
     }
 }

@@ -19,7 +19,7 @@ struct BookSearchView: View {
     var body: some View {
         
         BookListView(bookSearchViewModel: bookSearchViewModel)
-            .background(.white)
+            .background(Color.Fills.white)
             .padding(.top, 24)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -27,7 +27,7 @@ struct BookSearchView: View {
                         guard let selectedBook = bookSearchViewModel.selectedBook else { return }
                         
                         Task {
-                            bookSettingInputModel.totalPages =  await bookSearchViewModel.fetchBookTotalPages(isbn: selectedBook.isbn13)
+                            bookSettingInputModel.targetEndPage =  await bookSearchViewModel.fetchBookTotalPages(isbn: selectedBook.isbn13)
                             
                             bookSettingInputModel.selectedBook = selectedBook
                             bookSettingInputModel.nextPage()
@@ -35,12 +35,16 @@ struct BookSearchView: View {
                         
                     } label: {
                         Text("완료")
-                            .foregroundColor(bookSearchViewModel.selectedBook != nil ?
-                                             Color(red: 0.03, green: 0.68, blue: 0.41)
-                                             : Color(red: 0.84, green: 0.84, blue: 0.84))
+                            .foregroundStyle(bookSearchViewModel.selectedBook != nil ?
+                                             Color.Colors.green2
+                                             : Color.Labels.tertiaryBlack3)
                     }
                     .disabled(bookSearchViewModel.selectedBook == nil)
                 }
+            }
+            .onAppear {
+                // GA4 Tracking
+                Tracking.Screen.bookSearch.setTracking()
             }
     }
 }

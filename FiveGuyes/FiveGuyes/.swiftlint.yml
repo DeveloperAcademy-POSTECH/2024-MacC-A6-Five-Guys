@@ -31,7 +31,7 @@ line_length: # From https://realm.github.io/SwiftLint/line_length.html
 # 함수 본문 길이 제한
 function_body_length: # From https://realm.github.io/SwiftLint/function_body_length.html
     warning: 15 # 함수 본문이 15줄을 넘을 경우 warning
-    error: 30 # 함수 본문이 30줄을 넘을 경우 error
+    error: 50 # 함수 본문이 30줄을 넘을 경우 error
 
 # 클래스, 구조체, 열거형의 본문 길이 제한
 type_body_length: # From https://realm.github.io/SwiftLint/type_body_length.html

@@ -9,15 +9,17 @@ import SwiftData
 import SwiftUI
 
 struct CompletionListView: View {
+    typealias UserBook = UserBookSchemaV2.UserBookV2
+    
     @Environment(\.modelContext) private var modelContext
     
     @State private var selectedBookIndex: Int = 0
     @State var showCompletionAlert: Bool = false
     
     // 완독한 책을 가져오는 쿼리
+    // TODO: 책 역순으로 받아오기 🐯🐯🐯🐯🐯
     @Query(
-        filter: #Predicate<UserBook> { $0.isCompleted == true }
-//        sort: [SortDescriptor(\UserBook.book.targetEndDate, order: .reverse)]
+        filter: #Predicate<UserBook> { $0.completionStatus.isCompleted == true }
     )
     private var completedBooks: [UserBook]
     
@@ -28,11 +30,12 @@ struct CompletionListView: View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
                 Text("완독 리스트")
-                    .font(.system(size: 24, weight: .semibold))
-                    .foregroundColor(.black)
+                    .fontStyle(.title1, weight: .semibold)
+                    .foregroundStyle(Color.Labels.primaryBlack1)
                 
                 Spacer()
             }
+            .padding(.horizontal, 20)
             
             if !completedBooks.isEmpty {
                 VStack(alignment: .leading, spacing: 16) {
@@ -43,12 +46,13 @@ struct CompletionListView: View {
                                 let book = completedBooks[index]
                                 
                                 VStack(alignment: .leading, spacing: 6) {
-                                    if let coverURL = book.book.coverURL, let url = URL(string: coverURL) {
+                                    if let coverURL = book.bookMetaData.coverURL, let url = URL(string: coverURL) {
                                         AsyncImage(url: url) { image in
                                             image
                                                 .resizable()
-                                                .scaledToFit()
+                                                .scaledToFill()
                                                 .frame(width: 115, height: 178)
+                                                .clipped() // 넘어간 부분을 잘라냄
                                         } placeholder: {
                                             ProgressView()
                                         }
@@ -61,13 +65,14 @@ struct CompletionListView: View {
                                     }
                                     
                                     VStack(alignment: .leading, spacing: 0) {
-                                        Text(book.book.title )
-                                            .font(.system(size: 14, weight: .semibold))
-                                            .foregroundColor(.black)
-                                        Text(book.book.author)
-                                            .font(.system(size: 12, weight: .medium))
-                                            .foregroundColor(Color(red: 0.44, green: 0.44, blue: 0.44))
+                                        Text(book.bookMetaData.title)
+                                            .fontStyle(.caption1, weight: .semibold)
+                                            .foregroundStyle(Color.Labels.primaryBlack1)
+                                        Text(book.bookMetaData.author)
+                                            .fontStyle(.caption2)
+                                            .foregroundStyle(Color.Labels.secondaryBlack2)
                                     }
+                                    .lineLimit(1)
                                 }
                                 .frame(width: 115)
                                 .onTapGesture {
@@ -76,19 +81,20 @@ struct CompletionListView: View {
                                 .opacity(selectedBookIndex == index ? 1.0 : 0.3)
                             }
                         }
+                        .padding(.horizontal, 20)
                     }
-                    .padding(.horizontal, 20)
                     
                     // 선택된 책의 소감문 및 기타 정보 표시
                     let selectedBook = completedBooks[selectedBookIndex] 
+                    
                     VStack(alignment: .leading, spacing: 10) {
-                        Text(selectedBook.completionReview)
-                            .font(.system(size: 16, weight: .medium))
-                            .foregroundColor(.black)
+                        Text(selectedBook.completionStatus.completionReview)
+                            .fontStyle(.body)
+                            .foregroundStyle(Color.Labels.primaryBlack1)
                             .padding(.bottom, 10)
                         // TODO: 수정 버튼 추가하기
                         HStack {
-                            Text("\(selectedBook.book.targetEndDate.toKoreanDateStringWithoutYear()) 완독완료")
+                            Text("\(selectedBook.userSettings.targetEndDate.toKoreanDateStringWithoutYear()) 완독완료")
                             Spacer()
                             // TODO: ❗️❗️❗️ 수정하기 기능 추가
                             // 데이터를 지우니까 튕김
@@ -99,33 +105,38 @@ struct CompletionListView: View {
 //                                    .resizable()
 //                                    .scaledToFit()
 //                                    .frame(width: 20, height: 22)
-//                                    .tint(Color(red: 0.44, green: 0.44, blue: 0.44))
+//                                    .tint(Color.Labels.secondaryBlack2) // 디자인 시스템으로 수정
 //                                    .padding(.trailing, 3)
 //                            }
                         }
-                        .font(.system(size: 12, weight: .medium))
-                        .foregroundColor(Color(red: 0.44, green: 0.44, blue: 0.44))
+                        .fontStyle(.caption2)
+                        .foregroundStyle(Color.Labels.secondaryBlack2)
                     }
                     .padding(20)
                     .background {
                         RoundedRectangle(cornerRadius: 16)
-                            .foregroundColor(Color(red: 0.95, green: 0.98, blue: 0.96))
+                            .foregroundStyle(Color.Fills.lightGreen)
                     }
+                    .padding(.horizontal, 20)
                     
                 }
                 
             } else {
                 Rectangle()
                     .frame(width: 115, height: 178)
-                    .foregroundColor(Color(red: 0.93, green: 0.97, blue: 0.95))
+                    .foregroundStyle(Color.Fills.lightGreen)
+                    .padding(.horizontal, 20)
             }
         }
         // TODO: ❗️❗️❗️ 수정하기 기능 추가
         // 데이터를 지우니까 튕김
+        // FontStyle 적용해놓음
 //        .alert(isPresented: $showCompletionAlert) {
 //            Alert(
-//                title: Text(completionAlertText),
-//                message: Text(completionAlertMessage),
+//                title: Text(completionAlertText)
+//                    .alertFontStyle(.title3, weight: .semibold),
+//                message: Text(completionAlertMessage)
+//                    .alertFontStyle(.caption1),
 //                primaryButton: .cancel(Text("취소하기")),
 //                secondaryButton: .destructive(Text("삭제")) {
 //                    let book = completedBooks[selectedBookIndex]

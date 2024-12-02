@@ -5,177 +5,290 @@
 //  Created by zaehorang on 11/6/24.
 //
 
+import SwiftData
 import SwiftUI
 
 struct WeeklyPageCalendarView: View {
-    // 요일과 페이지 수를 저장하는 배열 (임의로 페이지 수 지정)
+    typealias UserBook = UserBookSchemaV2.UserBookV2
+    
     let daysOfWeek = ["일", "월", "화", "수", "목", "금", "토"]
-    let currentReadingBook: UserBook
+    @Query(filter: #Predicate<UserBook> { $0.completionStatus.isCompleted == false })
+    private var currentlyReadingBooks: [UserBook]  // 현재 읽고 있는 책을 가져오는 쿼리
     
-    // TODO: today로 바꾸기 Date()
-    let today = Date()
+    let today = Date().adjustedDate()
     
-    // TODO: 특정 날짜 이전 요일들의 UI 수정
+    @State private var allWeekStartDates: [Date] = []
+    @State private var currentWeekPageIndex: Int = 0
+    
+    let todayIndex = Calendar.current.getAdjustedWeekdayIndex(from: Date())
+    
+    @State private var lastWeekIndex = 0
+    @State private var lastDayIndex = 0
+    
     var body: some View {
-        let weeklyRecords = getWeeklyRecordedPages(for: currentReadingBook, from: today)
-        let todayIndex = Calendar.current.component(.weekday, from: today) - 1
+        let currentReadingBook = currentlyReadingBooks.first ?? UserBook.dummyUserBookV2
         
-        HStack(spacing: 0) { // 셀 간격을 없앰으로써 연결된 배경처럼 보이게 설정
-            ForEach(0..<daysOfWeek.count, id: \.self) { index in
-                VStack(spacing: 5) {
-                    Text(daysOfWeek[index]) // 요일 표시
-                        .font(.system(size: 13, weight: .semibold))
-                        .foregroundColor(.black)
-                    
-                    ZStack {
-                        // 오늘까지 이어지는 배경 추가
-                        if todayIndex != 0 { // 일요일인경우 뒷 배경 필요 없음
-                            if index <= todayIndex {
-                                if index == 0 {
-                                    HStack(spacing: 0) {
-                                        Rectangle()
-                                            .fill(.white)
-                                            .frame(height: 44)
-                                            .shadow(radius: 0)
-                                        
-                                        Rectangle()
-                                            .fill(Color(red: 0.93, green: 0.97, blue: 0.95))
-                                            .frame(height: 44)
-                                            .shadow(radius: 0)
-                                    }
-                                    
-                                    Circle()
-                                        .fill(Color(red: 0.93, green: 0.97, blue: 0.95))
-                                        .frame(height: 44)
-                                    
-                                } else if index == todayIndex {
-                                    HStack(spacing: 0) {
-                                        Rectangle()
-                                            .fill(Color(red: 0.93, green: 0.97, blue: 0.95))
-                                            .frame(height: 44)
-                                            .shadow(radius: 0)
-                                        
-                                        Rectangle()
-                                            .fill(.white)
-                                            .frame(height: 44)
-                                            .shadow(radius: 0)
-                                    }
-                                    
-                                } else {
-                                    Rectangle()
-                                        .fill(Color(red: 0.93, green: 0.97, blue: 0.95))
-                                        .frame(height: 44)
-                                }
-                            }
-                        }
+        ScrollViewReader { proxy in
+            ScrollView(.horizontal, showsIndicators: false) {
+                
+                HStack(spacing: .zero) {
+                    ForEach(Array(allWeekStartDates.enumerated()), id: \.offset) { weekPageIndex, weekStartDate in
                         
-                        // TODO: 데이터가 없어도 오늘 날짜는 표시가 되어야 한다!
-                        if let record = weeklyRecords[index] {
-                            if index < todayIndex {
-                                if record.pagesRead == record.targetPages {
-                                    Text("\(record.pagesRead)")
-                                        .font(.system(size: 20, weight: .medium))
-                                        .foregroundColor(.black)
-                                        .frame(height: 44)
-                                } else {
-                                    Text("•")
-                                        .font(.system(size: 20, weight: .semibold))
-                                        .foregroundColor(.black)
-                                        .frame(height: 44)
+                        let weeklyRecords = currentReadingBook.readingProgress.getAdjustedWeeklyRecorded(from: weekStartDate)
+                        
+                        HStack(spacing: 0) { // 셀 간격을 없앰으로써 연결된 배경처럼 보이게 설정
+                            ForEach(0..<daysOfWeek.count, id: \.self) { dayIndex in
+                                let record = weeklyRecords[dayIndex]
+                                VStack(spacing: 10) {
+                                    
+                                    // 요일 셀
+                                    dayTextView(daysOfWeek[dayIndex])
+                                    
+                                    // 페이지 셀
+                                    if weekPageIndex == currentWeekPageIndex { // 이번 주
+                                        currentWeekView(dayIndex: dayIndex, todayIndex: todayIndex, weekPageIndex: weekPageIndex, record: record)
+                                            .frame(height: 40)
+                                    } else if weekPageIndex < currentWeekPageIndex { // 과거
+                                        pastWeekView(dayIndex: dayIndex, record: record)
+                                            .frame(height: 40)
+                                        
+                                    } else { // 미래
+                                        futureWeekView(dayIndex: dayIndex, weekPageIndex: weekPageIndex, record: record)
+                                            .frame(height: 40)
+                                        
+                                    }
                                 }
-                            } else if index == todayIndex { // today
-                                Circle()
-                                    .fill(Color(red: 0.07, green: 0.87, blue: 0.54))
-                                    .frame(height: 44)
-                                
-                                Text("\(record.targetPages)")
-                                    .font(.system(size: 20, weight: .semibold))
-                                    .foregroundColor(.white)
-                                    .frame(height: 44)
-                            } else {
-                                Text("\(record.targetPages)")
-                                    .font(.system(size: 20, weight: .medium))
-                                    .foregroundColor(Color(red: 0.44, green: 0.44, blue: 0.44))
-                                    .frame(height: 44)
+                                .frame(maxWidth: .infinity)
                             }
-                        } else {
-                            if index == todayIndex { // today
-                                Circle()
-                                    .fill(Color(red: 0.07, green: 0.87, blue: 0.54))
-                                    .frame(height: 44)
-                            }
-                            Text("")
-                                .frame(height: 44)
-                                .foregroundColor(Color(red: 0.44, green: 0.44, blue: 0.44))
                         }
+                        .id(weekPageIndex)
+                        .containerRelativeFrame(.horizontal, count: allWeekStartDates.count, span: allWeekStartDates.count, spacing: 0)
+                        .scrollTargetLayout()
                     }
                 }
-                .frame(maxWidth: .infinity)
+            }
+            .scrollTargetBehavior(.paging)
+            .onAppear {
+                // 모든 주 시작 날짜를 가져옴
+                allWeekStartDates = currentReadingBook.readingProgress.getAllWeekStartDates(for: currentReadingBook.userSettings)
+                
+                // 오늘 날짜가 포함된 주의 인덱스를 찾음
+                let todayWeekIndex = allWeekStartDates.firstIndex {
+                    let calendar = Calendar.current
+                    return calendar.isDate(today, equalTo: $0, toGranularity: .weekOfMonth)
+                }
+                
+                // 현재 페이지 인덱스를 업데이트
+                if let todayWeekIndex {
+                    currentWeekPageIndex = todayWeekIndex
+                }
+                
+                calculateLastWeekAndDayIndex(
+                    totalWeeks: allWeekStartDates.count,
+                    targetEndDate: currentReadingBook.userSettings.targetEndDate
+                )
+            }
+            .onChange(of: currentWeekPageIndex) {
+                DispatchQueue.main.async {
+                    // 현재 페이지에 해당하는 위치로 스크롤
+                    proxy.scrollTo(currentWeekPageIndex, anchor: .center)
+                }
             }
         }
     }
     
-    // 현재 날짜를 기준으로 해당 주의 날짜와 타겟 페이지를 가져오는 함수
-    private func getWeeklyRecordedPages(for userBook: UserBook, from today: Date) -> [ReadingRecord?] {
-        let calendar = Calendar.current
-        let startOfWeek = calendar.dateInterval(of: .weekOfMonth, for: today)?.start ?? today
-        
-        return (0..<7).map { dayOffset in
-            let date = calendar.date(byAdding: .day, value: dayOffset, to: startOfWeek)!
-            let dateKey = toYearMonthDayString(date)  // Date를 문자열로 변환
-            return userBook.readingRecords[dateKey]
+    // MARK: - Views
+    private func dayTextView(_ text: String) -> some View {
+        Text(text) // 요일 표시
+            .fontStyle(.caption1)
+            .foregroundStyle(Color.Labels.tertiaryBlack3)
+            .frame(height: 18)
+    }
+    
+    private func pastWeekView(dayIndex: Int, record: ReadingRecord?) -> some View {
+        ZStack {
+            backgroundForPastWeek(dayIndex: dayIndex)
+            pastWeekText(record: record)
         }
     }
     
-    private func toYearMonthDayString(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        formatter.timeZone = TimeZone.current
-        return formatter.string(from: date)
-    }
-}
-
-struct WeeklyPageCalendarView_Previews: PreviewProvider {
-    static var previews: some View {
-        WeeklyPageCalendarView(currentReadingBook: UserBook.dummyUserBook)
+    private func currentWeekView(
+        dayIndex: Int,
+        todayIndex: Int,
+        weekPageIndex: Int,
+        record: ReadingRecord?
+    ) -> some View {
+        ZStack {
+            // 배경 처리
+            backgroundForCurrentWeek(dayIndex: dayIndex, todayIndex: todayIndex)
+            
+            if isLastDay(weekPageIndex: weekPageIndex, dayIndex: dayIndex) {
+                // 마지막 날 이미지 표시
+                completionImage
+            } else {
+                // 일반 텍스트 표시
+                textForCurrentWeek(record, dayIndex: dayIndex, todayIndex: todayIndex)
+            }
+        }
     }
     
-    // 더미 데이터 생성
-    static var dummyUserBook: UserBook {
-        let bookDetails = BookDetails(
-            title: "더미 책 제목",
-            author: "저자 이름",
-            coverURL: nil,
-            totalPages: 300,
-            startDate: Calendar.current.date(byAdding: .day, value: -14, to: Date())!,  // 2주 전 시작일
-            targetEndDate: Calendar.current.date(byAdding: .day, value: 7, to: Date())!,
-            nonReadingDays: []  // 1주 후 종료일
-        )
-        
-        let userBook = UserBook(book: bookDetails)
-        
-        // 더미 읽기 기록 추가
-        let calendar = Calendar.current
-        for dayOffset in -6...6 {  // 지난주 일요일부터 다음 주 토요일까지
-            let date = calendar.date(byAdding: .day, value: dayOffset, to: Date())!
-            let dateKey = date.toYearMonthDayString()
+    private func futureWeekView(
+        dayIndex: Int,
+        weekPageIndex: Int,
+        record: ReadingRecord?
+    ) -> some View {
+        ZStack {
+            backgroundForFutureWeek()
             
-            let targetPages = 20
-            let pagesRead = dayOffset < 0 ? targetPages : (dayOffset == 0 ? 15 : 0)  // 과거에는 목표를 달성, 오늘은 일부 읽음, 미래는 읽지 않음
-            
-            userBook.readingRecords[dateKey] = ReadingRecord(targetPages: targetPages, pagesRead: pagesRead)
+            if isLastDay(weekPageIndex: weekPageIndex, dayIndex: dayIndex) {
+                // 마지막 날 이미지 표시
+                completionImage
+            } else {
+                // 일반 텍스트 표시
+                futureWeekText(record: record)
+            }
         }
-        
-        return userBook
     }
-}
-
-// Date 확장으로 날짜 문자열 포맷 추가
-extension Date {
-    func toYearMonthDayString() -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        formatter.timeZone = TimeZone.current
-        return formatter.string(from: self)
+    
+    private var completionImage: some View {
+        Image("completionGreenFlag")
+            .resizable()
+            .scaledToFit()
+            .overlay(
+                Text("완독")
+                    .fontStyle(.caption1, weight: .semibold)
+                    .foregroundStyle(Color.Fills.white)
+                    .padding(.bottom, 1)
+                    .padding(.leading, 2)
+            )
+    }
+    
+    // MARK: - Background Handlers
+    private func backgroundForPastWeek(dayIndex: Int) -> some View {
+        Group {
+            if dayIndex == 0 { // 일요일
+                ZStack {
+                    HStack(spacing: 0) {
+                        Rectangle().fill(Color.Fills.white)
+                        Rectangle().fill(Color.Fills.lightGreen)
+                    }
+                    Circle().fill(Color.Fills.lightGreen)
+                }
+            } else if dayIndex == 6 { // 토요일
+                ZStack {
+                    HStack(spacing: 0) {
+                        Rectangle().fill(Color.Fills.lightGreen)
+                        Rectangle().fill(Color.Fills.white)
+                    }
+                    Circle().fill(Color.Fills.lightGreen)
+                }
+            } else {
+                Rectangle().fill(Color.Fills.lightGreen)
+            }
+        }
+    }
+    
+    private func backgroundForCurrentWeek(dayIndex: Int, todayIndex: Int) -> some View {
+        Group {
+            if dayIndex == todayIndex {
+                HStack(spacing: 0) {
+                    Rectangle().fill(Color.Fills.lightGreen)
+                    Rectangle().fill(Color.Fills.white)
+                }
+            } else if dayIndex == 0 {
+                ZStack {
+                    HStack(spacing: 0) {
+                        Rectangle().fill(Color.Fills.white)
+                        Rectangle().fill(Color.Fills.lightGreen)
+                    }
+                    Circle().fill(Color.Fills.lightGreen)
+                }
+            } else if dayIndex < todayIndex {
+                Rectangle().fill(Color.Fills.lightGreen)
+            } else {
+                Rectangle().fill(Color.Fills.white) // 기본 배경
+            }
+        }
+    }
+    
+    private func backgroundForFutureWeek() -> some View {
+        Rectangle().fill(Color.Fills.white) // 미래 상태의 기본 배경
+    }
+    
+    // MARK: - Text Handlers
+    private func pastWeekText(record: ReadingRecord?) -> some View {
+        Group {
+            if let record {
+                let hasCompletedToday = record.pagesRead == record.targetPages
+                Text(hasCompletedToday ? "\(record.pagesRead)" : "•")
+                    .fontStyle(.title3)
+                    .foregroundStyle(Color.Labels.quaternaryBlack4)
+            } else {
+                Text("")
+            }
+        }
+    }
+    
+    private func textForCurrentWeek(_ record: ReadingRecord?, dayIndex: Int, todayIndex: Int) -> some View {
+        Group {
+            if let record {
+                let hasCompletedToday = record.pagesRead == record.targetPages
+                
+                if dayIndex < todayIndex {
+                    Text(hasCompletedToday ? "\(record.pagesRead)" : "•")
+                        .fontStyle(.title3)
+                        .foregroundStyle(Color.Labels.quaternaryBlack4)
+                } else if dayIndex == todayIndex {
+                    ZStack {
+                        Circle().fill(hasCompletedToday ? Color.Colors.green1 : Color.Separators.green)
+                        
+                        Text("\(record.targetPages)")
+                            .fontStyle(.title3, weight: .semibold)
+                            .foregroundStyle(Color.Fills.white)
+                    }
+                } else {
+                    Text("\(record.targetPages)")
+                        .fontStyle(.title3)
+                        .foregroundStyle(Color.Labels.secondaryBlack2)
+                }
+            } else {
+                    if dayIndex == todayIndex {
+                        Circle().fill(Color.Separators.green)
+                }
+            }
+        }
+    }
+    
+    private func futureWeekText(record: ReadingRecord?) -> some View {
+        Group {
+            if let record {
+                Text("\(record.targetPages)")
+            } else {
+                Text("")
+            }
+        }
+        .fontStyle(.title3)
+        .foregroundStyle(Color.Labels.secondaryBlack2)
+    }
+    
+    // MARK: - Method
+    /// 마지막 독서일의 주 인덱스와 요일 인덱스를 계산하여 저장합니다.
+    /// - Parameters:
+    ///   - totalWeeks: 전체 주의 개수.
+    ///   - targetEndDate: 목표 종료 날짜.
+    private func calculateLastWeekAndDayIndex(totalWeeks: Int, targetEndDate: Date) {
+        lastWeekIndex = totalWeeks - 1
+        
+        // 목표 종료 날짜의 요일 인덱스 계산
+        lastDayIndex = Calendar.current.getWeekdayIndex(from: targetEndDate)
+    }
+    
+    /// 특정 주와 요일 인덱스가 마지막 독서일과 일치하는지 확인합니다.
+    /// - Parameters:
+    ///   - weekPageIndex: 현재 주의 페이지 인덱스.
+    ///   - dayIndex: 현재 요일의 인덱스.
+    /// - Returns: 주와 요일 인덱스가 마지막 독서일과 동일하면 `true`, 그렇지 않으면 `false`.
+    private func isLastDay(weekPageIndex: Int, dayIndex: Int) -> Bool {
+        return weekPageIndex == lastWeekIndex && dayIndex == lastDayIndex
     }
 }

@@ -9,12 +9,14 @@ import SwiftData
 import SwiftUI
 
 struct TotalCalendarView: View {
-    @Query(filter: #Predicate<UserBook> { $0.isCompleted == false })
+    typealias UserBook = UserBookSchemaV2.UserBookV2
+    
+    @Query(filter: #Predicate<UserBook> { $0.completionStatus.isCompleted == false })
     private var currentlyReadingBooks: [UserBook]  // 현재 읽고 있는 책을 가져오는 쿼리
     
-    // 현재 보고 있는 달력의 월
-    @State private var currentMonth: Date = Date()
-    private let todayDate = Date() // 오늘 날짜
+    // 현재 보고 있는 달력의 월 ⏰
+    @State private var currentMonth = Date().adjustedDate()
+    private let todayDate = Date().adjustedDate()
     
     private var currentReadingBook: UserBook? {
         currentlyReadingBooks.first
@@ -43,14 +45,18 @@ struct TotalCalendarView: View {
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
         .customNavigationBackButton()
+        .onAppear {
+            // GA4 Tracking
+            Tracking.Screen.calendarView.setTracking()
+        }
     }
     
     private var header: some View {
         ZStack {
             Text(calendarHeaderString(for: currentMonth))
-                .font(.system(size: 17, weight: .semibold))
+                .fontStyle(.body, weight: .semibold)
                 .multilineTextAlignment(.center)
-                .foregroundColor(Color(red: 0.12, green: 0.12, blue: 0.12))
+                .foregroundStyle(Color.Labels.primaryBlack1)
             
             HStack(alignment: .center, spacing: 28) {
                 Spacer()
@@ -62,7 +68,7 @@ struct TotalCalendarView: View {
                 }
                 .padding(.trailing, 20)
             }
-            .foregroundColor(Color(red: 0.03, green: 0.68, blue: 0.41))
+            .foregroundStyle(Color.Labels.primaryBlack1)
         }
         
     }
@@ -71,8 +77,8 @@ struct TotalCalendarView: View {
         LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7)) {
             ForEach(["일", "월", "화", "수", "목", "금", "토"], id: \.self) { day in
                 Text(day)
-                    .font(.system(size: 15, weight: .medium))
-                    .foregroundColor(Color(red: 0.74, green: 0.74, blue: 0.74))
+                    .fontStyle(.caption1, weight: .semibold) // TODO: 디자이너 확인중
+                    .foregroundStyle(Color.Labels.tertiaryBlack3)
                     .frame(width: 32, height: 18, alignment: .center)
                     .padding(.horizontal, 16)
             }
@@ -96,48 +102,50 @@ struct TotalCalendarView: View {
                     
                     VStack(spacing: 0) {
                         if let currentReadingBook = currentReadingBook,
-                           let readingRecord = currentReadingBook.readingRecords[dateKey] {
+                           let readingRecord = currentReadingBook.readingProgress.readingRecords[dateKey] {
                             
-                            if Calendar.current.isDate(date, inSameDayAs: currentReadingBook.book.targetEndDate) {
-                                // TODO: 이미지 교체하기 (마지막날, 아닌 날)
-                                // `targetEndDate` 날짜인 경우 - 특정 이미지를 배경으로 표시
-                                Image("completionFlag") // 넣고자 하는 이미지 이름으로 대체
+                            let isTodayCompletionDate = Calendar.current.isDate(todayDate, inSameDayAs: currentReadingBook.userSettings.targetEndDate)
+                            
+                            if Calendar.current.isDate(date, inSameDayAs: currentReadingBook.userSettings.targetEndDate) {
+                                Image(isTodayCompletionDate ? "completionGreenFlag" : "completionFlag")
                                     .resizable()
                                     .scaledToFit()
                                     .frame(width: 50, height: 50)
                                     .overlay(
                                         Text("완독")
-                                            .font(.system(size: 13, weight: .semibold))
-                                            .foregroundColor(Color(red: 0.03, green: 0.68, blue: 0.41))
+                                            .fontStyle(.caption1, weight: .semibold)
+                                            .foregroundStyle(isTodayCompletionDate ? Color.Fills.white : Color.Colors.green2)
+                                            .padding(.bottom, 1)
+                                            .padding(.leading, 2)
                                     )
                             } else if Calendar.current.isDate(date, inSameDayAs: todayDate) {
                                 // 오늘 날짜인 경우 - 초록색 배경에 목표 페이지 수 표시
                                 TotalCalendarTextBubble(
                                     text: "\(readingRecord.targetPages)",
-                                    textColor: .white,
-                                    backgroundColor: Color(red: 0.07, green: 0.87, blue: 0.54),
+                                    textColor: Color.Fills.white,
+                                    backgroundColor: Color.Colors.green1,
                                     fontWeight: .semibold
                                 )
                             } else if readingRecord.pagesRead == readingRecord.targetPages {
                                 // 목표 페이지를 달성한 날 - 녹색 배경의 읽은 페이지 수 표시
                                 TotalCalendarTextBubble(
                                     text: "\(readingRecord.pagesRead)",
-                                    textColor: Color(red: 0.44, green: 0.44, blue: 0.44),
-                                    backgroundColor: Color(red: 0.84, green: 0.97, blue: 0.88)
+                                    textColor: Color.Labels.secondaryBlack2,
+                                    backgroundColor: Color.Colors.green
                                 )
                             } else if date > todayDate {
                                 // 미래의 날짜로 계획이 설정된 날 - 회색 텍스트로 목표 페이지 수 표시
                                 TotalCalendarTextBubble(
                                     text: "\(readingRecord.targetPages)",
-                                    textColor: Color(red: 0.84, green: 0.84, blue: 0.84),
+                                    textColor: Color.Labels.quaternaryBlack4,
                                     backgroundColor: .clear
                                 )
                             } else {
                                 // 과거 날짜에서 계획은 설정되었지만, 읽지 않은 날 - 회색 점으로 결석 표시
                                 TotalCalendarTextBubble(
                                     text: "•",
-                                    textColor: Color(red: 0.44, green: 0.44, blue: 0.44),
-                                    backgroundColor: Color(red: 0.97, green: 0.98, blue: 0.97)
+                                    textColor: Color.Labels.secondaryBlack2,
+                                    backgroundColor: Color.Fills.lightGreen
                                 )
                             }
                         } else {
@@ -145,7 +153,7 @@ struct TotalCalendarView: View {
                             TotalCalendarTextBubble(
                                 text: "",
                                 textColor: Color.clear,
-                                backgroundColor: Color(red: 0.97, green: 0.98, blue: 0.97)
+                                backgroundColor: Color.Fills.lightGreen
                             )
                         }
                     }
@@ -158,17 +166,17 @@ struct TotalCalendarView: View {
     private var CompletionFooter: some View {
         HStack(alignment: .center) {
             Text("완독 종료일")
-                .font(.system(size: 17, weight: .medium))
+                .fontStyle(.body, weight: .semibold)
             
             Spacer()
-            if let targetEndDate = currentReadingBook?.book.targetEndDate {
+            if let targetEndDate = currentReadingBook?.userSettings.targetEndDate {
                 Text("\(formattedCompletionDateString(from: targetEndDate))")
-                    .font(.system(size: 17, weight: .medium))
+                    .fontStyle(.body)
                     .multilineTextAlignment(.center)
-                    .foregroundColor(Color(red: 0.03, green: 0.68, blue: 0.41))
+                    .foregroundStyle(Color.Colors.green2)
                     .padding(.horizontal, 11)
                     .padding(.vertical, 6)
-                    .background(Color(red: 0.93, green: 0.97, blue: 0.95))
+                    .background(Color.Fills.lightGreen)
                     .cornerRadius(8)
             }
         }

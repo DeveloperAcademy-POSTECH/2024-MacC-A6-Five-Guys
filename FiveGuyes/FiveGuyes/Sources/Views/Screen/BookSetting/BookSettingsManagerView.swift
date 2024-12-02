@@ -28,7 +28,7 @@ struct BookSettingsManagerView: View {
                 ProgressBar(currentPage: bookSettingInputModel.currentPage)
             }
         }
-        .background(.white)
+        .background(Color.Fills.white)
         .navigationTitle("완독할 책 추가하기")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
@@ -43,7 +43,7 @@ struct BookSettingsManagerView: View {
                                 .resizable()
                                 .scaledToFit()
                                 .frame(height: 20)
-                                .tint(.gray)
+                                .tint(Color.Labels.tertiaryBlack3)
                         }
                     }
                 }
@@ -72,7 +72,8 @@ struct BookSettingsManagerView: View {
                 bookSettingInputModel.endData = nil
                 bookSettingInputModel.startData = nil
             case .bookPageSetting:
-                bookSettingInputModel.totalPages = ""
+                bookSettingInputModel.startPage = ""
+                bookSettingInputModel.targetEndPage = ""
             case .bookSearch:
                 return
             case .bookSettingDone:
@@ -87,7 +88,7 @@ struct BookSettingsManagerView: View {
         case .bookSearch:
             BookSearchView()
         case .bookPageSetting:
-            BookPageSettingView(totalPages: bookSettingInputModel.totalPages)
+            BookPageSettingView()
         case .bookDurationSetting:
             CompletionCalendarView()
         case .bookSettingDone:
