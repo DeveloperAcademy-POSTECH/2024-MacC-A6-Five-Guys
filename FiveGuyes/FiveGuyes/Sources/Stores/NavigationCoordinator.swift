@@ -9,6 +9,7 @@ import SwiftUI
 
 // TODO: 추가되는 뷰 추가하기
 enum Screens: Hashable {
+    typealias UserBook = UserBookSchemaV2.UserBookV2
     case empty
     case mainHome
     case notiSetting
@@ -17,6 +18,7 @@ enum Screens: Hashable {
     case dailyProgress
     case completionCelebration
     case completionReview
+    case completionReviewUpdate(book: UserBook)
 }
 
 @Observable
@@ -42,6 +44,8 @@ final class NavigationCoordinator {
             CompletionCelebrationView()
         case .completionReview:
             CompletionReviewView()
+        case .completionReviewUpdate(book: let book):
+            CompletionReviewView(isUpdateMode: true, externalBook: book)
         }
     }
 

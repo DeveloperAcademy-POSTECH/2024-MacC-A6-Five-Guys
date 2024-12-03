@@ -11,6 +11,7 @@ import SwiftUI
 struct CompletionListView: View {
     typealias UserBook = UserBookSchemaV2.UserBookV2
     
+    @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
     @Environment(\.modelContext) private var modelContext
     
     @State private var selectedBookIndex: Int = 0
@@ -93,20 +94,34 @@ struct CompletionListView: View {
                             .fontStyle(.body)
                             .foregroundStyle(Color.Labels.primaryBlack1)
                             .padding(.bottom, 10)
-                        // TODO: 수정 버튼 추가하기
+                        
                         HStack {
                             Text("\(selectedBook.userSettings.targetEndDate.toKoreanDateStringWithoutYear()) 완독완료")
                             Spacer()
                             
-                            Button {
-                                showCompletionAlert = true
+                            Menu {
+                                Button {
+                                    // TODO: 내용 수정 뷰로 넘어가기
+                                    navigationCoordinator.push(.completionReviewUpdate(book: completedBooks[selectedBookIndex]))
+                                } label: {
+                                    Label("내용 수정하기", systemImage: "pencil")
+                                }
+                                
+                                Divider()
+                                
+                                Button(role: .destructive) {
+                                    showCompletionAlert = true
+                                } label: {
+                                    Label("삭제", systemImage: "trash")
+                                }
                             } label: {
                                 Image(systemName: "ellipsis")
                                     .resizable()
                                     .scaledToFit()
                                     .frame(width: 20, height: 22)
-                                    .tint(Color.Labels.secondaryBlack2) // 디자인 시스템으로 수정
+                                    .tint(Color.Labels.secondaryBlack2)
                                     .padding(.trailing, 3)
+
                             }
                         }
                         .fontStyle(.caption2)
@@ -117,8 +132,7 @@ struct CompletionListView: View {
                         RoundedRectangle(cornerRadius: 16)
                             .foregroundStyle(Color.Fills.lightGreen)
                     }
-                    .padding(.horizontal, 20)
-                    
+                    .padding(.horizontal, 20)    
                 }
                 
             } else {
