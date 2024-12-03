@@ -101,7 +101,6 @@ struct CompletionListView: View {
                             
                             Menu {
                                 Button {
-                                    // TODO: 내용 수정 뷰로 넘어가기
                                     navigationCoordinator.push(.completionReviewUpdate(book: completedBooks[selectedBookIndex]))
                                 } label: {
                                     Label("내용 수정하기", systemImage: "pencil")
