@@ -39,38 +39,14 @@ struct CompletionCalendarView: View {
     }
     
     var body: some View {
-        let bookTitle = bookSettingInputModel.selectedBook?.title ?? ""
-
         VStack(spacing: 0) {
-            
             VStack(alignment: .leading, spacing: 0) {
                 if isFirstClick {
-                    Text("<\(bookTitle)>\(bookTitle.subjectParticle())")
-                        .lineLimit(1) // 제목이 길어지면 줄바꿈 허용
-                    
-                    HStack(spacing: 8) {
-                        Text("총")
-                        
-                        Text("\(totalPages)")
-                            .fontStyle(.title2, weight: .semibold)
-                            .foregroundStyle(Color.Colors.green2)
-                            .padding(.horizontal, 8) // 텍스트 필드와 이미지 주변 패딩
-                            .padding(.vertical, 4)
-                            .background {
-                                RoundedRectangle(cornerRadius: 8)
-                                    .foregroundStyle(Color.Fills.lightGreen)
-                            }
-                        
-                        Text("쪽이에요")
-                        
-                        Spacer()
-                    }
                     Text("목표기간을 선택해주세요")
                     
                     HStack(spacing: 8) {
                         Text("매일")
                         
-                        // TODO: 페이지 할당량 계산
                         Text("\(pagesPerDay)")
                             .fontStyle(.title2, weight: .semibold)
                             .foregroundStyle(Color.Colors.green2)
@@ -250,15 +226,11 @@ struct CompletionCalendarView: View {
     private func dateText(for date: Date, isSelectedDay: Bool, textColor: Color) -> some View {
         Text("\(Calendar.current.component(.day, from: date))")
             .frame(width: 44, height: 44)
-//            .background(
-//                isSelectedDay ? Color.green : Color.clear
-//            )
             .foregroundStyle(isSelectedDay ? .white : textColor) // 선택된 경우 화이트, 그렇지 않으면 전달된 색상 사용
             .fontStyle(
                 isSelectedDay ? .title2 : .body,
                 weight: isSelectedDay ? .semibold : .regular
             )
-//            .cornerRadius(26)
     }
     
     // 선택된 날짜 범위에 색칠 처리

@@ -26,6 +26,7 @@ struct MainHomeView: View {
     
     var body: some View {
         
+        var currentlyReadingBook = currentlyReadingBooks.first
         let title = currentlyReadingBooks.first?.bookMetaData.title ?? ""
         let mainAlertText = "현재 읽고 있는 <\(title)>\(title.postPositionParticle()) 책장에서 삭제할까요?"
         
@@ -45,9 +46,13 @@ struct MainHomeView: View {
                             .padding(.bottom, 40)
                         Spacer()
                         
-                        if !currentlyReadingBooks.isEmpty {
-                            Button {
-                                showReadingBookAlert = true
+                        if let currentReadingBook = currentlyReadingBooks.first {
+                            Menu {
+                                Button(role: .destructive) {
+                                    showReadingBookAlert = true
+                                } label: {
+                                    Label("삭제", systemImage: "trash")
+                                }
                             } label: {
                                 Image(systemName: "ellipsis")
                                     .resizable()
@@ -55,6 +60,7 @@ struct MainHomeView: View {
                                     .frame(width: 20, height: 22)
                                     .tint(Color.Labels.primaryBlack1)
                             }
+                            .fontStyle(.body)
                             .alert(isPresented: $showReadingBookAlert) {
                                 Alert(
                                     title: Text(mainAlertText)
@@ -66,6 +72,13 @@ struct MainHomeView: View {
                                         if let currentReadingBook = currentlyReadingBooks.first {
                                             // SwiftData 컨텍스트에서 삭제 필요
                                             modelContext.delete(currentReadingBook)
+                                            
+                                            // 데이저 저장이 느려서 직접 저장해주기
+                                            do {
+                                                try modelContext.save()
+                                            } catch {
+                                                print(error.localizedDescription)
+                                            }
                                         }
                                     }
                                 )
