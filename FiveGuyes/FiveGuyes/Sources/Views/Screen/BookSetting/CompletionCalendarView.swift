@@ -243,7 +243,7 @@ struct CompletionCalendarView: View {
                     
                     Rectangle()
                         .fill(Color.Fills.lightGreen)
-                        .frame(height: 44)
+                        .frame(width: 22, height: 44)
                 }
                 // 선택된 종료 날짜
                 else if let end = endDate, date == end {
