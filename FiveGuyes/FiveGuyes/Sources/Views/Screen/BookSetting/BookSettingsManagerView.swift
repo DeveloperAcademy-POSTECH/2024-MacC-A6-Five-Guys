@@ -73,8 +73,8 @@ struct BookSettingsManagerView: View {
                 bookSettingInputModel.endData = nil
                 bookSettingInputModel.startData = nil
             case .bookPageSetting:
-                bookSettingInputModel.startPage = ""
-                bookSettingInputModel.targetEndPage = ""
+                bookSettingInputModel.startPage = 1
+                bookSettingInputModel.targetEndPage = 1
             case .bookSearch:
                 return
             case .bookSettingDone:
