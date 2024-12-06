@@ -107,7 +107,7 @@ struct CompletionCalendarView: View {
             }
         }
         .onAppear {
-            let (tartgetEndPage, startPage) = (Int(bookSettingInputModel.targetEndPage)!, Int(bookSettingInputModel.startPage)!)
+            let (tartgetEndPage, startPage) = (bookSettingInputModel.targetEndPage, bookSettingInputModel.startPage)
             
             totalPages = tartgetEndPage - startPage + 1
         }

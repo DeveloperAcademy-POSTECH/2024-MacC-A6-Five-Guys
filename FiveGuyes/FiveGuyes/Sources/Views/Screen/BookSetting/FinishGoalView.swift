@@ -23,10 +23,11 @@ struct FinishGoalView: View {
     var body: some View {
         
         if let book = bookSettingInputModel.selectedBook,
-           let startPage = Int(bookSettingInputModel.startPage),
-           let totalPages = Int(bookSettingInputModel.targetEndPage),
            let startDate = bookSettingInputModel.startData,
            let endDate = bookSettingInputModel.endData {
+            
+            let startPage = bookSettingInputModel.startPage
+            let totalPages = bookSettingInputModel.targetEndPage
             
             ZStack {
                 Color.Fills.lightGreen

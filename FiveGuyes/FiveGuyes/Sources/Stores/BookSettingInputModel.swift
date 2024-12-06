@@ -11,8 +11,8 @@ import SwiftUI
 final class BookSettingInputModel {
     var currentPage = BookSettingsPage.bookSearch.rawValue
     var selectedBook: Book?
-    var startPage = ""
-    var targetEndPage = ""
+    var startPage = 1
+    var targetEndPage = 1
     var startData: Date?
     var endData: Date?
     var nonReadingDays: [Date] = []
