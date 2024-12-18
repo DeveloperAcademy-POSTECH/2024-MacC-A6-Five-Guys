@@ -16,8 +16,8 @@ struct BookPageSettingView: View {
     @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
     @Environment(BookSettingInputModel.self) var bookSettingInputModel: BookSettingInputModel
     
-    @State private var startPage: String = "1"
-    @State private var targetEndPage: String = ""
+    @State private var startPage = 1
+    @State private var targetEndPage = 0
     
     @FocusState private var focusedField: FieldFocus?
     
@@ -94,11 +94,11 @@ struct BookPageSettingView: View {
     
     // 텍스트 필드 생성 메서드
     private func pageNumberTextField(
-        page: Binding<String>,
+        page: Binding<Int>,
         isFocused: FocusState<FieldFocus?>.Binding,
         field: FieldFocus
     ) -> some View {
-        TextField("", text: page)
+        TextField("", value: page, format: .number)
             .keyboardType(.numberPad)
             .focused(isFocused, equals: field)
             .fontStyle(.title2, weight: .semibold)
