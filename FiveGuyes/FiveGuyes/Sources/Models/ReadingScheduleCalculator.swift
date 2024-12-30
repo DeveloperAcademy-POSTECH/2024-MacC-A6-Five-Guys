@@ -8,25 +8,28 @@
 import Foundation
 
 struct ReadingScheduleCalculator {
-    
     private let readingPagesCalculator: ReadingPagesCalculator = ReadingPagesCalculator()
     private let readingDateCalculator: ReadingDateCalculator = ReadingDateCalculator()
-    
+
     /// 첫날을 기준으로 읽어야하는 페이지를 할당하는 메서드 (초기 페이지 계산)
     func calculateInitialDailyTargets<Settings: UserSettingsProtocol, Progress: ReadingProgressProtocol>(
         for settings: Settings,
         progress: Progress
     ) {
-        // TODO: !!!!!!!!!
-        let totalDays = try! readingDateCalculator.calculateValidReadingDays(startDate: settings.startDate, endDate: settings.targetEndDate, excludedDates: settings.nonReadingDays)
+        
+        let remainingReadingDays = getRemainingReadingDays(
+            startDate: settings.startDate,
+            targetEndDate: settings.targetEndDate,
+            nonReadingDays: settings.nonReadingDays
+        )
         
         let (pagesPerDay, remainderPages) = readingPagesCalculator.calculatePagesPerDayAndRemainder(
-            totalDays: totalDays,
+            totalDays: remainingReadingDays,
             startPage: settings.startPage,
-            endPage: settings.targetEndPage)
+            endPage: settings.targetEndPage
+        )
         
         var targetDate = settings.startDate
-        var remainderOffset = remainderPages
         var cumulativePages = 0
         
         // 비독서일을 제외하고 읽어야 할 페이지를 초기 할당
@@ -42,15 +45,10 @@ struct ReadingScheduleCalculator {
         }
         
         // 남은 페이지를 뒤에서부터 할당
-        var remainderTargetDate = settings.targetEndDate
-        while remainderOffset > 0 {
-            let dateKey = progress.getReadingRecordsKey(remainderTargetDate)
-            guard var record = progress.readingRecords[dateKey] else { return }
-            record.targetPages += remainderOffset
-            progress.readingRecords[dateKey] = record
-            remainderOffset -= 1
-            remainderTargetDate = remainderTargetDate.addingDays(-1)
-        }
+        distributeRemainingPagesFromEnd(
+            progress: progress,
+            remainderPages: remainderPages,
+            targetEndDate: settings.targetEndDate)
     }
     
     ///  읽은 페이지 입력 메서드 (오늘 날짜에만 값을 넣을 수 있음)
@@ -96,16 +94,18 @@ struct ReadingScheduleCalculator {
         progress: Progress,
         from date: Date
     ) {
-        // TODO: !!!!!!!!!
-        let totalDays = try! readingDateCalculator.calculateValidReadingDays(startDate: date.adjustedDate().addDays(1), endDate: settings.targetEndDate, excludedDates: settings.nonReadingDays)
+        
+        let remainingReadingDays = getRemainingReadingDays(
+            startDate: date.adjustedDate().addDays(1),
+            targetEndDate: settings.targetEndDate,
+            nonReadingDays: settings.nonReadingDays)
         
         // 오늘을 남은 일자에서 제외하기 위해 startDate에 1일 추가해서 계산하기
         let (pagesPerDay, remainderPages) = readingPagesCalculator.calculatePagesPerDayAndRemainder(
-            totalDays: totalDays,
+            totalDays: remainingReadingDays,
             startPage: progress.lastPagesRead,
             endPage: settings.targetEndPage)
         
-        var remainderOffset = remainderPages
         var cumulativePages = progress.lastPagesRead
         var nextDate = date.addingDays(1)
         
@@ -126,19 +126,15 @@ struct ReadingScheduleCalculator {
             nextDate = nextDate.addingDays(1)
         }
         
-        var remainingTargetDate = settings.targetEndDate
-        while remainderOffset > 0 {
-            let dateKey = progress.getReadingRecordsKey(remainingTargetDate)
-            guard var record = progress.readingRecords[dateKey] else {
-                remainingTargetDate = remainingTargetDate.addingDays(-1)
-                continue
-            }
-            record.targetPages += remainderOffset
-            progress.readingRecords[dateKey] = record
-            remainderOffset -= 1
-            remainingTargetDate = remainingTargetDate.addingDays(-1)
-        }
+        // 남은 페이지를 뒤에서부터 할당
+        distributeRemainingPagesFromEnd(
+            progress: progress,
+            remainderPages: remainderPages,
+            targetEndDate: settings.targetEndDate
+        )
     }
+    
+    
     
     /// 지난 날의 할당량을 읽지 않고, 앱에 새롭게 접속할 때 페이지를 재할당해주는 메서드
     func reassignPagesFromLastReadDate<Settings: UserSettingsProtocol, Progress: ReadingProgressProtocol>(
@@ -150,19 +146,21 @@ struct ReadingScheduleCalculator {
         
         var targetDate = Date().adjustedDate()
         
-        // TODO: !!!!!!!!!
-        let totalDays = try! readingDateCalculator.calculateValidReadingDays(startDate: targetDate, endDate: settings.targetEndDate, excludedDates: settings.nonReadingDays)
+        let remainingReadingDays = getRemainingReadingDays(
+            startDate: targetDate,
+            targetEndDate: settings.targetEndDate,
+            nonReadingDays: settings.nonReadingDays
+        )
         
         // 남은 페이지와 일수를 기준으로 새롭게 할당량 계산 🐯🐯🐯🐯
         let (pagesPerDay, remainderPages) = readingPagesCalculator.calculatePagesPerDayAndRemainder(
-            totalDays: totalDays,
+            totalDays: remainingReadingDays,
             startPage: progress.lastPagesRead,
             endPage: settings.targetEndPage)
         
-        var remainderOffset = remainderPages
         // TODO: ReadingProgress의 lastPagesRead가 디폴트 1로 되어 있어서 우선 여기에 필요 로직 추가
         var cumulativePages = progress.lastPagesRead == 1 ? 0 : progress.lastPagesRead
- 
+        
         // 비독서일을 제외하고 할당량 재설정
         while progress.getAdjustedReadingRecordsKey(targetDate) <= progress.getReadingRecordsKey(settings.targetEndDate) {
             let dateKey = progress.getAdjustedReadingRecordsKey(targetDate)
@@ -176,19 +174,55 @@ struct ReadingScheduleCalculator {
             targetDate = targetDate.addingDays(1)
         }
         
-        // 남은 페이지를 뒤에서부터 분배
-        var remainingTargetDate = settings.targetEndDate
-        while remainderOffset > 0 {
-            let dateKey = progress.getReadingRecordsKey(remainingTargetDate)
+        // 남은 페이지를 뒤에서부터 할당
+        distributeRemainingPagesFromEnd(
+            progress: progress,
+            remainderPages: remainderPages,
+            targetEndDate: settings.targetEndDate)
+    }
+    
+    private func getRemainingReadingDays(startDate: Date, targetEndDate: Date, nonReadingDays: [Date]) -> Int {
+        do {
+            return try readingDateCalculator.calculateValidReadingDays(
+                startDate: startDate,
+                endDate: targetEndDate,
+                excludedDates: nonReadingDays
+            )
+        } catch {
+            fatalError("getRemainingReadingDays: \(error)")
+        }
+    }
+    
+    /// 마지막 날부터 남은 페이지를 역순으로 분배하는 메서드
+    /// - Parameters:
+    ///   - progress: 읽기 기록 데이터를 포함한 Progress 객체.
+    ///   - remainderPages: 분배해야 할 남은 페이지 수.
+    ///   - targetEndDate: 읽기 일정의 마지막 날짜.
+    private func distributeRemainingPagesFromEnd<Progress: ReadingProgressProtocol>(
+        progress: Progress,
+        remainderPages: Int,
+        targetEndDate: Date
+    ) {
+        var remainingOffset = remainderPages
+        var currentTargetDate = targetEndDate
+        
+        // 마지막 날짜부터 시작하여 남은 페이지를 분배
+        while remainingOffset > 0 {
+            let dateKey = progress.getReadingRecordsKey(currentTargetDate)
+            
+            // 현재 날짜에 해당하는 기록이 없으면 이전 날짜로 이동
             guard var record = progress.readingRecords[dateKey] else {
-                remainingTargetDate = remainingTargetDate.addingDays(-1)
+                currentTargetDate = currentTargetDate.addingDays(-1)
                 continue
             }
             
-            record.targetPages += remainderOffset
+            // 현재 날짜의 목표 페이지에 남은 페이지를 추가
+            record.targetPages += remainingOffset
             progress.readingRecords[dateKey] = record
-            remainderOffset -= 1
-            remainingTargetDate = remainingTargetDate.addingDays(-1)
+            
+            // 남은 페이지 수를 감소시키고 이전 날짜로 이동
+            remainingOffset -= 1
+            currentTargetDate = currentTargetDate.addingDays(-1)
         }
     }
     
