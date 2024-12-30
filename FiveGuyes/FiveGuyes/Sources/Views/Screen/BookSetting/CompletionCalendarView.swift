@@ -26,15 +26,24 @@ struct CompletionCalendarView: View {
     @State private var isFirstClick = true
     
     private var dayCount: Int {
-        Calendar.current.getDateGap(from: startDate, to: endDate)
+        if let startDate, let endDate {
+            let readingcalculator = ReadingDateCalculator()
+            do {
+                return try readingcalculator.calculateDaysBetween(startDate: startDate, endDate: endDate)
+            } catch {
+                fatalError(error.localizedDescription)
+            }
+        } else {
+            return 1
+        }
     }
     
     private var pagesPerDay: Int {
-        get {
-            if dayCount == 0 {
-                return totalPages
-            }
-            return totalPages / dayCount
+        let readingPagesCalculator = ReadingPagesCalculator()
+        do {
+            return try readingPagesCalculator.calculatePagesPerDay(totalPages: totalPages, totalDays: dayCount)
+        } catch {
+            fatalError(error.localizedDescription)
         }
     }
     

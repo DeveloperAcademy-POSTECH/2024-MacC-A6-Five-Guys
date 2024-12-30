@@ -84,11 +84,18 @@ extension Date {
     }
 }
 
-
+// MARK: - 수정중 ❗️❗️❗️❗️❗️
 extension Date {
     /// 시간 부분을 버리기
     var onlyDate: Date {
         let component = Calendar.current.dateComponents([.year, .month, .day], from: self)
         return Calendar.current.date(from: component) ?? Date()
+    }
+    
+    /// 날짜에 지정된 일(day)을 추가하거나 감소합니다.
+    /// - Parameter days: 추가하거나 뺄 일수 (음수 값을 전달하면 감소)
+    /// - Returns: 지정된 일수를 더하거나 뺀 새로운 날짜
+    func addingDays(_ days: Int) -> Date {
+        return Calendar.current.date(byAdding: .day, value: days, to: self) ?? Date()
     }
 }

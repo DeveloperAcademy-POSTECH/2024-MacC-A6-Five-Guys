@@ -183,7 +183,14 @@ struct FinishGoalView: View {
                 let bookData = UserBook(bookMetaData: bookMetaData, userSettings: userSettings, readingProgress: readingProgress, completionStatus: completionStatus)
                 
                 userBook = bookData
-                pagesPerDay = calculator.firstCalculatePagesPerDay(settings: userSettings, progress: readingProgress).pagesPerDay
+                
+                // TODO: !!!!!!!!
+                let totalDays = try! ReadingDateCalculator().calculateValidReadingDays(startDate: userSettings.startDate, endDate: userSettings.targetEndDate, excludedDates: userSettings.nonReadingDays)
+                
+                pagesPerDay = ReadingPagesCalculator().calculatePagesPerDayAndRemainder(
+                    totalDays: totalDays,
+                    startPage: userSettings.startPage,
+                    endPage: userSettings.targetEndPage).pagesPerDay
             }
             .onAppear {
                 // GA4 Tracking

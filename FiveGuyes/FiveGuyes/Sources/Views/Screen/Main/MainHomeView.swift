@@ -25,8 +25,6 @@ struct MainHomeView: View {
     private var currentlyReadingBooks: [UserBook]
     
     var body: some View {
-        
-        var currentlyReadingBook = currentlyReadingBooks.first
         let title = currentlyReadingBooks.first?.bookMetaData.title ?? ""
         let mainAlertText = "현재 읽고 있는 <\(title)>\(title.postPositionParticle()) 책장에서 삭제할까요?"
         
@@ -46,7 +44,7 @@ struct MainHomeView: View {
                             .padding(.bottom, 40)
                         Spacer()
                         
-                        if let currentReadingBook = currentlyReadingBooks.first {
+                        if !currentlyReadingBooks.isEmpty {
                             Menu {
                                 Button(role: .destructive) {
                                     showReadingBookAlert = true
@@ -177,18 +175,18 @@ struct MainHomeView: View {
     }
     
     private var titleDescription: some View {
-        let readingScheduleCalculator = ReadingScheduleCalculator()
-        
+        let redingDateCalculator = ReadingDateCalculator()
         return HStack {
             if let currentReadingBook = currentlyReadingBooks.first {
                 let bookMetadata: BookMetaDataProtocol = currentReadingBook.bookMetaData
                 let userSettings: UserSettingsProtocol = currentReadingBook.userSettings
-                let readingProgress: any ReadingProgressProtocol = currentReadingBook.readingProgress
+
+                let remainingReadingDays = try? redingDateCalculator.calculateValidReadingDays(startDate: Date(), endDate: userSettings.targetEndDate, excludedDates: userSettings.nonReadingDays)
                 
                 VStack(alignment: .leading, spacing: 5) {
                     Text("<\(bookMetadata.title)>")
                         .lineLimit(2)
-                    Text("완독까지 \(readingScheduleCalculator.calculateRemainingReadingDays(settings: userSettings, progress: readingProgress))일 남았어요!")
+                    Text("완독까지 \(remainingReadingDays ?? 0)일 남았어요!")
                 }
                 
             } else {
