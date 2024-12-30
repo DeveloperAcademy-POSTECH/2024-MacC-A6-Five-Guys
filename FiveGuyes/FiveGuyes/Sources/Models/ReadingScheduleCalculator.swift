@@ -10,13 +10,12 @@ import Foundation
 struct ReadingScheduleCalculator {
     private let readingPagesCalculator: ReadingPagesCalculator = ReadingPagesCalculator()
     private let readingDateCalculator: ReadingDateCalculator = ReadingDateCalculator()
-
+    
     /// 첫날을 기준으로 읽어야하는 페이지를 할당하는 메서드 (초기 페이지 계산)
     func calculateInitialDailyTargets<Settings: UserSettingsProtocol, Progress: ReadingProgressProtocol>(
         for settings: Settings,
         progress: Progress
     ) {
-        
         let remainingReadingDays = getRemainingReadingDays(
             startDate: settings.startDate,
             targetEndDate: settings.targetEndDate,
@@ -29,21 +28,15 @@ struct ReadingScheduleCalculator {
             endPage: settings.targetEndPage
         )
         
-        // 하루 할당량을 앞에 날짜부터 할당
-        updateReadingRecord(
+        // 페이지 분배 계산
+        calculateReadingPages(
             for: progress,
-            lastReadPage: 0,
+            startingPage: 0,
             pagesPerDay: pagesPerDay,
+            remainderPages: remainderPages,
             startDate: settings.startDate,
             targetEndDate: settings.targetEndDate,
             nonReadingDays: settings.nonReadingDays
-        )
-
-        // 남은 페이지를 뒤에서부터 할당
-        distributeRemainingPagesFromEnd(
-            progress: progress,
-            remainderPages: remainderPages,
-            targetEndDate: settings.targetEndDate
         )
     }
     
@@ -104,21 +97,15 @@ struct ReadingScheduleCalculator {
             endPage: settings.targetEndPage
         )
         
-        // 새롭게 바뀐 하루 할당을 오늘 날짜부터 재분배
-        updateReadingRecord(
+        // 페이지 분배 계산
+        calculateReadingPages(
             for: progress,
-            lastReadPage: progress.lastPagesRead,
+            startingPage: progress.lastPagesRead,
             pagesPerDay: pagesPerDay,
+            remainderPages: remainderPages,
             startDate: startDate,
             targetEndDate: settings.targetEndDate,
             nonReadingDays: settings.nonReadingDays
-        )
-        
-        // 남은 페이지를 뒤에서부터 할당
-        distributeRemainingPagesFromEnd(
-            progress: progress,
-            remainderPages: remainderPages,
-            targetEndDate: settings.targetEndDate
         )
     }
     
@@ -149,21 +136,16 @@ struct ReadingScheduleCalculator {
         // TODO: ReadingProgress의 lastPagesRead가 디폴트 1로 되어 있어서 우선 여기에 필요 로직 추가
         var cumulativePages = progress.lastPagesRead == 1 ? 0 : progress.lastPagesRead
         
-        // 새롭게 바뀐 하루 할당을 오늘 날짜부터 재분배
-        updateReadingRecord(
+        // 페이지 분배 계산
+        calculateReadingPages(
             for: progress,
-            lastReadPage: cumulativePages,
+            startingPage: cumulativePages,
             pagesPerDay: pagesPerDay,
+            remainderPages: remainderPages,
             startDate: targetDate,
             targetEndDate: settings.targetEndDate,
             nonReadingDays: settings.nonReadingDays
         )
-        
-        // 남은 페이지를 뒤에서부터 할당
-        distributeRemainingPagesFromEnd(
-            progress: progress,
-            remainderPages: remainderPages,
-            targetEndDate: settings.targetEndDate)
     }
     
     private func getRemainingReadingDays(startDate: Date, targetEndDate: Date, nonReadingDays: [Date]) -> Int {
@@ -178,28 +160,64 @@ struct ReadingScheduleCalculator {
         }
     }
     
+    /// 읽기 페이지를 계산하고 목표를 설정하는 메서드
+    /// - Parameters:
+    ///   - progress: 읽기 기록 데이터를 포함한 Progress 객체.
+    ///   - startingPage: 시작 페이지 (처음 읽는 경우 0).
+    ///   - pagesPerDay: 하루에 할당할 페이지 수.
+    ///   - remainderPages: 뒤에서 분배해야 할 남은 페이지 수.
+    ///   - startDate: 읽기를 시작할 날짜.
+    ///   - targetEndDate: 읽기를 종료할 목표 날짜.
+    ///   - nonReadingDays: 비독서일의 날짜 배열.
+    private func calculateReadingPages<Progress: ReadingProgressProtocol>(
+        for progress: Progress,
+        startingPage: Int,
+        pagesPerDay: Int,
+        remainderPages: Int,
+        startDate: Date,
+        targetEndDate: Date,
+        nonReadingDays: [Date]
+    ) {
+        // 앞에서부터 하루 할당량을 계산하고 기록 업데이트
+        assignPagesForEachDay(
+            for: progress,
+            startingPage: startingPage,
+            pagesPerDay: pagesPerDay,
+            startDate: startDate,
+            targetEndDate: targetEndDate,
+            nonReadingDays: nonReadingDays
+        )
+        
+        // 뒤에서부터 남은 페이지를 분배
+        distributeRemainderPagesBackward(
+            progress: progress,
+            remainderPages: remainderPages,
+            targetEndDate: targetEndDate
+        )
+    }
+    
     /// 읽기 기록을 업데이트하는 메서드
     /// - Parameters:
     ///   - progress: 읽기 기록 데이터를 포함한 Progress 객체.
-    ///   - lastReadPage: 이전에 마지막으로 읽은 페이지. 처음 읽는 경우 0으로 설정해야 합니다.
+    ///   - startingPage: 이전에 마지막으로 읽은 페이지. 처음 읽는 경우 0으로 설정해야 합니다.
     ///   - pagesPerDay: 하루에 할당할 페이지 수.
     ///   - startDate: 읽기를 시작할 날짜.
     ///   - targetEndDate: 읽기를 종료할 목표 날짜.
     ///   - nonReadingDays: 비독서일의 날짜 배열.
-    private func updateReadingRecord<Progress: ReadingProgressProtocol>(
+    private func assignPagesForEachDay<Progress: ReadingProgressProtocol>(
         for progress: Progress,
-        lastReadPage: Int,
+        startingPage: Int,
         pagesPerDay: Int,
         startDate: Date,
         targetEndDate: Date,
         nonReadingDays: [Date]
     ) {
-        var cumulativePages = lastReadPage
+        var cumulativePages =         startingPage
         var targetDate = startDate
-
+        
         // 비독서일을 키로 변환하여 비교용 배열 생성
         let nonReadingDaysKey = nonReadingDays.map { progress.getReadingRecordsKey($0) }
-
+        
         // 시작 날짜부터 목표 날짜까지 반복
         while progress.getReadingRecordsKey(targetDate) <= progress.getReadingRecordsKey(targetEndDate) {
             let dateKey = progress.getReadingRecordsKey(targetDate)
@@ -209,7 +227,7 @@ struct ReadingScheduleCalculator {
                 progress.readingRecords[dateKey, default: ReadingRecord(targetPages: cumulativePages, pagesRead: 0)].targetPages = cumulativePages
                 cumulativePages += pagesPerDay
             }
-
+            
             // 다음 날짜로 이동
             targetDate = targetDate.addDays(1)
         }
@@ -220,7 +238,7 @@ struct ReadingScheduleCalculator {
     ///   - progress: 읽기 기록 데이터를 포함한 Progress 객체.
     ///   - remainderPages: 분배해야 할 남은 페이지 수.
     ///   - targetEndDate: 읽기 일정의 마지막 날짜.
-    private func distributeRemainingPagesFromEnd<Progress: ReadingProgressProtocol>(
+    private func distributeRemainderPagesBackward<Progress: ReadingProgressProtocol>(
         progress: Progress,
         remainderPages: Int,
         targetEndDate: Date
