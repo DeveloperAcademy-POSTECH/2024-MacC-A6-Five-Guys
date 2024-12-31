@@ -30,7 +30,8 @@ struct DailyProgressView: View {
     @FocusState private var isTextTextFieldFocused: Bool
     
     var body: some View {
-        let userBook = currentlyReadingBooks.first ?? UserBook.dummyUserBookV2
+        // 책이 있을 때만 해당 뷰로 올 수 있기 때문에 우선 강제 언래핑으로 사용
+        let userBook = currentlyReadingBooks.first!
         
         let bookMetadata: BookMetaDataProtocol = userBook.bookMetaData
         let userSettings: UserSettingsProtocol = userBook.userSettings
