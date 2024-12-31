@@ -27,7 +27,7 @@ struct CompletionListView: View {
     let completionAlertText = "삭제 후에는 복원할 수 없어요"
     
     var body: some View {
-        var completedBooks = Array(fetchCompletedBooks.reversed())
+        let completedBooks = Array(fetchCompletedBooks.reversed())
         
         VStack(alignment: .leading, spacing: 16) {
             HStack {

@@ -92,7 +92,15 @@ final class ReadingProgress: ReadingProgressProtocol {
     }
     
     func findNextReadingPagesPerDay(for settings: Settings) -> Int {
-        let readingScheduleCalculator = ReadingScheduleCalculator()
-        return readingScheduleCalculator.calculatePagesPerDay(settings: settings, progress: self).pagesPerDay
+        let readingPagesCalculator = ReadingPagesCalculator()
+        let readingDateCalculator = ReadingDateCalculator()
+        // TODO: !!!!!!!!!
+        let totalDays = try! readingDateCalculator.calculateValidReadingDays(startDate: Date(), endDate: settings.targetEndDate, excludedDates: settings.nonReadingDays)
+        
+        return readingPagesCalculator.calculatePagesPerDayAndRemainder(
+            totalDays: totalDays,
+            startPage: self.lastPagesRead,
+            endPage: settings.targetEndPage)
+        .pagesPerDay
     }
 }

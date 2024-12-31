@@ -28,6 +28,19 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES"
       shouldAutocreateTestPlan = "YES">
+      <Testables>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "26CF825E2D1D4D4D005037E4"
+               BuildableName = "ReadingDateCalculatorTests.xctest"
+               BlueprintName = "ReadingDateCalculatorTests"
+               ReferencedContainer = "container:FiveGuyes.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+      </Testables>
    </TestAction>
    <LaunchAction
       buildConfiguration = "Debug"

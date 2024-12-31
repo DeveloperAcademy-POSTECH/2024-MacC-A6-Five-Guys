@@ -278,7 +278,6 @@ struct WeeklyPageCalendarView: View {
     ///   - targetEndDate: 목표 종료 날짜.
     private func calculateLastWeekAndDayIndex(totalWeeks: Int, targetEndDate: Date) {
         lastWeekIndex = totalWeeks - 1
-        
         // 목표 종료 날짜의 요일 인덱스 계산
         lastDayIndex = Calendar.current.getWeekdayIndex(from: targetEndDate)
     }

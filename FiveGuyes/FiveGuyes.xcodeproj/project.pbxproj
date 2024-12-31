@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -43,6 +43,8 @@
 		26890B992CAE811D008DFF49 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 26890B982CAE811D008DFF49 /* Assets.xcassets */; };
 		26890B9C2CAE811D008DFF49 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 26890B9B2CAE811D008DFF49 /* Preview Assets.xcassets */; };
 		26890BBD2CAE98E2008DFF49 /* .swiftlint.yml in Resources */ = {isa = PBXBuildFile; fileRef = 26890BBC2CAE98E2008DFF49 /* .swiftlint.yml */; };
+		26CF82582D1D3216005037E4 /* ReadingDateCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26CF82572D1D3216005037E4 /* ReadingDateCalculator.swift */; };
+		26CF825A2D1D4B09005037E4 /* ReadingPagesCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26CF82592D1D4B09005037E4 /* ReadingPagesCalculator.swift */; };
 		26EBDE262CDE3C6000B3A2BC /* BookSettingInputModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDE252CDE3C6000B3A2BC /* BookSettingInputModel.swift */; };
 		26EBDE2A2CDF33D900B3A2BC /* Date+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDE292CDF33D900B3A2BC /* Date+Extension.swift */; };
 		26EBDE2C2CE1341800B3A2BC /* ReadingRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDE2B2CE1341800B3A2BC /* ReadingRecord.swift */; };
@@ -83,6 +85,16 @@
 		26F19A7A2CDB5F3900F41D6D /* ReadingScheduleCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F19A792CDB5F3900F41D6D /* ReadingScheduleCalculator.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		26CF82632D1D4D4D005037E4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 26890B892CAE811A008DFF49 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 26890B902CAE811A008DFF49;
+			remoteInfo = FiveGuyes;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		1A010EAB2CD8A7E500FBE3B3 /* APIBooksModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIBooksModel.swift; sourceTree = "<group>"; };
 		1A010EAD2CD8A86E00FBE3B3 /* APIStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIStore.swift; sourceTree = "<group>"; };
@@ -121,6 +133,9 @@
 		26890B982CAE811D008DFF49 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		26890B9B2CAE811D008DFF49 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		26890BBC2CAE98E2008DFF49 /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
+		26CF82572D1D3216005037E4 /* ReadingDateCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadingDateCalculator.swift; sourceTree = "<group>"; };
+		26CF82592D1D4B09005037E4 /* ReadingPagesCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadingPagesCalculator.swift; sourceTree = "<group>"; };
+		26CF825F2D1D4D4D005037E4 /* ReadingDateCalculatorTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ReadingDateCalculatorTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		26EBDE252CDE3C6000B3A2BC /* BookSettingInputModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookSettingInputModel.swift; sourceTree = "<group>"; };
 		26EBDE292CDF33D900B3A2BC /* Date+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Extension.swift"; sourceTree = "<group>"; };
 		26EBDE2B2CE1341800B3A2BC /* ReadingRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadingRecord.swift; sourceTree = "<group>"; };
@@ -156,6 +171,10 @@
 		26F19A792CDB5F3900F41D6D /* ReadingScheduleCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadingScheduleCalculator.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		26CF82602D1D4D4D005037E4 /* ReadingDateCalculatorTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = ReadingDateCalculatorTests; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
+
 /* Begin PBXFrameworksBuildPhase section */
 		26890B8E2CAE811A008DFF49 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
@@ -167,6 +186,13 @@
 				26EBDEB22CF1C5C900B3A2BC /* FirebaseRemoteConfig in Frameworks */,
 				26EBDEAC2CF1C5C900B3A2BC /* FirebaseDynamicLinks in Frameworks */,
 				26EBDEAE2CF1C5C900B3A2BC /* FirebaseInAppMessaging-Beta in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		26CF825C2D1D4D4D005037E4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -223,6 +249,7 @@
 			children = (
 				24F8A2162CEB290B00A01A76 /* Config.xcconfig */,
 				26890B932CAE811A008DFF49 /* FiveGuyes */,
+				26CF82602D1D4D4D005037E4 /* ReadingDateCalculatorTests */,
 				26890B922CAE811A008DFF49 /* Products */,
 				26EBDE2D2CE3307C00B3A2BC /* Recovered References */,
 			);
@@ -232,6 +259,7 @@
 			isa = PBXGroup;
 			children = (
 				26890B912CAE811A008DFF49 /* FiveGuyes.app */,
+				26CF825F2D1D4D4D005037E4 /* ReadingDateCalculatorTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -272,6 +300,7 @@
 			isa = PBXGroup;
 			children = (
 				26EBDEC82CF4553D00B3A2BC /* SwiftDataMigration */,
+				26CF82562D1D3205005037E4 /* Utils */,
 				26D853032CCE44730016239A /* Models */,
 				26D853022CCE44720016239A /* Stores */,
 				26890BB12CAE90E4008DFF49 /* Views */,
@@ -290,6 +319,15 @@
 				26D853042CCE44950016239A /* Shared */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		26CF82562D1D3205005037E4 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				26CF82572D1D3216005037E4 /* ReadingDateCalculator.swift */,
+				26CF82592D1D4B09005037E4 /* ReadingPagesCalculator.swift */,
+			);
+			path = Utils;
 			sourceTree = "<group>";
 		};
 		26D852F92CCE40930016239A /* Navigation */ = {
@@ -511,6 +549,29 @@
 			productReference = 26890B912CAE811A008DFF49 /* FiveGuyes.app */;
 			productType = "com.apple.product-type.application";
 		};
+		26CF825E2D1D4D4D005037E4 /* ReadingDateCalculatorTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 26CF82652D1D4D4D005037E4 /* Build configuration list for PBXNativeTarget "ReadingDateCalculatorTests" */;
+			buildPhases = (
+				26CF825B2D1D4D4D005037E4 /* Sources */,
+				26CF825C2D1D4D4D005037E4 /* Frameworks */,
+				26CF825D2D1D4D4D005037E4 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				26CF82642D1D4D4D005037E4 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				26CF82602D1D4D4D005037E4 /* ReadingDateCalculatorTests */,
+			);
+			name = ReadingDateCalculatorTests;
+			packageProductDependencies = (
+			);
+			productName = ReadingDateCalculatorTests;
+			productReference = 26CF825F2D1D4D4D005037E4 /* ReadingDateCalculatorTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -518,11 +579,15 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1520;
+				LastSwiftUpdateCheck = 1620;
 				LastUpgradeCheck = 1520;
 				TargetAttributes = {
 					26890B902CAE811A008DFF49 = {
 						CreatedOnToolsVersion = 15.2;
+					};
+					26CF825E2D1D4D4D005037E4 = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = 26890B902CAE811A008DFF49;
 					};
 				};
 			};
@@ -544,6 +609,7 @@
 			projectRoot = "";
 			targets = (
 				26890B902CAE811A008DFF49 /* FiveGuyes */,
+				26CF825E2D1D4D4D005037E4 /* ReadingDateCalculatorTests */,
 			);
 		};
 /* End PBXProject section */
@@ -560,6 +626,13 @@
 				26890BBD2CAE98E2008DFF49 /* .swiftlint.yml in Resources */,
 				26890B9C2CAE811D008DFF49 /* Preview Assets.xcassets in Resources */,
 				26890B992CAE811D008DFF49 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		26CF825D2D1D4D4D005037E4 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -638,11 +711,13 @@
 				1AA14A7A2CDDD96200B763A6 /* NotificationManager.swift in Sources */,
 				24FAF9452CEC5224004FEC3F /* ToastView.swift in Sources */,
 				26EBDE912CF068E600B3A2BC /* FontStyle.swift in Sources */,
+				26CF825A2D1D4B09005037E4 /* ReadingPagesCalculator.swift in Sources */,
 				264440502CD8A3AC0031A290 /* CompletionReviewView.swift in Sources */,
 				26EBDEBE2CF2390C00B3A2BC /* CompletionStatusProtocol.swift in Sources */,
 				264440502CD8A3AC0031A290 /* CompletionReviewView.swift in Sources */,
 				2655532F2CF6D73900288037 /* NotiSettingView.swift in Sources */,
 				26890B952CAE811A008DFF49 /* FiveGuyesApp.swift in Sources */,
+				26CF82582D1D3216005037E4 /* ReadingDateCalculator.swift in Sources */,
 				26EBDE992CF07A7900B3A2BC /* FontWeight.swift in Sources */,
 				26EBDE972CF0764A00B3A2BC /* FontModifier.swift in Sources */,
 				26F19A6E2CDA74A600F41D6D /* WeeklyPageCalendarView.swift in Sources */,
@@ -660,12 +735,24 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		26CF825B2D1D4D4D005037E4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
 		26890BBB2CAE9896008DFF49 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			productRef = 26890BBA2CAE9896008DFF49 /* SwiftLintBuildToolPlugin */;
+		};
+		26CF82642D1D4D4D005037E4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 26890B902CAE811A008DFF49 /* FiveGuyes */;
+			targetProxy = 26CF82632D1D4D4D005037E4 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -876,6 +963,54 @@
 			};
 			name = Release;
 		};
+		26CF82662D1D4D4D005037E4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = LYC8XX4ZNC;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MACOSX_DEPLOYMENT_TARGET = 15.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.FiveGuyes.ReadingDateCalculatorTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FiveGuyes.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/FiveGuyes";
+				XROS_DEPLOYMENT_TARGET = 2.2;
+			};
+			name = Debug;
+		};
+		26CF82672D1D4D4D005037E4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = LYC8XX4ZNC;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MACOSX_DEPLOYMENT_TARGET = 15.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.FiveGuyes.ReadingDateCalculatorTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FiveGuyes.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/FiveGuyes";
+				XROS_DEPLOYMENT_TARGET = 2.2;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -893,6 +1028,15 @@
 			buildConfigurations = (
 				26890BA02CAE811D008DFF49 /* Debug */,
 				26890BA12CAE811D008DFF49 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		26CF82652D1D4D4D005037E4 /* Build configuration list for PBXNativeTarget "ReadingDateCalculatorTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				26CF82662D1D4D4D005037E4 /* Debug */,
+				26CF82672D1D4D4D005037E4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

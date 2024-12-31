@@ -8,40 +8,38 @@
 import Foundation
 
 struct ReadingScheduleCalculator {
+    private let readingPagesCalculator: ReadingPagesCalculator = ReadingPagesCalculator()
+    private let readingDateCalculator: ReadingDateCalculator = ReadingDateCalculator()
     
     /// 첫날을 기준으로 읽어야하는 페이지를 할당하는 메서드 (초기 페이지 계산)
     func calculateInitialDailyTargets<Settings: UserSettingsProtocol, Progress: ReadingProgressProtocol>(
         for settings: Settings,
         progress: Progress
     ) {
-        let (pagesPerDay, remainderPages) = firstCalculatePagesPerDay(settings: settings, progress: progress)
+        let readingStartDate = settings.startDate
         
-        var targetDate = settings.startDate
-        var remainderOffset = remainderPages
-        var cumulativePages = settings.startPage
+        let remainingReadingDays = getRemainingReadingDays(
+            startDate: readingStartDate,
+            targetEndDate: settings.targetEndDate,
+            nonReadingDays: settings.nonReadingDays
+        )
         
-        // 비독서일을 제외하고 읽어야 할 페이지를 초기 할당
-        while progress.getReadingRecordsKey(targetDate) <= progress.getReadingRecordsKey(settings.targetEndDate) {
-            let dateKey = progress.getReadingRecordsKey(targetDate)
-            
-            if !settings.nonReadingDays.map({ progress.getReadingRecordsKey($0) }).contains(dateKey) {
-                cumulativePages += pagesPerDay
-                progress.readingRecords[dateKey] = ReadingRecord(targetPages: cumulativePages, pagesRead: 0)
-            }
-            
-            targetDate = Calendar.current.date(byAdding: .day, value: 1, to: targetDate)!
-        }
+        let (pagesPerDay, remainderPages) = readingPagesCalculator.calculatePagesPerDayAndRemainder(
+            totalDays: remainingReadingDays,
+            startPage: settings.startPage,
+            endPage: settings.targetEndPage
+        )
         
-        // 남은 페이지를 뒤에서부터 할당
-        var remainderTargetDate = settings.targetEndDate
-        while remainderOffset > 0 {
-            let dateKey = progress.getReadingRecordsKey(remainderTargetDate)
-            guard var record = progress.readingRecords[dateKey] else { return }
-            record.targetPages += remainderOffset
-            progress.readingRecords[dateKey] = record
-            remainderOffset -= 1
-            remainderTargetDate = Calendar.current.date(byAdding: .day, value: -1, to: remainderTargetDate)!
-        }
+        // 페이지 분배 계산
+        calculateReadingPages(
+            for: progress,
+            startingPage: progress.lastPagesRead,
+            pagesPerDay: pagesPerDay,
+            remainderPages: remainderPages,
+            startDate: readingStartDate,
+            targetEndDate: settings.targetEndDate,
+            nonReadingDays: settings.nonReadingDays
+        )
     }
     
     ///  읽은 페이지 입력 메서드 (오늘 날짜에만 값을 넣을 수 있음)
@@ -51,32 +49,32 @@ struct ReadingScheduleCalculator {
         pagesRead: Int,
         from today: Date
     ) {
-        let dateKey = progress.getAdjustedReadingRecordsKey(today)
+        let adjustedDateKey = progress.getAdjustedReadingRecordsKey(today)
         
         // 시작날짜보다 오늘 날짜가 이전이면
         if settings.startDate > today {
             settings.changeStartDate(for: today)
         }
         
-        var record = progress.readingRecords[dateKey, default: ReadingRecord(targetPages: 0, pagesRead: 0)]
+        var record = progress.readingRecords[adjustedDateKey, default: ReadingRecord(targetPages: 0, pagesRead: 0)]
         
         // 비독서일에서 해당 날짜 제거
         if let index = settings.nonReadingDays.firstIndex(where: {
-            progress.getReadingRecordsKey($0) == dateKey
+            progress.getReadingRecordsKey($0) == adjustedDateKey
         }) {
             settings.nonReadingDays.remove(at: index)
         }
         
         // 페이지 읽기 업데이트
         record.pagesRead = pagesRead
-        progress.readingRecords[dateKey] = record
+        progress.readingRecords[adjustedDateKey] = record
         
         progress.lastPagesRead = pagesRead
         progress.lastReadDate = today.adjustedDate()
         
         // 목표량과 실제 읽은 페이지 수가 다르면 이후 날짜 조정
         if record.pagesRead != record.targetPages {
-            progress.readingRecords[dateKey]?.targetPages = record.pagesRead
+            progress.readingRecords[adjustedDateKey]?.targetPages = record.pagesRead
             adjustFutureTargets(for: settings, progress: progress, from: today)
         }
     }
@@ -87,47 +85,30 @@ struct ReadingScheduleCalculator {
         progress: Progress,
         from date: Date
     ) {
-        let totalRemainingPages = calculateRemainingPages(settings: settings, progress: progress)
-        // 오늘을 남은 일자에서 제외하기 위해 각각 메서드 사용
-        let remainingDays = calculateRemainingReadingDays(settings: settings, progress: progress) - 1
+        // 다음날을 기준으로 새롭게 페이지를 분배하기 위해 date에 1일을 추가해서 계산합니다.
+        let startDate = date.adjustedDate().addDays(1)
         
-        guard remainingDays > 0 else { return }
+        let remainingReadingDays = getRemainingReadingDays(
+            startDate: startDate,
+            targetEndDate: settings.targetEndDate,
+            nonReadingDays: settings.nonReadingDays)
         
-        let pagesPerDay = totalRemainingPages / remainingDays
-        var remainderOffset = totalRemainingPages % remainingDays
-        var cumulativePages = progress.lastPagesRead
+        let (pagesPerDay, remainderPages) = readingPagesCalculator.calculatePagesPerDayAndRemainder(
+            totalDays: remainingReadingDays,
+            startPage: progress.lastPagesRead + 1, // 시작 페이지 == 이전까지 읽은 페이지 + 1
+            endPage: settings.targetEndPage
+        )
         
-        var nextDate = Calendar.current.date(byAdding: .day, value: 1, to: date)!
-        
-        while progress.getAdjustedReadingRecordsKey(nextDate) <= progress.getReadingRecordsKey(settings.targetEndDate) {
-            let dateKey = progress.getAdjustedReadingRecordsKey(nextDate)
-            
-            if !settings.nonReadingDays
-                .map({ progress.getReadingRecordsKey($0) })
-                .contains(dateKey) {
-                guard var record = progress.readingRecords[dateKey] else {
-                    nextDate = Calendar.current.date(byAdding: .day, value: 1, to: nextDate)!
-                    continue
-                }
-                cumulativePages += pagesPerDay
-                record.targetPages = cumulativePages
-                progress.readingRecords[dateKey] = record
-            }
-            nextDate = Calendar.current.date(byAdding: .day, value: 1, to: nextDate)!
-        }
-        
-        var remainingTargetDate = settings.targetEndDate
-        while remainderOffset > 0 {
-            let dateKey = progress.getReadingRecordsKey(remainingTargetDate)
-            guard var record = progress.readingRecords[dateKey] else {
-                remainingTargetDate = Calendar.current.date(byAdding: .day, value: -1, to: nextDate)!
-                continue
-            }
-            record.targetPages += remainderOffset
-            progress.readingRecords[dateKey] = record
-            remainderOffset -= 1
-            remainingTargetDate = Calendar.current.date(byAdding: .day, value: -1, to: remainingTargetDate)!
-        }
+        // 페이지 분배 계산
+        calculateReadingPages(
+            for: progress,
+            startingPage: progress.lastPagesRead,
+            pagesPerDay: pagesPerDay,
+            remainderPages: remainderPages,
+            startDate: startDate,
+            targetEndDate: settings.targetEndDate,
+            nonReadingDays: settings.nonReadingDays
+        )
     }
     
     /// 지난 날의 할당량을 읽지 않고, 앱에 새롭게 접속할 때 페이지를 재할당해주는 메서드
@@ -136,139 +117,170 @@ struct ReadingScheduleCalculator {
         progress: Progress
     ) {
         // 이미 오늘 읽은 페이지가 기록되었으면 재분배를 수행하지 않음
-        if hasReadPagesAdjustedToday(progress: progress) { return }
-        
-        // 남은 페이지와 일수를 기준으로 새롭게 할당량 계산
-        let (pagesPerDay, remainderPages) = calculatePagesPerDay(settings: settings, progress: progress)
-        var remainderOffset = remainderPages
-        var cumulativePages = progress.lastPagesRead
-        
-        var targetDate = Date()
-        
-        // 비독서일을 제외하고 할당량 재설정
-        while progress.getAdjustedReadingRecordsKey(targetDate) <= progress.getReadingRecordsKey(settings.targetEndDate) {
-            let dateKey = progress.getAdjustedReadingRecordsKey(targetDate)
-            
-            if !settings.nonReadingDays
-                .map({ progress.getReadingRecordsKey($0) })
-                .contains(dateKey) {
-                cumulativePages += pagesPerDay
-                progress.readingRecords[dateKey] = ReadingRecord(targetPages: cumulativePages, pagesRead: 0)
-            }
-            
-            targetDate = Calendar.current.date(byAdding: .day, value: 1, to: targetDate)!
+        if hasReadPagesAdjustedToday(progress: progress) {
+            print("페이지 재분배1 ❌❌❌ ")
+            return
         }
         
-        // 남은 페이지를 뒤에서부터 분배
-        var remainingTargetDate = settings.targetEndDate
-        while remainderOffset > 0 {
-            let dateKey = progress.getReadingRecordsKey(remainingTargetDate)
+        let adjustedToday = Date().adjustedDate()
+        
+        // TODO: 독서 시작 날짜와 조정된 오늘 날짜가 같은 날에는 재할당 막기
+        // 불필요한 계산
+        if settings.startDate.toYearMonthDayString() == adjustedToday.toYearMonthDayString() {
+            print("페이지 재분배2 ❌❌❌ ")
+            return
+        }
+        
+        let remainingReadingDays = getRemainingReadingDays(
+            startDate: adjustedToday,
+            targetEndDate: settings.targetEndDate,
+            nonReadingDays: settings.nonReadingDays
+        )
+        
+        // 남은 페이지와 일수를 기준으로 새롭게 할당량 계산 🐯🐯🐯🐯
+        let (pagesPerDay, remainderPages) =
+        readingPagesCalculator.calculatePagesPerDayAndRemainder(
+            totalDays: remainingReadingDays,
+            startPage: progress.lastPagesRead,
+            endPage: settings.targetEndPage
+        )
+
+        // 페이지 분배 계산
+        calculateReadingPages(
+            for: progress,
+            startingPage: progress.lastPagesRead,
+            pagesPerDay: pagesPerDay,
+            remainderPages: remainderPages,
+            startDate: adjustedToday,
+            targetEndDate: settings.targetEndDate,
+            nonReadingDays: settings.nonReadingDays
+        )
+    }
+    
+    private func getRemainingReadingDays(startDate: Date, targetEndDate: Date, nonReadingDays: [Date]) -> Int {
+        do {
+            return try readingDateCalculator.calculateValidReadingDays(
+                startDate: startDate,
+                endDate: targetEndDate,
+                excludedDates: nonReadingDays
+            )
+        } catch {
+            fatalError("getRemainingReadingDays: \(error)")
+        }
+    }
+    
+    /// 읽기 페이지를 계산하고 목표를 설정하는 메서드
+    /// - Parameters:
+    ///   - progress: 읽기 기록 데이터를 포함한 Progress 객체.
+    ///   - startingPage: 시작 페이지 (처음 읽는 경우 0).
+    ///   - pagesPerDay: 하루에 할당할 페이지 수.
+    ///   - remainderPages: 뒤에서 분배해야 할 남은 페이지 수.
+    ///   - startDate: 읽기를 시작할 날짜.
+    ///   - targetEndDate: 읽기를 종료할 목표 날짜.
+    ///   - nonReadingDays: 비독서일의 날짜 배열.
+    private func calculateReadingPages<Progress: ReadingProgressProtocol>(
+        for progress: Progress,
+        startingPage: Int,
+        pagesPerDay: Int,
+        remainderPages: Int,
+        startDate: Date,
+        targetEndDate: Date,
+        nonReadingDays: [Date]
+    ) {
+        // 앞에서부터 하루 할당량을 계산하고 기록 업데이트
+        assignPagesForEachDay(
+            for: progress,
+            startingPage: startingPage,
+            pagesPerDay: pagesPerDay,
+            startDate: startDate,
+            targetEndDate: targetEndDate,
+            nonReadingDays: nonReadingDays
+        )
+        
+        // 뒤에서부터 남은 페이지를 분배
+        distributeRemainderPagesBackward(
+            progress: progress,
+            remainderPages: remainderPages,
+            targetEndDate: targetEndDate
+        )
+    }
+    
+    /// 읽기 기록을 업데이트하는 메서드
+    /// - Parameters:
+    ///   - progress: 읽기 기록 데이터를 포함한 Progress 객체.
+    ///   - startingPage: 이전에 마지막으로 읽은 페이지. 처음 읽는 경우 0으로 설정해야 합니다.
+    ///   - pagesPerDay: 하루에 할당할 페이지 수.
+    ///   - startDate: 읽기를 시작할 날짜.
+    ///   - targetEndDate: 읽기를 종료할 목표 날짜.
+    ///   - nonReadingDays: 비독서일의 날짜 배열.
+    private func assignPagesForEachDay<Progress: ReadingProgressProtocol>(
+        for progress: Progress,
+        startingPage: Int,
+        pagesPerDay: Int,
+        startDate: Date,
+        targetEndDate: Date,
+        nonReadingDays: [Date]
+    ) {
+        var cumulativePages = startingPage
+        var targetDate = startDate
+        
+        // 비독서일을 키로 변환하여 비교용 배열 생성
+        let nonReadingDaysKey = nonReadingDays.map { progress.getReadingRecordsKey($0) }
+        
+        // 시작 날짜부터 목표 날짜까지 반복
+        while progress.getReadingRecordsKey(targetDate) <= progress.getReadingRecordsKey(targetEndDate) {
+            let dateKey = progress.getReadingRecordsKey(targetDate)
+            
+            // 비독서일이 아닌 경우에만 기록을 업데이트
+            if !nonReadingDaysKey.contains(dateKey) {
+                cumulativePages += pagesPerDay
+                progress.readingRecords[dateKey, default: ReadingRecord(targetPages: cumulativePages, pagesRead: 0)].targetPages = cumulativePages
+            }
+            
+            // 다음 날짜로 이동
+            targetDate = targetDate.addDays(1)
+        }
+    }
+    
+    /// 마지막 날부터 남은 페이지를 역순으로 분배하는 메서드
+    /// - Parameters:
+    ///   - progress: 읽기 기록 데이터를 포함한 Progress 객체.
+    ///   - remainderPages: 분배해야 할 남은 페이지 수.
+    ///   - targetEndDate: 읽기 일정의 마지막 날짜.
+    private func distributeRemainderPagesBackward<Progress: ReadingProgressProtocol>(
+        progress: Progress,
+        remainderPages: Int,
+        targetEndDate: Date
+    ) {
+        var remainingOffset = remainderPages
+        var currentTargetDate = targetEndDate
+        
+        // 마지막 날짜부터 시작하여 남은 페이지를 분배
+        while remainingOffset > 0 {
+            let dateKey = progress.getReadingRecordsKey(currentTargetDate)
+            
+            // 현재 날짜에 해당하는 기록이 없으면 이전 날짜로 이동
             guard var record = progress.readingRecords[dateKey] else {
-                remainingTargetDate = Calendar.current.date(byAdding: .day, value: -1, to: remainingTargetDate)!
+                currentTargetDate = currentTargetDate.addingDays(-1)
                 continue
             }
             
-            record.targetPages += remainderOffset
+            // 현재 날짜의 목표 페이지에 남은 페이지를 추가
+            record.targetPages += remainingOffset
             progress.readingRecords[dateKey] = record
-            remainderOffset -= 1
-            remainingTargetDate = Calendar.current.date(byAdding: .day, value: -1, to: remainingTargetDate)!
+            
+            // 남은 페이지 수를 감소시키고 이전 날짜로 이동
+            remainingOffset -= 1
+            currentTargetDate = currentTargetDate.addingDays(-1)
         }
     }
     
     /// 오늘 할당량이 읽혔는지 확인하는 메서드
     private func hasReadPagesAdjustedToday<Progress: ReadingProgressProtocol>(progress: Progress) -> Bool {
-        let today = Date()
-        let todayKey = progress.getAdjustedReadingRecordsKey(today)
-        return progress.readingRecords[todayKey]?.pagesRead != 0
-    }
-    
-    // MARK: - 초기에 페이지를 할당할 때 필요한 메서드
-    // 독서를 해야하는 일수 구하기
-    func firstCalculateTotalReadingDays<Settings: UserSettingsProtocol, Progress: ReadingProgressProtocol>(
-        settings: Settings,
-        progress: Progress
-    ) -> Int {
-        var totalDays = 0
-        var targetDate = settings.startDate
+        let adjustedToday = Date().adjustedDate()
+        let adjustedTodayKey = progress.getAdjustedReadingRecordsKey(adjustedToday)
         
-        while progress.getReadingRecordsKey(targetDate) <= progress.getReadingRecordsKey(settings.targetEndDate) {
-            let dateKey = progress.getReadingRecordsKey(targetDate)
-            
-            if !settings.nonReadingDays
-                .map({ progress.getReadingRecordsKey($0) })
-                .contains(dateKey) {
-                totalDays += 1
-            }
-            
-            targetDate = Calendar.current.date(byAdding: .day, value: 1, to: targetDate)!
-        }
-        
-        return totalDays
-    }
-    
-    // 하루에 몇 페이지 읽는지 계산
-    func firstCalculatePagesPerDay<Settings: UserSettingsProtocol, Progress: ReadingProgressProtocol>(
-        settings: Settings,
-        progress: Progress
-    ) -> (pagesPerDay: Int, remainder: Int) {
-        let totalReadingDays = firstCalculateTotalReadingDays(settings: settings, progress: progress)
-        
-        // 총 페이지 수와 하루 할당량 계산
-        let totalPages = settings.targetEndPage - settings.startPage
-        let pagesPerDay = totalPages / totalReadingDays
-        let remainder = totalPages % totalReadingDays
-        
-        return (pagesPerDay, remainder)
-    }
-    
-    // MARK: - 남은 양을 다시 계산할 때 사용하는 메서드
-    // 지금까지 읽은 페이지를 제외하고 남은 페이지 계산
-    func calculateRemainingPages<Settings: UserSettingsProtocol, Progress: ReadingProgressProtocol>(
-        settings: Settings,
-        progress: Progress
-    ) -> Int {
-        return settings.targetEndPage - progress.lastPagesRead
-    }
-    
-    /// 완독까지 남은 기간을 구하는 메서드 (오늘부터)
-    func calculateRemainingReadingDays<Settings: UserSettingsProtocol, Progress: ReadingProgressProtocol>(
-        settings: Settings,
-        progress: Progress
-    ) -> Int {
-        var remainingDays = 0
-        var targetDate = Date()
-        
-        while progress.getAdjustedReadingRecordsKey(targetDate) <= progress.getReadingRecordsKey(settings.targetEndDate) {
-            let dateKey = progress.getAdjustedReadingRecordsKey(targetDate)
-            guard progress.readingRecords[dateKey] != nil else {
-                targetDate = Calendar.current.date(byAdding: .day, value: 1, to: targetDate)!
-                continue
-            }
-            
-            if !settings.nonReadingDays
-                .map({ progress.getReadingRecordsKey($0) })
-                .contains(dateKey) {
-                remainingDays += 1
-            }
-            targetDate = Calendar.current.date(byAdding: .day, value: 1, to: targetDate)!
-        }
-        return remainingDays
-    }
-    
-    ///  하루에 몇 페이지를 읽어야 하는지를 구하는 메서드
-    func calculatePagesPerDay<Settings: UserSettingsProtocol, Progress: ReadingProgressProtocol>(
-        settings: Settings,
-        progress: Progress
-    ) -> (pagesPerDay: Int, remainder: Int) {
-        let totalRemainingPages = calculateRemainingPages(settings: settings, progress: progress)
-        let remainingDays = calculateRemainingReadingDays(settings: settings, progress: progress)
-        
-        guard remainingDays > 0 else { return (0, 0) } // 남은 날짜가 없으면 0 반환
-        
-        let pagesPerDay = totalRemainingPages / remainingDays
-        let remainder = totalRemainingPages % remainingDays
-        
-        return (pagesPerDay, remainder)
+        return progress.readingRecords[adjustedTodayKey]?.pagesRead != 0
     }
 }
 
@@ -279,11 +291,4 @@ extension ReadingScheduleCalculator {
     ) -> Int {
         return progress.readingRecords.values.filter { $0.pagesRead > 0 }.count
     }
-    
-    func calculateTotalReadingPages<Settings: UserSettingsProtocol>(
-        setttings: Settings
-    ) -> Int {
-        return setttings.targetEndPage - setttings.startPage
-    }
-    
 }
