@@ -115,12 +115,22 @@ struct ReadingScheduleCalculator {
         progress: Progress
     ) {
         // 이미 오늘 읽은 페이지가 기록되었으면 재분배를 수행하지 않음
-        if hasReadPagesAdjustedToday(progress: progress) { return }
+        if hasReadPagesAdjustedToday(progress: progress) {
+            print("페이지 재분배1 ❌❌❌ ")
+            return
+        }
         
-        let targetDate = Date().adjustedDate()
+        let adjustedToday = Date().adjustedDate()
+        
+        // TODO: 독서 시작 날짜와 조정된 오늘 날짜가 같은 날에는 재할당 막기
+        // 불필요한 계산
+        if settings.startDate.toYearMonthDayString() == adjustedToday.toYearMonthDayString() {
+            print("페이지 재분배2 ❌❌❌ ")
+            return
+        }
         
         let remainingReadingDays = getRemainingReadingDays(
-            startDate: targetDate,
+            startDate: adjustedToday,
             targetEndDate: settings.targetEndDate,
             nonReadingDays: settings.nonReadingDays
         )
