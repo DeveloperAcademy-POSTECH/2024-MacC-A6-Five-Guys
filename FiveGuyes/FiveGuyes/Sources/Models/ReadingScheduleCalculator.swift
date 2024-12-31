@@ -16,8 +16,10 @@ struct ReadingScheduleCalculator {
         for settings: Settings,
         progress: Progress
     ) {
+        let readingStartDate = settings.startDate
+        
         let remainingReadingDays = getRemainingReadingDays(
-            startDate: settings.startDate,
+            startDate: readingStartDate,
             targetEndDate: settings.targetEndDate,
             nonReadingDays: settings.nonReadingDays
         )
@@ -31,10 +33,10 @@ struct ReadingScheduleCalculator {
         // 페이지 분배 계산
         calculateReadingPages(
             for: progress,
-            startingPage: 0,
+            startingPage: progress.lastPagesRead,
             pagesPerDay: pagesPerDay,
             remainderPages: remainderPages,
-            startDate: settings.startDate,
+            startDate: readingStartDate,
             targetEndDate: settings.targetEndDate,
             nonReadingDays: settings.nonReadingDays
         )
@@ -47,32 +49,32 @@ struct ReadingScheduleCalculator {
         pagesRead: Int,
         from today: Date
     ) {
-        let dateKey = progress.getAdjustedReadingRecordsKey(today)
+        let adjustedDateKey = progress.getAdjustedReadingRecordsKey(today)
         
         // 시작날짜보다 오늘 날짜가 이전이면
         if settings.startDate > today {
             settings.changeStartDate(for: today)
         }
         
-        var record = progress.readingRecords[dateKey, default: ReadingRecord(targetPages: 0, pagesRead: 0)]
+        var record = progress.readingRecords[adjustedDateKey, default: ReadingRecord(targetPages: 0, pagesRead: 0)]
         
         // 비독서일에서 해당 날짜 제거
         if let index = settings.nonReadingDays.firstIndex(where: {
-            progress.getReadingRecordsKey($0) == dateKey
+            progress.getReadingRecordsKey($0) == adjustedDateKey
         }) {
             settings.nonReadingDays.remove(at: index)
         }
         
         // 페이지 읽기 업데이트
         record.pagesRead = pagesRead
-        progress.readingRecords[dateKey] = record
+        progress.readingRecords[adjustedDateKey] = record
         
         progress.lastPagesRead = pagesRead
         progress.lastReadDate = today.adjustedDate()
         
         // 목표량과 실제 읽은 페이지 수가 다르면 이후 날짜 조정
         if record.pagesRead != record.targetPages {
-            progress.readingRecords[dateKey]?.targetPages = record.pagesRead
+            progress.readingRecords[adjustedDateKey]?.targetPages = record.pagesRead
             adjustFutureTargets(for: settings, progress: progress, from: today)
         }
     }
@@ -93,7 +95,7 @@ struct ReadingScheduleCalculator {
         
         let (pagesPerDay, remainderPages) = readingPagesCalculator.calculatePagesPerDayAndRemainder(
             totalDays: remainingReadingDays,
-            startPage: progress.lastPagesRead,
+            startPage: progress.lastPagesRead + 1, // 시작 페이지 == 이전까지 읽은 페이지 + 1
             endPage: settings.targetEndPage
         )
         
@@ -142,17 +144,14 @@ struct ReadingScheduleCalculator {
             startPage: progress.lastPagesRead,
             endPage: settings.targetEndPage
         )
-        
-        // TODO: ReadingProgress의 lastPagesRead가 디폴트 1로 되어 있어서 우선 여기에 필요 로직 추가
-        var cumulativePages = progress.lastPagesRead == 1 ? 0 : progress.lastPagesRead
-        
+
         // 페이지 분배 계산
         calculateReadingPages(
             for: progress,
-            startingPage: cumulativePages,
+            startingPage: progress.lastPagesRead,
             pagesPerDay: pagesPerDay,
             remainderPages: remainderPages,
-            startDate: targetDate,
+            startDate: adjustedToday,
             targetEndDate: settings.targetEndDate,
             nonReadingDays: settings.nonReadingDays
         )
@@ -222,7 +221,7 @@ struct ReadingScheduleCalculator {
         targetEndDate: Date,
         nonReadingDays: [Date]
     ) {
-        var cumulativePages =         startingPage
+        var cumulativePages = startingPage
         var targetDate = startDate
         
         // 비독서일을 키로 변환하여 비교용 배열 생성
@@ -234,8 +233,8 @@ struct ReadingScheduleCalculator {
             
             // 비독서일이 아닌 경우에만 기록을 업데이트
             if !nonReadingDaysKey.contains(dateKey) {
-                progress.readingRecords[dateKey, default: ReadingRecord(targetPages: cumulativePages, pagesRead: 0)].targetPages = cumulativePages
                 cumulativePages += pagesPerDay
+                progress.readingRecords[dateKey, default: ReadingRecord(targetPages: cumulativePages, pagesRead: 0)].targetPages = cumulativePages
             }
             
             // 다음 날짜로 이동
@@ -278,9 +277,10 @@ struct ReadingScheduleCalculator {
     
     /// 오늘 할당량이 읽혔는지 확인하는 메서드
     private func hasReadPagesAdjustedToday<Progress: ReadingProgressProtocol>(progress: Progress) -> Bool {
-        let today = Date()
-        let todayKey = progress.getAdjustedReadingRecordsKey(today)
-        return progress.readingRecords[todayKey]?.pagesRead != 0
+        let adjustedToday = Date().adjustedDate()
+        let adjustedTodayKey = progress.getAdjustedReadingRecordsKey(adjustedToday)
+        
+        return progress.readingRecords[adjustedTodayKey]?.pagesRead != 0
     }
 }
 
