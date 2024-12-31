@@ -46,7 +46,7 @@ struct NotiSettingView: View {
     }
     
     var body: some View {
-        let userBook = currentlyReadingBooks.first ?? UserBook.dummyUserBookV2
+        let userBook = currentlyReadingBooks.first
         
         ZStack {
             Color.Fills.white // 배경색 지정
@@ -251,8 +251,11 @@ struct NotiSettingView: View {
         isNotificationDisabled = UserDefaultsManager.fetchNotificationDisabled()
     }
     
-    private func handleNotificationStatusChange(isDisabled: Bool, userBook: UserBook) async {
+    private func handleNotificationStatusChange(isDisabled: Bool, userBook: UserBook?) async {
         saveNotificationStatus(isDisabled)
+        
+        // 등록된 책이 없을 때는 노티 설정 X
+        guard let userBook else { return }
         
         if isDisabled {
             await notificationManager.clearRequests()
@@ -261,8 +264,11 @@ struct NotiSettingView: View {
         }
     }
     
-    private func handleNotificationTimeChange(newTime: Date, userBook: UserBook) async {
+    private func handleNotificationTimeChange(newTime: Date, userBook: UserBook?) async {
         saveNotificationTime(newTime)
+        
+        // 등록된 책이 없을 때는 노티 설정 X
+        guard let userBook else { return }
         
         await notificationManager.updateNotification(notificationType: .morning(readingBook: userBook))
     }
