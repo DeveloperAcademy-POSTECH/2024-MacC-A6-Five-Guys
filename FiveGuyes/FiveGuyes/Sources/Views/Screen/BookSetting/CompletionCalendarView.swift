@@ -149,7 +149,7 @@ struct CompletionCalendarView: View {
                     let adjustedDays = self.adjustDaysForMonth(monthDate: monthDate, daysInMonth: daysInMonth)
                     
                     VStack(spacing: 0) {
-                        Text(monthDate.toKoreanDateStringWithoutDay())
+                        Text(monthDate.toYearMonthString())
                         // TODO: 폰트 확인하기
                             .fontStyle(.title3, weight: .semibold)
                             .padding(.bottom, 20)
@@ -195,6 +195,7 @@ struct CompletionCalendarView: View {
                     } else if isSelectedDay {
                         dateSelectionRectangle(for: date)
                     }
+                    
                     dateText(for: date, isSelectedDay: isSelectedDay, textColor: Color.Labels.secondaryBlack2) // 기본 색상
                 }
                 .onTapGesture {
