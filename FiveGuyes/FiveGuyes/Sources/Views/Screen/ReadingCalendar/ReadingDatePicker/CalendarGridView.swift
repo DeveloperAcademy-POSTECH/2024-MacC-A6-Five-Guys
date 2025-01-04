@@ -9,17 +9,17 @@ import SwiftUI
 
 struct CalendarGridView: View {
     var month: Date
-    @ObservedObject var calendarManager: CalendarManager
+    let calendarCalculator: CalendarCalculator
     
     private let weekSpacing: CGFloat = 21
     
     private let gridColumns: [GridItem] = Array(repeating: GridItem(.flexible(), spacing: 0), count: 7)
     
     var body: some View {
-        let daysInMonth = calendarManager.numberOfDays(in: month)
+        let daysInMonth = calendarCalculator.numberOfDays(in: month)
         
         // 일요일을 0으로 맞추기 위해 -1
-        let firstWeekday = calendarManager.firstWeekdayOfMonth(in: month) - 1
+        let firstWeekday = calendarCalculator.firstWeekdayOfMonth(in: month) - 1
         
         let totalCells = daysInMonth + firstWeekday
         
@@ -39,7 +39,7 @@ struct CalendarGridView: View {
                         let day = index - firstWeekday + 1
                         
                         // 셀에 해당하는 실제 Date 값 (이후에 해당 셀에 넣어줘야 함.)
-                        let date = calendarManager.dateForDay(index - firstWeekday, inMonth: month)
+                        let date = calendarCalculator.dateForDay(index - firstWeekday, inMonth: month)
                         
                         // 날짜 셀
                         calendarGridCell(day: day, date: date)
@@ -68,5 +68,5 @@ struct CalendarGridView: View {
 }
 
 #Preview {
-    CalendarGridView(month: Date(), calendarManager: CalendarManager())
+    CalendarGridView(month: Date(), calendarCalculator: CalendarCalculator())
 }

@@ -14,19 +14,19 @@ struct ReadingDatePickerView: View {
     let displayedMonths: Int = 12
     let calendarSpacing: CGFloat = 30
     
-    @StateObject private var calendarManager: CalendarManager
+    let calendarCalculator: CalendarCalculator
     
-    init(calendarManager: CalendarManager = CalendarManager()) {
-        _calendarManager = StateObject(wrappedValue: calendarManager)
+    init(calendarCalculator: CalendarCalculator = CalendarCalculator()) {
+        self.calendarCalculator = calendarCalculator
     }
     
     var body: some View {
         ScrollView {
             VStack(spacing: calendarSpacing) {
                 ForEach(0..<displayedMonths, id: \.self) { monthOffset in
-                    let month = calendarManager.addMonths(to: adjustedToday, by: monthOffset)
+                    let month = calendarCalculator.addMonths(to: adjustedToday, by: monthOffset)
                     
-                    CalendarGridView(month: month, calendarManager: calendarManager)
+                    CalendarGridView(month: month, calendarCalculator: calendarCalculator)
                 }
             }
         }
@@ -34,5 +34,5 @@ struct ReadingDatePickerView: View {
 }
 
 #Preview {
-    ReadingDatePickerView(calendarManager: CalendarManager())
+    ReadingDatePickerView(calendarCalculator: CalendarCalculator())
 }

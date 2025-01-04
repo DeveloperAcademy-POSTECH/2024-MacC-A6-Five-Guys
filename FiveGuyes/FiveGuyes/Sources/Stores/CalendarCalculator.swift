@@ -7,12 +7,7 @@
 
 import Foundation
 
-@Observable
-final class CalendarManager: ObservableObject {
-    var startDate: Date?
-    var endDate: Date?
-    var deletedDates: [Date] = []
-    
+struct CalendarCalculator {
     let calendar = Calendar.current
     
     /// 주어진 날짜가 속한 월의 첫 번째 날짜를 반환합니다.
@@ -22,7 +17,7 @@ final class CalendarManager: ObservableObject {
         let components = calendar.dateComponents([.year, .month], from: month)
         return calendar.date(from: components)!
     }
-     
+    
     /// 주어진 월에서 특정 일을 계산하여 반환합니다.
     /// - Parameters:
     ///   - day: 기준 월에서의 날짜 (1일부터 시작).
