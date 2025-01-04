@@ -106,14 +106,20 @@ final class CalendarCellModel: ObservableObject {
         } else {
             // 확정되지 않은 경우 시작 날짜와 종료 날짜를 업데이트
             if let start = startDate, day < start {
+                // 선택한 날짜가 시작 날짜 이전인 경우: 시작 날짜를 업데이트
                 startDate = day
             } else if let end = endDate, day > end {
+                // 선택한 날짜가 종료 날짜 이후인 경우: 종료 날짜를 업데이트
+                endDate = day
+            } else if let start = startDate, let end = endDate, day > start && day < end {
+                // 시작과 종료 날짜 사이의 날짜를 선택한 경우: 종료 날짜로 업데이트
                 endDate = day
             } else if day == startDate {
                 startDate = nil
             } else if day == endDate {
                 endDate = nil
             } else {
+                // 시작 또는 종료 날짜가 설정되지 않은 경우
                 if startDate == nil {
                     startDate = day
                 } else if endDate == nil {
@@ -121,9 +127,6 @@ final class CalendarCellModel: ObservableObject {
                 }
             }
         }
-        print("startDate: \(startDate)")
-        print("endDate: \(endDate)")
-        print("excludedDates: \(excludedDates)")
     }
     
     /// 특정 날짜를 제외 리스트에서 추가하거나 제거합니다.
