@@ -94,11 +94,17 @@ final class CalendarCellModel: ObservableObject {
     }
     
     /// 선택된 날짜에 따라 상태를 업데이트합니다.
-    /// - Parameter date: 선택된 날짜
-    func updateCellSelection(for date: Date) {
+    /// - Parameters:
+    ///   - date: 선택된 날짜
+    ///   - onPastDateSelected: 과거 날짜를 선택했을 때 실행할 클로저
+    func updateCellSelection(for date: Date, onPastDateSelected: () -> Void) {
         let day = calendar.startOfDay(for: date)
         
-        guard day >= adjustedToday else { return } // 과거 날짜는 선택 불가
+        // 과거 날짜인 경우 클로저 실행 후 종료
+        guard day >= adjustedToday else {
+            onPastDateSelected()
+            return
+        }
         
         if isConfirmed {
             // 날짜가 확정된 경우 제외 날짜를 추가하거나 제거

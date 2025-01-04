@@ -16,6 +16,8 @@ struct ReadingDatePickerView: View {
     
     let calendarCalculator: CalendarCalculator
     
+    @StateObject private var toastViewModel = ToastViewModel()
+    
     @ObservedObject private var calendarCellManager: CalendarCellModel
     
     // 초기화 시 adjustedToday를 CalendarCellModel에 주입
@@ -32,12 +34,16 @@ struct ReadingDatePickerView: View {
                 ForEach(0..<displayedMonths, id: \.self) { monthOffset in
                     let month = calendarCalculator.addMonths(to: adjustedToday, by: monthOffset)
                     
-                    CalendarGridView(month: month, calendarCalculator: calendarCalculator, calendarCellModel: calendarCellManager)
+                    CalendarGridView(month: month, calendarCalculator: calendarCalculator, calendarCellModel: calendarCellManager, toastViewModel: toastViewModel)
                         .padding(.top, 20)
                         .padding(.bottom, 10)
                 }
             }
             .padding(.horizontal, 20)
+        }
+        .overlay(alignment: .bottom) {
+            ToastView(viewModel: toastViewModel)
+                .padding(.bottom, 21)
         }
         .scrollIndicators(.hidden)
     }

@@ -27,6 +27,14 @@ struct CalendarGridView: View {
     
     /// 캘린더 셀의 상태와 로직을 관리하는 모델
     @ObservedObject var calendarCellModel: CalendarCellModel
+    @ObservedObject private var toastViewModel: ToastViewModel
+    
+    init(month: Date, calendarCalculator: CalendarCalculator, calendarCellModel: CalendarCellModel, toastViewModel: ToastViewModel) {
+        self.month = month
+        self.calendarCalculator = calendarCalculator
+        self.calendarCellModel = calendarCellModel
+        self.toastViewModel = toastViewModel
+    }
     
     var body: some View {
         let daysInMonth = calendarCalculator.numberOfDays(in: month)
@@ -140,7 +148,9 @@ struct CalendarGridView: View {
     /// 셀 탭 이벤트 처리
     /// - Parameter date: 탭한 셀의 날짜
     private func handleCellTap(for date: Date) {
-        calendarCellModel.updateCellSelection(for: date)
+        calendarCellModel.updateCellSelection(for: date) {
+            toastViewModel.showToast(message: "이미 지난 날짜는 선택할 수 없어요")
+        }
     }
 }
 
@@ -149,6 +159,7 @@ struct CalendarGridView: View {
     CalendarGridView(
         month: today,
         calendarCalculator: CalendarCalculator(),
-        calendarCellModel: CalendarCellModel(adjustedToday: today)
+        calendarCellModel: CalendarCellModel(adjustedToday: today),
+        toastViewModel: ToastViewModel()
     )
 }
