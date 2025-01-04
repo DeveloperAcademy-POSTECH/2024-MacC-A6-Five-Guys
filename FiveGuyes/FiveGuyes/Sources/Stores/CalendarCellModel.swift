@@ -126,6 +126,18 @@ final class CalendarCellModel: ObservableObject {
                     endDate = day
                 }
             }
+            
+            // 제외된 날짜 업데이트 로직 추가
+            updateExcludedDates()
+        }
+    }
+    
+    /// 시작 날짜와 종료 날짜를 기준으로 제외된 날짜 리스트를 업데이트합니다.
+    /// 범위에 포함되지 않는 제외된 날짜를 제거합니다.
+    private func updateExcludedDates() {
+        guard let startDate, let endDate else { return }
+        excludedDates.removeAll { date in
+            date < startDate || date > endDate
         }
     }
     
