@@ -101,7 +101,9 @@ struct CalendarGridView: View {
     /// 셀의 배경 렌더링
     /// - Parameter date: 해당 날짜
     private func cellBackground(for date: Date) -> some View {
-        HStack(spacing: 0) {
+        let isPastDate = calendarCellModel.isPastDate(for: date)
+        
+        return HStack(spacing: 0) {
             if calendarCellModel.isStartOrEndDate(for: date) {
                 ZStack {
                     if calendarCellModel.isRangeComplete() {  // 마지막 날이 채워지기 전에는 배경 없애기
@@ -121,7 +123,7 @@ struct CalendarGridView: View {
                     }
                     // 시작/끝 날짜 강조
                     Circle()
-                        .fill(Color.Colors.green1)
+                        .fill(isPastDate ? Color.Separators.green : Color.Colors.green1)
                 }
             } else if calendarCellModel.isBetweenSelectedDays(for: date) {
                 Rectangle()
