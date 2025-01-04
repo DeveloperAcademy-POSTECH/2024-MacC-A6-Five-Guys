@@ -53,4 +53,13 @@ struct CalendarCalculator {
     func addMonths(to currentMonth: Date, by monthOffset: Int) -> Date {
         return calendar.date(byAdding: .month, value: monthOffset, to: currentMonth)!
     }
+    
+    func getWeekdayHeaders() -> [String] {
+        let calendar = Calendar.current
+        let weekdays = calendar.shortStandaloneWeekdaySymbols
+        let firstWeekdayIndex = calendar.firstWeekday - 1
+        let adjustedWeekdats = Array(weekdays[firstWeekdayIndex...] + weekdays[..<firstWeekdayIndex])
+        
+        return adjustedWeekdats
+    }
 }

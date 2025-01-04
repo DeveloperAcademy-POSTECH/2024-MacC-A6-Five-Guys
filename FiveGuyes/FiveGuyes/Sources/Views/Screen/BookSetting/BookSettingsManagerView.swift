@@ -91,7 +91,7 @@ struct BookSettingsManagerView: View {
         case .bookPageSetting:
             BookPageSettingView()
         case .bookDurationSetting:
-            CompletionCalendarView()
+            ReadingDateSettingView()
         case .bookSettingDone:
             FinishGoalView()
         case .none:
