@@ -11,7 +11,7 @@ struct ReadingDateSettingView: View {
     @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
     @Environment(BookSettingInputModel.self) var bookSettingInputModel: BookSettingInputModel
     
-    @StateObject private var calendarCellManager: CalendarCellModel
+    @StateObject private var calendarCellModel: CalendarCellModel
     
     @State var totalPages = 0
     
@@ -19,8 +19,8 @@ struct ReadingDateSettingView: View {
     private let calendarCalculator = CalendarCalculator()
     
     private var dayCount: Int {
-        if let startDate = calendarCellManager.getStartDate(),
-           let endDate = calendarCellManager.getEndDate() {
+        if let startDate = calendarCellModel.getStartDate(),
+           let endDate = calendarCellModel.getEndDate() {
             let readingcalculator = ReadingDateCalculator()
             do {
                 return try readingcalculator.calculateDaysBetween(startDate: startDate, endDate: endDate)
@@ -47,7 +47,7 @@ struct ReadingDateSettingView: View {
         let calendarCellModel = CalendarCellModel(adjustedToday: adjustedToday, startDate: adjustedToday)
         
         self.adjustedToday = adjustedToday
-        self._calendarCellManager = StateObject(wrappedValue: calendarCellModel)
+        self._calendarCellModel = StateObject(wrappedValue: calendarCellModel)
     }
     
     var body: some View {
@@ -61,7 +61,7 @@ struct ReadingDateSettingView: View {
             
             dividerLine()
             
-            ReadingDatePickerView(adjustedToday: adjustedToday, calendarCalculator: calendarCalculator, calendarCellManager: calendarCellManager)
+            ReadingDatePickerView(adjustedToday: adjustedToday, calendarCalculator: calendarCalculator, calendarCellManager: calendarCellModel)
             
             dividerLine()
             
@@ -83,7 +83,7 @@ struct ReadingDateSettingView: View {
     
     private func descriptionText() -> some View {
         Group {
-            if !calendarCellManager.getConfirmed() {
+            if !calendarCellModel.getConfirmed() {
                 goalSelectionText()
             } else {
                 restDaySelectionText()
@@ -116,11 +116,11 @@ struct ReadingDateSettingView: View {
     private func nextButton() -> some View {
         Button(action: nextButtonAction) {
             RoundedRectangle(cornerRadius: 16)
-                .fill(calendarCellManager.isRangeComplete() ? Color.Colors.green1 : Color.Fills.lightGreen)
+                .fill(calendarCellModel.isRangeComplete() ? Color.Colors.green1 : Color.Fills.lightGreen)
                 .frame(maxWidth: .infinity)
                 .frame(height: 56)
                 .overlay {
-                    Text(calendarCellManager.getConfirmed() ? "완료" : "\(dayCount)일 동안 목표하기")
+                    Text(calendarCellModel.getConfirmed() ? "완료" : "\(dayCount)일 동안 목표하기")
                         .foregroundStyle(Color.Fills.white)
                         .fontStyle(.title2, weight: .semibold)
                 }
@@ -129,7 +129,7 @@ struct ReadingDateSettingView: View {
         .padding(.top, 14)
         .padding(.bottom, 21)
         .padding(.horizontal, 16)
-        .disabled(!calendarCellManager.isRangeComplete())
+        .disabled(!calendarCellModel.isRangeComplete())
     }
     
     private func goalSelectionText() -> some View {
@@ -162,15 +162,15 @@ struct ReadingDateSettingView: View {
     }
     
     private func nextButtonAction() {
-        if !calendarCellManager.getConfirmed() {
+        if !calendarCellModel.getConfirmed() {
             withAnimation(.easeOut) {
-                calendarCellManager.confirmDates()
+                calendarCellModel.confirmDates()
             }
         } else {
             // 입력 데이터 추가
-            bookSettingInputModel.startData = calendarCellManager.getStartDate()
-            bookSettingInputModel.endData = calendarCellManager.getEndDate()
-            bookSettingInputModel.nonReadingDays = calendarCellManager.getExcludedDates()
+            bookSettingInputModel.startData = calendarCellModel.getStartDate()
+            bookSettingInputModel.endData = calendarCellModel.getEndDate()
+            bookSettingInputModel.nonReadingDays = calendarCellModel.getExcludedDates()
             
             // 페이지 이동
             bookSettingInputModel.nextPage()
