@@ -144,7 +144,7 @@ struct ReadingScheduleCalculator {
             startPage: progress.lastPagesRead,
             endPage: settings.targetEndPage
         )
-
+        
         // 페이지 분배 계산
         calculateReadingPages(
             for: progress,
@@ -157,22 +157,28 @@ struct ReadingScheduleCalculator {
         )
     }
     
-    /// 지난 날의 할당량을 읽지 않고, 앱에 새롭게 접속할 때 페이지를 재할당해주는 메서드
+    /// 독서 일정을 변경하면 페이지를 재할당해주는 메서드
     func reassignPagesForUpdatedDates<Settings: UserSettingsProtocol, Progress: ReadingProgressProtocol>(
         settings: Settings,
         progress: Progress
     ) {
         let adjustedToday = Date().adjustedDate()
         
-        // 마지막 날짜 이후 데이터를 삭제
-        removeProgressAfterEndDate(progress: progress, newEndDate: settings.targetEndDate)
+        // 마지막 날짜 이후 데이터를 필터링
+        let filteredAfterEndDate = filteredProgressAfterEndDate(progress: progress, newEndDate: settings.targetEndDate)
+        
+        // 제외된 날짜 데이터를 필터링
+        let filteredExcludedDates = filteredProgressForExcludedDates(progress: progress, excludedDates: settings.nonReadingDays)
+        
+        // 필터링 결과를 적용하여 업데이트
+        progress.readingRecords = filteredAfterEndDate.merging(filteredExcludedDates) { $1 }
         
         // 이미 오늘 읽은 페이지가 기록되었으면 다음날부터 재분배
         if hasReadPagesAdjustedToday(progress: progress) {
             adjustFutureTargets(for: settings, progress: progress, from: Date())
             return
         }
-
+        
         let remainingReadingDays = getRemainingReadingDays(
             startDate: adjustedToday,
             targetEndDate: settings.targetEndDate,
@@ -186,7 +192,7 @@ struct ReadingScheduleCalculator {
             startPage: progress.lastPagesRead,
             endPage: settings.targetEndPage
         )
-
+        
         // 페이지 분배 계산
         calculateReadingPages(
             for: progress,
@@ -199,19 +205,37 @@ struct ReadingScheduleCalculator {
         )
     }
     
-    /// 목표의 마지막 날짜 이후에 저장된 읽기 기록 데이터를 삭제합니다.
+    /// 목표의 마지막 날짜 이후에 저장된 읽기 기록 데이터를 반환합니다.
     /// - Parameters:
     ///   - progress: 읽기 기록 데이터를 포함한 Progress 객체.
     ///   - newEndDate: 새로 설정된 목표의 마지막 날짜.
-    private func removeProgressAfterEndDate<Progress: ReadingProgressProtocol>(
+    /// - Returns: 마지막 날짜 이후 데이터를 제거한 읽기 기록.
+    private func filteredProgressAfterEndDate<Progress: ReadingProgressProtocol>(
         progress: Progress,
         newEndDate: Date
-    ) {
+    ) -> [String: ReadingRecord] {
         let adjustedEndDateKey = progress.getReadingRecordsKey(newEndDate)
         
-        // 읽기 기록에서 마지막 날짜 이후의 데이터를 제거
-        progress.readingRecords = progress.readingRecords.filter { record in
+        // 마지막 날짜 이후의 데이터를 제거한 결과 반환
+        return progress.readingRecords.filter { record in
             record.key <= adjustedEndDateKey
+        }
+    }
+    
+    /// 제외된 날짜를 기준으로 필터링된 읽기 기록 데이터를 반환합니다.
+    /// - Parameters:
+    ///   - progress: 읽기 기록 데이터를 포함한 Progress 객체.
+    ///   - excludedDates: 새로 설정된 제외 날짜 배열.
+    /// - Returns: 제외된 날짜를 제거한 읽기 기록.
+    private func filteredProgressForExcludedDates<Progress: ReadingProgressProtocol>(
+        progress: Progress,
+        excludedDates: [Date]
+    ) -> [String: ReadingRecord] {
+        let excludedDateKeys = excludedDates.map { progress.getReadingRecordsKey($0) }
+        
+        // 제외된 날짜를 제거한 결과 반환
+        return progress.readingRecords.filter { record in
+            !excludedDateKeys.contains(record.key)
         }
     }
     
