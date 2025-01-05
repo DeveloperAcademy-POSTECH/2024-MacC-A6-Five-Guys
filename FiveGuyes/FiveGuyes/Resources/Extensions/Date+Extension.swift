@@ -44,11 +44,12 @@ extension Date {
         return formatter.string(from: self)
     }
     
-    /// `MM월 dd일` 형식으로 변환하여 문자열로 반환합니다.
-    func toKoreanDateStringWithoutDay() -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "YYYY년 M월"
-        return formatter.string(from: self)
+    /// 년과 월을 문자로 반환합니다.
+    func toYearMonthString() -> String {
+        let formatter = Date.FormatStyle()
+            .year(.defaultDigits)
+            .month(.abbreviated)
+        return self.formatted(formatter)
     }
 }
 

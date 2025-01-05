@@ -46,11 +46,8 @@ struct MainHomeView: View {
                         
                         if !currentlyReadingBooks.isEmpty {
                             Menu {
-                                Button(role: .destructive) {
-                                    showReadingBookAlert = true
-                                } label: {
-                                    Label("삭제", systemImage: "trash")
-                                }
+                                ReadingDateEditButton
+                                DeleteReadingBookButton
                             } label: {
                                 Image(systemName: "ellipsis")
                                     .resizable()
@@ -262,6 +259,24 @@ struct MainHomeView: View {
                     RoundedRectangle(cornerRadius: 16)
                         .foregroundStyle(Color.Colors.green1)
                 }
+        }
+    }
+    
+    private var ReadingDateEditButton: some View {
+        Button {
+            // 날짜 수정 화면으로 기기
+            navigationCoordinator.push(.readingDateEdit(book: currentlyReadingBooks.first!))
+        } label: {
+            Label("수정하기", systemImage: "pencil")
+                .foregroundStyle(Color.Labels.primaryBlack1)
+        }
+    }
+    
+    private var DeleteReadingBookButton: some View {
+        Button(role: .destructive) {
+            showReadingBookAlert = true
+        } label: {
+            Label("삭제", systemImage: "trash")
         }
     }
 }

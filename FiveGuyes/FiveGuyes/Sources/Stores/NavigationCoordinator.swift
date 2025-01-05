@@ -19,6 +19,7 @@ enum Screens: Hashable {
     case completionCelebration
     case completionReview
     case completionReviewUpdate(book: UserBook)
+    case readingDateEdit(book: UserBook)
 }
 
 @Observable
@@ -46,6 +47,8 @@ final class NavigationCoordinator {
             CompletionReviewView()
         case .completionReviewUpdate(book: let book):
             CompletionReviewView(isUpdateMode: true, externalBook: book)
+        case .readingDateEdit(book: let book):
+            ReadingDateEditView(userBook: book)
         }
     }
 
