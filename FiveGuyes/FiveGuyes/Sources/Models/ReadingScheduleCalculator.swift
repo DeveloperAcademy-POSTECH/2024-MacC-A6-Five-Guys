@@ -7,6 +7,7 @@
 
 import Foundation
 
+/// 독서 스케줄을 계산하고 관리하는 구조체
 struct ReadingScheduleCalculator {
     private let readingPagesCalculator: ReadingPagesCalculator = ReadingPagesCalculator()
     private let readingDateCalculator: ReadingDateCalculator = ReadingDateCalculator()
@@ -157,87 +158,7 @@ struct ReadingScheduleCalculator {
         )
     }
     
-    /// 독서 일정을 변경하면 페이지를 재할당해주는 메서드
-    func reassignPagesForUpdatedDates<Settings: UserSettingsProtocol, Progress: ReadingProgressProtocol>(
-        settings: Settings,
-        progress: Progress
-    ) {
-        let adjustedToday = Date().adjustedDate()
-        
-        // 마지막 날짜 이후 데이터를 필터링
-        let filteredAfterEndDate = filteredProgressAfterEndDate(progress: progress, newEndDate: settings.targetEndDate)
-        
-        // 제외된 날짜 데이터를 필터링
-        let filteredExcludedDates = filteredProgressForExcludedDates(progress: progress, excludedDates: settings.nonReadingDays)
-        
-        // 필터링 결과를 적용하여 업데이트
-        progress.readingRecords = filteredAfterEndDate.merging(filteredExcludedDates) { $1 }
-        
-        // 이미 오늘 읽은 페이지가 기록되었으면 다음날부터 재분배
-        if hasReadPagesAdjustedToday(progress: progress) {
-            adjustFutureTargets(for: settings, progress: progress, from: Date())
-            return
-        }
-        
-        let remainingReadingDays = getRemainingReadingDays(
-            startDate: adjustedToday,
-            targetEndDate: settings.targetEndDate,
-            nonReadingDays: settings.nonReadingDays
-        )
-        
-        // 남은 페이지와 일수를 기준으로 새롭게 할당량 계산 🐯🐯🐯🐯
-        let (pagesPerDay, remainderPages) =
-        readingPagesCalculator.calculatePagesPerDayAndRemainder(
-            totalDays: remainingReadingDays,
-            startPage: progress.lastPagesRead,
-            endPage: settings.targetEndPage
-        )
-        
-        // 페이지 분배 계산
-        calculateReadingPages(
-            for: progress,
-            startingPage: progress.lastPagesRead,
-            pagesPerDay: pagesPerDay,
-            remainderPages: remainderPages,
-            startDate: adjustedToday,
-            targetEndDate: settings.targetEndDate,
-            nonReadingDays: settings.nonReadingDays
-        )
-    }
-    
-    /// 목표의 마지막 날짜 이후에 저장된 읽기 기록 데이터를 반환합니다.
-    /// - Parameters:
-    ///   - progress: 읽기 기록 데이터를 포함한 Progress 객체.
-    ///   - newEndDate: 새로 설정된 목표의 마지막 날짜.
-    /// - Returns: 마지막 날짜 이후 데이터를 제거한 읽기 기록.
-    private func filteredProgressAfterEndDate<Progress: ReadingProgressProtocol>(
-        progress: Progress,
-        newEndDate: Date
-    ) -> [String: ReadingRecord] {
-        let adjustedEndDateKey = progress.getReadingRecordsKey(newEndDate)
-        
-        // 마지막 날짜 이후의 데이터를 제거한 결과 반환
-        return progress.readingRecords.filter { record in
-            record.key <= adjustedEndDateKey
-        }
-    }
-    
-    /// 제외된 날짜를 기준으로 필터링된 읽기 기록 데이터를 반환합니다.
-    /// - Parameters:
-    ///   - progress: 읽기 기록 데이터를 포함한 Progress 객체.
-    ///   - excludedDates: 새로 설정된 제외 날짜 배열.
-    /// - Returns: 제외된 날짜를 제거한 읽기 기록.
-    private func filteredProgressForExcludedDates<Progress: ReadingProgressProtocol>(
-        progress: Progress,
-        excludedDates: [Date]
-    ) -> [String: ReadingRecord] {
-        let excludedDateKeys = excludedDates.map { progress.getReadingRecordsKey($0) }
-        
-        // 제외된 날짜를 제거한 결과 반환
-        return progress.readingRecords.filter { record in
-            !excludedDateKeys.contains(record.key)
-        }
-    }
+
     
     private func getRemainingReadingDays(startDate: Date, targetEndDate: Date, nonReadingDays: [Date]) -> Int {
         do {
@@ -372,5 +293,109 @@ extension ReadingScheduleCalculator {
         progress: Progress
     ) -> Int {
         return progress.readingRecords.values.filter { $0.pagesRead > 0 }.count
+    }
+}
+
+
+// MARK: - 독서 날짜가 변경되면 업데이트
+extension ReadingScheduleCalculator {
+    /// 독서 일정이 변경된 경우 페이지를 재할당하는 메서드
+    func reassignPagesForUpdatedDates<Settings: UserSettingsProtocol, Progress: ReadingProgressProtocol>(
+        settings: Settings,
+        progress: Progress
+    ) {
+        let adjustedToday = Date().adjustedDate()
+        
+        if settings.startDate.toKoreanDateString() >= adjustedToday.toKoreanDateString() {
+            // 시작 날짜가 변경된 경우
+            progress.readingRecords = [:]
+            calculateInitialDailyTargets(for: settings, progress: progress)
+            return
+        }
+        
+        // 데이터 정리 로직 호출
+        cleanUpInvalidRecords(for: settings, progress: progress)
+        
+        // 이미 오늘 읽은 페이지가 기록되었으면 다음날부터 재분배
+        if hasReadPagesAdjustedToday(progress: progress) {
+            adjustFutureTargets(for: settings, progress: progress, from: Date())
+            return
+        }
+        
+        let remainingReadingDays = getRemainingReadingDays(
+            startDate: adjustedToday,
+            targetEndDate: settings.targetEndDate,
+            nonReadingDays: settings.nonReadingDays
+        )
+        
+        // 남은 페이지와 일수를 기준으로 새롭게 할당량 계산 🐯🐯🐯🐯
+        let (pagesPerDay, remainderPages) =
+        readingPagesCalculator.calculatePagesPerDayAndRemainder(
+            totalDays: remainingReadingDays,
+            startPage: progress.lastPagesRead,
+            endPage: settings.targetEndPage
+        )
+        
+        // 페이지 분배 계산
+        calculateReadingPages(
+            for: progress,
+            startingPage: progress.lastPagesRead,
+            pagesPerDay: pagesPerDay,
+            remainderPages: remainderPages,
+            startDate: adjustedToday,
+            targetEndDate: settings.targetEndDate,
+            nonReadingDays: settings.nonReadingDays
+        )
+    }
+    
+    /// 불필요한 읽기 기록 데이터를 제거하는 메서드
+    private func cleanUpInvalidRecords<Settings: UserSettingsProtocol, Progress: ReadingProgressProtocol>(
+        for settings: Settings,
+        progress: Progress
+    ) {
+        // 시작 날짜 이전 및 마지막 날짜 이후 데이터를 필터링
+        let filteredRecords = filteredProgressForDateRange(
+            progress: progress,
+            startDate: settings.startDate,
+            endDate: settings.targetEndDate
+        )
+        progress.readingRecords = filteredRecords
+        
+        // 제외된 날짜 데이터를 필터링
+        let filteredExcludedDates = filteredProgressForExcludedDates(
+            progress: progress,
+            excludedDates: settings.nonReadingDays
+        )
+        progress.readingRecords = filteredExcludedDates
+    }
+    
+    /// 목표의 마지막 날짜 이후 및 시작 날짜 이전에 저장된 읽기 기록 데이터를 제거합니다.
+    /// - Returns: 지정된 범위를 벗어난 데이터를 제거한 읽기 기록.
+    private func filteredProgressForDateRange<Progress: ReadingProgressProtocol>(
+        progress: Progress,
+        startDate: Date,
+        endDate: Date
+    ) -> [String: ReadingRecord] {
+        let adjustedStartDateKey = progress.getReadingRecordsKey(startDate)
+        let adjustedEndDateKey = progress.getReadingRecordsKey(endDate)
+        
+        // 시작 날짜 이전 또는 마지막 날짜 이후 데이터를 제거한 결과 반환
+        return progress.readingRecords.filter { record in
+            record.key >= adjustedStartDateKey && record.key <= adjustedEndDateKey
+        }
+    }
+    
+    /// 제외된 날짜를 기준으로 필터링된 읽기 기록 데이터를 반환합니다.
+    /// - Returns: 제외된 날짜를 제거한 읽기 기록.
+    private func filteredProgressForExcludedDates<Progress: ReadingProgressProtocol>(
+        progress: Progress,
+        excludedDates: [Date]
+    ) -> [String: ReadingRecord] {
+        let excludedDateKeys = excludedDates.map { progress.getReadingRecordsKey($0) }
+        
+        // 제외된 날짜를 제거한 결과 반환
+        return progress.readingRecords.filter { record in
+            !excludedDateKeys.contains(record.key)
+        }
     }
 }
