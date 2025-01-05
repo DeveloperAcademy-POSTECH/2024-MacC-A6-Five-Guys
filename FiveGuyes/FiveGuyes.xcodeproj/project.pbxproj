@@ -27,6 +27,9 @@
 		24F8A2172CEB290B00A01A76 /* Config.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 24F8A2162CEB290B00A01A76 /* Config.xcconfig */; };
 		24FAF9452CEC5224004FEC3F /* ToastView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24FAF9442CEC5224004FEC3F /* ToastView.swift */; };
 		261714D62CDDDA4000A3241D /* BookSettingsManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 261714D52CDDDA4000A3241D /* BookSettingsManagerView.swift */; };
+		2622C7D82D2AC4C000AA3FF4 /* DividerLine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2622C7D72D2AC4C000AA3FF4 /* DividerLine.swift */; };
+		2622C7DA2D2AC56400AA3FF4 /* CalendarWeekdayHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2622C7D92D2AC56400AA3FF4 /* CalendarWeekdayHeader.swift */; };
+		2622C7DC2D2AC67800AA3FF4 /* PageTextModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2622C7DB2D2AC67800AA3FF4 /* PageTextModifier.swift */; };
 		26410A982D26D18200D6B477 /* ReadingDatePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26410A972D26D18200D6B477 /* ReadingDatePickerView.swift */; };
 		26410A9B2D26D8F000D6B477 /* CalendarCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26410A9A2D26D8F000D6B477 /* CalendarCalculator.swift */; };
 		26410AED2D28599700D6B477 /* CalendarGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26410AEC2D28599700D6B477 /* CalendarGridView.swift */; };
@@ -120,6 +123,9 @@
 		24F8A2162CEB290B00A01A76 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		24FAF9442CEC5224004FEC3F /* ToastView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastView.swift; sourceTree = "<group>"; };
 		261714D52CDDDA4000A3241D /* BookSettingsManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookSettingsManagerView.swift; sourceTree = "<group>"; };
+		2622C7D72D2AC4C000AA3FF4 /* DividerLine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DividerLine.swift; sourceTree = "<group>"; };
+		2622C7D92D2AC56400AA3FF4 /* CalendarWeekdayHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarWeekdayHeader.swift; sourceTree = "<group>"; };
+		2622C7DB2D2AC67800AA3FF4 /* PageTextModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageTextModifier.swift; sourceTree = "<group>"; };
 		26410A972D26D18200D6B477 /* ReadingDatePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadingDatePickerView.swift; sourceTree = "<group>"; };
 		26410A9A2D26D8F000D6B477 /* CalendarCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarCalculator.swift; sourceTree = "<group>"; };
 		26410AEC2D28599700D6B477 /* CalendarGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarGridView.swift; sourceTree = "<group>"; };
@@ -435,6 +441,7 @@
 			isa = PBXGroup;
 			children = (
 				264440582CD8F6020031A290 /* CustomBackButton.swift */,
+				2622C7DB2D2AC67800AA3FF4 /* PageTextModifier.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -450,6 +457,8 @@
 				26F19A6D2CDA74A600F41D6D /* WeeklyPageCalendarView.swift */,
 				1AA14A772CDDA30D00B763A6 /* TotalCalendarTextBubble.swift */,
 				24FAF9442CEC5224004FEC3F /* ToastView.swift */,
+				2622C7D72D2AC4C000AA3FF4 /* DividerLine.swift */,
+				2622C7D92D2AC56400AA3FF4 /* CalendarWeekdayHeader.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -707,6 +716,7 @@
 				26EBDE812CEF812A00B3A2BC /* Calendar+Extension.swift in Sources */,
 				1A010EAC2CD8A7E500FBE3B3 /* APIBooksModel.swift in Sources */,
 				240445B42CED9074005C3623 /* ToastViewModel.swift in Sources */,
+				2622C7D82D2AC4C000AA3FF4 /* DividerLine.swift in Sources */,
 				26EBDE832CF0219300B3A2BC /* FontAsset.swift in Sources */,
 				26890B972CAE811A008DFF49 /* ContentView.swift in Sources */,
 				26EBDEB42CF1CC8500B3A2BC /* Tracking.swift in Sources */,
@@ -731,6 +741,8 @@
 				26EBDEC02CF2398F00B3A2BC /* BookMetaDataProtocol.swift in Sources */,
 				26F19A722CDB267600F41D6D /* NavigationCoordinator.swift in Sources */,
 				26410AED2D28599700D6B477 /* CalendarGridView.swift in Sources */,
+				26410AFB2D29845200D6B477 /* ReadingDateEditView.swift in Sources */,
+				2622C7DA2D2AC56400AA3FF4 /* CalendarWeekdayHeader.swift in Sources */,
 				26EBDED42CF45B1E00B3A2BC /* UserSettings.swift in Sources */,
 				264440592CD8F6020031A290 /* CustomBackButton.swift in Sources */,
 				26EBDEC72CF4553600B3A2BC /* MigrationPlan.swift in Sources */,
@@ -759,6 +771,7 @@
 				26F19A6C2CDA0A2B00F41D6D /* CompletionListView.swift in Sources */,
 				26EBDE2F2CE3856900B3A2BC /* NotificationType.swift in Sources */,
 				1A27D9662CDB779000D1E14D /* TotalCalendarView.swift in Sources */,
+				2622C7DC2D2AC67800AA3FF4 /* PageTextModifier.swift in Sources */,
 				2644404E2CD8A39E0031A290 /* CompletionCelebrationView.swift in Sources */,
 				26410A9B2D26D8F000D6B477 /* CalendarCalculator.swift in Sources */,
 				26EBDE262CDE3C6000B3A2BC /* BookSettingInputModel.swift in Sources */,

@@ -56,14 +56,14 @@ struct ReadingDateSettingView: View {
                 .padding(.top, 32)
                 .padding(.bottom, 26)
             
-            weekdayHeader()
+            CalendarWeekdayHeader(calendarCalculator: calendarCalculator)
                 .padding(.bottom, 12)
             
-            dividerLine()
+            DividerLine()
             
             ReadingDatePickerView(adjustedToday: adjustedToday, calendarCalculator: calendarCalculator, calendarCellManager: calendarCellModel)
             
-            dividerLine()
+            DividerLine()
             
             nextButton()
         }
@@ -94,25 +94,6 @@ struct ReadingDateSettingView: View {
         .padding(.horizontal, 20)
     }
     
-    private func weekdayHeader() -> some View {
-        HStack(spacing: 20) {
-            ForEach(calendarCalculator.getWeekdayHeaders(), id: \.self) { day in
-                Text(day)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 18)
-                    .fontStyle(.caption1, weight: .semibold)
-                    .foregroundStyle(Color.Labels.tertiaryBlack3)
-            }
-        }
-        .padding(.horizontal, 23)
-    }
-    
-    private func dividerLine() -> some View {
-        Rectangle()
-            .fill(Color.Separators.gray)
-            .frame(height: 1)
-    }
-    
     private func nextButton() -> some View {
         Button(action: nextButtonAction) {
             RoundedRectangle(cornerRadius: 16)
@@ -140,14 +121,7 @@ struct ReadingDateSettingView: View {
                 Text("매일")
                 
                 Text("\(pagesPerDay)")
-                    .fontStyle(.title2, weight: .semibold)
-                    .foregroundStyle(Color.Colors.green2)
-                    .padding(.horizontal, 8) // 텍스트 필드와 이미지 주변 패딩
-                    .padding(.vertical, 4)
-                    .background {
-                        RoundedRectangle(cornerRadius: 8)
-                            .foregroundStyle(Color.Fills.lightGreen)
-                    }
+                    .pageTextStyle()
                 
                 Text("쪽만 읽으면 돼요")
             }
