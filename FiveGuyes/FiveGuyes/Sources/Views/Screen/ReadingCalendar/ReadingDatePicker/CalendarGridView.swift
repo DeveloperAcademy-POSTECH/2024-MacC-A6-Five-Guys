@@ -102,8 +102,15 @@ struct CalendarGridView: View {
         let isStartOrEndDate = calendarCellModel.isStartOrEndDate(for: date)
         
         return Text("\(day)")
-            .foregroundStyle(isPastDate ? Color.Labels.quaternaryBlack4 : isStartOrEndDate ? Color.Fills.white : Color.Labels.secondaryBlack2)
-            .fontStyle(isStartOrEndDate ? .title2 : .body, weight: isStartOrEndDate ? .semibold : .regular)
+            .foregroundStyle(
+                isStartOrEndDate
+                ? Color.Fills.white
+                : isPastDate ? Color.Labels.quaternaryBlack4 : Color.Labels.secondaryBlack2
+            )
+            .fontStyle(
+                isStartOrEndDate ? .title2 : .body,
+                       weight: isStartOrEndDate ? .semibold : .regular
+            )
     }
     
     /// 셀의 배경 렌더링
