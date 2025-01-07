@@ -32,6 +32,8 @@
 		2622C7DC2D2AC67800AA3FF4 /* PageTextModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2622C7DB2D2AC67800AA3FF4 /* PageTextModifier.swift */; };
 		2622C8012D2D8EDA00AA3FF4 /* UserBookDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2622C8002D2D8EDA00AA3FF4 /* UserBookDTO.swift */; };
 		2622C8042D2D911200AA3FF4 /* BookRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2622C8022D2D911200AA3FF4 /* BookRepository.swift */; };
+		2622C8062D2D943900AA3FF4 /* InMemoryBookRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2622C8052D2D943900AA3FF4 /* InMemoryBookRepository.swift */; };
+		2622C8082D2D945000AA3FF4 /* SwiftDataBookRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2622C8072D2D945000AA3FF4 /* SwiftDataBookRepository.swift */; };
 		26410A982D26D18200D6B477 /* ReadingDatePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26410A972D26D18200D6B477 /* ReadingDatePickerView.swift */; };
 		26410A9B2D26D8F000D6B477 /* CalendarCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26410A9A2D26D8F000D6B477 /* CalendarCalculator.swift */; };
 		26410AED2D28599700D6B477 /* CalendarGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26410AEC2D28599700D6B477 /* CalendarGridView.swift */; };
@@ -131,6 +133,8 @@
 		2622C7DB2D2AC67800AA3FF4 /* PageTextModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageTextModifier.swift; sourceTree = "<group>"; };
 		2622C8002D2D8EDA00AA3FF4 /* UserBookDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserBookDTO.swift; sourceTree = "<group>"; };
 		2622C8022D2D911200AA3FF4 /* BookRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookRepository.swift; sourceTree = "<group>"; };
+		2622C8052D2D943900AA3FF4 /* InMemoryBookRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InMemoryBookRepository.swift; sourceTree = "<group>"; };
+		2622C8072D2D945000AA3FF4 /* SwiftDataBookRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftDataBookRepository.swift; sourceTree = "<group>"; };
 		26410A972D26D18200D6B477 /* ReadingDatePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadingDatePickerView.swift; sourceTree = "<group>"; };
 		26410A9A2D26D8F000D6B477 /* CalendarCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarCalculator.swift; sourceTree = "<group>"; };
 		26410AEC2D28599700D6B477 /* CalendarGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarGridView.swift; sourceTree = "<group>"; };
@@ -243,6 +247,8 @@
 			isa = PBXGroup;
 			children = (
 				2622C8022D2D911200AA3FF4 /* BookRepository.swift */,
+				2622C8052D2D943900AA3FF4 /* InMemoryBookRepository.swift */,
+				2622C8072D2D945000AA3FF4 /* SwiftDataBookRepository.swift */,
 			);
 			path = Repository;
 			sourceTree = "<group>";
@@ -744,6 +750,7 @@
 				1A27D9602CDA31EE00D1E14D /* ProgressBar.swift in Sources */,
 				26410AF72D2964E100D6B477 /* ReadingDateSettingView.swift in Sources */,
 				1A27D9622CDB05C000D1E14D /* CustomTextFieldStylePageCount.swift in Sources */,
+				2622C8062D2D943900AA3FF4 /* InMemoryBookRepository.swift in Sources */,
 				26EBDEC22CF239AE00B3A2BC /* UserSettingsProtocol.swift in Sources */,
 				26F19A7A2CDB5F3900F41D6D /* ReadingScheduleCalculator.swift in Sources */,
 				2622C8042D2D911200AA3FF4 /* BookRepository.swift in Sources */,
@@ -787,6 +794,7 @@
 				264440532CD8B1540031A290 /* String+Extension.swift in Sources */,
 				264440572CD8E0D20031A290 /* CustomTextEditorStyle.swift in Sources */,
 				264440552CD8E0100031A290 /* KeyboardObserver.swift in Sources */,
+				2622C8082D2D945000AA3FF4 /* SwiftDataBookRepository.swift in Sources */,
 				26F19A6C2CDA0A2B00F41D6D /* CompletionListView.swift in Sources */,
 				26EBDE2F2CE3856900B3A2BC /* NotificationType.swift in Sources */,
 				1A27D9662CDB779000D1E14D /* TotalCalendarView.swift in Sources */,
