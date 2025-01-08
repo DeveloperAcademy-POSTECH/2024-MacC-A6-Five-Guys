@@ -41,6 +41,13 @@ struct ReadingScheduleCalculator {
             targetEndDate: settings.targetEndDate,
             nonReadingDays: settings.nonReadingDays
         )
+        
+        // 목표 종료 페이지와 마지막 날 할당 페이지를 검증 및 수정
+        adjustLastDayTargetPage(
+            progress: progress,
+            targetEndDate: settings.targetEndDate,
+            targetEndPage: settings.targetEndPage
+        )
     }
     
     ///  읽은 페이지 입력 메서드 (오늘 날짜에만 값을 넣을 수 있음)
@@ -110,6 +117,12 @@ struct ReadingScheduleCalculator {
             targetEndDate: settings.targetEndDate,
             nonReadingDays: settings.nonReadingDays
         )
+        // 목표 종료 페이지와 마지막 날 할당 페이지를 검증 및 수정
+        adjustLastDayTargetPage(
+            progress: progress,
+            targetEndDate: settings.targetEndDate,
+            targetEndPage: settings.targetEndPage
+        )
     }
     
     /// 지난 날의 할당량을 읽지 않고, 앱에 새롭게 접속할 때 페이지를 재할당해주는 메서드
@@ -156,14 +169,20 @@ struct ReadingScheduleCalculator {
             targetEndDate: settings.targetEndDate,
             nonReadingDays: settings.nonReadingDays
         )
+        
+        // 목표 종료 페이지와 마지막 날 할당 페이지를 검증 및 수정
+        adjustLastDayTargetPage(
+            progress: progress,
+            targetEndDate: settings.targetEndDate,
+            targetEndPage: settings.targetEndPage
+        )
     }
-    
-
     
     private func getRemainingReadingDays(startDate: Date, targetEndDate: Date, nonReadingDays: [Date]) -> Int {
         do {
             return try readingDateCalculator.calculateValidReadingDays(
                 startDate: startDate,
+                
                 endDate: targetEndDate,
                 excludedDates: nonReadingDays
             )
@@ -294,8 +313,23 @@ extension ReadingScheduleCalculator {
     ) -> Int {
         return progress.readingRecords.values.filter { $0.pagesRead > 0 }.count
     }
+    
+    /// 마지막 날 할당 페이지를 목표 페이지로 재조정하는 메서드
+    /// - Parameters:
+    ///   - progress: 독서 진행 상황 객체
+    ///   - targetEndDate: 목표 종료 날짜
+    ///   - targetEndPage: 목표 종료 페이지
+    private func adjustLastDayTargetPage<Progress: ReadingProgressProtocol>(
+        progress: Progress,
+        targetEndDate: Date,
+        targetEndPage: Int
+    ) {
+        let endDateKey = progress.getReadingRecordsKey(targetEndDate)
+        if progress.readingRecords[endDateKey]?.targetPages != targetEndPage {
+            progress.readingRecords[endDateKey]?.targetPages = targetEndPage
+        }
+    }
 }
-
 
 // MARK: - 독서 날짜가 변경되면 업데이트
 extension ReadingScheduleCalculator {
@@ -345,6 +379,13 @@ extension ReadingScheduleCalculator {
             startDate: adjustedToday,
             targetEndDate: settings.targetEndDate,
             nonReadingDays: settings.nonReadingDays
+        )
+        
+        // 목표 종료 페이지와 마지막 날 할당 페이지를 검증 및 수정
+        adjustLastDayTargetPage(
+            progress: progress,
+            targetEndDate: settings.targetEndDate,
+            targetEndPage: settings.targetEndPage
         )
     }
     
