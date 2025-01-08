@@ -19,7 +19,7 @@ struct ReadingDateCalculator {
     ///   - 이 메서드에서는 도메인 로직을 통해 시작 날짜와 종료 날짜를 모두 포함하여 결과에 1을 추가합니다.
     func calculateDaysBetween(startDate: Date, endDate: Date) throws -> Int {
         // 시작 날짜가 종료 날짜 이후인 경우 에러를 던짐
-        guard startDate <= endDate else {
+        guard startDate.onlyDate <= endDate.onlyDate else {
             throw DateError.invalidDateOrder
         }
 
