@@ -25,7 +25,7 @@ struct DailyProgressView: View {
     private let notificationManager = NotificationManager()
     private let readingScheduleCalculator = ReadingScheduleCalculator()
     
-    private let today = Date()
+    private let adjustedToday = Date().adjustedDate()
     
     @FocusState private var isTextTextFieldFocused: Bool
     
@@ -37,7 +37,7 @@ struct DailyProgressView: View {
         let userSettings: UserSettingsProtocol = userBook.userSettings
         let readingProgress: any ReadingProgressProtocol = userBook.readingProgress
         
-        let isTodayCompletionDate = Calendar.current.isDate(today, inSameDayAs: userSettings.targetEndDate)
+        let isTodayCompletionDate = Calendar.current.isDate(adjustedToday, inSameDayAs: userSettings.targetEndDate)
         
         VStack(spacing: 0) {
             HStack {
@@ -75,16 +75,19 @@ struct DailyProgressView: View {
             if isTextTextFieldFocused {
                 Button {
                     if pagesToReadToday > userSettings.targetEndPage {
+                        // 최종 목표보다 더 큰 페이지를 입력하면
                         showAlert = true
                         return
                     } else if isTodayCompletionDate && pagesToReadToday < userSettings.targetEndPage {
+                        // 오늘이 마지막 날인데, 최종 목표를 다 읽지 못하면
                         
+                        // 목표 날짜를 하루 연장 (자동 연장)
                         userSettings.targetEndDate = userSettings.targetEndDate.addDays(1)
                         
                         readingScheduleCalculator.updateReadingProgress(
                             for: userSettings,
                             progress: readingProgress,
-                            pagesRead: pagesToReadToday, from: today
+                            pagesRead: pagesToReadToday, from: adjustedToday
                         )
                         
                         // 노티 세팅하기
@@ -99,7 +102,7 @@ struct DailyProgressView: View {
                             for: userSettings,
                             progress: readingProgress,
                             pagesRead: pagesToReadToday,
-                            from: today
+                            from: adjustedToday
                         )
                         
                         // 노티 세팅하기
@@ -144,7 +147,7 @@ struct DailyProgressView: View {
                     // "확인" 버튼 로직 (최종 타켓 페이지로 수정 및 완독 기록)
                     pagesToReadToday = userSettings.targetEndPage
                     
-                    readingScheduleCalculator.updateReadingProgress(for: userSettings, progress: readingProgress, pagesRead: pagesToReadToday, from: today)
+                    readingScheduleCalculator.updateReadingProgress(for: userSettings, progress: readingProgress, pagesRead: pagesToReadToday, from: adjustedToday)
                     
                     navigationCoordinator.push(.completionCelebration)
                 }
@@ -155,9 +158,8 @@ struct DailyProgressView: View {
         .navigationBarBackButtonHidden(true)
         .customNavigationBackButton()
         .onAppear {
-            print("🐯🐯🐯🐯🐯: \(today)")
             // ⏰
-            if let readingRecord = readingProgress.getAdjustedReadingRecord(for: today) {
+            if let readingRecord = readingProgress.getAdjustedReadingRecord(for: adjustedToday) {
                 pagesToReadToday = readingRecord.targetPages
             }
             
