@@ -8,12 +8,19 @@
 import Foundation
 
 protocol BookRepository {
-    func fetchBooks() -> [UserBookDTO]
-    func fetchBook(by id: UUID) -> UserBookDTO?
+    func fetchBooks() -> Result<[UserBookDTO], RepositoryError>
+    func fetchBook(by id: UUID) -> Result<UserBookDTO, RepositoryError>
     
-    func fetchCompletedBooks() -> [UserBookDTO]
-    
-    func addBook(_ book: UserBookDTO) -> Bool
-    func updateBook(_ book: UserBookDTO) -> Bool
-    func deleteBook(by id: UUID) -> Bool
+    func addBook(_ book: UserBookDTO) -> Result<Void, RepositoryError>
+    func updateBook(_ book: UserBookDTO) -> Result<Void, RepositoryError>
+    func deleteBook(by id: UUID) -> Result<Void, RepositoryError>
+}
+
+// RepositoryError 정의
+enum RepositoryError: Error {
+    case notFound
+    case saveFailed
+    case updateFailed
+    case deleteFailed
+    case fetchFailed
 }

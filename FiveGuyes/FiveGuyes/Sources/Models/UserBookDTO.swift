@@ -18,8 +18,8 @@ struct UserBookDTO: Identifiable {
     struct UserSettings {
         let startPage: Int
         let targetEndPage: Int
-        let initialPage: Date
-        let goalEndPage: Date
+        let startDate: Date
+        let targetEndDate: Date
         let excludedReadingDays: [Date]
     }
     
@@ -55,8 +55,8 @@ extension UserBookSchemaV2.UserBookV2 {
             userSettings: UserBookDTO.UserSettings(
                 startPage: self.userSettings.startPage,
                 targetEndPage: self.userSettings.targetEndPage,
-                initialPage: self.userSettings.startDate,
-                goalEndPage: self.userSettings.targetEndDate,
+                startDate: self.userSettings.startDate,
+                targetEndDate: self.userSettings.targetEndDate,
                 excludedReadingDays: self.userSettings.nonReadingDays
             ),
             readingProgress: UserBookDTO.ReadingProgress(
