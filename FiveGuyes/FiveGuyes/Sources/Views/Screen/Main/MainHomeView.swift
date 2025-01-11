@@ -26,7 +26,14 @@ struct MainHomeView: View {
     
     @State private var activeBookID: UUID?
     
-    @State private var selectedBook: UserBook?
+    @State private var selectedBookIndex: Int? = 0
+    
+    private var selectedBook: UserBook? {
+        if let selectedBookIndex, !currentlyReadingBooks.isEmpty && selectedBookIndex < currentlyReadingBooks.count {
+            return currentlyReadingBooks[selectedBookIndex]
+        }
+        return nil
+    }
     
     var body: some View {
         let title = selectedBook?.bookMetaData.title ?? ""
@@ -69,17 +76,24 @@ struct MainHomeView: View {
                                         .alertFontStyle(.caption1),
                                     primaryButton: .cancel(Text("취소하기")),
                                     secondaryButton: .destructive(Text("삭제")) {
-                                        if let book = selectedBook {
-                                            // 삭제하기 전, 명시적으로 참조 지우기
-                                            selectedBook = nil
-                                            // SwiftData 컨텍스트에서 삭제 필요
-                                            modelContext.delete(book)
+                                        if let selectedBookIndex {
+                                            // 책 삭제
+                                            let bookToDelete = currentlyReadingBooks[selectedBookIndex]
+                                            modelContext.delete(bookToDelete)
                                             
-                                            // 데이저 저장이 느려서 직접 저장해주기
+                                            // 데이터 저장
                                             do {
                                                 try modelContext.save()
                                             } catch {
                                                 print(error.localizedDescription)
+                                            }
+                                            
+                                            // 삭제 후 인덱스 업데이트
+                                            if currentlyReadingBooks.isEmpty {
+                                                self.selectedBookIndex = nil
+                                            } else if selectedBookIndex >= currentlyReadingBooks.count {
+                                                // 마지막 책이 삭제된 경우 이전 인덱스로 이동
+                                                self.selectedBookIndex = currentlyReadingBooks.count - 1
                                             }
                                         }
                                     }
@@ -147,8 +161,6 @@ struct MainHomeView: View {
             } else {
                 Tracking.Screen.homeAfterBookSetting.setTracking()
             }
-            
-            selectedBook = currentlyReadingBooks.first
         }
         .task {
             if let currentReadingBook = currentlyReadingBooks.first {
@@ -159,11 +171,10 @@ struct MainHomeView: View {
         }
         .onChange(of: activeBookID) {
             if let activeBookID {
-                selectedBook = currentlyReadingBooks.first(where: { $0.id == activeBookID })
+                selectedBookIndex = currentlyReadingBooks.firstIndex(where: { $0.id == activeBookID })
             } else {
-                selectedBook = nil
-            }
-        }
+                selectedBookIndex = nil
+            }        }
     }
     
     private var titleDescription: some View {
