@@ -24,8 +24,12 @@ struct MainHomeView: View {
     @Query(filter: #Predicate<UserBook> { $0.completionStatus.isCompleted == false })
     private var currentlyReadingBooks: [UserBook]
     
+    @State private var activeBookID: UUID?
+    
+    @State private var selectedBook: UserBook?
+    
     var body: some View {
-        let title = currentlyReadingBooks.first?.bookMetaData.title ?? ""
+        let title = selectedBook?.bookMetaData.title ?? ""
         let mainAlertText = "현재 읽고 있는 <\(title)>\(title.postPositionParticle()) 책장에서 삭제할까요?"
         
         ScrollView {
@@ -34,20 +38,20 @@ struct MainHomeView: View {
                     HStack {
                         Spacer()
                         notiButton {
-                            // TODO: 🐯선택된 책 넣어주기
-                            navigationCoordinator.push(.notiSetting(book: currentlyReadingBooks.first))
+                            navigationCoordinator.push(.notiSetting(book: selectedBook))
                         }
                     }
-                    .padding(.bottom, 42)
+                    .padding(.bottom, 49)
+                    .padding(.trailing, 20)
                     
                     HStack(alignment: .top) {
                         titleDescription
-                            .padding(.bottom, 40)
                         Spacer()
                         
                         if !currentlyReadingBooks.isEmpty {
                             Menu {
                                 ReadingDateEditButton
+                                UserBookAddButton
                                 DeleteReadingBookButton
                             } label: {
                                 Image(systemName: "ellipsis")
@@ -65,9 +69,9 @@ struct MainHomeView: View {
                                         .alertFontStyle(.caption1),
                                     primaryButton: .cancel(Text("취소하기")),
                                     secondaryButton: .destructive(Text("삭제")) {
-                                        if let currentReadingBook = currentlyReadingBooks.first {
+                                        if let selectedBook {
                                             // SwiftData 컨텍스트에서 삭제 필요
-                                            modelContext.delete(currentReadingBook)
+                                            modelContext.delete(selectedBook)
                                             
                                             // 데이저 저장이 느려서 직접 저장해주기
                                             do {
@@ -81,46 +85,24 @@ struct MainHomeView: View {
                             }
                         }
                     }
+                    .padding(.bottom, 10)
+                    .padding(.horizontal, 20)
                     
-                    ZStack(alignment: .top) {
-                        
-                        WeeklyReadingProgressView()
-                            .padding(.top, 153)
-                        
-                        if let currentReadingBook = currentlyReadingBooks.first,
-                           let coverURL = currentReadingBook.bookMetaData.coverURL,
-                           let url = URL(string: coverURL) {
-                            // TODO: 옆에 책 제목, 저자 text 추가하기
-                            // 책제목 .fontStyle(.body, weight: .semibold)
-                            // 저자 .fontStyle(.caption1)
-                            AsyncImage(url: url) { image in
-                                image
-                                    .resizable()
-                                    .scaledToFill()
-                                    .frame(width: 104, height: 161)
-                                    .shadow(color: Color(red: 0.84, green: 0.84, blue: 0.84).opacity(0.25), radius: 2, x: 0, y: 4)
-                            } placeholder: {
-                                ProgressView()
-                            }
-                        } else {
-                            Rectangle()
-                                .foregroundStyle(Color.Fills.white)
-                                .frame(width: 104, height: 161)
-                                .shadow(color: Color(red: 0.84, green: 0.84, blue: 0.84).opacity(0.25), radius: 2, x: 0, y: 4)
-                        }
-                        
-                    }
-                    .padding(.bottom, 16)
+                    WeeklyProgressPagingSlider(readingBooks: currentlyReadingBooks, activeID: $activeBookID)
+                        .padding(.bottom, 16)
+                    // TODO: 책이 처음, 마지막 일때는 한쪽만 보이고, 아닌 경우는 양쪽 보이고
+                        .safeAreaPadding(.horizontal, 30)
                     
                     HStack(spacing: 16) {
                         calendarFullScreenButton
                             .frame(width: 107)
                         
                         mainActionButton
+                        
                     }
                     .padding(.bottom, 40)
+                    .padding(.horizontal, 20)
                 }
-                .padding(.horizontal, 20)
                 
                 CompletionListView()
             }
@@ -142,17 +124,18 @@ struct MainHomeView: View {
             }
         }
         .onAppear {
-            if let currentReadingBook = currentlyReadingBooks.first {
-                let readingScheduleCalculator = ReadingScheduleCalculator()
-                print("🌝🌝🌝🌝🌝 재할당!!")
-                readingScheduleCalculator.reassignPagesFromLastReadDate(settings: currentReadingBook.userSettings, progress: currentReadingBook.readingProgress)
-                
-                // 데이저 저장이 느려서 직접 저장해주기
-                do {
-                    try modelContext.save()
-                } catch {
-                    print(error.localizedDescription)
-                }
+            guard !currentlyReadingBooks.isEmpty else { return }
+            
+            let readingScheduleCalculator = ReadingScheduleCalculator()
+            
+            for book in currentlyReadingBooks {
+                readingScheduleCalculator.reassignPagesFromLastReadDate(settings: book.userSettings, progress: book.readingProgress)
+            }
+            // 데이저 저장이 느려서 직접 저장해주기
+            do {
+                try modelContext.save()
+            } catch {
+                print(error.localizedDescription)
             }
         }
         .onAppear {
@@ -162,6 +145,8 @@ struct MainHomeView: View {
             } else {
                 Tracking.Screen.homeAfterBookSetting.setTracking()
             }
+            
+            selectedBook = currentlyReadingBooks.first
         }
         .task {
             if let currentReadingBook = currentlyReadingBooks.first {
@@ -170,21 +155,33 @@ struct MainHomeView: View {
                 print("노티 설정 실패 ❗️❗️❗️")
             }
         }
+        .onChange(of: activeBookID) {
+            if let activeBookID {
+                selectedBook = currentlyReadingBooks.first(where: { $0.id == activeBookID })
+            } else {
+                selectedBook = nil
+            }
+        }
     }
     
     private var titleDescription: some View {
         let redingDateCalculator = ReadingDateCalculator()
-        return HStack {
-            if let currentReadingBook = currentlyReadingBooks.first {
+        return Group {
+            if let currentReadingBook = selectedBook {
                 let bookMetadata: BookMetaDataProtocol = currentReadingBook.bookMetaData
                 let userSettings: UserSettingsProtocol = currentReadingBook.userSettings
-
-                let remainingReadingDays = try? redingDateCalculator.calculateValidReadingDays(startDate: Date(), endDate: userSettings.targetEndDate, excludedDates: userSettings.nonReadingDays)
+                
+                let remainingReadingDays = try? redingDateCalculator.calculateValidReadingDays(
+                    startDate: Date().adjustedDate(),
+                    endDate: userSettings.targetEndDate,
+                    excludedDates: userSettings.nonReadingDays)
                 
                 VStack(alignment: .leading, spacing: 5) {
                     Text("<\(bookMetadata.title)>")
                         .lineLimit(2)
+                    
                     Text("완독까지 \(remainingReadingDays ?? 0)일 남았어요!")
+                        .lineLimit(1)
                 }
                 
             } else {
@@ -193,9 +190,8 @@ struct MainHomeView: View {
                     Text("저와 함께 완독을 시작해볼까요?")
                 }
             }
-            
-            Spacer()
         }
+        .frame(height: 110, alignment: .topLeading)
         .fontStyle(.title1, weight: .semibold)
         .foregroundStyle(Color.Labels.primaryBlack1)
     }
@@ -211,13 +207,14 @@ struct MainHomeView: View {
     }
     
     private var calendarFullScreenButton: some View {
-        let isReadingBookAvailable = currentlyReadingBooks.first != nil
+        let isReadingBookAvailable = !currentlyReadingBooks.isEmpty
         let backgroundColor = isReadingBookAvailable ? Color.Fills.white : Color.Fills.lightGreen
         let opacity = isReadingBookAvailable ? 1 : 0.2
         
         return Button {
-            // TODO: 🐯선택된 책 넣어주기
-            navigationCoordinator.push(.totalCalendar(book: currentlyReadingBooks.first!))
+            if let selectedBook {
+                navigationCoordinator.push(.totalCalendar(book: selectedBook))
+            }
         } label: {
             HStack(spacing: 8) {
                 Image(systemName: "calendar")
@@ -246,9 +243,8 @@ struct MainHomeView: View {
         let isReadingBookAvailable = currentlyReadingBooks.first != nil
         
         return Button {
-            if isReadingBookAvailable {
-                // TODO: 🐯선택된 책 넣어주기
-                navigationCoordinator.push(.dailyProgress(book: currentlyReadingBooks.first!))
+            if isReadingBookAvailable, let selectedBook {
+                navigationCoordinator.push(.dailyProgress(book: selectedBook))
             } else {
                 navigationCoordinator.push(.bookSettingsManager)
             }
@@ -267,11 +263,21 @@ struct MainHomeView: View {
     
     private var ReadingDateEditButton: some View {
         Button {
-            // TODO: 🐯선택된 책 넣어주기
             // 날짜 수정 화면으로 기기
-            navigationCoordinator.push(.readingDateEdit(book: currentlyReadingBooks.first!))
+            if let selectedBook {
+                navigationCoordinator.push(.readingDateEdit(book: selectedBook))
+            }
         } label: {
             Label("수정하기", systemImage: "pencil")
+                .foregroundStyle(Color.Labels.primaryBlack1)
+        }
+    }
+    
+    private var UserBookAddButton: some View {
+        Button {
+            navigationCoordinator.push(.bookSettingsManager)
+        } label: {
+            Label("책 추가하기", systemImage: "plus")
                 .foregroundStyle(Color.Labels.primaryBlack1)
         }
     }
@@ -283,9 +289,4 @@ struct MainHomeView: View {
             Label("삭제", systemImage: "trash")
         }
     }
-}
-
-#Preview {
-    MainHomeView()
-        .environment(NavigationCoordinator())
 }
