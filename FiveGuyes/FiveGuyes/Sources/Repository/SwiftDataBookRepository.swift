@@ -9,7 +9,7 @@ import Foundation
 import SwiftData
 
 final class SwiftDataBookRepository: BookRepository {
-    typealias UserBook = UserBookSchemaV2.UserBookV2
+    typealias SDUserBook = UserBookSchemaV2.UserBookV2
     
     // MARK: - Properties
     
@@ -21,7 +21,7 @@ final class SwiftDataBookRepository: BookRepository {
     @MainActor init(modleContainer: ModelContainer) {
         do {
             self.modelContainer = try ModelContainer(
-                for: UserBook.self,
+                for: SDUserBook.self,
                 migrationPlan: MigrationPlan.self
             )
             
@@ -33,27 +33,27 @@ final class SwiftDataBookRepository: BookRepository {
     
     // MARK: - Public Methods
     
-    func fetchBooks() -> Result<[UserBookDTO], RepositoryError> {
+    func fetchBooks() -> Result<[UserBook], RepositoryError> {
         do {
-            let books = try modelContext.fetch(FetchDescriptor<UserBook>())
-            let dtos = books.map { $0.toDTO() }
-            return .success(dtos)
+            let swiftDatabooks = try modelContext.fetch(FetchDescriptor<SDUserBook>())
+            let books = swiftDatabooks.map { $0.toUserBook() }
+            return .success(books)
         } catch {
             return .failure(.fetchFailed)
         }
     }
     
-    func fetchBook(by id: UUID) -> Result<UserBookDTO, RepositoryError> {
+    func fetchBook(by id: UUID) -> Result<UserBook, RepositoryError> {
         switch findSwiftDataBook(by: id) {
         case .success(let book):
-            return .success(book.toDTO())
+            return .success(book.toUserBook())
         case .failure(let error):
             return .failure(error)
         }
     }
     
-    func addBook(_ book: UserBookDTO) -> Result<Void, RepositoryError> {
-        let swiftDataBook = toSwiftDataBookModel(dto: book)
+    func addBook(_ book: UserBook) -> Result<Void, RepositoryError> {
+        let swiftDataBook = toSwiftDataBookModel(book)
         modelContext.insert(swiftDataBook)
         
         do {
@@ -64,7 +64,7 @@ final class SwiftDataBookRepository: BookRepository {
         }
     }
     
-    func updateBook(_ book: UserBookDTO) -> Result<Void, RepositoryError> {
+    func updateBook(_ book: UserBook) -> Result<Void, RepositoryError> {
         switch findSwiftDataBook(by: book.id) {
         case .success(let swiftDataBook):
             // 기존 책 데이터를 DTO를 기준으로 업데이트
@@ -102,55 +102,55 @@ final class SwiftDataBookRepository: BookRepository {
     // MARK: - Helper Methods
     
     /// DTO를 SwiftData 모델로 변환
-    private func toSwiftDataBookModel(dto: UserBookDTO) -> UserBook {
+    private func toSwiftDataBookModel(_ book: UserBook) -> SDUserBook {
         let bookMetaData: SDBookMetaData = SDBookMetaData(
-            title: dto.bookMetaData.title,
-            author: dto.bookMetaData.author,
-            coverURL: dto.bookMetaData.coverImageURL,
-            totalPages: dto.bookMetaData.totalPages
+            title: book.bookMetaData.title,
+            author: book.bookMetaData.author,
+            coverURL: book.bookMetaData.coverImageURL,
+            totalPages: book.bookMetaData.totalPages
         )
         
         let userSettings: SDUserSettings = .init(
-            startPage: dto.userSettings.startPage,
-            targetEndPage: dto.userSettings.targetEndPage,
-            startDate: dto.userSettings.startDate,
-            targetEndDate: dto.userSettings.targetEndDate,
-            nonReadingDays: dto.userSettings.excludedReadingDays
+            startPage: book.userSettings.startPage,
+            targetEndPage: book.userSettings.targetEndPage,
+            startDate: book.userSettings.startDate,
+            targetEndDate: book.userSettings.targetEndDate,
+            nonReadingDays: book.userSettings.excludedReadingDays
         )
         
         let readingProgress: SDReadingProgress = SDReadingProgress(
-            readingRecords: dto.readingProgress.dailyReadingRecords,
-            lastReadDate: dto.readingProgress.lastReadDate,
-            lastPagesRead: dto.readingProgress.lastReadPage
+            readingRecords: book.readingProgress.dailyReadingRecords,
+            lastReadDate: book.readingProgress.lastReadDate,
+            lastPagesRead: book.readingProgress.lastReadPage
         )
         
         let completionStatus: SDCompletionStatus = SDCompletionStatus(
-            isCompleted: dto.completionStatus.isCompleted,
-            completionReview: dto.completionStatus.reviewAfterCompletion
+            isCompleted: book.completionStatus.isCompleted,
+            completionReview: book.completionStatus.reviewAfterCompletion
         )
         
-        return UserBook(bookMetaData: bookMetaData, userSettings: userSettings, readingProgress: readingProgress, completionStatus: completionStatus)
+        return SDUserBook(bookMetaData: bookMetaData, userSettings: userSettings, readingProgress: readingProgress, completionStatus: completionStatus)
     }
     
-    /// 기존 SwiftData 모델을 DTO로 업데이트
-    private func updateSwiftDataModel(_ existingBook: UserBook, with dto: UserBookDTO) {
-        existingBook.userSettings.startPage = dto.userSettings.startPage
-        existingBook.userSettings.targetEndPage = dto.userSettings.targetEndPage
-        existingBook.userSettings.startDate = dto.userSettings.startDate
-        existingBook.userSettings.targetEndDate = dto.userSettings.targetEndDate
-        existingBook.userSettings.nonReadingDays = dto.userSettings.excludedReadingDays
+    /// UserBook으로 기존 SwiftData 모델을  업데이트
+    private func updateSwiftDataModel(_ existingBook: SDUserBook, with book: UserBook) {
+        existingBook.userSettings.startPage = book.userSettings.startPage
+        existingBook.userSettings.targetEndPage = book.userSettings.targetEndPage
+        existingBook.userSettings.startDate = book.userSettings.startDate
+        existingBook.userSettings.targetEndDate = book.userSettings.targetEndDate
+        existingBook.userSettings.nonReadingDays = book.userSettings.excludedReadingDays
         
-        existingBook.readingProgress.readingRecords = dto.readingProgress.dailyReadingRecords
-        existingBook.readingProgress.lastReadDate = dto.readingProgress.lastReadDate
-        existingBook.readingProgress.lastPagesRead = dto.readingProgress.lastReadPage
+        existingBook.readingProgress.readingRecords = book.readingProgress.dailyReadingRecords
+        existingBook.readingProgress.lastReadDate = book.readingProgress.lastReadDate
+        existingBook.readingProgress.lastPagesRead = book.readingProgress.lastReadPage
         
-        existingBook.completionStatus.isCompleted = dto.completionStatus.isCompleted
-        existingBook.completionStatus.completionReview = dto.completionStatus.reviewAfterCompletion
+        existingBook.completionStatus.isCompleted = book.completionStatus.isCompleted
+        existingBook.completionStatus.completionReview = book.completionStatus.reviewAfterCompletion
     }
     
     /// 특정 ID로 SwiftData 모델을 조회
-    private func findSwiftDataBook(by id: UUID) -> Result<UserBook, RepositoryError> {
-        var fetchDescriptor: FetchDescriptor<UserBook> = .init(
+    private func findSwiftDataBook(by id: UUID) -> Result<SDUserBook, RepositoryError> {
+        var fetchDescriptor: FetchDescriptor<SDUserBook> = .init(
             predicate: #Predicate { book in
                 book.id == id
             }

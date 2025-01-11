@@ -30,7 +30,7 @@
 		2622C7D82D2AC4C000AA3FF4 /* DividerLine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2622C7D72D2AC4C000AA3FF4 /* DividerLine.swift */; };
 		2622C7DA2D2AC56400AA3FF4 /* CalendarWeekdayHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2622C7D92D2AC56400AA3FF4 /* CalendarWeekdayHeader.swift */; };
 		2622C7DC2D2AC67800AA3FF4 /* PageTextModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2622C7DB2D2AC67800AA3FF4 /* PageTextModifier.swift */; };
-		2622C8012D2D8EDA00AA3FF4 /* UserBookDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2622C8002D2D8EDA00AA3FF4 /* UserBookDTO.swift */; };
+		2622C8012D2D8EDA00AA3FF4 /* UserBook.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2622C8002D2D8EDA00AA3FF4 /* UserBook.swift */; };
 		2622C8042D2D911200AA3FF4 /* BookRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2622C8022D2D911200AA3FF4 /* BookRepository.swift */; };
 		2622C8062D2D943900AA3FF4 /* InMemoryBookRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2622C8052D2D943900AA3FF4 /* InMemoryBookRepository.swift */; };
 		2622C8082D2D945000AA3FF4 /* SwiftDataBookRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2622C8072D2D945000AA3FF4 /* SwiftDataBookRepository.swift */; };
@@ -131,7 +131,7 @@
 		2622C7D72D2AC4C000AA3FF4 /* DividerLine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DividerLine.swift; sourceTree = "<group>"; };
 		2622C7D92D2AC56400AA3FF4 /* CalendarWeekdayHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarWeekdayHeader.swift; sourceTree = "<group>"; };
 		2622C7DB2D2AC67800AA3FF4 /* PageTextModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageTextModifier.swift; sourceTree = "<group>"; };
-		2622C8002D2D8EDA00AA3FF4 /* UserBookDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserBookDTO.swift; sourceTree = "<group>"; };
+		2622C8002D2D8EDA00AA3FF4 /* UserBook.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserBook.swift; sourceTree = "<group>"; };
 		2622C8022D2D911200AA3FF4 /* BookRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookRepository.swift; sourceTree = "<group>"; };
 		2622C8052D2D943900AA3FF4 /* InMemoryBookRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InMemoryBookRepository.swift; sourceTree = "<group>"; };
 		2622C8072D2D945000AA3FF4 /* SwiftDataBookRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftDataBookRepository.swift; sourceTree = "<group>"; };
@@ -481,7 +481,7 @@
 				1AA14A792CDDD96200B763A6 /* NotificationManager.swift */,
 				26EBDEB32CF1CC8500B3A2BC /* Tracking.swift */,
 				264443EB2CF8709D009422BA /* UserDefaults */,
-				2622C8002D2D8EDA00AA3FF4 /* UserBookDTO.swift */,
+				2622C8002D2D8EDA00AA3FF4 /* UserBook.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -777,7 +777,7 @@
 				1A010EB62CD8AF9800FBE3B3 /* BookSearchViewModel.swift in Sources */,
 				26EBDED22CF45ACA00B3A2BC /* SDReadingProgress.swift in Sources */,
 				26EBDE2C2CE1341800B3A2BC /* ReadingRecord.swift in Sources */,
-				2622C8012D2D8EDA00AA3FF4 /* UserBookDTO.swift in Sources */,
+				2622C8012D2D8EDA00AA3FF4 /* UserBook.swift in Sources */,
 				26EBDE2A2CDF33D900B3A2BC /* Date+Extension.swift in Sources */,
 				1A9E3D542CF88BA400C7B27A /* Text+Extension.swift in Sources */,
 				26EBDEC02CF2398F00B3A2BC /* BookMetaDataProtocol.swift in Sources */,

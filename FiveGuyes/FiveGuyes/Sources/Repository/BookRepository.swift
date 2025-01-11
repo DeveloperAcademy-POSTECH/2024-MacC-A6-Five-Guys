@@ -8,11 +8,11 @@
 import Foundation
 
 protocol BookRepository {
-    func fetchBooks() -> Result<[UserBookDTO], RepositoryError>
-    func fetchBook(by id: UUID) -> Result<UserBookDTO, RepositoryError>
+    func fetchBooks() -> Result<[UserBook], RepositoryError>
+    func fetchBook(by id: UUID) -> Result<UserBook, RepositoryError>
     
-    func addBook(_ book: UserBookDTO) -> Result<Void, RepositoryError>
-    func updateBook(_ book: UserBookDTO) -> Result<Void, RepositoryError>
+    func addBook(_ book: UserBook) -> Result<Void, RepositoryError>
+    func updateBook(_ book: UserBook) -> Result<Void, RepositoryError>
     func deleteBook(by id: UUID) -> Result<Void, RepositoryError>
 }
 
