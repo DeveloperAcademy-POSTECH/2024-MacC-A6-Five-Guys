@@ -77,24 +77,7 @@ struct MainHomeView: View {
                                     primaryButton: .cancel(Text("취소하기")),
                                     secondaryButton: .destructive(Text("삭제")) {
                                         if let selectedBookIndex {
-                                            // 책 삭제
-                                            let bookToDelete = currentlyReadingBooks[selectedBookIndex]
-                                            modelContext.delete(bookToDelete)
-                                            
-                                            // 데이터 저장
-                                            do {
-                                                try modelContext.save()
-                                            } catch {
-                                                print(error.localizedDescription)
-                                            }
-                                            
-                                            // 삭제 후 인덱스 업데이트
-                                            if currentlyReadingBooks.isEmpty {
-                                                self.selectedBookIndex = nil
-                                            } else if selectedBookIndex >= currentlyReadingBooks.count {
-                                                // 마지막 책이 삭제된 경우 이전 인덱스로 이동
-                                                self.selectedBookIndex = currentlyReadingBooks.count - 1
-                                            }
+                                            deleteBook(at: selectedBookIndex)
                                         }
                                     }
                                 )
@@ -131,50 +114,28 @@ struct MainHomeView: View {
                 .frame(height: 448)
                 .ignoresSafeArea(edges: .top)
         }
-        .onAppear {
-            // 상단 안전 영역 값 계산
-            if let window = UIApplication.shared.connectedScenes
-                .compactMap({ $0 as? UIWindowScene })
-                .first?.windows.first {
-                topSafeAreaInset = window.safeAreaInsets.top
-            }
-        }
-        .onAppear {
-            guard !currentlyReadingBooks.isEmpty else { return }
-            
-            let readingScheduleCalculator = ReadingScheduleCalculator()
-            
-            for book in currentlyReadingBooks {
-                readingScheduleCalculator.reassignPagesFromLastReadDate(settings: book.userSettings, progress: book.readingProgress)
-            }
-            // 데이저 저장이 느려서 직접 저장해주기
-            do {
-                try modelContext.save()
-            } catch {
-                print(error.localizedDescription)
-            }
-        }
-        .onAppear {
-            // GA4 Tracking
-            if currentlyReadingBooks.isEmpty {
-                Tracking.Screen.homeBeforeBookSetting.setTracking()
+        .onChange(of: activeBookID) {
+            if let activeBookID {
+                selectedBookIndex = currentlyReadingBooks.firstIndex(where: { $0.id == activeBookID })
             } else {
-                Tracking.Screen.homeAfterBookSetting.setTracking()
+                selectedBookIndex = nil
             }
+        }
+        .onAppear {
+            calculateTopSafeAreaInset()
+            
+            guard !currentlyReadingBooks.isEmpty else { return }
+            reassignReadingSchedules()
         }
         .task {
+            trackScreen()
+            
             if let currentReadingBook = currentlyReadingBooks.first {
                 await notificationManager.setupAllNotifications(currentReadingBook)
             } else {
                 print("노티 설정 실패 ❗️❗️❗️")
             }
         }
-        .onChange(of: activeBookID) {
-            if let activeBookID {
-                selectedBookIndex = currentlyReadingBooks.firstIndex(where: { $0.id == activeBookID })
-            } else {
-                selectedBookIndex = nil
-            }        }
     }
     
     private var titleDescription: some View {
@@ -300,6 +261,63 @@ struct MainHomeView: View {
             showReadingBookAlert = true
         } label: {
             Label("삭제", systemImage: "trash")
+        }
+    }
+    
+    // MARK: - Helper Method
+    
+    private func deleteBook(at index: Int) {
+        guard index < currentlyReadingBooks.count else { return }
+        
+        let bookToDelete = currentlyReadingBooks[index]
+        modelContext.delete(bookToDelete)
+        
+        // 데이터 저장
+        do {
+            try modelContext.save()
+        } catch {
+            print("데이터 저장 중 오류 발생: \(error.localizedDescription)")
+        }
+        
+        // 삭제 후 인덱스 업데이트
+        if currentlyReadingBooks.isEmpty {
+            selectedBookIndex = nil
+        } else if index >= currentlyReadingBooks.count {
+            selectedBookIndex = currentlyReadingBooks.count - 1
+        }
+    }
+    
+    private func trackScreen() {
+        if currentlyReadingBooks.isEmpty {
+            Tracking.Screen.homeBeforeBookSetting.setTracking()
+        } else {
+            Tracking.Screen.homeAfterBookSetting.setTracking()
+        }
+    }
+    
+    private func calculateTopSafeAreaInset() {
+        if let window = UIApplication.shared.connectedScenes
+            .compactMap({ $0 as? UIWindowScene })
+            .first?.windows.first {
+            topSafeAreaInset = window.safeAreaInsets.top
+        }
+    }
+    
+    private func reassignReadingSchedules() {
+        let readingScheduleCalculator = ReadingScheduleCalculator()
+        
+        for book in currentlyReadingBooks {
+            readingScheduleCalculator.reassignPagesFromLastReadDate(
+                settings: book.userSettings,
+                progress: book.readingProgress
+            )
+        }
+        
+        // 데이터 저장
+        do {
+            try modelContext.save()
+        } catch {
+            print("읽기 스케줄 저장 중 오류 발생: \(error.localizedDescription)")
         }
     }
 }
