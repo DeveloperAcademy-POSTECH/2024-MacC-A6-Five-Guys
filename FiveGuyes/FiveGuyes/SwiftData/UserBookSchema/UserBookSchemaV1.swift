@@ -20,7 +20,7 @@ extension UserBookSchemaV1 {
     @Model
     final class UserBook {
         @Attribute(.unique) var id = UUID()
-        var book: BookDetails
+        var book: SDBookDetails
         
         var readingRecords: [String: ReadingRecord] = [:] // Keyed by formatted date strings
         
@@ -31,7 +31,7 @@ extension UserBookSchemaV1 {
         var completionReview = ""
         var isCompleted: Bool = false  // 현재 읽는 중인지 완독한 책인지 표시
         
-        init(book: BookDetails) {
+        init(book: SDBookDetails) {
             self.book = book
         }
     }

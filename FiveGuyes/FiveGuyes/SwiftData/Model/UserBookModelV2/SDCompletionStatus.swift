@@ -1,5 +1,5 @@
 //
-//  CompletionStatus.swift
+//  SDCompletionStatus.swift
 //  FiveGuyes
 //
 //  Created by zaehorang on 11/25/24.
@@ -7,7 +7,7 @@
 import SwiftData
 
 @Model
-final class CompletionStatus: CompletionStatusProtocol {
+final class SDCompletionStatus: CompletionStatusProtocol {
     var isCompleted: Bool
     var completionReview: String
     

@@ -1,5 +1,5 @@
 //
-//  BookMetaData.swift
+//  SDBookMetaData.swift
 //  FiveGuyes
 //
 //  Created by zaehorang on 11/25/24.
@@ -9,7 +9,7 @@ import Foundation
 import SwiftData
 
 @Model
-final class BookMetaData: BookMetaDataProtocol {
+final class SDBookMetaData: BookMetaDataProtocol {
     let title: String
     let author: String
     let coverURL: String?

@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import SwiftData
 
 struct ReadingRecord: Codable {
     var targetPages: Int   // 목표로 설정된 페이지 수

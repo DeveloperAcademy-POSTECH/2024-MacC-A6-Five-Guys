@@ -1,5 +1,5 @@
 //
-//  ReadingProgress.swift
+//  SDReadingProgress.swift
 //  FiveGuyes
 //
 //  Created by zaehorang on 11/25/24.
@@ -9,7 +9,7 @@ import Foundation
 import SwiftData
 
 @Model
-final class ReadingProgress: ReadingProgressProtocol {
+final class SDReadingProgress: ReadingProgressProtocol {
     typealias Settings = UserSettingsProtocol
     
     var readingRecords: [String: ReadingRecord]

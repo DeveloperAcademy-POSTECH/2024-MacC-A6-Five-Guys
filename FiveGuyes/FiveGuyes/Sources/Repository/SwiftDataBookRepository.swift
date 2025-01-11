@@ -103,14 +103,14 @@ final class SwiftDataBookRepository: BookRepository {
     
     /// DTO를 SwiftData 모델로 변환
     private func toSwiftDataBookModel(dto: UserBookDTO) -> UserBook {
-        let bookMetaData: BookMetaData = BookMetaData(
+        let bookMetaData: SDBookMetaData = SDBookMetaData(
             title: dto.bookMetaData.title,
             author: dto.bookMetaData.author,
             coverURL: dto.bookMetaData.coverImageURL,
             totalPages: dto.bookMetaData.totalPages
         )
         
-        let userSettings: UserSettings = .init(
+        let userSettings: SDUserSettings = .init(
             startPage: dto.userSettings.startPage,
             targetEndPage: dto.userSettings.targetEndPage,
             startDate: dto.userSettings.startDate,
@@ -118,13 +118,13 @@ final class SwiftDataBookRepository: BookRepository {
             nonReadingDays: dto.userSettings.excludedReadingDays
         )
         
-        let readingProgress: ReadingProgress = ReadingProgress(
+        let readingProgress: SDReadingProgress = SDReadingProgress(
             readingRecords: dto.readingProgress.dailyReadingRecords,
             lastReadDate: dto.readingProgress.lastReadDate,
             lastPagesRead: dto.readingProgress.lastReadPage
         )
         
-        let completionStatus: CompletionStatus = CompletionStatus(
+        let completionStatus: SDCompletionStatus = SDCompletionStatus(
             isCompleted: dto.completionStatus.isCompleted,
             completionReview: dto.completionStatus.reviewAfterCompletion
         )

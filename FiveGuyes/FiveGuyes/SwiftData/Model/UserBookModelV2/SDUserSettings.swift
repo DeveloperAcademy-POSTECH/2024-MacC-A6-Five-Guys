@@ -1,5 +1,5 @@
 //
-//  UserSettings.swift
+//  SDUserSettings.swift
 //  FiveGuyes
 //
 //  Created by zaehorang on 11/25/24.
@@ -9,7 +9,7 @@ import Foundation
 import SwiftData
 
 @Model
-final class UserSettings: UserSettingsProtocol {
+final class SDUserSettings: UserSettingsProtocol {
     var startPage: Int
     var targetEndPage: Int
     var startDate: Date

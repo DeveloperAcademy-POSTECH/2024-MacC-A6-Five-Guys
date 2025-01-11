@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct BookDetails: Codable {
+struct SDBookDetails: Codable {
     let title: String
     let author: String
     let coverURL: String?
