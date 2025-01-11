@@ -69,9 +69,11 @@ struct MainHomeView: View {
                                         .alertFontStyle(.caption1),
                                     primaryButton: .cancel(Text("취소하기")),
                                     secondaryButton: .destructive(Text("삭제")) {
-                                        if let selectedBook {
+                                        if let book = selectedBook {
+                                            // 삭제하기 전, 명시적으로 참조 지우기
+                                            selectedBook = nil
                                             // SwiftData 컨텍스트에서 삭제 필요
-                                            modelContext.delete(selectedBook)
+                                            modelContext.delete(book)
                                             
                                             // 데이저 저장이 느려서 직접 저장해주기
                                             do {
