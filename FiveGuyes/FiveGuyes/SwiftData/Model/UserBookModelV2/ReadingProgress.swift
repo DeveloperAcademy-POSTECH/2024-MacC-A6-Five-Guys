@@ -9,7 +9,7 @@ import Foundation
 import SwiftData
 
 @Model
-final class SDReadingProgress: ReadingProgressProtocol {
+final class ReadingProgress: ReadingProgressProtocol {
     typealias Settings = UserSettingsProtocol
     
     var readingRecords: [String: ReadingRecord]

@@ -173,12 +173,12 @@ struct FinishGoalView: View {
             .onAppear {
                 // 1일 할당량 계산
                 // TODO: 해당 모델 객체를 더 잘 만들 방식 고민하기
-                let bookMetaData = SDBookMetaData(title: book.title, author: book.author, coverURL: book.cover, totalPages: totalPages)
-                let userSettings = SDUserSettings(startPage: startPage, targetEndPage: totalPages, startDate: startDate, targetEndDate: endDate, nonReadingDays: bookSettingInputModel.nonReadingDays)
+                let bookMetaData = BookMetaData(title: book.title, author: book.author, coverURL: book.cover, totalPages: totalPages)
+                let userSettings = UserSettings(startPage: startPage, targetEndPage: totalPages, startDate: startDate, targetEndDate: endDate, nonReadingDays: bookSettingInputModel.nonReadingDays)
                 
                 // 시작 페이지가 아직 읽지 않은 페이지임을 고려하여 초기 등록 시 -1 처리 추가
-                let readingProgress = SDReadingProgress(lastPagesRead: startPage - 1)
-                let completionStatus = SDCompletionStatus()
+                let readingProgress = ReadingProgress(lastPagesRead: startPage - 1)
+                let completionStatus = CompletionStatus()
   
                 calculator.calculateInitialDailyTargets(for: userSettings, progress: readingProgress)
                 

@@ -19,18 +19,14 @@ struct CompletionReviewView: View {
     @ObservedObject private var keyboardObserver = KeyboardObserver()
     
     @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
-    @Query(filter: #Predicate<UserBook> { $0.completionStatus.isCompleted == false })
-    private var currentlyReadingBooks: [UserBook]  // 현재 읽고 있는 책을 가져오는 쿼리
     
     // 업데이트 상황을 나타내는 불 변수
     var isUpdateMode: Bool = false
         
-        // 외부에서 주입받을 수 있는 책 변수
-    var externalBook: UserBook?
+    // 외부에서 주입받을 수 있는 책 변수
+    var userBook: UserBook
     
     var body: some View {
-        let userBook = isUpdateMode ? (externalBook ?? UserBook.dummyUserBookV2) : (currentlyReadingBooks.first ?? UserBook.dummyUserBookV2)
-        
         let bookMetadata: BookMetaDataProtocol = userBook.bookMetaData
         var completionStatus: CompletionStatusProtocol = userBook.completionStatus
         let userSettings = userBook.userSettings
@@ -104,6 +100,6 @@ struct CompletionReviewView: View {
     }
 }
 
-#Preview {
-    CompletionReviewView()
-}
+//#Preview {
+//    CompletionReviewView()
+//}

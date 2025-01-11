@@ -22,8 +22,7 @@ struct NotiSettingView: View {
     @State private var notificationStatusTask: Task<Void, Never>?
     @State private var notificationTimeTask: Task<Void, Never>?
     
-    @Query(filter: #Predicate<UserBook> { $0.completionStatus.isCompleted == false })
-    private var currentlyReadingBooks: [UserBook]  // 현재 읽고 있는 책을 가져오는 쿼리
+    let userBook: UserBook?
     
     private let notificationManager = NotificationManager()
     
@@ -46,8 +45,6 @@ struct NotiSettingView: View {
     }
     
     var body: some View {
-        let userBook = currentlyReadingBooks.first
-        
         ZStack {
             Color.Fills.white // 배경색 지정
                 .ignoresSafeArea()
@@ -274,8 +271,8 @@ struct NotiSettingView: View {
     }
 }
 
-#Preview {
-    NavigationStack {
-        NotiSettingView()
-    }
-}
+//#Preview {
+//    NavigationStack {
+//        NotiSettingView()
+//    }
+//}

@@ -9,7 +9,7 @@ import Foundation
 import SwiftData
 
 @Model
-final class SDUserSettings: UserSettingsProtocol {
+final class UserSettings: UserSettingsProtocol {
     var startPage: Int
     var targetEndPage: Int
     var startDate: Date

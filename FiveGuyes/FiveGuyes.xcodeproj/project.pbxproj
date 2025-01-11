@@ -30,9 +30,8 @@
 		2622C7D82D2AC4C000AA3FF4 /* DividerLine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2622C7D72D2AC4C000AA3FF4 /* DividerLine.swift */; };
 		2622C7DA2D2AC56400AA3FF4 /* CalendarWeekdayHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2622C7D92D2AC56400AA3FF4 /* CalendarWeekdayHeader.swift */; };
 		2622C7DC2D2AC67800AA3FF4 /* PageTextModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2622C7DB2D2AC67800AA3FF4 /* PageTextModifier.swift */; };
-		2622C8012D2D8EDA00AA3FF4 /* UserBook.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2622C8002D2D8EDA00AA3FF4 /* UserBook.swift */; };
+		2622C8012D2D8EDA00AA3FF4 /* UserBook1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2622C8002D2D8EDA00AA3FF4 /* UserBook1.swift */; };
 		2622C8042D2D911200AA3FF4 /* BookRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2622C8022D2D911200AA3FF4 /* BookRepository.swift */; };
-		2622C8062D2D943900AA3FF4 /* InMemoryBookRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2622C8052D2D943900AA3FF4 /* InMemoryBookRepository.swift */; };
 		2622C8082D2D945000AA3FF4 /* SwiftDataBookRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2622C8072D2D945000AA3FF4 /* SwiftDataBookRepository.swift */; };
 		26410A982D26D18200D6B477 /* ReadingDatePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26410A972D26D18200D6B477 /* ReadingDatePickerView.swift */; };
 		26410A9B2D26D8F000D6B477 /* CalendarCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26410A9A2D26D8F000D6B477 /* CalendarCalculator.swift */; };
@@ -83,17 +82,17 @@
 		26EBDEC72CF4553600B3A2BC /* MigrationPlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDEC62CF4553500B3A2BC /* MigrationPlan.swift */; };
 		26EBDECA2CF4556300B3A2BC /* UserBookSchemaV2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDEC92CF4556300B3A2BC /* UserBookSchemaV2.swift */; };
 		26EBDECD2CF4558B00B3A2BC /* UserBookSchemaV1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDECC2CF4558B00B3A2BC /* UserBookSchemaV1.swift */; };
-		26EBDED22CF45ACA00B3A2BC /* SDReadingProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDED12CF45ACA00B3A2BC /* SDReadingProgress.swift */; };
-		26EBDED42CF45B1E00B3A2BC /* SDUserSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDED32CF45B1E00B3A2BC /* SDUserSettings.swift */; };
-		26EBDED62CF45B3400B3A2BC /* SDBookMetaData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDED52CF45B3400B3A2BC /* SDBookMetaData.swift */; };
-		26EBDED82CF45B9300B3A2BC /* SDCompletionStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDED72CF45B9300B3A2BC /* SDCompletionStatus.swift */; };
+		26EBDED22CF45ACA00B3A2BC /* ReadingProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDED12CF45ACA00B3A2BC /* ReadingProgress.swift */; };
+		26EBDED42CF45B1E00B3A2BC /* UserSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDED32CF45B1E00B3A2BC /* UserSettings.swift */; };
+		26EBDED62CF45B3400B3A2BC /* BookMetaData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDED52CF45B3400B3A2BC /* BookMetaData.swift */; };
+		26EBDED82CF45B9300B3A2BC /* CompletionStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDED72CF45B9300B3A2BC /* CompletionStatus.swift */; };
 		26F19A682CD9EFD800F41D6D /* MainHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F19A672CD9EFD800F41D6D /* MainHomeView.swift */; };
 		26F19A6A2CD9FE5C00F41D6D /* WeeklyReadingProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F19A692CD9FE5C00F41D6D /* WeeklyReadingProgressView.swift */; };
 		26F19A6C2CDA0A2B00F41D6D /* CompletionListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F19A6B2CDA0A2B00F41D6D /* CompletionListView.swift */; };
 		26F19A6E2CDA74A600F41D6D /* WeeklyPageCalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F19A6D2CDA74A600F41D6D /* WeeklyPageCalendarView.swift */; };
 		26F19A722CDB267600F41D6D /* NavigationCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F19A712CDB267600F41D6D /* NavigationCoordinator.swift */; };
 		26F19A742CDB271E00F41D6D /* NavigationRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F19A732CDB271E00F41D6D /* NavigationRootView.swift */; };
-		26F19A782CDB5D0100F41D6D /* SDBookDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F19A772CDB5D0100F41D6D /* SDBookDetails.swift */; };
+		26F19A782CDB5D0100F41D6D /* BookDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F19A772CDB5D0100F41D6D /* BookDetails.swift */; };
 		26F19A7A2CDB5F3900F41D6D /* ReadingScheduleCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F19A792CDB5F3900F41D6D /* ReadingScheduleCalculator.swift */; };
 /* End PBXBuildFile section */
 
@@ -131,9 +130,8 @@
 		2622C7D72D2AC4C000AA3FF4 /* DividerLine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DividerLine.swift; sourceTree = "<group>"; };
 		2622C7D92D2AC56400AA3FF4 /* CalendarWeekdayHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarWeekdayHeader.swift; sourceTree = "<group>"; };
 		2622C7DB2D2AC67800AA3FF4 /* PageTextModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageTextModifier.swift; sourceTree = "<group>"; };
-		2622C8002D2D8EDA00AA3FF4 /* UserBook.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserBook.swift; sourceTree = "<group>"; };
+		2622C8002D2D8EDA00AA3FF4 /* UserBook1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserBook1.swift; sourceTree = "<group>"; };
 		2622C8022D2D911200AA3FF4 /* BookRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookRepository.swift; sourceTree = "<group>"; };
-		2622C8052D2D943900AA3FF4 /* InMemoryBookRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InMemoryBookRepository.swift; sourceTree = "<group>"; };
 		2622C8072D2D945000AA3FF4 /* SwiftDataBookRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftDataBookRepository.swift; sourceTree = "<group>"; };
 		26410A972D26D18200D6B477 /* ReadingDatePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadingDatePickerView.swift; sourceTree = "<group>"; };
 		26410A9A2D26D8F000D6B477 /* CalendarCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarCalculator.swift; sourceTree = "<group>"; };
@@ -181,17 +179,17 @@
 		26EBDEC62CF4553500B3A2BC /* MigrationPlan.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MigrationPlan.swift; sourceTree = "<group>"; };
 		26EBDEC92CF4556300B3A2BC /* UserBookSchemaV2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserBookSchemaV2.swift; sourceTree = "<group>"; };
 		26EBDECC2CF4558B00B3A2BC /* UserBookSchemaV1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserBookSchemaV1.swift; sourceTree = "<group>"; };
-		26EBDED12CF45ACA00B3A2BC /* SDReadingProgress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDReadingProgress.swift; sourceTree = "<group>"; };
-		26EBDED32CF45B1E00B3A2BC /* SDUserSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDUserSettings.swift; sourceTree = "<group>"; };
-		26EBDED52CF45B3400B3A2BC /* SDBookMetaData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDBookMetaData.swift; sourceTree = "<group>"; };
-		26EBDED72CF45B9300B3A2BC /* SDCompletionStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDCompletionStatus.swift; sourceTree = "<group>"; };
+		26EBDED12CF45ACA00B3A2BC /* ReadingProgress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadingProgress.swift; sourceTree = "<group>"; };
+		26EBDED32CF45B1E00B3A2BC /* UserSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSettings.swift; sourceTree = "<group>"; };
+		26EBDED52CF45B3400B3A2BC /* BookMetaData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookMetaData.swift; sourceTree = "<group>"; };
+		26EBDED72CF45B9300B3A2BC /* CompletionStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletionStatus.swift; sourceTree = "<group>"; };
 		26F19A672CD9EFD800F41D6D /* MainHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainHomeView.swift; sourceTree = "<group>"; };
 		26F19A692CD9FE5C00F41D6D /* WeeklyReadingProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyReadingProgressView.swift; sourceTree = "<group>"; };
 		26F19A6B2CDA0A2B00F41D6D /* CompletionListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletionListView.swift; sourceTree = "<group>"; };
 		26F19A6D2CDA74A600F41D6D /* WeeklyPageCalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyPageCalendarView.swift; sourceTree = "<group>"; };
 		26F19A712CDB267600F41D6D /* NavigationCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationCoordinator.swift; sourceTree = "<group>"; };
 		26F19A732CDB271E00F41D6D /* NavigationRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationRootView.swift; sourceTree = "<group>"; };
-		26F19A772CDB5D0100F41D6D /* SDBookDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDBookDetails.swift; sourceTree = "<group>"; };
+		26F19A772CDB5D0100F41D6D /* BookDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookDetails.swift; sourceTree = "<group>"; };
 		26F19A792CDB5F3900F41D6D /* ReadingScheduleCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadingScheduleCalculator.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -266,7 +264,6 @@
 			isa = PBXGroup;
 			children = (
 				2622C8022D2D911200AA3FF4 /* BookRepository.swift */,
-				2622C8052D2D943900AA3FF4 /* InMemoryBookRepository.swift */,
 				2622C8072D2D945000AA3FF4 /* SwiftDataBookRepository.swift */,
 			);
 			path = Repository;
@@ -481,7 +478,7 @@
 				1AA14A792CDDD96200B763A6 /* NotificationManager.swift */,
 				26EBDEB32CF1CC8500B3A2BC /* Tracking.swift */,
 				264443EB2CF8709D009422BA /* UserDefaults */,
-				2622C8002D2D8EDA00AA3FF4 /* UserBook.swift */,
+				2622C8002D2D8EDA00AA3FF4 /* UserBook1.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -570,7 +567,7 @@
 		26EBDECE2CF4597100B3A2BC /* UserBookModelV1 */ = {
 			isa = PBXGroup;
 			children = (
-				26F19A772CDB5D0100F41D6D /* SDBookDetails.swift */,
+				26F19A772CDB5D0100F41D6D /* BookDetails.swift */,
 			);
 			path = UserBookModelV1;
 			sourceTree = "<group>";
@@ -578,10 +575,10 @@
 		26EBDED02CF45AB300B3A2BC /* UserBookModelV2 */ = {
 			isa = PBXGroup;
 			children = (
-				26EBDED12CF45ACA00B3A2BC /* SDReadingProgress.swift */,
-				26EBDED52CF45B3400B3A2BC /* SDBookMetaData.swift */,
-				26EBDED32CF45B1E00B3A2BC /* SDUserSettings.swift */,
-				26EBDED72CF45B9300B3A2BC /* SDCompletionStatus.swift */,
+				26EBDED12CF45ACA00B3A2BC /* ReadingProgress.swift */,
+				26EBDED52CF45B3400B3A2BC /* BookMetaData.swift */,
+				26EBDED32CF45B1E00B3A2BC /* UserSettings.swift */,
+				26EBDED72CF45B9300B3A2BC /* CompletionStatus.swift */,
 			);
 			path = UserBookModelV2;
 			sourceTree = "<group>";
@@ -745,7 +742,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1A54142B2CD9FEF400283FBD /* BookSearchView.swift in Sources */,
-				26F19A782CDB5D0100F41D6D /* SDBookDetails.swift in Sources */,
+				26F19A782CDB5D0100F41D6D /* BookDetails.swift in Sources */,
 				26EBDECA2CF4556300B3A2BC /* UserBookSchemaV2.swift in Sources */,
 				1A010EAE2CD8A86E00FBE3B3 /* APIStore.swift in Sources */,
 				264443ED2CF870B0009422BA /* UserDefaultsManager.swift in Sources */,
@@ -766,18 +763,17 @@
 				1A27D9602CDA31EE00D1E14D /* ProgressBar.swift in Sources */,
 				26410AF72D2964E100D6B477 /* ReadingDateSettingView.swift in Sources */,
 				1A27D9622CDB05C000D1E14D /* CustomTextFieldStylePageCount.swift in Sources */,
-				2622C8062D2D943900AA3FF4 /* InMemoryBookRepository.swift in Sources */,
 				26EBDEC22CF239AE00B3A2BC /* UserSettingsProtocol.swift in Sources */,
 				26F19A7A2CDB5F3900F41D6D /* ReadingScheduleCalculator.swift in Sources */,
 				2622C8042D2D911200AA3FF4 /* BookRepository.swift in Sources */,
-				26EBDED62CF45B3400B3A2BC /* SDBookMetaData.swift in Sources */,
+				26EBDED62CF45B3400B3A2BC /* BookMetaData.swift in Sources */,
 				26EBDE8F2CF0684900B3A2BC /* View+Extension.swift in Sources */,
-				26EBDED82CF45B9300B3A2BC /* SDCompletionStatus.swift in Sources */,
+				26EBDED82CF45B9300B3A2BC /* CompletionStatus.swift in Sources */,
 				264443EA2CF861E5009422BA /* SystemSettingsManager.swift in Sources */,
 				1A010EB62CD8AF9800FBE3B3 /* BookSearchViewModel.swift in Sources */,
-				26EBDED22CF45ACA00B3A2BC /* SDReadingProgress.swift in Sources */,
+				26EBDED22CF45ACA00B3A2BC /* ReadingProgress.swift in Sources */,
 				26EBDE2C2CE1341800B3A2BC /* ReadingRecord.swift in Sources */,
-				2622C8012D2D8EDA00AA3FF4 /* UserBook.swift in Sources */,
+				2622C8012D2D8EDA00AA3FF4 /* UserBook1.swift in Sources */,
 				26EBDE2A2CDF33D900B3A2BC /* Date+Extension.swift in Sources */,
 				1A9E3D542CF88BA400C7B27A /* Text+Extension.swift in Sources */,
 				26EBDEC02CF2398F00B3A2BC /* BookMetaDataProtocol.swift in Sources */,
@@ -785,7 +781,7 @@
 				26410AED2D28599700D6B477 /* CalendarGridView.swift in Sources */,
 				26410AFB2D29845200D6B477 /* ReadingDateEditView.swift in Sources */,
 				2622C7DA2D2AC56400AA3FF4 /* CalendarWeekdayHeader.swift in Sources */,
-				26EBDED42CF45B1E00B3A2BC /* SDUserSettings.swift in Sources */,
+				26EBDED42CF45B1E00B3A2BC /* UserSettings.swift in Sources */,
 				264440592CD8F6020031A290 /* CustomBackButton.swift in Sources */,
 				26EBDEC72CF4553600B3A2BC /* MigrationPlan.swift in Sources */,
 				24360D4A2CD8BE3C00E83D2B /* FinishGoalView.swift in Sources */,

@@ -22,20 +22,20 @@ extension UserBookSchemaV2 {
         @Attribute(.unique) var id = UUID()
         
         @Relationship(deleteRule: .cascade)
-        var bookMetaData: SDBookMetaData
+        var bookMetaData: BookMetaData
         @Relationship(deleteRule: .cascade)
-        var userSettings: SDUserSettings
+        var userSettings: UserSettings
         @Relationship(deleteRule: .cascade)
-        var readingProgress: SDReadingProgress
+        var readingProgress: ReadingProgress
         @Relationship(deleteRule: .cascade)
-        var completionStatus: SDCompletionStatus
+        var completionStatus: CompletionStatus
         
         // MARK: init
         init(
-            bookMetaData: SDBookMetaData,
-            userSettings: SDUserSettings,
-            readingProgress: SDReadingProgress,
-            completionStatus: SDCompletionStatus
+            bookMetaData: BookMetaData,
+            userSettings: UserSettings,
+            readingProgress: ReadingProgress,
+            completionStatus: CompletionStatus
         ) {
             self.bookMetaData = bookMetaData
             self.userSettings = userSettings
@@ -44,25 +44,25 @@ extension UserBookSchemaV2 {
         }
         
         convenience init(from userBook: UserBookSchemaV1.UserBook) {
-            let bookMetaData = SDBookMetaData(
+            let bookMetaData = BookMetaData(
                 title: userBook.book.title,
                 author: userBook.book.author,
                 coverURL: userBook.book.coverURL,
                 totalPages: userBook.book.totalPages
             )
-            let userSettings = SDUserSettings(
+            let userSettings = UserSettings(
                 startPage: 1, // 기존 데이터에 start page 기본값 추가
                 targetEndPage: userBook.book.totalPages,
                 startDate: userBook.book.startDate,
                 targetEndDate: userBook.book.targetEndDate,
                 nonReadingDays: userBook.book.nonReadingDays
             )
-            let readingProgress = SDReadingProgress(
+            let readingProgress = ReadingProgress(
                 readingRecords: userBook.readingRecords,
                 lastReadDate: userBook.lastReadDate,
                 lastPagesRead: userBook.lastPagesRead
             )
-            let completionStatus = SDCompletionStatus(
+            let completionStatus = CompletionStatus(
                 isCompleted: userBook.isCompleted,
                 completionReview: userBook.completionReview
             )
@@ -79,25 +79,25 @@ extension UserBookSchemaV2 {
 
 extension UserBookSchemaV2.UserBookV2 {
     static let dummyUserBookV2 = UserBookSchemaV2.UserBookV2(
-        bookMetaData: SDBookMetaData(
+        bookMetaData: BookMetaData(
             title: "더미 책 제목",
             author: "더미 작가",
             coverURL: "https://dummyimage.com/cover",
             totalPages: 300
         ),
-        userSettings: SDUserSettings(
+        userSettings: UserSettings(
             startPage: 1,
             targetEndPage: 300,
             startDate: Date(), // 현재 날짜
             targetEndDate: Calendar.current.date(byAdding: .day, value: 30, to: Date()) ?? Date(), // 30일 후
             nonReadingDays: []
         ),
-        readingProgress: SDReadingProgress(
+        readingProgress: ReadingProgress(
             readingRecords: [:], // 비어 있는 읽기 기록
             lastReadDate: nil,
             lastPagesRead: 0
         ),
-        completionStatus: SDCompletionStatus(
+        completionStatus: CompletionStatus(
             isCompleted: false,
             completionReview: ""
         )

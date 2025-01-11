@@ -7,7 +7,7 @@
 import SwiftData
 
 @Model
-final class SDCompletionStatus: CompletionStatusProtocol {
+final class CompletionStatus: CompletionStatusProtocol {
     var isCompleted: Bool
     var completionReview: String
     

@@ -33,7 +33,7 @@ final class SwiftDataBookRepository: BookRepository {
     
     // MARK: - Public Methods
     
-    func fetchBooks() -> Result<[UserBook], RepositoryError> {
+    func fetchBooks() -> Result<[UserBook1], RepositoryError> {
         do {
             let swiftDatabooks = try modelContext.fetch(FetchDescriptor<SDUserBook>())
             let books = swiftDatabooks.map { $0.toUserBook() }
@@ -43,7 +43,7 @@ final class SwiftDataBookRepository: BookRepository {
         }
     }
     
-    func fetchBook(by id: UUID) -> Result<UserBook, RepositoryError> {
+    func fetchBook(by id: UUID) -> Result<UserBook1, RepositoryError> {
         switch findSwiftDataBook(by: id) {
         case .success(let book):
             return .success(book.toUserBook())
@@ -52,7 +52,7 @@ final class SwiftDataBookRepository: BookRepository {
         }
     }
     
-    func addBook(_ book: UserBook) -> Result<Void, RepositoryError> {
+    func addBook(_ book: UserBook1) -> Result<Void, RepositoryError> {
         let swiftDataBook = toSwiftDataBookModel(book)
         modelContext.insert(swiftDataBook)
         
@@ -64,7 +64,7 @@ final class SwiftDataBookRepository: BookRepository {
         }
     }
     
-    func updateBook(_ book: UserBook) -> Result<Void, RepositoryError> {
+    func updateBook(_ book: UserBook1) -> Result<Void, RepositoryError> {
         switch findSwiftDataBook(by: book.id) {
         case .success(let swiftDataBook):
             // 기존 책 데이터를 DTO를 기준으로 업데이트
@@ -102,15 +102,15 @@ final class SwiftDataBookRepository: BookRepository {
     // MARK: - Helper Methods
     
     /// DTO를 SwiftData 모델로 변환
-    private func toSwiftDataBookModel(_ book: UserBook) -> SDUserBook {
-        let bookMetaData: SDBookMetaData = SDBookMetaData(
+    private func toSwiftDataBookModel(_ book: UserBook1) -> SDUserBook {
+        let bookMetaData: BookMetaData = BookMetaData(
             title: book.bookMetaData.title,
             author: book.bookMetaData.author,
             coverURL: book.bookMetaData.coverImageURL,
             totalPages: book.bookMetaData.totalPages
         )
         
-        let userSettings: SDUserSettings = .init(
+        let userSettings: UserSettings = .init(
             startPage: book.userSettings.startPage,
             targetEndPage: book.userSettings.targetEndPage,
             startDate: book.userSettings.startDate,
@@ -118,13 +118,13 @@ final class SwiftDataBookRepository: BookRepository {
             nonReadingDays: book.userSettings.excludedReadingDays
         )
         
-        let readingProgress: SDReadingProgress = SDReadingProgress(
+        let readingProgress: ReadingProgress = ReadingProgress(
             readingRecords: book.readingProgress.dailyReadingRecords,
             lastReadDate: book.readingProgress.lastReadDate,
             lastPagesRead: book.readingProgress.lastReadPage
         )
         
-        let completionStatus: SDCompletionStatus = SDCompletionStatus(
+        let completionStatus: CompletionStatus = CompletionStatus(
             isCompleted: book.completionStatus.isCompleted,
             completionReview: book.completionStatus.reviewAfterCompletion
         )
@@ -133,7 +133,7 @@ final class SwiftDataBookRepository: BookRepository {
     }
     
     /// UserBook으로 기존 SwiftData 모델을  업데이트
-    private func updateSwiftDataModel(_ existingBook: SDUserBook, with book: UserBook) {
+    private func updateSwiftDataModel(_ existingBook: SDUserBook, with book: UserBook1) {
         existingBook.userSettings.startPage = book.userSettings.startPage
         existingBook.userSettings.targetEndPage = book.userSettings.targetEndPage
         existingBook.userSettings.startDate = book.userSettings.startDate

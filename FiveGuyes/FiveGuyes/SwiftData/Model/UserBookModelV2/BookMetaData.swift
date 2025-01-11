@@ -9,7 +9,7 @@ import Foundation
 import SwiftData
 
 @Model
-final class SDBookMetaData: BookMetaDataProtocol {
+final class BookMetaData: BookMetaDataProtocol {
     let title: String
     let author: String
     let coverURL: String?

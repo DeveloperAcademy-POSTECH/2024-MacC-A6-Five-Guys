@@ -34,7 +34,8 @@ struct MainHomeView: View {
                     HStack {
                         Spacer()
                         notiButton {
-                            navigationCoordinator.push(.notiSetting)
+                            // TODO: 🐯선택된 책 넣어주기
+                            navigationCoordinator.push(.notiSetting(book: currentlyReadingBooks.first))
                         }
                     }
                     .padding(.bottom, 42)
@@ -215,7 +216,8 @@ struct MainHomeView: View {
         let opacity = isReadingBookAvailable ? 1 : 0.2
         
         return Button {
-            navigationCoordinator.push(.totalCalendar)
+            // TODO: 🐯선택된 책 넣어주기
+            navigationCoordinator.push(.totalCalendar(book: currentlyReadingBooks.first!))
         } label: {
             HStack(spacing: 8) {
                 Image(systemName: "calendar")
@@ -245,7 +247,8 @@ struct MainHomeView: View {
         
         return Button {
             if isReadingBookAvailable {
-                navigationCoordinator.push(.dailyProgress)
+                // TODO: 🐯선택된 책 넣어주기
+                navigationCoordinator.push(.dailyProgress(book: currentlyReadingBooks.first!))
             } else {
                 navigationCoordinator.push(.bookSettingsManager)
             }
@@ -264,6 +267,7 @@ struct MainHomeView: View {
     
     private var ReadingDateEditButton: some View {
         Button {
+            // TODO: 🐯선택된 책 넣어주기
             // 날짜 수정 화면으로 기기
             navigationCoordinator.push(.readingDateEdit(book: currentlyReadingBooks.first!))
         } label: {
