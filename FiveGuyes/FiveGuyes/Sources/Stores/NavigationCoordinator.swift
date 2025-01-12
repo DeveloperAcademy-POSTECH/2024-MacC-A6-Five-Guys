@@ -25,7 +25,8 @@ enum Screens: Hashable {
 @Observable
 final class NavigationCoordinator {
     var paths = NavigationPath()
-
+    private(set) var viewReloadTrigger = UUID()
+    
     @ViewBuilder
      func navigate(to screen: Screens) -> some View {
          // TODO: 추가되는 뷰 추가하기
@@ -65,5 +66,13 @@ final class NavigationCoordinator {
     // go to root screen
     func popToRoot() {
         paths.removeLast(paths.count)
+    }
+    
+    func reloadView() {
+        viewReloadTrigger = UUID()
+    }
+    
+    func getViewReloadTrigger() -> UUID {
+        viewReloadTrigger
     }
 }

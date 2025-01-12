@@ -51,7 +51,7 @@ struct MainHomeView: View {
                     .padding(.bottom, 49)
                     .padding(.trailing, 20)
                     
-                    HStack(alignment: .top) {
+                    HStack(alignment: .top, spacing: 10) {
                         titleDescription
                         Spacer()
                         
@@ -91,6 +91,8 @@ struct MainHomeView: View {
                         .padding(.bottom, 16)
                     // TODO: 책이 처음, 마지막 일때는 한쪽만 보이고, 아닌 경우는 양쪽 보이고
                         .safeAreaPadding(.horizontal, 30)
+                        .id(navigationCoordinator.getViewReloadTrigger())
+                        .onAppear(perform: navigationCoordinator.reloadView)
                     
                     HStack(spacing: 16) {
                         calendarFullScreenButton

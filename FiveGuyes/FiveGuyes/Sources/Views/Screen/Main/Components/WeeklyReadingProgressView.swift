@@ -16,8 +16,11 @@ struct WeeklyReadingProgressView: View {
     
     var body: some View {
         let todayRecords = userBook.readingProgress.getAdjustedReadingRecord(for: adjustedToday)
-        VStack(spacing: -3) {
+        
+        VStack(spacing: 0) {
             AnyView(userBookImage(userBook))
+                .offset(y: 10) // 이미지를 아래로 3만큼 이동
+                .zIndex(1)
             
             VStack(alignment: .leading, spacing: 17) {
                 VStack(alignment: .leading, spacing: 0) {
@@ -79,18 +82,18 @@ struct WeeklyReadingProgressView: View {
             return AsyncImage(url: url) { image in
                 image
                     .resizable()
-                    .scaledToFill()
-                    .frame(width: 104, height: 161)
-                    .shadow(color: Color(red: 0.84, green: 0.84, blue: 0.84).opacity(0.25), radius: 2, x: 0, y: 4)
             } placeholder: {
                 ProgressView()
             }
+            .scaledToFill()
+            .frame(width: 104, height: 161)
+
         } else {
             return Rectangle()
                 .foregroundStyle(Color.Fills.white)
                 .frame(width: 104, height: 161)
                 .shadow(color: Color(red: 0.84, green: 0.84, blue: 0.84).opacity(0.25), radius: 2, x: 0, y: 4)
+                
         }
     }
-    
 }
