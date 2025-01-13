@@ -84,15 +84,9 @@ struct WeeklyReadingProgressView: View {
             } placeholder: {
                 ProgressView()
             }
-            .scaledToFill()
-            .frame(width: 104, height: 161)
-            .clipShape(
-                .rect(
-                    bottomTrailingRadius: 6,
-                    topTrailingRadius: 6
-                )
-            )
-
+            .scaledToFit()
+            .frame(height: 161)
+            .clipToBookShape()
         } else {
             return EmptyImageDefaultView()
         }

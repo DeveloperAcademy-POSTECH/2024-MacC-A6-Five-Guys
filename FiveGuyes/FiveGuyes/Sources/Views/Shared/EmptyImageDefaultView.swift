@@ -12,12 +12,7 @@ struct EmptyImageDefaultView: View {
         Rectangle()
             .foregroundStyle(Color.Fills.white)
             .frame(width: 104, height: 161)
-            .clipShape(
-                .rect(
-                    bottomTrailingRadius: 6,
-                    topTrailingRadius: 6
-                )
-            )
+            .clipToBookShape()
             .commonShadow()
     }
 }
