@@ -33,12 +33,10 @@ struct WeeklyProgressPagingSlider: View {
             .scrollTargetBehavior(.viewAligned)
             .scrollPosition(id: $activeID)
         } else {
-            VStack(spacing: -3) {
-                Rectangle()
-                    .foregroundStyle(Color.Fills.white)
-                    .frame(width: 104, height: 161)
-                    .shadow(color: Color(red: 0.84, green: 0.84, blue: 0.84).opacity(0.25), radius: 2, x: 0, y: 4)
-                
+            VStack(spacing: 0) {
+                EmptyImageDefaultView()
+                    .offset(y: 10)
+                    .zIndex(1)
                 emptyProgressView
             }
             
