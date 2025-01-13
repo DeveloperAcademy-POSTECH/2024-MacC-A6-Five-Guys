@@ -80,9 +80,7 @@ struct MainHomeView: View {
                                     primaryButton: .cancel(Text("취소하기")),
                                     secondaryButton: .destructive(Text("삭제")) {
                                         if let selectedBookIndex {
-                                            withAnimation(.easeInOut) {
                                                 deleteBook(at: selectedBookIndex)
-                                            }
                                         }
                                     }
                                 )
@@ -330,6 +328,6 @@ struct MainHomeView: View {
     }
     
     private func resetSelectedBookIndex() {
-        selectedBookIndex = 0
+        activeBookID = currentlyReadingBooks.first?.id
     }
 }
