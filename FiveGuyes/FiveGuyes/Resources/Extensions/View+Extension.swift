@@ -28,3 +28,14 @@ extension View {
         return self.modifier(FontModifier(fontAsset: fontAsset))
     }
 }
+
+extension View {
+    func commonShadow() -> some View {
+        self.shadow(
+            color: Color(red: 0.84, green: 0.84, blue: 0.84).opacity(0.25),
+            radius: 2,
+            x: 0,
+            y: 4
+        )
+    }
+}

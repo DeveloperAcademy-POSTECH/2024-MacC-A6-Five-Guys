@@ -89,7 +89,7 @@ struct MainHomeView: View {
                     
                     WeeklyProgressPagingSlider(readingBooks: currentlyReadingBooks, activeID: $activeBookID)
                         .padding(.bottom, 16)
-                    // TODO: 책이 처음, 마지막 일때는 한쪽만 보이고, 아닌 경우는 양쪽 보이고
+                        .commonShadow()
                         .safeAreaPadding(.horizontal, 30)
                         .id(navigationCoordinator.getViewReloadTrigger())
                         .onAppear(perform: navigationCoordinator.reloadView)
@@ -205,7 +205,7 @@ struct MainHomeView: View {
                 RoundedRectangle(cornerRadius: 16)
                     .foregroundStyle(backgroundColor)
             }
-            .shadow(color: isReadingBookAvailable ? Color(red: 0.84, green: 0.84, blue: 0.84).opacity(0.25) : .clear, radius: 2, x: 0, y: 4)
+            .commonShadow()
             .overlay(
                 isReadingBookAvailable ? nil : RoundedRectangle(cornerRadius: 16)
                     .inset(by: 0.5)
