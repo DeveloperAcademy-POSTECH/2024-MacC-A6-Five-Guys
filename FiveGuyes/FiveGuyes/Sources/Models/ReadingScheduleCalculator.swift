@@ -182,7 +182,6 @@ struct ReadingScheduleCalculator {
         do {
             return try readingDateCalculator.calculateValidReadingDays(
                 startDate: startDate,
-                
                 endDate: targetEndDate,
                 excludedDates: nonReadingDays
             )

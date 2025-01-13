@@ -83,7 +83,8 @@ struct DailyProgressView: View {
                         readingScheduleCalculator.updateReadingProgress(
                             for: userSettings,
                             progress: readingProgress,
-                            pagesRead: pagesToReadToday, from: adjustedToday
+                            pagesRead: pagesToReadToday,
+                            from: adjustedToday
                         )
                         
                         // 노티 세팅하기

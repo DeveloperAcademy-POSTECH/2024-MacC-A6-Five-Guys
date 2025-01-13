@@ -14,7 +14,7 @@ struct WeeklyProgressPagingSlider: View {
     
     let adjustedToday = Date().adjustedDate()
     
-    private let spacing: CGFloat = 5
+    private let spacing: CGFloat = 8
     
     @Binding var activeID: UUID?
     
