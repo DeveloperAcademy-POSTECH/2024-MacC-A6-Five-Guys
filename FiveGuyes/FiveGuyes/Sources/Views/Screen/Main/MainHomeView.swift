@@ -80,7 +80,9 @@ struct MainHomeView: View {
                                     primaryButton: .cancel(Text("취소하기")),
                                     secondaryButton: .destructive(Text("삭제")) {
                                         if let selectedBookIndex {
-                                            deleteBook(at: selectedBookIndex)
+                                            withAnimation(.easeInOut) {
+                                                deleteBook(at: selectedBookIndex)
+                                            }
                                         }
                                     }
                                 )
@@ -102,7 +104,6 @@ struct MainHomeView: View {
                             .frame(width: 107)
                         
                         mainActionButton
-                        
                     }
                     .padding(.bottom, 40)
                     .padding(.horizontal, 20)
