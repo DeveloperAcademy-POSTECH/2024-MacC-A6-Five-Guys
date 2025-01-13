@@ -128,6 +128,7 @@ struct MainHomeView: View {
         }
         .onAppear {
             calculateTopSafeAreaInset()
+            resetSelectedBookIndex()
             
             guard !currentlyReadingBooks.isEmpty else { return }
             reassignReadingSchedules()
@@ -325,5 +326,9 @@ struct MainHomeView: View {
         } catch {
             print("읽기 스케줄 저장 중 오류 발생: \(error.localizedDescription)")
         }
+    }
+    
+    private func resetSelectedBookIndex() {
+        selectedBookIndex = 0
     }
 }
