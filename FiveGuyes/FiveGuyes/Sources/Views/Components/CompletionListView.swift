@@ -54,7 +54,7 @@ struct CompletionListView: View {
                                                 .resizable()
                                                 .scaledToFill()
                                                 .frame(width: 115, height: 178)
-                                                .clipped() // 넘어간 부분을 잘라냄
+                                                .clipToBookShape()
                                         } placeholder: {
                                             ProgressView()
                                         }
@@ -63,7 +63,7 @@ struct CompletionListView: View {
                                             .resizable()
                                             .scaledToFit()
                                             .frame(width: 115, height: 178)
-                                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                                            .clipToBookShape()
                                     }
                                     
                                     VStack(alignment: .leading, spacing: 0) {

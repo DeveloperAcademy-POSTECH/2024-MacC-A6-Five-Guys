@@ -19,12 +19,12 @@ struct PageTextModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .fontStyle(fontSize, weight: fontWeight)
-            .foregroundColor(foregroundColor)
+            .foregroundStyle(foregroundColor)
             .padding(.horizontal, horizontalPadding)
             .padding(.vertical, verticalPadding)
             .background(
                 RoundedRectangle(cornerRadius: cornerRadius)
-                    .foregroundColor(backgroundColor)
+                    .foregroundStyle(backgroundColor)
             )
     }
 }

@@ -14,16 +14,13 @@ struct CompletionCelebrationView: View {
     
     @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
     
-    @Query(filter: #Predicate<UserBook> { $0.completionStatus.isCompleted == false })
-    private var currentlyReadingBooks: [UserBook]  // 현재 읽고 있는 책을 가져오는 쿼리
+    let userBook: UserBook
     
     private let celebrationTitleText = "완독 완료!"
     private let celebrationMessageText = "한 권을 전부 읽다니...\n대단한걸요?"
     
     // TODO: 컬러, 폰트 수정하기
     var body: some View {
-        let userBook = currentlyReadingBooks.first ?? UserBook.dummyUserBookV2
-        
         let bookMetadata: BookMetaDataProtocol = userBook.bookMetaData
         let userSettings: UserSettingsProtocol = userBook.userSettings
         let readingProgress: any ReadingProgressProtocol = userBook.readingProgress
@@ -128,7 +125,8 @@ struct CompletionCelebrationView: View {
     
     private var reflectionButton: some View {
         Button {
-            navigationCoordinator.push(.completionReview)
+            // TODO: 🐯선택된 책 넣어주기
+            navigationCoordinator.push(.completionReview(book: userBook))
         } label: {
             Text("완독 소감 작성하기")
                 .fontStyle(.title2, weight: .semibold)

@@ -134,7 +134,7 @@ struct FinishGoalView: View {
                     .background {
                         RoundedRectangle(cornerRadius: 16)
                             .fill(Color.Fills.white)
-                            .shadow(color: Color(red: 0.84, green: 0.84, blue: 0.84).opacity(0.25), radius: 2, x: 0, y: 4)
+                            .commonShadow()
                     }
                     .padding(.horizontal, 44)
                     

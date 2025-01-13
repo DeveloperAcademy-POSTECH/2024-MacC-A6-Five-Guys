@@ -26,10 +26,15 @@
 		24360D532CD9F3AF00E83D2B /* DailyProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24360D522CD9F3AF00E83D2B /* DailyProgressView.swift */; };
 		24F8A2172CEB290B00A01A76 /* Config.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 24F8A2162CEB290B00A01A76 /* Config.xcconfig */; };
 		24FAF9452CEC5224004FEC3F /* ToastView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24FAF9442CEC5224004FEC3F /* ToastView.swift */; };
+		2613B7522D329FD900AC717F /* WeeklyProgressPagingSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2613B7512D329FD900AC717F /* WeeklyProgressPagingSlider.swift */; };
+		2613B7582D34F81E00AC717F /* EmptyImageDefaultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2613B7572D34F81E00AC717F /* EmptyImageDefaultView.swift */; };
 		261714D62CDDDA4000A3241D /* BookSettingsManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 261714D52CDDDA4000A3241D /* BookSettingsManagerView.swift */; };
 		2622C7D82D2AC4C000AA3FF4 /* DividerLine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2622C7D72D2AC4C000AA3FF4 /* DividerLine.swift */; };
 		2622C7DA2D2AC56400AA3FF4 /* CalendarWeekdayHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2622C7D92D2AC56400AA3FF4 /* CalendarWeekdayHeader.swift */; };
 		2622C7DC2D2AC67800AA3FF4 /* PageTextModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2622C7DB2D2AC67800AA3FF4 /* PageTextModifier.swift */; };
+		2622C8012D2D8EDA00AA3FF4 /* UserBook1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2622C8002D2D8EDA00AA3FF4 /* UserBook1.swift */; };
+		2622C8042D2D911200AA3FF4 /* BookRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2622C8022D2D911200AA3FF4 /* BookRepository.swift */; };
+		2622C8082D2D945000AA3FF4 /* SwiftDataBookRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2622C8072D2D945000AA3FF4 /* SwiftDataBookRepository.swift */; };
 		26410A982D26D18200D6B477 /* ReadingDatePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26410A972D26D18200D6B477 /* ReadingDatePickerView.swift */; };
 		26410A9B2D26D8F000D6B477 /* CalendarCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26410A9A2D26D8F000D6B477 /* CalendarCalculator.swift */; };
 		26410AED2D28599700D6B477 /* CalendarGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26410AEC2D28599700D6B477 /* CalendarGridView.swift */; };
@@ -86,7 +91,7 @@
 		26F19A682CD9EFD800F41D6D /* MainHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F19A672CD9EFD800F41D6D /* MainHomeView.swift */; };
 		26F19A6A2CD9FE5C00F41D6D /* WeeklyReadingProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F19A692CD9FE5C00F41D6D /* WeeklyReadingProgressView.swift */; };
 		26F19A6C2CDA0A2B00F41D6D /* CompletionListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F19A6B2CDA0A2B00F41D6D /* CompletionListView.swift */; };
-		26F19A6E2CDA74A600F41D6D /* WeeklyPageCalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F19A6D2CDA74A600F41D6D /* WeeklyPageCalendarView.swift */; };
+		26F19A6E2CDA74A600F41D6D /* WeeklyProgressCalendar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F19A6D2CDA74A600F41D6D /* WeeklyProgressCalendar.swift */; };
 		26F19A722CDB267600F41D6D /* NavigationCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F19A712CDB267600F41D6D /* NavigationCoordinator.swift */; };
 		26F19A742CDB271E00F41D6D /* NavigationRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F19A732CDB271E00F41D6D /* NavigationRootView.swift */; };
 		26F19A782CDB5D0100F41D6D /* BookDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F19A772CDB5D0100F41D6D /* BookDetails.swift */; };
@@ -123,10 +128,15 @@
 		24360D522CD9F3AF00E83D2B /* DailyProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyProgressView.swift; sourceTree = "<group>"; };
 		24F8A2162CEB290B00A01A76 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		24FAF9442CEC5224004FEC3F /* ToastView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastView.swift; sourceTree = "<group>"; };
+		2613B7512D329FD900AC717F /* WeeklyProgressPagingSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyProgressPagingSlider.swift; sourceTree = "<group>"; };
+		2613B7572D34F81E00AC717F /* EmptyImageDefaultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyImageDefaultView.swift; sourceTree = "<group>"; };
 		261714D52CDDDA4000A3241D /* BookSettingsManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookSettingsManagerView.swift; sourceTree = "<group>"; };
 		2622C7D72D2AC4C000AA3FF4 /* DividerLine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DividerLine.swift; sourceTree = "<group>"; };
 		2622C7D92D2AC56400AA3FF4 /* CalendarWeekdayHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarWeekdayHeader.swift; sourceTree = "<group>"; };
 		2622C7DB2D2AC67800AA3FF4 /* PageTextModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageTextModifier.swift; sourceTree = "<group>"; };
+		2622C8002D2D8EDA00AA3FF4 /* UserBook1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserBook1.swift; sourceTree = "<group>"; };
+		2622C8022D2D911200AA3FF4 /* BookRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookRepository.swift; sourceTree = "<group>"; };
+		2622C8072D2D945000AA3FF4 /* SwiftDataBookRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftDataBookRepository.swift; sourceTree = "<group>"; };
 		26410A972D26D18200D6B477 /* ReadingDatePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadingDatePickerView.swift; sourceTree = "<group>"; };
 		26410A9A2D26D8F000D6B477 /* CalendarCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarCalculator.swift; sourceTree = "<group>"; };
 		26410AEC2D28599700D6B477 /* CalendarGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarGridView.swift; sourceTree = "<group>"; };
@@ -180,7 +190,7 @@
 		26F19A672CD9EFD800F41D6D /* MainHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainHomeView.swift; sourceTree = "<group>"; };
 		26F19A692CD9FE5C00F41D6D /* WeeklyReadingProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyReadingProgressView.swift; sourceTree = "<group>"; };
 		26F19A6B2CDA0A2B00F41D6D /* CompletionListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletionListView.swift; sourceTree = "<group>"; };
-		26F19A6D2CDA74A600F41D6D /* WeeklyPageCalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyPageCalendarView.swift; sourceTree = "<group>"; };
+		26F19A6D2CDA74A600F41D6D /* WeeklyProgressCalendar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyProgressCalendar.swift; sourceTree = "<group>"; };
 		26F19A712CDB267600F41D6D /* NavigationCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationCoordinator.swift; sourceTree = "<group>"; };
 		26F19A732CDB271E00F41D6D /* NavigationRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationRootView.swift; sourceTree = "<group>"; };
 		26F19A772CDB5D0100F41D6D /* BookDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookDetails.swift; sourceTree = "<group>"; };
@@ -233,6 +243,44 @@
 				24360D522CD9F3AF00E83D2B /* DailyProgressView.swift */,
 			);
 			path = BookProgress;
+			sourceTree = "<group>";
+		};
+		2613B6E42D3255A400AC717F /* SwiftData */ = {
+			isa = PBXGroup;
+			children = (
+				2613B6E52D3255F800AC717F /* Model */,
+				26EBDECB2CF4557800B3A2BC /* UserBookSchema */,
+				26EBDEC82CF4553D00B3A2BC /* SwiftDataMigration */,
+			);
+			path = SwiftData;
+			sourceTree = "<group>";
+		};
+		2613B6E52D3255F800AC717F /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				26EBDED02CF45AB300B3A2BC /* UserBookModelV2 */,
+				26EBDECE2CF4597100B3A2BC /* UserBookModelV1 */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		2622C8032D2D911200AA3FF4 /* Repository */ = {
+			isa = PBXGroup;
+			children = (
+				2622C8022D2D911200AA3FF4 /* BookRepository.swift */,
+				2622C8072D2D945000AA3FF4 /* SwiftDataBookRepository.swift */,
+			);
+			path = Repository;
+			sourceTree = "<group>";
+		};
+		2622C81A2D30178500AA3FF4 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				26F19A692CD9FE5C00F41D6D /* WeeklyReadingProgressView.swift */,
+				2613B7512D329FD900AC717F /* WeeklyProgressPagingSlider.swift */,
+				26F19A6D2CDA74A600F41D6D /* WeeklyProgressCalendar.swift */,
+			);
+			path = Components;
 			sourceTree = "<group>";
 		};
 		26410A962D26D0FF00D6B477 /* ReadingCalendar */ = {
@@ -306,6 +354,7 @@
 				26890B942CAE811A008DFF49 /* FiveGuyesApp.swift */,
 				26890BBC2CAE98E2008DFF49 /* .swiftlint.yml */,
 				26890BAD2CAE903E008DFF49 /* Resources */,
+				2613B6E42D3255A400AC717F /* SwiftData */,
 				26890BAE2CAE904A008DFF49 /* Sources */,
 				26890B9A2CAE811D008DFF49 /* Preview Content */,
 			);
@@ -333,7 +382,7 @@
 		26890BAE2CAE904A008DFF49 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				26EBDEC82CF4553D00B3A2BC /* SwiftDataMigration */,
+				2622C8032D2D911200AA3FF4 /* Repository */,
 				26CF82562D1D3205005037E4 /* Utils */,
 				26D853032CCE44730016239A /* Models */,
 				26D853022CCE44720016239A /* Stores */,
@@ -428,7 +477,7 @@
 		26D853032CCE44730016239A /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				26EBDECF2CF459DB00B3A2BC /* UserBook */,
+				26EBDE2B2CE1341800B3A2BC /* ReadingRecord.swift */,
 				264443E92CF861E5009422BA /* SystemSettingsManager.swift */,
 				1A010EAB2CD8A7E500FBE3B3 /* APIBooksModel.swift */,
 				26F19A792CDB5F3900F41D6D /* ReadingScheduleCalculator.swift */,
@@ -436,6 +485,7 @@
 				1AA14A792CDDD96200B763A6 /* NotificationManager.swift */,
 				26EBDEB32CF1CC8500B3A2BC /* Tracking.swift */,
 				264443EB2CF8709D009422BA /* UserDefaults */,
+				2622C8002D2D8EDA00AA3FF4 /* UserBook1.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -445,6 +495,7 @@
 			children = (
 				264440582CD8F6020031A290 /* CustomBackButton.swift */,
 				2622C7DB2D2AC67800AA3FF4 /* PageTextModifier.swift */,
+				2613B7572D34F81E00AC717F /* EmptyImageDefaultView.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -455,9 +506,7 @@
 				264440562CD8E0D20031A290 /* CustomTextEditorStyle.swift */,
 				1A27D95F2CDA31EE00D1E14D /* ProgressBar.swift */,
 				1A27D9612CDB05C000D1E14D /* CustomTextFieldStylePageCount.swift */,
-				26F19A692CD9FE5C00F41D6D /* WeeklyReadingProgressView.swift */,
 				26F19A6B2CDA0A2B00F41D6D /* CompletionListView.swift */,
-				26F19A6D2CDA74A600F41D6D /* WeeklyPageCalendarView.swift */,
 				1AA14A772CDDA30D00B763A6 /* TotalCalendarTextBubble.swift */,
 				24FAF9442CEC5224004FEC3F /* ToastView.swift */,
 				2622C7D72D2AC4C000AA3FF4 /* DividerLine.swift */,
@@ -508,7 +557,6 @@
 			isa = PBXGroup;
 			children = (
 				26EBDEC62CF4553500B3A2BC /* MigrationPlan.swift */,
-				26EBDECB2CF4557800B3A2BC /* UserBookSchema */,
 			);
 			path = SwiftDataMigration;
 			sourceTree = "<group>";
@@ -530,16 +578,6 @@
 			path = UserBookModelV1;
 			sourceTree = "<group>";
 		};
-		26EBDECF2CF459DB00B3A2BC /* UserBook */ = {
-			isa = PBXGroup;
-			children = (
-				26EBDE2B2CE1341800B3A2BC /* ReadingRecord.swift */,
-				26EBDED02CF45AB300B3A2BC /* UserBookModelV2 */,
-				26EBDECE2CF4597100B3A2BC /* UserBookModelV1 */,
-			);
-			path = UserBook;
-			sourceTree = "<group>";
-		};
 		26EBDED02CF45AB300B3A2BC /* UserBookModelV2 */ = {
 			isa = PBXGroup;
 			children = (
@@ -554,6 +592,7 @@
 		26F19A662CD9EF9400F41D6D /* Main */ = {
 			isa = PBXGroup;
 			children = (
+				2622C81A2D30178500AA3FF4 /* Components */,
 				26F19A672CD9EFD800F41D6D /* MainHomeView.swift */,
 			);
 			path = Main;
@@ -730,8 +769,10 @@
 				1A27D9602CDA31EE00D1E14D /* ProgressBar.swift in Sources */,
 				26410AF72D2964E100D6B477 /* ReadingDateSettingView.swift in Sources */,
 				1A27D9622CDB05C000D1E14D /* CustomTextFieldStylePageCount.swift in Sources */,
+				2613B7582D34F81E00AC717F /* EmptyImageDefaultView.swift in Sources */,
 				26EBDEC22CF239AE00B3A2BC /* UserSettingsProtocol.swift in Sources */,
 				26F19A7A2CDB5F3900F41D6D /* ReadingScheduleCalculator.swift in Sources */,
+				2622C8042D2D911200AA3FF4 /* BookRepository.swift in Sources */,
 				26EBDED62CF45B3400B3A2BC /* BookMetaData.swift in Sources */,
 				26EBDE8F2CF0684900B3A2BC /* View+Extension.swift in Sources */,
 				26EBDED82CF45B9300B3A2BC /* CompletionStatus.swift in Sources */,
@@ -739,9 +780,11 @@
 				1A010EB62CD8AF9800FBE3B3 /* BookSearchViewModel.swift in Sources */,
 				26EBDED22CF45ACA00B3A2BC /* ReadingProgress.swift in Sources */,
 				26EBDE2C2CE1341800B3A2BC /* ReadingRecord.swift in Sources */,
+				2622C8012D2D8EDA00AA3FF4 /* UserBook1.swift in Sources */,
 				26EBDE2A2CDF33D900B3A2BC /* Date+Extension.swift in Sources */,
 				1A9E3D542CF88BA400C7B27A /* Text+Extension.swift in Sources */,
 				26EBDEC02CF2398F00B3A2BC /* BookMetaDataProtocol.swift in Sources */,
+				2613B7522D329FD900AC717F /* WeeklyProgressPagingSlider.swift in Sources */,
 				26F19A722CDB267600F41D6D /* NavigationCoordinator.swift in Sources */,
 				26410AED2D28599700D6B477 /* CalendarGridView.swift in Sources */,
 				26410AFB2D29845200D6B477 /* ReadingDateEditView.swift in Sources */,
@@ -766,11 +809,12 @@
 				26CF82582D1D3216005037E4 /* ReadingDateCalculator.swift in Sources */,
 				26EBDE992CF07A7900B3A2BC /* FontWeight.swift in Sources */,
 				26EBDE972CF0764A00B3A2BC /* FontModifier.swift in Sources */,
-				26F19A6E2CDA74A600F41D6D /* WeeklyPageCalendarView.swift in Sources */,
+				26F19A6E2CDA74A600F41D6D /* WeeklyProgressCalendar.swift in Sources */,
 				26EBDEBC2CF238FD00B3A2BC /* ReadingProgressProtocol.swift in Sources */,
 				264440532CD8B1540031A290 /* String+Extension.swift in Sources */,
 				264440572CD8E0D20031A290 /* CustomTextEditorStyle.swift in Sources */,
 				264440552CD8E0100031A290 /* KeyboardObserver.swift in Sources */,
+				2622C8082D2D945000AA3FF4 /* SwiftDataBookRepository.swift in Sources */,
 				26F19A6C2CDA0A2B00F41D6D /* CompletionListView.swift in Sources */,
 				26EBDE2F2CE3856900B3A2BC /* NotificationType.swift in Sources */,
 				1A27D9662CDB779000D1E14D /* TotalCalendarView.swift in Sources */,

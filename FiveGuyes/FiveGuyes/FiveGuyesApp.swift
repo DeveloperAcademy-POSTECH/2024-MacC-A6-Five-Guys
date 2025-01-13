@@ -14,7 +14,7 @@ import FirebaseCore
 
 @main
 struct FiveGuyesApp: App {
-    typealias UserBook = UserBookSchemaV2.UserBookV2
+    typealias SDUserBook = UserBookSchemaV2.UserBookV2
     
     // register app delegate for Firebase setup
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
@@ -24,7 +24,7 @@ struct FiveGuyesApp: App {
     init() {
         do {
             self.container = try ModelContainer(
-                for: UserBook.self,
+                for: SDUserBook.self,
                 migrationPlan: MigrationPlan.self
             )
         } catch {

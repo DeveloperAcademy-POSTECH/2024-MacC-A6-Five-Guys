@@ -1,19 +1,16 @@
 //
-//  WeeklyPageCalendarView.swift
+//  WeeklyProgressCalendar.swift
 //  FiveGuyes
 //
 //  Created by zaehorang on 11/6/24.
 //
 
-import SwiftData
 import SwiftUI
 
-struct WeeklyPageCalendarView: View {
+struct WeeklyProgressCalendar: View {
     typealias UserBook = UserBookSchemaV2.UserBookV2
     
     let daysOfWeek = ["일", "월", "화", "수", "목", "금", "토"]
-    @Query(filter: #Predicate<UserBook> { $0.completionStatus.isCompleted == false })
-    private var currentlyReadingBooks: [UserBook]  // 현재 읽고 있는 책을 가져오는 쿼리
     
     let today = Date().adjustedDate()
     
@@ -25,16 +22,16 @@ struct WeeklyPageCalendarView: View {
     @State private var lastWeekIndex = 0
     @State private var lastDayIndex = 0
     
+    var userBook: UserBook
+    
     var body: some View {
-        let currentReadingBook = currentlyReadingBooks.first ?? UserBook.dummyUserBookV2
-        
         ScrollViewReader { proxy in
             ScrollView(.horizontal, showsIndicators: false) {
                 
                 HStack(spacing: .zero) {
                     ForEach(Array(allWeekStartDates.enumerated()), id: \.offset) { weekPageIndex, weekStartDate in
                         
-                        let weeklyRecords = currentReadingBook.readingProgress.getAdjustedWeeklyRecorded(from: weekStartDate)
+                        let weeklyRecords = userBook.readingProgress.getAdjustedWeeklyRecorded(from: weekStartDate)
                         
                         HStack(spacing: 0) { // 셀 간격을 없앰으로써 연결된 배경처럼 보이게 설정
                             ForEach(0..<daysOfWeek.count, id: \.self) { dayIndex in
@@ -70,7 +67,7 @@ struct WeeklyPageCalendarView: View {
             .scrollTargetBehavior(.paging)
             .onAppear {
                 // 모든 주 시작 날짜를 가져옴
-                allWeekStartDates = currentReadingBook.readingProgress.getAllWeekStartDates(for: currentReadingBook.userSettings)
+                allWeekStartDates = userBook.readingProgress.getAllWeekStartDates(for: userBook.userSettings)
                 
                 // 오늘 날짜가 포함된 주의 인덱스를 찾음
                 let todayWeekIndex = allWeekStartDates.firstIndex {
@@ -85,7 +82,7 @@ struct WeeklyPageCalendarView: View {
                 
                 calculateLastWeekAndDayIndex(
                     totalWeeks: allWeekStartDates.count,
-                    targetEndDate: currentReadingBook.userSettings.targetEndDate
+                    targetEndDate: userBook.userSettings.targetEndDate
                 )
             }
             .onChange(of: currentWeekPageIndex) {

@@ -22,7 +22,7 @@ struct BookRowView: View {
                             ProgressView()
                         }
                         .cornerRadius(6)
-                        .shadow(color: Color(red: 0.84, green: 0.84, blue: 0.84).opacity(0.25), radius: 2, x: 0, y: 4)
+                        .commonShadow()
                     } else {
                         // 이미지 없을 때
                         Rectangle()

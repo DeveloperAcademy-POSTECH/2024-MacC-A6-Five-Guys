@@ -12,12 +12,12 @@ enum Screens: Hashable {
     typealias UserBook = UserBookSchemaV2.UserBookV2
     case empty
     case mainHome
-    case notiSetting
+    case notiSetting(book: UserBook?)
     case bookSettingsManager
-    case totalCalendar
-    case dailyProgress
-    case completionCelebration
-    case completionReview
+    case totalCalendar(book: UserBook)
+    case dailyProgress(book: UserBook)
+    case completionCelebration(book: UserBook)
+    case completionReview(book: UserBook)
     case completionReviewUpdate(book: UserBook)
     case readingDateEdit(book: UserBook)
 }
@@ -25,7 +25,8 @@ enum Screens: Hashable {
 @Observable
 final class NavigationCoordinator {
     var paths = NavigationPath()
-
+    private(set) var viewReloadTrigger = UUID()
+    
     @ViewBuilder
      func navigate(to screen: Screens) -> some View {
          // TODO: 추가되는 뷰 추가하기
@@ -33,20 +34,20 @@ final class NavigationCoordinator {
         case .empty: EmptyView()
         case .mainHome: 
             MainHomeView()
-        case .notiSetting:
-            NotiSettingView()
+        case .notiSetting(book: let book):
+            NotiSettingView(userBook: book)
         case .bookSettingsManager:
             BookSettingsManagerView()
-        case .totalCalendar:
-            TotalCalendarView()
-        case .dailyProgress:
-            DailyProgressView()
-        case .completionCelebration:
-            CompletionCelebrationView()
-        case .completionReview:
-            CompletionReviewView()
+        case .totalCalendar(book: let book):
+            TotalCalendarView(currentReadingBook: book)
+        case .dailyProgress(book: let book):
+            DailyProgressView(userBook: book)
+        case .completionCelebration(book: let book):
+            CompletionCelebrationView(userBook: book)
+        case .completionReview(book: let book):
+            CompletionReviewView(userBook: book)
         case .completionReviewUpdate(book: let book):
-            CompletionReviewView(isUpdateMode: true, externalBook: book)
+            CompletionReviewView(isUpdateMode: true, userBook: book)
         case .readingDateEdit(book: let book):
             ReadingDateEditView(userBook: book)
         }
@@ -65,5 +66,13 @@ final class NavigationCoordinator {
     // go to root screen
     func popToRoot() {
         paths.removeLast(paths.count)
+    }
+    
+    func reloadView() {
+        viewReloadTrigger = UUID()
+    }
+    
+    func getViewReloadTrigger() -> UUID {
+        viewReloadTrigger
     }
 }

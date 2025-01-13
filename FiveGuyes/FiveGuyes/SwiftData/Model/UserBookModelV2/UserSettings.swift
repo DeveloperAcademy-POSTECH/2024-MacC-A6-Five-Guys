@@ -1,5 +1,5 @@
 //
-//  UserSettings.swift
+//  SDUserSettings.swift
 //  FiveGuyes
 //
 //  Created by zaehorang on 11/25/24.

@@ -10,17 +10,12 @@ import SwiftUI
 
 struct TotalCalendarView: View {
     typealias UserBook = UserBookSchemaV2.UserBookV2
-    
-    @Query(filter: #Predicate<UserBook> { $0.completionStatus.isCompleted == false })
-    private var currentlyReadingBooks: [UserBook]  // 현재 읽고 있는 책을 가져오는 쿼리
-    
+
     // 현재 보고 있는 달력의 월 ⏰
     @State private var currentMonth = Date().adjustedDate()
     private let todayDate = Date().adjustedDate()
     
-    private var currentReadingBook: UserBook? {
-        currentlyReadingBooks.first
-    }
+    let currentReadingBook: UserBook?
     
     var body: some View {
         VStack(spacing: 0) {

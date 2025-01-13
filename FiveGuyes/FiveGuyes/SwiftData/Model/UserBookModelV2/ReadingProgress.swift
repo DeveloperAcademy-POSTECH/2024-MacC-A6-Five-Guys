@@ -1,5 +1,5 @@
 //
-//  ReadingProgress.swift
+//  SDReadingProgress.swift
 //  FiveGuyes
 //
 //  Created by zaehorang on 11/25/24.
