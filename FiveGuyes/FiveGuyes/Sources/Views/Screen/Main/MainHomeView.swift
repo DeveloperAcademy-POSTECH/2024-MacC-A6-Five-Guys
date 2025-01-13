@@ -21,9 +21,11 @@ struct MainHomeView: View {
     let mainAlertMessage = "삭제 후에는 복원할 수 없어요"
     private let notificationManager = NotificationManager()
     
-    @Query(filter: #Predicate<UserBook> { $0.completionStatus.isCompleted == false })
+    @Query(
+        filter: #Predicate<UserBook> { $0.completionStatus.isCompleted == false },
+        sort: \UserBook.userSettings.targetEndDate) // 독서 종료 날짜를 기준으로 오름차순
     private var currentlyReadingBooks: [UserBook]
-    
+
     @State private var activeBookID: UUID?
     
     @State private var selectedBookIndex: Int? = 0
@@ -45,7 +47,8 @@ struct MainHomeView: View {
                     HStack {
                         Spacer()
                         notiButton {
-                            navigationCoordinator.push(.notiSetting(book: selectedBook))
+                            // 독서 종료일이 제일 가까운 책을 기준으로 노티를 설정합니다.
+                            navigationCoordinator.push(.notiSetting(book: currentlyReadingBooks.first))
                         }
                     }
                     .padding(.bottom, 49)
@@ -132,6 +135,7 @@ struct MainHomeView: View {
         .task {
             trackScreen()
             
+            // 독서 종료일이 제일 가까운 책을 기준으로 노티를 설정합니다.
             if let currentReadingBook = currentlyReadingBooks.first {
                 await notificationManager.setupAllNotifications(currentReadingBook)
             } else {
