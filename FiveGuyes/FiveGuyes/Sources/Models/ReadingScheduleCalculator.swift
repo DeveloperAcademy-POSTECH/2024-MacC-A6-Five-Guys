@@ -7,6 +7,10 @@
 
 import Foundation
 
+enum ReadingScheduleError: Error {
+    case targetDatePassed
+}
+
 /// 독서 스케줄을 계산하고 관리하는 구조체
 struct ReadingScheduleCalculator {
     private let readingPagesCalculator: ReadingPagesCalculator = ReadingPagesCalculator()
@@ -129,14 +133,19 @@ struct ReadingScheduleCalculator {
     func reassignPagesFromLastReadDate<Settings: UserSettingsProtocol, Progress: ReadingProgressProtocol>(
         settings: Settings,
         progress: Progress
-    ) {
+    ) throws {
+        let adjustedToday = Date().adjustedDate()
+        
+        // 완독 날짜가 지나면 에러 처리
+        if adjustedToday.onlyDate > settings.targetEndDate.onlyDate {
+            throw ReadingScheduleError.targetDatePassed
+        }
+        
         // 이미 오늘 읽은 페이지가 기록되었으면 재분배를 수행하지 않음
         if hasReadPagesAdjustedToday(progress: progress) {
             print("페이지 재분배1 ❌❌❌ ")
             return
         }
-        
-        let adjustedToday = Date().adjustedDate()
         
         // TODO: 독서 시작 날짜와 조정된 오늘 날짜가 같은 날에는 재할당 막기
         // 불필요한 계산
@@ -298,10 +307,13 @@ struct ReadingScheduleCalculator {
     
     /// 오늘 할당량이 읽혔는지 확인하는 메서드
     private func hasReadPagesAdjustedToday<Progress: ReadingProgressProtocol>(progress: Progress) -> Bool {
-        let adjustedToday = Date().adjustedDate()
-        let adjustedTodayKey = progress.getAdjustedReadingRecordsKey(adjustedToday)
+        let today = Date()
+        let adjustedTodayKey = progress.getAdjustedReadingRecordsKey(today)
         
-        return progress.readingRecords[adjustedTodayKey]?.pagesRead != 0
+        // 해당 날짜에 기록이 없는 경우
+        guard let record = progress.readingRecords[adjustedTodayKey] else { return false }
+        
+        return record.pagesRead != 0
     }
 }
 
@@ -400,7 +412,6 @@ extension ReadingScheduleCalculator {
             endDate: settings.targetEndDate
         )
         progress.readingRecords = filteredRecords
-        
         // 제외된 날짜 데이터를 필터링
         let filteredExcludedDates = filteredProgressForExcludedDates(
             progress: progress,

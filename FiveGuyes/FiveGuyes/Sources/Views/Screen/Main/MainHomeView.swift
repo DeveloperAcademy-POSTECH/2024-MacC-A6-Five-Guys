@@ -25,9 +25,8 @@ struct MainHomeView: View {
         filter: #Predicate<UserBook> { $0.completionStatus.isCompleted == false },
         sort: \UserBook.userSettings.targetEndDate) // 독서 종료 날짜를 기준으로 오름차순
     private var currentlyReadingBooks: [UserBook]
-
-    @State private var activeBookID: UUID?
     
+    @State private var activeBookID: UUID?
     @State private var selectedBookIndex: Int? = 0
     
     private var selectedBook: UserBook? {
@@ -80,7 +79,7 @@ struct MainHomeView: View {
                                     primaryButton: .cancel(Text("취소하기")),
                                     secondaryButton: .destructive(Text("삭제")) {
                                         if let selectedBookIndex {
-                                                deleteBook(at: selectedBookIndex)
+                                            deleteBook(at: selectedBookIndex)
                                         }
                                     }
                                 )
@@ -313,10 +312,19 @@ struct MainHomeView: View {
         let readingScheduleCalculator = ReadingScheduleCalculator()
         
         for book in currentlyReadingBooks {
-            readingScheduleCalculator.reassignPagesFromLastReadDate(
-                settings: book.userSettings,
-                progress: book.readingProgress
-            )
+            do {
+                try readingScheduleCalculator
+                    .reassignPagesFromLastReadDate(
+                        settings: book.userSettings,
+                        progress: book.readingProgress
+                    )
+            } catch ReadingScheduleError.targetDatePassed {
+                // 종료 날짜 초과 에러가 발생한 경우 날짜 연장 뷰로 이동
+                navigationCoordinator.push(.unfinishReading(book: book))
+                continue
+            } catch {
+                print("예상치 못한 에러 발생: \(error.localizedDescription)")
+            }
         }
         
         // 데이터 저장

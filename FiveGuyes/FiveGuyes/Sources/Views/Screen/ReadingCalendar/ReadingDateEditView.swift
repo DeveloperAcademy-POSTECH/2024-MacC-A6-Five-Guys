@@ -112,7 +112,7 @@ struct ReadingDateEditView: View {
                 // 페이지 재할당 로직 호출
                 reassignPages()
                 // 페이지 나가기
-                navigationCoordinator.pop()
+                navigationCoordinator.popToRoot()
             }
         } label: {
             RoundedRectangle(cornerRadius: 16)
