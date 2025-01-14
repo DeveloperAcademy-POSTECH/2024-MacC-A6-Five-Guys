@@ -28,6 +28,7 @@
 		24FAF9452CEC5224004FEC3F /* ToastView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24FAF9442CEC5224004FEC3F /* ToastView.swift */; };
 		2613B7522D329FD900AC717F /* WeeklyProgressPagingSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2613B7512D329FD900AC717F /* WeeklyProgressPagingSlider.swift */; };
 		2613B7582D34F81E00AC717F /* EmptyImageDefaultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2613B7572D34F81E00AC717F /* EmptyImageDefaultView.swift */; };
+		2613B7652D3559D400AC717F /* UnfinishReadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2613B7642D3559D400AC717F /* UnfinishReadingView.swift */; };
 		261714D62CDDDA4000A3241D /* BookSettingsManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 261714D52CDDDA4000A3241D /* BookSettingsManagerView.swift */; };
 		2622C7D82D2AC4C000AA3FF4 /* DividerLine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2622C7D72D2AC4C000AA3FF4 /* DividerLine.swift */; };
 		2622C7DA2D2AC56400AA3FF4 /* CalendarWeekdayHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2622C7D92D2AC56400AA3FF4 /* CalendarWeekdayHeader.swift */; };
@@ -130,6 +131,7 @@
 		24FAF9442CEC5224004FEC3F /* ToastView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastView.swift; sourceTree = "<group>"; };
 		2613B7512D329FD900AC717F /* WeeklyProgressPagingSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyProgressPagingSlider.swift; sourceTree = "<group>"; };
 		2613B7572D34F81E00AC717F /* EmptyImageDefaultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyImageDefaultView.swift; sourceTree = "<group>"; };
+		2613B7642D3559D400AC717F /* UnfinishReadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnfinishReadingView.swift; sourceTree = "<group>"; };
 		261714D52CDDDA4000A3241D /* BookSettingsManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookSettingsManagerView.swift; sourceTree = "<group>"; };
 		2622C7D72D2AC4C000AA3FF4 /* DividerLine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DividerLine.swift; sourceTree = "<group>"; };
 		2622C7D92D2AC56400AA3FF4 /* CalendarWeekdayHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarWeekdayHeader.swift; sourceTree = "<group>"; };
@@ -262,6 +264,14 @@
 				26EBDECE2CF4597100B3A2BC /* UserBookModelV1 */,
 			);
 			path = Model;
+			sourceTree = "<group>";
+		};
+		2613B7612D35592400AC717F /* New Group */ = {
+			isa = PBXGroup;
+			children = (
+				2613B7642D3559D400AC717F /* UnfinishReadingView.swift */,
+			);
+			path = "New Group";
 			sourceTree = "<group>";
 		};
 		2622C8032D2D911200AA3FF4 /* Repository */ = {
@@ -425,6 +435,7 @@
 		26D852FB2CCE40BC0016239A /* Screen */ = {
 			isa = PBXGroup;
 			children = (
+				2613B7612D35592400AC717F /* New Group */,
 				26F19A662CD9EF9400F41D6D /* Main */,
 				26410A962D26D0FF00D6B477 /* ReadingCalendar */,
 				1A27D95E2CDA155B00D1E14D /* BookSetting */,
@@ -804,6 +815,7 @@
 				264440502CD8A3AC0031A290 /* CompletionReviewView.swift in Sources */,
 				26EBDEBE2CF2390C00B3A2BC /* CompletionStatusProtocol.swift in Sources */,
 				264440502CD8A3AC0031A290 /* CompletionReviewView.swift in Sources */,
+				2613B7652D3559D400AC717F /* UnfinishReadingView.swift in Sources */,
 				2655532F2CF6D73900288037 /* NotiSettingView.swift in Sources */,
 				26890B952CAE811A008DFF49 /* FiveGuyesApp.swift in Sources */,
 				26CF82582D1D3216005037E4 /* ReadingDateCalculator.swift in Sources */,
