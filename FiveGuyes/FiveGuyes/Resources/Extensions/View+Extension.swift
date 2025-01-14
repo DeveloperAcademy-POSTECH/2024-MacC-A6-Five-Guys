@@ -48,4 +48,9 @@ extension View {
             RoundedRectangle(cornerSize: CGSize(width: bottomTrailingRadius, height: topTrailingRadius))
         )
     }
+    
+    /// 네비게이션 드래그 제스처를 비활성화합니다.
+    func disableNavigationGesture() -> some View {
+        self.gesture(DragGesture().onChanged { _ in })
+    }
 }
