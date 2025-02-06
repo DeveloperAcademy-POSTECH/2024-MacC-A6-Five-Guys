@@ -38,9 +38,6 @@ struct MainHomeView: View {
     }
     
     var body: some View {
-        let title = selectedBook?.bookMetaData.title ?? ""
-        let mainAlertText = "현재 읽고 있는 <\(title)>\(title.postPositionParticle()) 책장에서 삭제할까요?"
-        
         ScrollView {
             VStack(spacing: 0) {
                 VStack(spacing: 0) {
@@ -59,7 +56,7 @@ struct MainHomeView: View {
                         
                         Spacer()
                         
-                        if !currentlyReadingBooks.isEmpty { // 읽고 있는 책이 없는 경우
+                        if !currentlyReadingBooks.isEmpty { // 읽고 있는 책이 있는 경우
                             Menu {
                                 ReadingDateEditButton
                                 UserBookAddButton
@@ -74,7 +71,7 @@ struct MainHomeView: View {
                             .fontStyle(.body)
                             .alert(isPresented: $showReadingBookAlert) {
                                 Alert(
-                                    title: Text(mainAlertText)
+                                    title: Text(getMainAlertText(book: selectedBook))
                                         .alertFontStyle(.title3, weight: .semibold),
                                     message: Text(mainAlertMessage)
                                         .alertFontStyle(.caption1),
@@ -257,6 +254,15 @@ struct MainHomeView: View {
     }
     
     // MARK: - Helper Method
+    private func getMainAlertText(book: UserBook?) -> String {
+        if let book {
+            let title = book.bookMetaData.title
+            return "현재 읽고 있는 <\(title)>\(title.postPositionParticle()) 책장에서 삭제할까요?"
+        } else {
+            return ""
+        }
+    }
+    
     private func getRemainingDays(book: UserBook) -> Int {
         let redingDateCalculator = ReadingDateCalculator()
         let remainingReadingDays = try? redingDateCalculator.calculateValidReadingDays(
@@ -266,7 +272,6 @@ struct MainHomeView: View {
         
         return remainingReadingDays ?? 0
     }
-    
     
     private func deleteBook(at index: Int) {
         guard index < currentlyReadingBooks.count else { return }
