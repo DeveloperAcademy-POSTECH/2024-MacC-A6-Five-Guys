@@ -54,10 +54,11 @@ struct MainHomeView: View {
                     .padding(.trailing, 20)
                     
                     HStack(alignment: .top, spacing: 10) {
-                        titleDescription
+                        titleDescription(book: selectedBook)
+                        
                         Spacer()
                         
-                        if !currentlyReadingBooks.isEmpty {
+                        if !currentlyReadingBooks.isEmpty { // 읽고 있는 책이 없는 경우
                             Menu {
                                 ReadingDateEditButton
                                 UserBookAddButton
@@ -143,31 +144,18 @@ struct MainHomeView: View {
         }
     }
     
-    private var titleDescription: some View {
-        let redingDateCalculator = ReadingDateCalculator()
-        return Group {
-            if let currentReadingBook = selectedBook {
-                let bookMetadata: BookMetaDataProtocol = currentReadingBook.bookMetaData
-                let userSettings: UserSettingsProtocol = currentReadingBook.userSettings
-                
-                let remainingReadingDays = try? redingDateCalculator.calculateValidReadingDays(
-                    startDate: Date().adjustedDate(),
-                    endDate: userSettings.targetEndDate,
-                    excludedDates: userSettings.nonReadingDays)
-                
-                VStack(alignment: .leading, spacing: 5) {
-                    Text("<\(bookMetadata.title)>")
-                        .lineLimit(2)
-                    
-                    Text("완독까지 \(remainingReadingDays ?? 0)일 남았어요!")
-                        .lineLimit(1)
-                }
-                
+    // MARK: - View Property & Function
+    
+    private func titleDescription(book: UserBook?) -> some View {
+        VStack(alignment: .leading, spacing: 5) {
+            if let book {
+                Text("<\(book.bookMetaData.title)>")
+                    .lineLimit(2)
+                Text("완독까지 \(getRemainingDays(book: book))일 남았어요!")
+                    .lineLimit(1)
             } else {
-                VStack(alignment: .leading, spacing: 5) {
-                    Text("환영해요!")
-                    Text("저와 함께 완독을 시작해볼까요?")
-                }
+                Text("환영해요!")
+                Text("저와 함께 완독을 시작해볼까요?")
             }
         }
         .frame(height: 110, alignment: .topLeading)
@@ -270,6 +258,16 @@ struct MainHomeView: View {
     }
     
     // MARK: - Helper Method
+    private func getRemainingDays(book: UserBook) -> Int {
+        let redingDateCalculator = ReadingDateCalculator()
+        let remainingReadingDays = try? redingDateCalculator.calculateValidReadingDays(
+            startDate: Date().adjustedDate(),
+            endDate: book.userSettings.targetEndDate,
+            excludedDates: book.userSettings.nonReadingDays)
+        
+        return remainingReadingDays ?? 0
+    }
+    
     
     private func deleteBook(at index: Int) {
         guard index < currentlyReadingBooks.count else { return }
