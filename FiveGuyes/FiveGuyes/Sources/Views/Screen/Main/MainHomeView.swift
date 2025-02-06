@@ -27,8 +27,9 @@ struct MainHomeView: View {
     private var currentlyReadingBooks: [UserBook]
     
     @State private var activeBookID: UUID?
-    @State private var selectedBookIndex: Int? = 0
+    @State private var selectedBookIndex: Int?
     
+    // MARK: 🐯 문제가 되는 프로퍼티
     private var selectedBook: UserBook? {
         if let selectedBookIndex, !currentlyReadingBooks.isEmpty && selectedBookIndex < currentlyReadingBooks.count {
             return currentlyReadingBooks[selectedBookIndex]
