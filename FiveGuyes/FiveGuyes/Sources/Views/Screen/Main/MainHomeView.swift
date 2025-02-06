@@ -127,9 +127,7 @@ struct MainHomeView: View {
         }
         .onAppear {
             calculateTopSafeAreaInset()
-            resetSelectedBookIndex()
-            
-            guard !currentlyReadingBooks.isEmpty else { return }
+            initializeActiveBookID()
             reassignReadingSchedules()
         }
         .task {
@@ -307,6 +305,8 @@ struct MainHomeView: View {
     }
     
     private func reassignReadingSchedules() {
+        guard !currentlyReadingBooks.isEmpty else { return }
+        
         let readingScheduleCalculator = ReadingScheduleCalculator()
         
         for book in currentlyReadingBooks {
@@ -333,7 +333,7 @@ struct MainHomeView: View {
         }
     }
     
-    private func resetSelectedBookIndex() {
+    private func initializeActiveBookID() {
         activeBookID = currentlyReadingBooks.first?.id
     }
 }
