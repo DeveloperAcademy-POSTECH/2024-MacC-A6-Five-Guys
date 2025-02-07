@@ -22,8 +22,10 @@ struct MainHomeView: View {
     private let notificationManager = NotificationManager()
     
     @Query(
-        filter: #Predicate<UserBook> { $0.completionStatus.isCompleted == false },
-        sort: \UserBook.userSettings.targetEndDate) // 독서 종료 날짜를 기준으로 오름차순
+        filter: #Predicate<UserBook> {
+            $0.completionStatus.isCompleted == false
+        }
+    )
     private var currentlyReadingBooks: [UserBook]
     
     @State private var activeBookID: UUID?
