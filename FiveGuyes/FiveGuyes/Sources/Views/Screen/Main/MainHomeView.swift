@@ -22,13 +22,16 @@ struct MainHomeView: View {
     private let notificationManager = NotificationManager()
     
     @Query(
-        filter: #Predicate<UserBook> { $0.completionStatus.isCompleted == false },
-        sort: \UserBook.userSettings.targetEndDate) // 독서 종료 날짜를 기준으로 오름차순
+        filter: #Predicate<UserBook> {
+            $0.completionStatus.isCompleted == false
+        }
+    )
     private var currentlyReadingBooks: [UserBook]
     
     @State private var activeBookID: UUID?
-    @State private var selectedBookIndex: Int? = 0
+    @State private var selectedBookIndex: Int?
     
+    // MARK: 🐯 문제가 되는 프로퍼티
     private var selectedBook: UserBook? {
         if let selectedBookIndex, !currentlyReadingBooks.isEmpty && selectedBookIndex < currentlyReadingBooks.count {
             return currentlyReadingBooks[selectedBookIndex]
@@ -37,9 +40,6 @@ struct MainHomeView: View {
     }
     
     var body: some View {
-        let title = selectedBook?.bookMetaData.title ?? ""
-        let mainAlertText = "현재 읽고 있는 <\(title)>\(title.postPositionParticle()) 책장에서 삭제할까요?"
-        
         ScrollView {
             VStack(spacing: 0) {
                 VStack(spacing: 0) {
@@ -54,10 +54,11 @@ struct MainHomeView: View {
                     .padding(.trailing, 20)
                     
                     HStack(alignment: .top, spacing: 10) {
-                        titleDescription
+                        titleDescription(book: selectedBook)
+                        
                         Spacer()
                         
-                        if !currentlyReadingBooks.isEmpty {
+                        if !currentlyReadingBooks.isEmpty { // 읽고 있는 책이 있는 경우
                             Menu {
                                 ReadingDateEditButton
                                 UserBookAddButton
@@ -72,7 +73,7 @@ struct MainHomeView: View {
                             .fontStyle(.body)
                             .alert(isPresented: $showReadingBookAlert) {
                                 Alert(
-                                    title: Text(mainAlertText)
+                                    title: Text(getMainAlertText(book: selectedBook))
                                         .alertFontStyle(.title3, weight: .semibold),
                                     message: Text(mainAlertMessage)
                                         .alertFontStyle(.caption1),
@@ -126,13 +127,11 @@ struct MainHomeView: View {
         }
         .onAppear {
             calculateTopSafeAreaInset()
-            resetSelectedBookIndex()
-            
-            guard !currentlyReadingBooks.isEmpty else { return }
             reassignReadingSchedules()
         }
         .task {
             trackScreen()
+            initializeActiveBookID()
             
             // 독서 종료일이 제일 가까운 책을 기준으로 노티를 설정합니다.
             if let currentReadingBook = currentlyReadingBooks.first {
@@ -143,31 +142,18 @@ struct MainHomeView: View {
         }
     }
     
-    private var titleDescription: some View {
-        let redingDateCalculator = ReadingDateCalculator()
-        return Group {
-            if let currentReadingBook = selectedBook {
-                let bookMetadata: BookMetaDataProtocol = currentReadingBook.bookMetaData
-                let userSettings: UserSettingsProtocol = currentReadingBook.userSettings
-                
-                let remainingReadingDays = try? redingDateCalculator.calculateValidReadingDays(
-                    startDate: Date().adjustedDate(),
-                    endDate: userSettings.targetEndDate,
-                    excludedDates: userSettings.nonReadingDays)
-                
-                VStack(alignment: .leading, spacing: 5) {
-                    Text("<\(bookMetadata.title)>")
-                        .lineLimit(2)
-                    
-                    Text("완독까지 \(remainingReadingDays ?? 0)일 남았어요!")
-                        .lineLimit(1)
-                }
-                
+    // MARK: - View Property & Function
+    
+    private func titleDescription(book: UserBook?) -> some View {
+        VStack(alignment: .leading, spacing: 5) {
+            if let book {
+                Text("<\(book.bookMetaData.title)>")
+                    .lineLimit(2)
+                Text("완독까지 \(getRemainingDays(book: book))일 남았어요!")
+                    .lineLimit(1)
             } else {
-                VStack(alignment: .leading, spacing: 5) {
-                    Text("환영해요!")
-                    Text("저와 함께 완독을 시작해볼까요?")
-                }
+                Text("환영해요!")
+                Text("저와 함께 완독을 시작해볼까요?")
             }
         }
         .frame(height: 110, alignment: .topLeading)
@@ -270,6 +256,24 @@ struct MainHomeView: View {
     }
     
     // MARK: - Helper Method
+    private func getMainAlertText(book: UserBook?) -> String {
+        if let book {
+            let title = book.bookMetaData.title
+            return "현재 읽고 있는 <\(title)>\(title.postPositionParticle()) 책장에서 삭제할까요?"
+        } else {
+            return ""
+        }
+    }
+    
+    private func getRemainingDays(book: UserBook) -> Int {
+        let redingDateCalculator = ReadingDateCalculator()
+        let remainingReadingDays = try? redingDateCalculator.calculateValidReadingDays(
+            startDate: Date().adjustedDate(),
+            endDate: book.userSettings.targetEndDate,
+            excludedDates: book.userSettings.nonReadingDays)
+        
+        return remainingReadingDays ?? 0
+    }
     
     private func deleteBook(at index: Int) {
         guard index < currentlyReadingBooks.count else { return }
@@ -309,6 +313,8 @@ struct MainHomeView: View {
     }
     
     private func reassignReadingSchedules() {
+        guard !currentlyReadingBooks.isEmpty else { return }
+        
         let readingScheduleCalculator = ReadingScheduleCalculator()
         
         for book in currentlyReadingBooks {
@@ -335,7 +341,7 @@ struct MainHomeView: View {
         }
     }
     
-    private func resetSelectedBookIndex() {
+    private func initializeActiveBookID() {
         activeBookID = currentlyReadingBooks.first?.id
     }
 }
