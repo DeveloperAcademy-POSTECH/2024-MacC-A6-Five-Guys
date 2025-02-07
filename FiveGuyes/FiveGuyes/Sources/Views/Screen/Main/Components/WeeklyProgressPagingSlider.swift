@@ -39,7 +39,6 @@ struct WeeklyProgressPagingSlider: View {
                     .zIndex(1)
                 emptyProgressView
             }
-            
         }
     }
     

@@ -127,11 +127,11 @@ struct MainHomeView: View {
         }
         .onAppear {
             calculateTopSafeAreaInset()
-            initializeActiveBookID()
             reassignReadingSchedules()
         }
         .task {
             trackScreen()
+            initializeActiveBookID()
             
             // 독서 종료일이 제일 가까운 책을 기준으로 노티를 설정합니다.
             if let currentReadingBook = currentlyReadingBooks.first {
