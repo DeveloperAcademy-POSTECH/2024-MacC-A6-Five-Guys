@@ -113,13 +113,7 @@ struct BookPageSettingView: View {
     }
     
     private func nextButtonTapped() {
-        if targetEndPage > bookSettingInputModel.targetEndPage {
-            targetEndPage = bookSettingInputModel.targetEndPage
-            toastViewModel.showToast(message: "앗! 마지막 페이지를 초과했어요!")
-            return
-        }
-        
-        if targetEndPage > startPage {
+        if startPage >= 1 && (targetEndPage > startPage) {
             bookSettingInputModel.targetEndPage = targetEndPage
             bookSettingInputModel.startPage = startPage
             
@@ -128,7 +122,9 @@ struct BookPageSettingView: View {
             return
         }
         
-        let message = startPage > targetEndPage
+        let message = (startPage < 0)
+        ? "시작 페이지를 0보다 큰 페이지로 입력해주세요!"
+        : (startPage > targetEndPage)
             ? "앗! 시작 페이지는 마지막 페이지를 초과할 수 없어요!"
             : "시작 페이지는 마지막 페이지와 같을 수 없어요!"
         
