@@ -25,8 +25,9 @@ struct BookSettingsManagerView: View {
             
             // TODO: 캘린더 뷰로 넘어갈 때 새롭게 그려지면서 어색한 동작 수정하기
             if bookSettingInputModel.currentPage != 4 {
-                ProgressBar(currentPage: bookSettingInputModel.currentPage)
+                BookSettingProgressBar(currentPage: bookSettingInputModel.currentPage)
                     .padding(.top, 5)
+                    .padding(.horizontal, 20)
             }
         }
         .background(Color.Fills.white)
@@ -48,11 +49,9 @@ struct BookSettingsManagerView: View {
                         }
                     }
                 }
-                
             }
         }
         .environment(bookSettingInputModel)
-        
     }
     
     private func handleBackButton() {
@@ -104,4 +103,5 @@ struct BookSettingsManagerView: View {
 
 #Preview {
     BookSettingsManagerView()
+        .environment(NavigationCoordinator())
 }
