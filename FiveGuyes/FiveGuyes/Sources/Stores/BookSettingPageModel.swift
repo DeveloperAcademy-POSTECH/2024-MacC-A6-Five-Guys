@@ -13,22 +13,15 @@ final class BookSettingPageModel {
     
     /// 다음 페이지로 이동
     func nextPage() {
-        withAnimation {
+        withAnimation(.easeOut) {
             currentPage += 1
         }
     }
 
     /// 이전 페이지로 이동
     func previousPage() {
-        withAnimation {
+        withAnimation(.easeOut) {
             currentPage = max(1, currentPage - 1)
-        }
-    }
-
-    /// 특정 페이지로 설정
-    func setPage(_ page: Int) {
-        withAnimation {
-            currentPage = page
         }
     }
 }

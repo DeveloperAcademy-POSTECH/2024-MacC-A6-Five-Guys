@@ -23,8 +23,8 @@ struct FinishGoalView: View {
     var body: some View {
         
         if let book = bookSettingInputModel.selectedBook,
-           let startDate = bookSettingInputModel.startData,
-           let endDate = bookSettingInputModel.endData {
+           let startDate = bookSettingInputModel.startDate,
+           let endDate = bookSettingInputModel.endDate {
             
             let startPage = bookSettingInputModel.startPage
             let totalPages = bookSettingInputModel.targetEndPage

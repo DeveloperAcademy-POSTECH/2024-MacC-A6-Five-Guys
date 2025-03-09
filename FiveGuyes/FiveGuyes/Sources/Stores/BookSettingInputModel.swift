@@ -12,8 +12,8 @@ final class BookSettingInputModel {
     private(set) var selectedBook: Book?
     private(set) var startPage = 1
     private(set) var targetEndPage = 1
-    private(set) var startData: Date?
-    private(set) var endData: Date?
+    private(set) var startDate: Date?
+    private(set) var endDate: Date?
     private(set) var nonReadingDays: [Date] = []
     
     func setSelectedBook(_ book: Book) {
@@ -26,8 +26,8 @@ final class BookSettingInputModel {
     }
     
     func setReadingPeriod(startDate: Date?, endDate: Date?) {
-        self.startData = startDate
-        self.endData = endDate
+        self.startDate = startDate
+        self.endDate = endDate
     }
     
     func setNonReadingDays(_ days: [Date]) {
@@ -44,8 +44,8 @@ final class BookSettingInputModel {
     }
     
     func clearReadingPeriod() {
-        startData = nil
-        endData = nil
+        startDate = nil
+        endDate = nil
     }
     
     func clearNonReadingDays() {

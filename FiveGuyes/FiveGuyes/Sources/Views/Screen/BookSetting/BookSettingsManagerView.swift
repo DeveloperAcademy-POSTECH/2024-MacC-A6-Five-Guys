@@ -11,6 +11,7 @@ enum BookSettingsPage: Int {
     case bookSearch = 1
     case bookPageSetting
     case bookDurationSetting
+    case bookNoneReadingDaySetting
     case bookSettingDone
 }
 
@@ -22,9 +23,15 @@ struct BookSettingsManagerView: View {
     
     var body: some View {
         ZStack(alignment: .top) {
-            pageView
+            if [BookSettingsPage.bookDurationSetting.rawValue,
+                BookSettingsPage.bookNoneReadingDaySetting.rawValue]
+                .contains(pageModel.currentPage) {
+                ReadingDateSettingView()
+            } else {
+                pageView
+            }
             
-            if pageModel.currentPage != 4 {
+            if pageModel.currentPage != BookSettingsPage.bookSettingDone.rawValue {
                 BookSettingProgressBar(currentPage: pageModel.currentPage)
                     .padding(.top, 5)
                     .padding(.horizontal, 20)
@@ -58,7 +65,7 @@ struct BookSettingsManagerView: View {
     private func handleBackButton() {
         if pageModel.currentPage > BookSettingsPage.bookSearch.rawValue {
             clearBookSetting()
-            withAnimation {
+            withAnimation(.easeOut) {
                 pageModel.previousPage()
             }
         } else {
@@ -69,10 +76,15 @@ struct BookSettingsManagerView: View {
     private func clearBookSetting() {
         if let page = BookSettingsPage(rawValue: pageModel.currentPage) {
             switch page {
+            case .bookNoneReadingDaySetting:
+                bookSettingInputModel
+                    .clearNonReadingDays()
             case .bookDurationSetting:
-                bookSettingInputModel.clearReadingPeriod()
+                bookSettingInputModel
+                    .clearReadingPeriod()
             case .bookPageSetting:
-                bookSettingInputModel.clearPageRange()
+                bookSettingInputModel
+                    .clearPageRange()
             case .bookSearch:
                 return
             case .bookSettingDone:
@@ -88,11 +100,9 @@ struct BookSettingsManagerView: View {
             BookSearchView()
         case .bookPageSetting:
             BookPageSettingView()
-        case .bookDurationSetting:
-            ReadingDateSettingView()
         case .bookSettingDone:
             FinishGoalView()
-        case .none:
+        default:
             EmptyView()
         }
     }
