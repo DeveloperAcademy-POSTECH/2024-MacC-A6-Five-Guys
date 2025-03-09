@@ -85,12 +85,12 @@ struct ReadingDateSettingView: View {
                 calendarCellModel.setEndDate(bookSettingInputModel.endDate)
                 calendarCellModel.setExcludedDates(bookSettingInputModel.nonReadingDays)
 
-                calendarCellModel.confirmDates()
+                confirmReadingPeriod()
             }
         }
         .onChange(of: pageModel.currentPage) {
             if pageModel.currentPage == BookSettingsPage.bookDurationSetting.rawValue {
-                calendarCellModel.resetConfirmedDates()
+                resetNonReadingDays()
             }
         }
     }
@@ -160,6 +160,12 @@ struct ReadingDateSettingView: View {
     private func confirmReadingPeriod() {
         withAnimation(.easeOut) {
             calendarCellModel.confirmDates()
+        }
+    }
+    
+    private func resetNonReadingDays() {
+        withAnimation(.easeOut) {
+            calendarCellModel.resetConfirmedDates()
         }
     }
     
