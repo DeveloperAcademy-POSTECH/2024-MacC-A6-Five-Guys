@@ -10,17 +10,59 @@ import SwiftUI
 @Observable
 final class BookSettingInputModel {
     var currentPage = BookSettingsPage.bookSearch.rawValue
-    var selectedBook: Book?
-    var startPage = 1
-    var targetEndPage = 1
-    var startData: Date?
-    var endData: Date?
-    var nonReadingDays: [Date] = []
+    
+    private(set) var selectedBook: Book?
+    private(set) var startPage = 1
+    private(set) var targetEndPage = 1
+    private(set) var startData: Date?
+    private(set) var endData: Date?
+    private(set) var nonReadingDays: [Date] = []
+    
+    func setCurrentPage(_ page: Int) {
+        withAnimation {
+            currentPage = page
+        }
+    }
     
     func nextPage() {
         withAnimation {
             currentPage += 1
         }
     }
-
+    
+    func setSelectedBook(_ book: Book) {
+        self.selectedBook = book
+    }
+    
+    func setPageRange(start: Int = 1, end: Int) {
+        self.startPage = start
+        self.targetEndPage = end
+    }
+    
+    func setReadingPeriod(startDate: Date?, endDate: Date?) {
+        self.startData = startDate
+        self.endData = endDate
+    }
+    
+    func setNonReadingDays(_ days: [Date]) {
+        self.nonReadingDays = days
+    }
+    
+    func clearSelectedBook() {
+        selectedBook = nil
+    }
+    
+    func clearPageRange() {
+        startPage = 1
+        targetEndPage = 1
+    }
+    
+    func clearReadingPeriod() {
+        startData = nil
+        endData = nil
+    }
+    
+    func clearNonReadingDays() {
+        nonReadingDays.removeAll()
+    }
 }

@@ -68,11 +68,9 @@ struct BookSettingsManagerView: View {
         if let page = BookSettingsPage(rawValue: bookSettingInputModel.currentPage) {
             switch page {
             case .bookDurationSetting:
-                bookSettingInputModel.endData = nil
-                bookSettingInputModel.startData = nil
+                bookSettingInputModel.clearReadingPeriod()
             case .bookPageSetting:
-                bookSettingInputModel.startPage = 1
-                bookSettingInputModel.targetEndPage = 1
+                bookSettingInputModel.clearPageRange()
             case .bookSearch:
                 return
             case .bookSettingDone:

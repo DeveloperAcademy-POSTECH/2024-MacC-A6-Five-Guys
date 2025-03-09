@@ -141,9 +141,14 @@ struct ReadingDateSettingView: View {
             }
         } else {
             // 입력 데이터 추가
-            bookSettingInputModel.startData = calendarCellModel.getStartDate()
-            bookSettingInputModel.endData = calendarCellModel.getEndDate()
-            bookSettingInputModel.nonReadingDays = calendarCellModel.getExcludedDates()
+            bookSettingInputModel.setReadingPeriod(
+                startDate: calendarCellModel.getStartDate(),
+                endDate: calendarCellModel.getEndDate()
+            )
+    
+            bookSettingInputModel.setNonReadingDays(
+                calendarCellModel.getExcludedDates()
+            )
             
             // 페이지 이동
             bookSettingInputModel.nextPage()
