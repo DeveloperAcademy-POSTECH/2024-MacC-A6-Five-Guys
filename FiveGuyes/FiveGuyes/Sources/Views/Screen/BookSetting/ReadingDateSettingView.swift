@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ReadingDateSettingView: View {
     @Environment(BookSettingInputModel.self) var bookSettingInputModel: BookSettingInputModel
+    @Environment(BookSettingPageModel.self) var pageModel: BookSettingPageModel
     
     @StateObject private var calendarCellModel: CalendarCellModel
     
@@ -151,7 +152,7 @@ struct ReadingDateSettingView: View {
             )
             
             // 페이지 이동
-            bookSettingInputModel.nextPage()
+            pageModel.nextPage()
         }
     }
 }

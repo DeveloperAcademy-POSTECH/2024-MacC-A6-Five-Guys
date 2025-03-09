@@ -18,13 +18,14 @@ struct BookSettingsManagerView: View {
     @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
     
     @State private var bookSettingInputModel = BookSettingInputModel()
+    @State private var pageModel = BookSettingPageModel()
     
     var body: some View {
         ZStack(alignment: .top) {
             pageView
             
-            if bookSettingInputModel.currentPage != 4 {
-                BookSettingProgressBar(currentPage: bookSettingInputModel.currentPage)
+            if pageModel.currentPage != 4 {
+                BookSettingProgressBar(currentPage: pageModel.currentPage)
                     .padding(.top, 5)
                     .padding(.horizontal, 20)
             }
@@ -51,13 +52,14 @@ struct BookSettingsManagerView: View {
             }
         }
         .environment(bookSettingInputModel)
+        .environment(pageModel)
     }
     
     private func handleBackButton() {
-        if bookSettingInputModel.currentPage > BookSettingsPage.bookSearch.rawValue {
+        if pageModel.currentPage > BookSettingsPage.bookSearch.rawValue {
             clearBookSetting()
             withAnimation {
-                bookSettingInputModel.currentPage -= 1
+                pageModel.previousPage()
             }
         } else {
             navigationCoordinator.pop()
@@ -65,7 +67,7 @@ struct BookSettingsManagerView: View {
     }
     
     private func clearBookSetting() {
-        if let page = BookSettingsPage(rawValue: bookSettingInputModel.currentPage) {
+        if let page = BookSettingsPage(rawValue: pageModel.currentPage) {
             switch page {
             case .bookDurationSetting:
                 bookSettingInputModel.clearReadingPeriod()
@@ -81,7 +83,7 @@ struct BookSettingsManagerView: View {
     
     @ViewBuilder
     private var pageView: some View {
-        switch BookSettingsPage(rawValue: bookSettingInputModel.currentPage) {
+        switch BookSettingsPage(rawValue: pageModel.currentPage) {
         case .bookSearch:
             BookSearchView()
         case .bookPageSetting:
@@ -93,9 +95,7 @@ struct BookSettingsManagerView: View {
         case .none:
             EmptyView()
         }
-        
     }
-    
 }
 
 #Preview {

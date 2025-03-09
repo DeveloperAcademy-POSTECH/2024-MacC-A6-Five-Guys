@@ -10,6 +10,7 @@ import SwiftUI
 // TODO: 검색 결과 없을 때 화면 추가하기
 struct BookSearchView: View {
     @Environment(BookSettingInputModel.self) var bookSettingInputModel: BookSettingInputModel
+    @Environment(BookSettingPageModel.self) var pageModel: BookSettingPageModel
     
     @StateObject private var bookSearchViewModel = BookSearchViewModel()
     
@@ -37,7 +38,7 @@ struct BookSearchView: View {
                             bookSettingInputModel
                                 .setSelectedBook(selectedBook)
                             
-                            bookSettingInputModel.nextPage()
+                            pageModel.nextPage()
                         }
                         
                     } label: {
