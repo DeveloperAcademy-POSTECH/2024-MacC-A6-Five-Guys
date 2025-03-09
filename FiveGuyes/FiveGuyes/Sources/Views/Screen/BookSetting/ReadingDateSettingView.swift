@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct ReadingDateSettingView: View {
-    @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
     @Environment(BookSettingInputModel.self) var bookSettingInputModel: BookSettingInputModel
     
     @StateObject private var calendarCellModel: CalendarCellModel
