@@ -85,9 +85,7 @@ struct BookSettingsManagerView: View {
             case .bookPageSetting:
                 bookSettingInputModel
                     .clearPageRange()
-            case .bookSearch:
-                return
-            case .bookSettingDone:
+            default:
                 return
             }
         }
