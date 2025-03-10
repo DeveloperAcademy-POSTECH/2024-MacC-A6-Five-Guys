@@ -24,6 +24,7 @@
 		240445B42CED9074005C3623 /* ToastViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 240445B32CED9074005C3623 /* ToastViewModel.swift */; };
 		24360D4A2CD8BE3C00E83D2B /* FinishGoalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24360D492CD8BE3C00E83D2B /* FinishGoalView.swift */; };
 		24360D532CD9F3AF00E83D2B /* DailyProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24360D522CD9F3AF00E83D2B /* DailyProgressView.swift */; };
+		24D519BC2D7F267000CCBF5F /* CustomTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24D519BB2D7F267000CCBF5F /* CustomTextField.swift */; };
 		24F8A2172CEB290B00A01A76 /* Config.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 24F8A2162CEB290B00A01A76 /* Config.xcconfig */; };
 		24FAF9452CEC5224004FEC3F /* ToastView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24FAF9442CEC5224004FEC3F /* ToastView.swift */; };
 		2613B7522D329FD900AC717F /* WeeklyProgressPagingSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2613B7512D329FD900AC717F /* WeeklyProgressPagingSlider.swift */; };
@@ -127,6 +128,7 @@
 		240445B32CED9074005C3623 /* ToastViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastViewModel.swift; sourceTree = "<group>"; };
 		24360D492CD8BE3C00E83D2B /* FinishGoalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinishGoalView.swift; sourceTree = "<group>"; };
 		24360D522CD9F3AF00E83D2B /* DailyProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyProgressView.swift; sourceTree = "<group>"; };
+		24D519BB2D7F267000CCBF5F /* CustomTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTextField.swift; sourceTree = "<group>"; };
 		24F8A2162CEB290B00A01A76 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		24FAF9442CEC5224004FEC3F /* ToastView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastView.swift; sourceTree = "<group>"; };
 		2613B7512D329FD900AC717F /* WeeklyProgressPagingSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyProgressPagingSlider.swift; sourceTree = "<group>"; };
@@ -522,6 +524,7 @@
 				24FAF9442CEC5224004FEC3F /* ToastView.swift */,
 				2622C7D72D2AC4C000AA3FF4 /* DividerLine.swift */,
 				2622C7D92D2AC56400AA3FF4 /* CalendarWeekdayHeader.swift */,
+				24D519BB2D7F267000CCBF5F /* CustomTextField.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -836,6 +839,7 @@
 				26EBDE262CDE3C6000B3A2BC /* BookSettingInputModel.swift in Sources */,
 				26F19A6A2CD9FE5C00F41D6D /* WeeklyReadingProgressView.swift in Sources */,
 				2644405B2CD8F9380031A290 /* UINavigationController+Extension.swift in Sources */,
+				24D519BC2D7F267000CCBF5F /* CustomTextField.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
