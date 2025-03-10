@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UIKit
 
 struct BookPageSettingView: View {
     private enum FieldFocus {
@@ -98,18 +99,25 @@ struct BookPageSettingView: View {
         isFocused: FocusState<FieldFocus?>.Binding,
         field: FieldFocus
     ) -> some View {
-        TextField("", value: page, format: .number)
-            .keyboardType(.numberPad)
-            .focused(isFocused, equals: field)
-            .fontStyle(.title2, weight: .semibold)
-            .foregroundStyle(Color.Colors.green2)
-            .fixedSize()
-            .padding(.horizontal, 8)
-            .padding(.vertical, 4)
-            .background {
-                RoundedRectangle(cornerRadius: 8)
-                    .foregroundStyle(Color.Fills.lightGreen)
-            }
+        // UITextField를 SwiftUI로 래핑
+        CustomTextFieldRepresentable(
+            text: Binding(
+                get: { String(page.wrappedValue) },
+                set: { newValue in
+                    if let intValue = Int(newValue) {
+                        page.wrappedValue = intValue
+                    }
+                }
+            ),
+            isFocused: isFocused.wrappedValue == field
+        )
+        .frame(height: 40)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
+        .background {
+            RoundedRectangle(cornerRadius: 8)
+                .foregroundStyle(Color.Fills.lightGreen)
+        }
     }
     
     private func nextButtonTapped() {
@@ -140,5 +148,67 @@ struct BookPageSettingView: View {
     
     private func trackPageSettingScreen() {
         Tracking.Screen.pageSetting.setTracking()
+    }
+}
+
+// CustomTextField를 사용
+// SwiftUI 내에서 UIKit을 사용하려면 UIViewRepresentable을 사용
+struct CustomTextFieldRepresentable: UIViewRepresentable {
+    @Binding var text: String
+    var isFocused: Bool
+    var keyboardType: UIKeyboardType = .numberPad
+    private let font = UIFont.systemFont(ofSize: FontStyle.title2.size, weight: .semibold)
+    private let textColor = UIColor(Color.Colors.green2)
+    private let backgroundColor = UIColor(Color.Fills.lightGreen)
+    private let cornerRadius: CGFloat = 8
+    private let height: CGFloat = 40
+    
+    func makeUIView(context: Context) -> CustomTextField {
+        let textField = CustomTextField()
+        textField.delegate = context.coordinator
+        textField.keyboardType = keyboardType
+        configureTextField(textField)
+        
+        return textField
+    }
+    
+    func updateUIView(_ uiView: CustomTextField, context: Context) {
+        uiView.text = text
+        
+        if isFocused {
+            uiView.becomeFirstResponder()
+        } else {
+            uiView.resignFirstResponder()
+        }
+    }
+    
+    func configureTextField(_ textField: CustomTextField) {
+        textField.font = font
+        textField.textColor = textColor
+        textField.backgroundColor = backgroundColor
+        textField.layer.cornerRadius = cornerRadius
+        textField.layer.masksToBounds = true
+        textField.textAlignment = .center
+        textField.translatesAutoresizingMaskIntoConstraints = false
+        textField.heightAnchor.constraint(equalToConstant: height).isActive = true
+        
+        textField.setContentHuggingPriority(.required, for: .horizontal)
+        textField.setContentCompressionResistancePriority(.required, for: .horizontal)
+    }
+    
+    class Coordinator: NSObject, UITextFieldDelegate {
+        var parent: CustomTextFieldRepresentable
+
+        init(parent: CustomTextFieldRepresentable) {
+            self.parent = parent
+        }
+
+        func textFieldDidChangeSelection(_ textField: UITextField) {
+            parent.text = textField.text ?? ""
+        }
+    }
+
+    func makeCoordinator() -> Coordinator {
+        return Coordinator(parent: self)
     }
 }
