@@ -163,8 +163,8 @@ struct CustomTextFieldRepresentable: UIViewRepresentable {
     private let cornerRadius: CGFloat = 8
     private let height: CGFloat = 40
     
-    func makeUIView(context: Context) -> CustomTextField {
-        let textField = CustomTextField()
+    func makeUIView(context: Context) -> PageInputTextField {
+        let textField = PageInputTextField()
         textField.delegate = context.coordinator
         textField.keyboardType = keyboardType
         configureTextField(textField)
@@ -172,7 +172,7 @@ struct CustomTextFieldRepresentable: UIViewRepresentable {
         return textField
     }
     
-    func updateUIView(_ uiView: CustomTextField, context: Context) {
+    func updateUIView(_ uiView: PageInputTextField, context: Context) {
         uiView.text = text
         
         if isFocused {
@@ -182,7 +182,7 @@ struct CustomTextFieldRepresentable: UIViewRepresentable {
         }
     }
     
-    func configureTextField(_ textField: CustomTextField) {
+    func configureTextField(_ textField: PageInputTextField) {
         textField.font = font
         textField.textColor = textColor
         textField.backgroundColor = backgroundColor
