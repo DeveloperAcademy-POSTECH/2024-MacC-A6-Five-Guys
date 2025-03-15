@@ -121,22 +121,25 @@ struct BookPageSettingView: View {
     }
     
     private func nextButtonTapped() {
-        if startPage >= 1 && (targetEndPage > startPage) {
+        var message: String?
+        
+        if startPage < 0 {
+            message = "시작 페이지를 0보다 큰 페이지로 입력해주세요!"
+        } else if startPage > targetEndPage {
+            message = "앗! 시작 페이지는 마지막 페이지를 초과할 수 없어요!"
+        } else if startPage == targetEndPage {
+            message = "시작 페이지는 마지막 페이지와 같을 수 없어요!"
+        } else {
             bookSettingInputModel.targetEndPage = targetEndPage
             bookSettingInputModel.startPage = startPage
-            
             focusedField = nil
             bookSettingInputModel.nextPage()
             return
         }
         
-        let message = (startPage < 0)
-        ? "시작 페이지를 0보다 큰 페이지로 입력해주세요!"
-        : (startPage > targetEndPage)
-            ? "앗! 시작 페이지는 마지막 페이지를 초과할 수 없어요!"
-            : "시작 페이지는 마지막 페이지와 같을 수 없어요!"
-        
-        toastViewModel.showToast(message: message)
+        if let message = message {
+            toastViewModel.showToast(message: message)
+        }
     }
     
     private func initializePageSettings() {
