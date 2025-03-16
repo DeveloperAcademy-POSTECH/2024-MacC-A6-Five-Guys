@@ -20,7 +20,7 @@ class PageInputTextField: UITextField {
 // CustomTextField를 사용
 // SwiftUI 내에서 UIKit을 사용하려면 UIViewRepresentable을 사용
 struct CustomTextFieldRepresentable: UIViewRepresentable {
-    @Binding var text: String
+    @Binding var text: Int
     var isFocused: Bool
     var keyboardType: UIKeyboardType = .numberPad
     private let font = UIFont.systemFont(ofSize: FontStyle.title2.size, weight: .semibold)
@@ -39,10 +39,12 @@ struct CustomTextFieldRepresentable: UIViewRepresentable {
     }
     
     func updateUIView(_ uiView: PageInputTextField, context: Context) {
-        uiView.text = text
+        uiView.text = "\(text)"
         
         if isFocused {
-            uiView.becomeFirstResponder()
+            DispatchQueue.main.async {
+                uiView.becomeFirstResponder()
+            }
         } else {
             uiView.resignFirstResponder()
         }
@@ -68,9 +70,14 @@ struct CustomTextFieldRepresentable: UIViewRepresentable {
         init(parent: CustomTextFieldRepresentable) {
             self.parent = parent
         }
-
+        
+        // 입력값을 Int로 변환
         func textFieldDidChangeSelection(_ textField: UITextField) {
-            parent.text = textField.text ?? ""
+            if let intValue = Int(textField.text ?? "") {
+                parent.text = intValue
+            } else {
+                parent.text = 0
+            }
         }
     }
 

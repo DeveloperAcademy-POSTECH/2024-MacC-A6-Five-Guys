@@ -61,7 +61,7 @@ struct BookPageSettingView: View {
             
             Spacer()
             
-            if focusedField != nil {
+            if focusedField == nil {
                 VStack(spacing: 22) {
                     ToastView(viewModel: toastViewModel)
                     
@@ -99,16 +99,9 @@ struct BookPageSettingView: View {
         isFocused: FocusState<FieldFocus?>.Binding,
         field: FieldFocus
     ) -> some View {
-        // UITextField를 SwiftUI로 래핑
+        // UIKit의 UITextField를 SwiftUI로 래핑
         CustomTextFieldRepresentable(
-            text: Binding(
-                get: { String(page.wrappedValue) },
-                set: { newValue in
-                    if let intValue = Int(newValue) {
-                        page.wrappedValue = intValue
-                    }
-                }
-            ),
+            text: page,
             isFocused: isFocused.wrappedValue == field
         )
         .frame(height: 40)
@@ -123,7 +116,7 @@ struct BookPageSettingView: View {
     private func nextButtonTapped() {
         var message: String?
         
-        if startPage < 0 {
+        if startPage <= 0 {
             message = "시작 페이지를 0보다 큰 페이지로 입력해주세요!"
         } else if startPage > targetEndPage {
             message = "앗! 시작 페이지는 마지막 페이지를 초과할 수 없어요!"
@@ -137,9 +130,7 @@ struct BookPageSettingView: View {
             return
         }
         
-        if let message = message {
-            toastViewModel.showToast(message: message)
-        }
+        if let message = message { toastViewModel.showToast(message: message) }
     }
     
     private func initializePageSettings() {
