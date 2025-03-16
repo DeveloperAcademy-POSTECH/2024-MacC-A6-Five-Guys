@@ -21,8 +21,10 @@ class PageInputTextField: UITextField {
 // SwiftUI 내에서 UIKit을 사용하려면 UIViewRepresentable을 사용
 struct CustomTextFieldRepresentable: UIViewRepresentable {
     @Binding var text: Int
-    var isFocused: Bool
+    @Binding var isFocused: Bool
+    
     var keyboardType: UIKeyboardType = .numberPad
+    
     private let font = UIFont.systemFont(ofSize: FontStyle.title2.size, weight: .semibold)
     private let textColor = UIColor(Color.Colors.green2)
     private let backgroundColor = UIColor(Color.Fills.lightGreen)
@@ -42,9 +44,7 @@ struct CustomTextFieldRepresentable: UIViewRepresentable {
         uiView.text = "\(text)"
         
         if isFocused {
-            DispatchQueue.main.async {
-                uiView.becomeFirstResponder()
-            }
+            uiView.becomeFirstResponder()
         } else {
             uiView.resignFirstResponder()
         }
@@ -66,21 +66,35 @@ struct CustomTextFieldRepresentable: UIViewRepresentable {
     
     class Coordinator: NSObject, UITextFieldDelegate {
         var parent: CustomTextFieldRepresentable
-
+        
         init(parent: CustomTextFieldRepresentable) {
             self.parent = parent
         }
         
         // 입력값을 Int로 변환
         func textFieldDidChangeSelection(_ textField: UITextField) {
-            if let intValue = Int(textField.text ?? "") {
-                parent.text = intValue
-            } else {
-                parent.text = 0
+            DispatchQueue.main.async {
+                if let intValue = Int(textField.text ?? "") {
+                    self.parent.text = intValue
+                } else {
+                    self.parent.text = 0
+                }
+            }
+        }
+        
+        func textFieldDidBeginEditing(_ textField: UITextField) {
+            DispatchQueue.main.async {
+                self.parent.isFocused = true
+            }
+        }
+        
+        func textFieldDidEndEditing(_ textField: UITextField) {
+            DispatchQueue.main.async {
+                self.parent.isFocused = false
             }
         }
     }
-
+    
     func makeCoordinator() -> Coordinator {
         return Coordinator(parent: self)
     }
