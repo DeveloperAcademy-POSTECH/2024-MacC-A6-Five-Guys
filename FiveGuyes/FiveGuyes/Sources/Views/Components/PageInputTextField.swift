@@ -23,19 +23,12 @@ struct CustomTextFieldRepresentable: UIViewRepresentable {
     @Binding var text: Int
     @Binding var isFocused: Bool
     
-    var keyboardType: UIKeyboardType = .numberPad
-    
-    private let font = UIFont.systemFont(ofSize: FontStyle.title2.size, weight: .semibold)
-    private let textColor = UIColor(Color.Colors.green2)
-    private let backgroundColor = UIColor(Color.Fills.lightGreen)
-    private let cornerRadius: CGFloat = 8
-    private let height: CGFloat = 40
-    
     func makeUIView(context: Context) -> PageInputTextField {
         let textField = PageInputTextField()
         textField.delegate = context.coordinator
-        textField.keyboardType = keyboardType
-        configureTextField(textField)
+        textField.keyboardType = .numberPad
+        textField.font = UIFont.systemFont(ofSize: FontStyle.title2.size, weight: .semibold)
+        textField.textColor = UIColor(Color.Colors.green2)
         
         return textField
     }
@@ -48,20 +41,6 @@ struct CustomTextFieldRepresentable: UIViewRepresentable {
         } else {
             uiView.resignFirstResponder()
         }
-    }
-    
-    func configureTextField(_ textField: PageInputTextField) {
-        textField.font = font
-        textField.textColor = textColor
-        textField.backgroundColor = backgroundColor
-        textField.layer.cornerRadius = cornerRadius
-        textField.layer.masksToBounds = true
-        textField.textAlignment = .center
-        textField.translatesAutoresizingMaskIntoConstraints = false
-        textField.heightAnchor.constraint(equalToConstant: height).isActive = true
-        
-        textField.setContentHuggingPriority(.required, for: .horizontal)
-        textField.setContentCompressionResistancePriority(.required, for: .horizontal)
     }
     
     class Coordinator: NSObject, UITextFieldDelegate {

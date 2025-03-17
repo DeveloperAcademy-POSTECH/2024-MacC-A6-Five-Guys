@@ -94,6 +94,7 @@ struct BookPageSettingView: View {
             isFocused: isFocused
         )
         .frame(height: 40)
+        .fixedSize()
         .padding(.horizontal, 8)
         .padding(.vertical, 4)
         .background {
