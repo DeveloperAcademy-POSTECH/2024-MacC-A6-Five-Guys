@@ -13,7 +13,6 @@
 		1A010EBE2CD8DA2400FBE3B3 /* BookListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A010EBD2CD8DA2400FBE3B3 /* BookListView.swift */; };
 		1A010EC02CD8DA3800FBE3B3 /* BookLowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A010EBF2CD8DA3800FBE3B3 /* BookLowView.swift */; };
 		1A010EC22CD8DA4300FBE3B3 /* BookPageSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A010EC12CD8DA4300FBE3B3 /* BookPageSettingView.swift */; };
-		1A27D9602CDA31EE00D1E14D /* ProgressBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A27D95F2CDA31EE00D1E14D /* ProgressBar.swift */; };
 		1A27D9622CDB05C000D1E14D /* CustomTextFieldStylePageCount.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A27D9612CDB05C000D1E14D /* CustomTextFieldStylePageCount.swift */; };
 		1A27D9662CDB779000D1E14D /* TotalCalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A27D9652CDB779000D1E14D /* TotalCalendarView.swift */; };
 		1A54142B2CD9FEF400283FBD /* BookSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A54142A2CD9FEF400283FBD /* BookSearchView.swift */; };
@@ -27,6 +26,8 @@
 		24D519BC2D7F267000CCBF5F /* PageInputTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24D519BB2D7F267000CCBF5F /* PageInputTextField.swift */; };
 		24F8A2172CEB290B00A01A76 /* Config.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 24F8A2162CEB290B00A01A76 /* Config.xcconfig */; };
 		24FAF9452CEC5224004FEC3F /* ToastView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24FAF9442CEC5224004FEC3F /* ToastView.swift */; };
+		2606F32B2D7D9D6C004E519C /* BookSettingProgressBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2606F32A2D7D9D6C004E519C /* BookSettingProgressBar.swift */; };
+		2606F32F2D7DC7AA004E519C /* BookSettingPageModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2606F32E2D7DC7AA004E519C /* BookSettingPageModel.swift */; };
 		2613B7522D329FD900AC717F /* WeeklyProgressPagingSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2613B7512D329FD900AC717F /* WeeklyProgressPagingSlider.swift */; };
 		2613B7582D34F81E00AC717F /* EmptyImageDefaultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2613B7572D34F81E00AC717F /* EmptyImageDefaultView.swift */; };
 		2613B7652D3559D400AC717F /* UnfinishReadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2613B7642D3559D400AC717F /* UnfinishReadingView.swift */; };
@@ -118,7 +119,6 @@
 		1A010EBD2CD8DA2400FBE3B3 /* BookListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookListView.swift; sourceTree = "<group>"; };
 		1A010EBF2CD8DA3800FBE3B3 /* BookLowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookLowView.swift; sourceTree = "<group>"; };
 		1A010EC12CD8DA4300FBE3B3 /* BookPageSettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookPageSettingView.swift; sourceTree = "<group>"; };
-		1A27D95F2CDA31EE00D1E14D /* ProgressBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressBar.swift; sourceTree = "<group>"; };
 		1A27D9612CDB05C000D1E14D /* CustomTextFieldStylePageCount.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTextFieldStylePageCount.swift; sourceTree = "<group>"; };
 		1A27D9652CDB779000D1E14D /* TotalCalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TotalCalendarView.swift; sourceTree = "<group>"; };
 		1A54142A2CD9FEF400283FBD /* BookSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = BookSearchView.swift; path = FiveGuyes/Sources/Views/Screen/BookSetting/BookSearch/BookSearchView.swift; sourceTree = SOURCE_ROOT; };
@@ -131,6 +131,8 @@
 		24D519BB2D7F267000CCBF5F /* PageInputTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageInputTextField.swift; sourceTree = "<group>"; };
 		24F8A2162CEB290B00A01A76 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		24FAF9442CEC5224004FEC3F /* ToastView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastView.swift; sourceTree = "<group>"; };
+		2606F32A2D7D9D6C004E519C /* BookSettingProgressBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookSettingProgressBar.swift; sourceTree = "<group>"; };
+		2606F32E2D7DC7AA004E519C /* BookSettingPageModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookSettingPageModel.swift; sourceTree = "<group>"; };
 		2613B7512D329FD900AC717F /* WeeklyProgressPagingSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyProgressPagingSlider.swift; sourceTree = "<group>"; };
 		2613B7572D34F81E00AC717F /* EmptyImageDefaultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyImageDefaultView.swift; sourceTree = "<group>"; };
 		2613B7642D3559D400AC717F /* UnfinishReadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnfinishReadingView.swift; sourceTree = "<group>"; };
@@ -233,6 +235,7 @@
 			isa = PBXGroup;
 			children = (
 				261714D52CDDDA4000A3241D /* BookSettingsManagerView.swift */,
+				2606F32A2D7D9D6C004E519C /* BookSettingProgressBar.swift */,
 				26EBDE242CDE3A7900B3A2BC /* BookSearch */,
 				1A010EC12CD8DA4300FBE3B3 /* BookPageSettingView.swift */,
 				26410AF62D2964E100D6B477 /* ReadingDateSettingView.swift */,
@@ -483,6 +486,7 @@
 				26EBDE252CDE3C6000B3A2BC /* BookSettingInputModel.swift */,
 				240445B32CED9074005C3623 /* ToastViewModel.swift */,
 				26410AF42D292ED100D6B477 /* CalendarCellModel.swift */,
+				2606F32E2D7DC7AA004E519C /* BookSettingPageModel.swift */,
 			);
 			path = Stores;
 			sourceTree = "<group>";
@@ -517,7 +521,6 @@
 			isa = PBXGroup;
 			children = (
 				264440562CD8E0D20031A290 /* CustomTextEditorStyle.swift */,
-				1A27D95F2CDA31EE00D1E14D /* ProgressBar.swift */,
 				1A27D9612CDB05C000D1E14D /* CustomTextFieldStylePageCount.swift */,
 				26F19A6B2CDA0A2B00F41D6D /* CompletionListView.swift */,
 				1AA14A772CDDA30D00B763A6 /* TotalCalendarTextBubble.swift */,
@@ -773,6 +776,7 @@
 				1A010EAC2CD8A7E500FBE3B3 /* APIBooksModel.swift in Sources */,
 				240445B42CED9074005C3623 /* ToastViewModel.swift in Sources */,
 				2622C7D82D2AC4C000AA3FF4 /* DividerLine.swift in Sources */,
+				2606F32B2D7D9D6C004E519C /* BookSettingProgressBar.swift in Sources */,
 				26EBDE832CF0219300B3A2BC /* FontAsset.swift in Sources */,
 				26890B972CAE811A008DFF49 /* ContentView.swift in Sources */,
 				26EBDEB42CF1CC8500B3A2BC /* Tracking.swift in Sources */,
@@ -780,7 +784,6 @@
 				261714D62CDDDA4000A3241D /* BookSettingsManagerView.swift in Sources */,
 				1AA14A782CDDA30D00B763A6 /* TotalCalendarTextBubble.swift in Sources */,
 				24360D532CD9F3AF00E83D2B /* DailyProgressView.swift in Sources */,
-				1A27D9602CDA31EE00D1E14D /* ProgressBar.swift in Sources */,
 				26410AF72D2964E100D6B477 /* ReadingDateSettingView.swift in Sources */,
 				1A27D9622CDB05C000D1E14D /* CustomTextFieldStylePageCount.swift in Sources */,
 				2613B7582D34F81E00AC717F /* EmptyImageDefaultView.swift in Sources */,
@@ -815,6 +818,7 @@
 				24FAF9452CEC5224004FEC3F /* ToastView.swift in Sources */,
 				26EBDE912CF068E600B3A2BC /* FontStyle.swift in Sources */,
 				26CF825A2D1D4B09005037E4 /* ReadingPagesCalculator.swift in Sources */,
+				2606F32F2D7DC7AA004E519C /* BookSettingPageModel.swift in Sources */,
 				264440502CD8A3AC0031A290 /* CompletionReviewView.swift in Sources */,
 				26EBDEBE2CF2390C00B3A2BC /* CompletionStatusProtocol.swift in Sources */,
 				264440502CD8A3AC0031A290 /* CompletionReviewView.swift in Sources */,
@@ -994,6 +998,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -1020,6 +1025,7 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.FiveNorms.FiveNorms;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -1035,6 +1041,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -1061,6 +1068,7 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.FiveNorms.FiveNorms;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;

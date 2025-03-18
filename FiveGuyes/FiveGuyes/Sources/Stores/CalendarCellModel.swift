@@ -168,6 +168,11 @@ final class CalendarCellModel: ObservableObject {
         isConfirmed = true
     }
     
+    func resetConfirmedDates() {
+        isConfirmed = false
+        excludedDates.removeAll()
+    }
+    
     // MARK: - Getter Methods
     
     /// 시작 날짜를 가져옵니다.
@@ -192,5 +197,20 @@ final class CalendarCellModel: ObservableObject {
     /// - Returns: 날짜 범위가 확정되었으면 `true`, 그렇지 않으면 `false`.
     func getConfirmed() -> Bool {
         return isConfirmed
+    }
+    
+    // 시작 날짜 설정
+    func setStartDate(_ date: Date?) {
+        startDate = date
+    }
+
+    // 종료 날짜 설정
+    func setEndDate(_ date: Date?) {
+        endDate = date
+    }
+
+    // 제외된 날짜 설정
+    func setExcludedDates(_ dates: [Date]) {
+        excludedDates = dates
     }
 }

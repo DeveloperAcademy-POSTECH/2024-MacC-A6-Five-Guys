@@ -10,6 +10,7 @@ import SwiftUI
 struct BookPageSettingView: View {
     @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
     @Environment(BookSettingInputModel.self) var bookSettingInputModel: BookSettingInputModel
+    @Environment(BookSettingPageModel.self) var pageModel: BookSettingPageModel
     
     @State private var startPage = 1
     @State private var targetEndPage = 0
@@ -104,26 +105,28 @@ struct BookPageSettingView: View {
     }
     
     private func nextButtonTapped() {
-        var message: String?
-        
-        if startPage <= 0 {
-            message = "시작 페이지를 0보다 큰 페이지로 입력해주세요!"
-        } else if startPage > targetEndPage {
-            message = "앗! 시작 페이지는 마지막 페이지를 초과할 수 없어요!"
-        } else if startPage == targetEndPage {
-            message = "시작 페이지는 마지막 페이지와 같을 수 없어요!"
-        } else {
-            bookSettingInputModel.targetEndPage = targetEndPage
-            bookSettingInputModel.startPage = startPage
-            
-            dismissKeyboard()
-            bookSettingInputModel.nextPage()
+        if let message = pageValidationError() {
+            toastViewModel.showToast(message: message)
             return
         }
         
-        if let message {
-            toastViewModel.showToast(message: message)
+        bookSettingInputModel.setPageRange(start: startPage, end: targetEndPage)
+        
+        dismissKeyboard()
+        pageModel.nextPage()
+    }
+    
+    /// 시작 페이지와 마지막 페이지의 입력값을 검증하여, 오류가 있으면 에러 메시지를 반환합니다.
+    /// 유효한 입력이면 nil을 반환합니다.
+    private func pageValidationError() -> String? {
+        if startPage <= 0 {
+            return "시작 페이지를 0보다 큰 페이지로 입력해주세요!"
+        } else if startPage > targetEndPage {
+            return "앗! 시작 페이지는 마지막 페이지를 초과할 수 없어요!"
+        } else if startPage == targetEndPage {
+            return "시작 페이지는 마지막 페이지와 같을 수 없어요!"
         }
+        return nil
     }
     
     private func initializePageSettings() {

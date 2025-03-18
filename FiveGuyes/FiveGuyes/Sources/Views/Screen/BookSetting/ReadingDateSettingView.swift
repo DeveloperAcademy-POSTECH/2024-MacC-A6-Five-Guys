@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct ReadingDateSettingView: View {
-    @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
     @Environment(BookSettingInputModel.self) var bookSettingInputModel: BookSettingInputModel
+    @Environment(BookSettingPageModel.self) var pageModel: BookSettingPageModel
     
     @StateObject private var calendarCellModel: CalendarCellModel
     
@@ -47,6 +47,7 @@ struct ReadingDateSettingView: View {
         let calendarCellModel = CalendarCellModel(adjustedToday: adjustedToday, startDate: adjustedToday)
         
         self.adjustedToday = adjustedToday
+        
         self._calendarCellModel = StateObject(wrappedValue: calendarCellModel)
     }
     
@@ -78,7 +79,20 @@ struct ReadingDateSettingView: View {
                 startPage: bookSettingInputModel.startPage
             )
         }
-        
+        .onAppear {
+            if pageModel.currentPage == BookSettingsPage.bookNoneReadingDaySetting.rawValue {
+                calendarCellModel.setStartDate(bookSettingInputModel.startDate)
+                calendarCellModel.setEndDate(bookSettingInputModel.endDate)
+                calendarCellModel.setExcludedDates(bookSettingInputModel.nonReadingDays)
+
+                confirmReadingPeriod()
+            }
+        }
+        .onChange(of: pageModel.currentPage) {
+            if pageModel.currentPage == BookSettingsPage.bookDurationSetting.rawValue {
+                resetNonReadingDays()
+            }
+        }
     }
     
     private func descriptionText() -> some View {
@@ -105,7 +119,6 @@ struct ReadingDateSettingView: View {
                         .foregroundStyle(Color.Fills.white)
                         .fontStyle(.title2, weight: .semibold)
                 }
-            
         }
         .padding(.top, 14)
         .padding(.bottom, 21)
@@ -137,18 +150,31 @@ struct ReadingDateSettingView: View {
     
     private func nextButtonAction() {
         if !calendarCellModel.getConfirmed() {
-            withAnimation(.easeOut) {
-                calendarCellModel.confirmDates()
-            }
+            confirmReadingPeriod()
         } else {
-            // 입력 데이터 추가
-            bookSettingInputModel.startData = calendarCellModel.getStartDate()
-            bookSettingInputModel.endData = calendarCellModel.getEndDate()
-            bookSettingInputModel.nonReadingDays = calendarCellModel.getExcludedDates()
-            
-            // 페이지 이동
-            bookSettingInputModel.nextPage()
+            saveReadingData()
         }
+        pageModel.nextPage()
+    }
+    
+    private func confirmReadingPeriod() {
+        withAnimation(.easeOut) {
+            calendarCellModel.confirmDates()
+        }
+    }
+    
+    private func resetNonReadingDays() {
+        withAnimation(.easeOut) {
+            calendarCellModel.resetConfirmedDates()
+        }
+    }
+    
+    private func saveReadingData() {
+        bookSettingInputModel.setReadingPeriod(
+            startDate: calendarCellModel.getStartDate(),
+            endDate: calendarCellModel.getEndDate()
+        )
+        bookSettingInputModel.setNonReadingDays(calendarCellModel.getExcludedDates())
     }
 }
 
