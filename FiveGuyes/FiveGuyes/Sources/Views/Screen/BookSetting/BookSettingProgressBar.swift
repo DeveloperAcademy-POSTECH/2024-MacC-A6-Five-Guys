@@ -15,10 +15,20 @@ struct BookSettingProgressBar: View {
         HStack(spacing: 4) { // 간격 추가
             ForEach(0..<totalPages, id: \.self) { index in
                 Rectangle()
-                    .fill(index + 1 == currentPage ? Color.Colors.green1 : Color.Separators.green) // 현재 페이지만 강조
+                    .fill(progressColor(for: index)) // 현재 페이지만 강조
                     .frame(height: 2)
                     .frame(maxWidth: .infinity) // 동일한 너비 유지
             }
+        }
+    }
+    
+    private func progressColor(for index: Int) -> Color {
+        if index + 1 < currentPage {
+            return Color.Colors.green // 지나온 페이지 색상
+        } else if index + 1 == currentPage {
+            return Color.Colors.green1 // 현재 페이지 색상
+        } else {
+            return Color.Separators.gray // 미래 페이지 색상
         }
     }
 }
