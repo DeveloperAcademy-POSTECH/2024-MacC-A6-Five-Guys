@@ -19,7 +19,7 @@ enum UserBookSchemaV2: VersionedSchema {
 extension UserBookSchemaV2 {
     @Model
     final class UserBookV2: Identifiable {
-        @Attribute(.unique) var id = UUID()
+        @Attribute(.unique) var id: UUID
         
         @Relationship(deleteRule: .cascade)
         var bookMetaData: BookMetaData
@@ -32,11 +32,13 @@ extension UserBookSchemaV2 {
         
         // MARK: init
         init(
+            id: UUID = UUID(),
             bookMetaData: BookMetaData,
             userSettings: UserSettings,
             readingProgress: ReadingProgress,
             completionStatus: CompletionStatus
         ) {
+            self.id = id
             self.bookMetaData = bookMetaData
             self.userSettings = userSettings
             self.readingProgress = readingProgress
