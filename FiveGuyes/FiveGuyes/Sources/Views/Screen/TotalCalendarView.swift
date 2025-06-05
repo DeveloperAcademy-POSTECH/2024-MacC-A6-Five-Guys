@@ -5,17 +5,14 @@
 //  Created by Shim Hyeonhee on 11/6/24.
 //
 
-import SwiftData
 import SwiftUI
 
 struct TotalCalendarView: View {
-    typealias UserBook = UserBookSchemaV2.UserBookV2
-
     // 현재 보고 있는 달력의 월 ⏰
     @State private var currentMonth = Date().adjustedDate()
     private let todayDate = Date().adjustedDate()
     
-    let currentReadingBook: UserBook?
+    let currentReadingBook: FGUserBook
     
     var body: some View {
         VStack(spacing: 0) {
@@ -96,8 +93,7 @@ struct TotalCalendarView: View {
                     let dateKey = date.toYearMonthDayString()
                     
                     VStack(spacing: 0) {
-                        if let currentReadingBook = currentReadingBook,
-                           let readingRecord = currentReadingBook.readingProgress.readingRecords[dateKey] {
+                        if let readingRecord = currentReadingBook.readingProgress.dailyReadingRecords[dateKey] {
                             
                             let isTodayCompletionDate = Calendar.current.isDate(todayDate, inSameDayAs: currentReadingBook.userSettings.targetEndDate)
                             
@@ -164,16 +160,15 @@ struct TotalCalendarView: View {
                 .fontStyle(.body, weight: .semibold)
             
             Spacer()
-            if let targetEndDate = currentReadingBook?.userSettings.targetEndDate {
-                Text("\(formattedCompletionDateString(from: targetEndDate))")
-                    .fontStyle(.body)
-                    .multilineTextAlignment(.center)
-                    .foregroundStyle(Color.Colors.green2)
-                    .padding(.horizontal, 11)
-                    .padding(.vertical, 6)
-                    .background(Color.Fills.lightGreen)
-                    .cornerRadius(8)
-            }
+            
+            Text("\(formattedCompletionDateString(from: currentReadingBook.userSettings.targetEndDate))")
+                .fontStyle(.body)
+                .multilineTextAlignment(.center)
+                .foregroundStyle(Color.Colors.green2)
+                .padding(.horizontal, 11)
+                .padding(.vertical, 6)
+                .background(Color.Fills.lightGreen)
+                .cornerRadius(8)
         }
         .padding(.horizontal, 16)
         .frame(width: 361, alignment: .center)
