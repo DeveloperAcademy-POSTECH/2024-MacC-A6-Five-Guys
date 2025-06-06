@@ -14,7 +14,7 @@ enum Screens: Hashable {
     case mainHome
     case notiSetting(book: UserBook?)
     case bookSettingsManager
-    case totalCalendar(book: UserBook)
+    case totalCalendar(book: FGUserBook)
     case dailyProgress(book: UserBook)
     case completionCelebration(book: UserBook)
     case completionReview(book: UserBook)

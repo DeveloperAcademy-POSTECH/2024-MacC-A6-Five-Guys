@@ -33,27 +33,27 @@ final class SwiftDataBookRepository: BookRepository {
     
     // MARK: - Public Methods
     
-    func fetchBooks() -> Result<[UserBook1], RepositoryError> {
+    func fetchBooks() -> Result<[FGUserBook], RepositoryError> {
         do {
             let swiftDatabooks = try modelContext.fetch(FetchDescriptor<SDUserBook>())
-            let books = swiftDatabooks.map { $0.toUserBook() }
+            let books = swiftDatabooks.map { $0.toFGUserBook() }
             return .success(books)
         } catch {
             return .failure(.fetchFailed)
         }
     }
     
-    func fetchBook(by id: UUID) -> Result<UserBook1, RepositoryError> {
+    func fetchBook(by id: UUID) -> Result<FGUserBook, RepositoryError> {
         switch findSwiftDataBook(by: id) {
         case .success(let book):
-            return .success(book.toUserBook())
+            return .success(book.toFGUserBook())
         case .failure(let error):
             return .failure(error)
         }
     }
     
-    func addBook(_ book: UserBook1) -> Result<Void, RepositoryError> {
-        let swiftDataBook = toSwiftDataBookModel(book)
+    func addBook(_ book: FGUserBook) -> Result<Void, RepositoryError> {
+        let swiftDataBook = book.toUserBookV2()
         modelContext.insert(swiftDataBook)
         
         do {
@@ -64,7 +64,7 @@ final class SwiftDataBookRepository: BookRepository {
         }
     }
     
-    func updateBook(_ book: UserBook1) -> Result<Void, RepositoryError> {
+    func updateBook(_ book: FGUserBook) -> Result<Void, RepositoryError> {
         switch findSwiftDataBook(by: book.id) {
         case .success(let swiftDataBook):
             // 기존 책 데이터를 DTO를 기준으로 업데이트
@@ -101,51 +101,11 @@ final class SwiftDataBookRepository: BookRepository {
     
     // MARK: - Helper Methods
     
-    /// DTO를 SwiftData 모델로 변환
-    private func toSwiftDataBookModel(_ book: UserBook1) -> SDUserBook {
-        let bookMetaData: BookMetaData = BookMetaData(
-            title: book.bookMetaData.title,
-            author: book.bookMetaData.author,
-            coverURL: book.bookMetaData.coverImageURL,
-            totalPages: book.bookMetaData.totalPages
-        )
-        
-        let userSettings: UserSettings = .init(
-            startPage: book.userSettings.startPage,
-            targetEndPage: book.userSettings.targetEndPage,
-            startDate: book.userSettings.startDate,
-            targetEndDate: book.userSettings.targetEndDate,
-            nonReadingDays: book.userSettings.excludedReadingDays
-        )
-        
-        let readingProgress: ReadingProgress = ReadingProgress(
-            readingRecords: book.readingProgress.dailyReadingRecords,
-            lastReadDate: book.readingProgress.lastReadDate,
-            lastPagesRead: book.readingProgress.lastReadPage
-        )
-        
-        let completionStatus: CompletionStatus = CompletionStatus(
-            isCompleted: book.completionStatus.isCompleted,
-            completionReview: book.completionStatus.reviewAfterCompletion
-        )
-        
-        return SDUserBook(bookMetaData: bookMetaData, userSettings: userSettings, readingProgress: readingProgress, completionStatus: completionStatus)
-    }
-    
     /// UserBook으로 기존 SwiftData 모델을  업데이트
-    private func updateSwiftDataModel(_ existingBook: SDUserBook, with book: UserBook1) {
-        existingBook.userSettings.startPage = book.userSettings.startPage
-        existingBook.userSettings.targetEndPage = book.userSettings.targetEndPage
-        existingBook.userSettings.startDate = book.userSettings.startDate
-        existingBook.userSettings.targetEndDate = book.userSettings.targetEndDate
-        existingBook.userSettings.nonReadingDays = book.userSettings.excludedReadingDays
-        
-        existingBook.readingProgress.readingRecords = book.readingProgress.dailyReadingRecords
-        existingBook.readingProgress.lastReadDate = book.readingProgress.lastReadDate
-        existingBook.readingProgress.lastPagesRead = book.readingProgress.lastReadPage
-        
-        existingBook.completionStatus.isCompleted = book.completionStatus.isCompleted
-        existingBook.completionStatus.completionReview = book.completionStatus.reviewAfterCompletion
+    private func updateSwiftDataModel(_ existingBook: SDUserBook, with book: FGUserBook) {
+        existingBook.userSettings = book.userSettings.toUserSettings()
+        existingBook.readingProgress = book.readingProgress.toReadingProgress()
+        existingBook.completionStatus = book.completionStatus.toCompletionStatus()
     }
     
     /// 특정 ID로 SwiftData 모델을 조회
