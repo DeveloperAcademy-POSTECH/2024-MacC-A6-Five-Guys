@@ -52,9 +52,12 @@ struct WeeklyReadingProgressView: View {
                 .padding(.top, 22)
                 .padding(.horizontal, 16)
                 
-                WeeklyProgressCalendar(userBook: userBook)
-                    .padding(.horizontal, 16)
-                    .padding(.bottom, 18)
+                WeeklyProgressCalendar(
+                    userBook: userBook.toFGUserBook(),
+                    today: adjustedToday
+                )
+                .padding(.horizontal, 16)
+                .padding(.bottom, 18)
             }
             .background {
                 RoundedRectangle(cornerRadius: 16)
