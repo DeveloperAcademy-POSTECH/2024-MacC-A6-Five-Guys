@@ -28,12 +28,44 @@ struct FGUserSetting: Hashable {
     let startDate: Date
     let targetEndDate: Date
     let excludedReadingDays: [Date]
+    
+    /// 독서 시작일부터 종료일까지 포함된 각 주의 시작 날짜 배열을 반환
+    func weeklyStartDates(today: Date) -> [Date] {
+        // 오늘이 시작일보다 빠르면 오늘부터 계산 시작
+        let effectiveStartDay = today < startDate ? today : startDate
+        
+        let calendar = Calendar.current
+        let firstWeekStart = calendar.dateInterval(of: .weekOfMonth, for: effectiveStartDay)?.start ?? effectiveStartDay
+        let lastWeekStart = calendar.dateInterval(of: .weekOfMonth, for: targetEndDate)?.start ?? targetEndDate
+        
+        var startDates: [Date] = []
+        var currentStart = firstWeekStart
+        
+        // 시작일부터 종료일까지 매주 시작 날짜 추가
+        while currentStart <= lastWeekStart {
+            startDates.append(currentStart)
+            currentStart = calendar.date(byAdding: .weekOfMonth, value: 1, to: currentStart) ?? currentStart
+        }
+        
+        return startDates
+    }
 }
 
 struct FGReadingProgress: Hashable {
     let dailyReadingRecords: [String: ReadingRecord] // 날짜와 읽은 페이지 수의 매핑
     let lastReadDate: Date?
     let lastReadPage: Int
+    
+    /// 특정 주의 기록 가져오기
+    func getAdjustedWeeklyRecorded(from today: Date) -> [ReadingRecord?] {
+        let calendar = Calendar.current
+        let startOfWeek = calendar.dateInterval(of: .weekOfMonth, for: today)?.start ?? today
+        
+        return (0..<7).map { dayOffset in
+            let date = calendar.date(byAdding: .day, value: dayOffset, to: startOfWeek)!
+            return dailyReadingRecords[date.toYearMonthDayString()]
+        }
+    }
 }
 
 struct FGCompletionStatus: Hashable {
