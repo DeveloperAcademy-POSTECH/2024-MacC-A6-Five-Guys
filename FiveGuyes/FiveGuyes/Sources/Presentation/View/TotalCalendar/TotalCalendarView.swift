@@ -16,23 +16,16 @@ struct TotalCalendarView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            header
-                .padding(.top, 27)
-                .padding(.bottom, 29)
+            bookInfoHeader
+                .padding(.top, 9)
+                .padding(.bottom, 34)
             
-            dayLabels
-                .padding(.bottom, 22)
+            calendarCardView
+                .padding(.horizontal, 4)
             
-            calendarDays
-                .padding(.bottom, 43)
-            
-            Divider()
-                .padding(.bottom, 8)
-            
-            CompletionFooter
             Spacer()
         }
-        .padding(.horizontal, 16)
+        .padding(.horizontal, 20)
         .navigationTitle("전체 독서 현황")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
@@ -43,22 +36,76 @@ struct TotalCalendarView: View {
         }
     }
     
+    private var bookInfoHeader: some View {
+        HStack {
+            Text(currentReadingBook.bookMetaData.title)
+                .fontStyle(.title1, weight: .semibold)
+                .multilineTextAlignment(.leading)
+                .foregroundStyle(Color.Labels.primaryBlack1)
+            
+            Spacer()
+            
+            if let coverImageURLString = currentReadingBook.bookMetaData.coverImageURL,
+               let url = URL(string: coverImageURLString) {
+                AsyncImage(url: url) { image in
+                    image.resizable()
+                        .scaledToFit()
+                        .frame(width: 44, height: 68)
+                        .clipRightSideRounded(radius: 8)
+                } placeholder: {
+                    ProgressView()
+                }
+            }
+        }
+    }
+    
+    private var calendarCardView: some View {
+        VStack(spacing: 0) {
+            header
+                .padding(.top, 24)
+                .padding(.bottom, 23)
+            
+            dayLabels
+                .padding(.bottom, 22)
+            
+            calendarDays
+                .padding(.horizontal, 5)
+                .padding(.bottom, 16)
+            
+            Divider()
+                .padding(.bottom, 12)
+            
+            CompletionFooter
+                .padding(.bottom, 16)
+        }
+        .padding(.horizontal, 16)
+        .background(Color.Backgrounds.primary)
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .inset(by: 0.5)
+                .stroke(Color.Separators.green, lineWidth: 1)
+        )
+    }
+    
     private var header: some View {
-        ZStack {
+        HStack(spacing: 0) {
             Text(calendarHeaderString(for: currentMonth))
                 .fontStyle(.body, weight: .semibold)
                 .multilineTextAlignment(.center)
                 .foregroundStyle(Color.Labels.primaryBlack1)
             
-            HStack(alignment: .center, spacing: 28) {
+            Spacer()
+            
+            HStack(alignment: .center, spacing: 24) {
                 Spacer()
                 Button(action: previousMonth) {
                     Image(systemName: "chevron.left")
+                        .foregroundStyle(Color.Colors.green2)
                 }
                 Button(action: nextMonth) {
                     Image(systemName: "chevron.right")
+                        .foregroundStyle(Color.Colors.green2)
                 }
-                .padding(.trailing, 20)
             }
             .foregroundStyle(Color.Labels.primaryBlack1)
         }
@@ -69,7 +116,7 @@ struct TotalCalendarView: View {
         LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7)) {
             ForEach(["일", "월", "화", "수", "목", "금", "토"], id: \.self) { day in
                 Text(day)
-                    .fontStyle(.caption1, weight: .semibold) // TODO: 디자이너 확인중
+                    .fontStyle(.caption2, weight: .semibold) // TODO: 디자이너 확인중
                     .foregroundStyle(Color.Labels.tertiaryBlack3)
                     .frame(width: 32, height: 18, alignment: .center)
                     .padding(.horizontal, 16)
@@ -115,7 +162,8 @@ struct TotalCalendarView: View {
                                     text: "\(readingRecord.targetPages)",
                                     textColor: Color.Fills.white,
                                     backgroundColor: Color.Colors.green1,
-                                    fontWeight: .semibold
+                                    fontWeight: .regular,
+                                    fontSize: .title2
                                 )
                             } else if readingRecord.pagesRead == readingRecord.targetPages {
                                 // 목표 페이지를 달성한 날 - 녹색 배경의 읽은 페이지 수 표시
@@ -162,7 +210,7 @@ struct TotalCalendarView: View {
             Spacer()
             
             Text("\(formattedCompletionDateString(from: currentReadingBook.userSettings.targetEndDate))")
-                .fontStyle(.body)
+                .fontStyle(.body, weight: .regular)
                 .multilineTextAlignment(.center)
                 .foregroundStyle(Color.Colors.green2)
                 .padding(.horizontal, 11)
@@ -171,7 +219,6 @@ struct TotalCalendarView: View {
                 .cornerRadius(8)
         }
         .padding(.horizontal, 16)
-        .frame(width: 361, alignment: .center)
     }
     
     private func previousMonth() {
