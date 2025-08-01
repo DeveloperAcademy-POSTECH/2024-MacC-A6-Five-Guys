@@ -8,24 +8,40 @@
 import SwiftUI
 
 struct TotalCalendarView: View {
-    // 현재 보고 있는 달력의 월 ⏰
-    @State private var currentMonth = Date().adjustedDate()
+    
+    // MARK: - Properties
+    
+    @State private var currentIndex: Int? = 0
+    
+    @State private var currentMonths: [Date]
     private let todayDate = Date().adjustedDate()
     
-    let currentReadingBook: FGUserBook
+    let currentReadingBooks: [FGUserBook]
+    
+    // MARK: - Initializer
+    
+    init(currentReadingBooks: [FGUserBook]) {
+        self.currentReadingBooks = currentReadingBooks
+        _currentMonths = State(initialValue: currentReadingBooks.map { _ in Date().adjustedDate() })
+    }
+    
+    // MARK: - Layout
     
     var body: some View {
         VStack(spacing: 0) {
-            bookInfoHeader
+            bookInfoHeader(for: currentReadingBooks[currentIndex ?? 0])
                 .padding(.top, 9)
-                .padding(.bottom, 34)
+                .padding(.bottom, 8)
+                .padding(.horizontal, 20)
             
-            calendarCardView
-                .padding(.horizontal, 4)
+            indicatorView()
+                .padding(.bottom, 22)
+                .padding(.horizontal, 20)
+            
+            calendarScrollView()
             
             Spacer()
         }
-        .padding(.horizontal, 20)
         .navigationTitle("전체 독서 현황")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
@@ -36,16 +52,19 @@ struct TotalCalendarView: View {
         }
     }
     
-    private var bookInfoHeader: some View {
-        HStack {
-            Text(currentReadingBook.bookMetaData.title)
+    // MARK: - Subviews
+    
+    private func bookInfoHeader(for book: FGUserBook) -> some View {
+        HStack(alignment: .top) {
+            Text(book.bookMetaData.title)
                 .fontStyle(.title1, weight: .semibold)
                 .multilineTextAlignment(.leading)
+                .lineLimit(2)
                 .foregroundStyle(Color.Labels.primaryBlack1)
             
             Spacer()
             
-            if let coverImageURLString = currentReadingBook.bookMetaData.coverImageURL,
+            if let coverImageURLString = book.bookMetaData.coverImageURL,
                let url = URL(string: coverImageURLString) {
                 AsyncImage(url: url) { image in
                     image.resizable()
@@ -59,37 +78,63 @@ struct TotalCalendarView: View {
         }
     }
     
-    private var calendarCardView: some View {
-        VStack(spacing: 0) {
-            header
-                .padding(.top, 24)
-                .padding(.bottom, 23)
+    private func indicatorView() -> some View {
+        HStack(spacing: 2) {
+            ForEach(currentReadingBooks.indices, id: \.self) { index in
+                Circle()
+                    .fill(index == currentIndex ? Color.Labels.primaryBlack1 : Color.Labels.quaternaryBlack4)
+                    .frame(width: 4, height: 4)
+            }
             
-            dayLabels
-                .padding(.bottom, 22)
-            
-            calendarDays
-                .padding(.horizontal, 5)
-                .padding(.bottom, 16)
-            
-            Divider()
-                .padding(.bottom, 12)
-            
-            CompletionFooter
-                .padding(.bottom, 16)
+            Spacer()
         }
-        .padding(.horizontal, 16)
-        .background(Color.Backgrounds.primary)
-        .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .inset(by: 0.5)
-                .stroke(Color.Separators.green, lineWidth: 1)
-        )
     }
     
-    private var header: some View {
+    // TODO: - 디자이너 작업 중
+    private func calendarScrollView() -> some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(alignment: .top, spacing: 8) {
+                ForEach(currentReadingBooks.indices, id: \.self) { index in
+                    VStack(spacing: 0) {
+                        header(for: index)
+                            .padding(.top, 24)
+                            .padding(.bottom, 23)
+                        
+                        dayLabels
+                            .padding(.bottom, 22)
+                        
+                        calendarDays(for: currentReadingBooks[index], index: index)
+                            .padding(.horizontal, 5)
+                            .padding(.bottom, 16)
+                        
+                        Divider()
+                            .padding(.bottom, 12)
+                        
+                        CompletionFooter(for: currentReadingBooks[index])
+                            .padding(.bottom, 16)
+                    }
+                    .padding(.horizontal, 16)
+                    .background {
+                        RoundedRectangle(cornerRadius: 16)
+                            .inset(by: 0.5)
+                            .stroke(Color.Separators.green, lineWidth: 1)
+                            .foregroundStyle(Color.Backgrounds.primary)
+                    }
+                    .frame(maxWidth: UIScreen.main.bounds.width - 48)
+//                    .containerRelativeFrame(.horizontal)
+                    .id(index)
+                }
+            }
+            .safeAreaPadding(.horizontal, 24)
+            .scrollTargetLayout()
+        }
+        .scrollTargetBehavior(.viewAligned)
+        .scrollPosition(id: $currentIndex)
+    }
+    
+    private func header(for index: Int) -> some View {
         HStack(spacing: 0) {
-            Text(calendarHeaderString(for: currentMonth))
+            Text(calendarHeaderString(for: currentMonths[index]))
                 .fontStyle(.body, weight: .semibold)
                 .multilineTextAlignment(.center)
                 .foregroundStyle(Color.Labels.primaryBlack1)
@@ -98,18 +143,21 @@ struct TotalCalendarView: View {
             
             HStack(alignment: .center, spacing: 24) {
                 Spacer()
-                Button(action: previousMonth) {
+                
+                Button {
+                    previousMonth(index)
+                } label: {
                     Image(systemName: "chevron.left")
-                        .foregroundStyle(Color.Colors.green2)
                 }
-                Button(action: nextMonth) {
+                
+                Button {
+                    nextMonth(index)
+                } label: {
                     Image(systemName: "chevron.right")
-                        .foregroundStyle(Color.Colors.green2)
                 }
             }
-            .foregroundStyle(Color.Labels.primaryBlack1)
+            .foregroundStyle(Color.Colors.green2)
         }
-        
     }
     
     private var dayLabels: some View {
@@ -122,87 +170,111 @@ struct TotalCalendarView: View {
                     .padding(.horizontal, 16)
             }
         }
-        
     }
     
-    private var calendarDays: some View {
+    private func calendarDays(for currentReadingBook: FGUserBook, index: Int) -> some View {
         LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7)) {
-            let (daysInMonth, startDayOfWeek) = getDateFromCalendar()
+            let (daysInMonth, startDayOfWeek) = getDateFromCalendar(for: index)
             let totalCells = startDayOfWeek + daysInMonth
             
-            ForEach(0..<totalCells, id: \.self) { index in
-                if index < startDayOfWeek {
-                    Text("")
-                        .frame(width: 50, height: 50)
-                } else {
-                    let day = index - startDayOfWeek + 1
-                    let date = Calendar.current.date(from: DateComponents(year: getCurrentMonthAndYear().year, month: getCurrentMonthAndYear().month, day: day))!
-                    let dateKey = date.toYearMonthDayString()
-                    
-                    VStack(spacing: 0) {
-                        if let readingRecord = currentReadingBook.readingProgress.dailyReadingRecords[dateKey] {
-                            
-                            let isTodayCompletionDate = Calendar.current.isDate(todayDate, inSameDayAs: currentReadingBook.userSettings.targetEndDate)
-                            
-                            if Calendar.current.isDate(date, inSameDayAs: currentReadingBook.userSettings.targetEndDate) {
-                                Image(isTodayCompletionDate ? "completionGreenFlag" : "completionFlag")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 50, height: 50)
-                                    .overlay(
-                                        Text("완독")
-                                            .fontStyle(.caption1, weight: .semibold)
-                                            .foregroundStyle(isTodayCompletionDate ? Color.Fills.white : Color.Colors.green2)
-                                            .padding(.bottom, 1)
-                                            .padding(.leading, 2)
-                                    )
-                            } else if Calendar.current.isDate(date, inSameDayAs: todayDate) {
-                                // 오늘 날짜인 경우 - 초록색 배경에 목표 페이지 수 표시
-                                TotalCalendarTextBubble(
-                                    text: "\(readingRecord.targetPages)",
-                                    textColor: Color.Fills.white,
-                                    backgroundColor: Color.Colors.green1,
-                                    fontWeight: .regular,
-                                    fontSize: .title2
-                                )
-                            } else if readingRecord.pagesRead == readingRecord.targetPages {
-                                // 목표 페이지를 달성한 날 - 녹색 배경의 읽은 페이지 수 표시
-                                TotalCalendarTextBubble(
-                                    text: "\(readingRecord.pagesRead)",
-                                    textColor: Color.Labels.secondaryBlack2,
-                                    backgroundColor: Color.Colors.green
-                                )
-                            } else if date > todayDate {
-                                // 미래의 날짜로 계획이 설정된 날 - 회색 텍스트로 목표 페이지 수 표시
-                                TotalCalendarTextBubble(
-                                    text: "\(readingRecord.targetPages)",
-                                    textColor: Color.Labels.quaternaryBlack4,
-                                    backgroundColor: .clear
-                                )
-                            } else {
-                                // 과거 날짜에서 계획은 설정되었지만, 읽지 않은 날 - 회색 점으로 결석 표시
-                                TotalCalendarTextBubble(
-                                    text: "•",
-                                    textColor: Color.Labels.secondaryBlack2,
-                                    backgroundColor: Color.Fills.lightGreen
-                                )
-                            }
-                        } else {
-                            // 계획되지 않은 날 - 빈 배경
-                            TotalCalendarTextBubble(
-                                text: "",
-                                textColor: Color.clear,
-                                backgroundColor: Color.Fills.lightGreen
-                            )
-                        }
-                    }
-                    .frame(width: 50, height: 50, alignment: .center)
-                }
+            ForEach(0..<totalCells, id: \.self) { cellIndex in
+                calendarDayCell(
+                    cellIndex: cellIndex,
+                    startDayOfWeek: startDayOfWeek,
+                    currentReadingBook: currentReadingBook,
+                    index: index
+                )
             }
         }
     }
+
+    private func calendarDayCell(
+        cellIndex: Int,
+        startDayOfWeek: Int,
+        currentReadingBook: FGUserBook,
+        index: Int
+    ) -> some View {
+        if cellIndex < startDayOfWeek {
+            return AnyView(Text("")
+                .frame(width: 50, height: 50))
+        } else {
+            let day = cellIndex - startDayOfWeek + 1
+            
+            guard let date = Calendar.current.date(
+                from: DateComponents(
+                    year: getCurrentMonthAndYear(for: index).year,
+                    month: getCurrentMonthAndYear(for: index).month,
+                    day: day)
+            ) else {
+                return AnyView(EmptyView())
+            }
+            
+            let dateKey = date.toYearMonthDayString()
+            
+            return AnyView(calendarDayContent(date: date, dateKey: dateKey, currentReadingBook: currentReadingBook))
+        }
+    }
+
+    private func calendarDayContent(date: Date, dateKey: String, currentReadingBook: FGUserBook) -> some View {
+        VStack(spacing: 0) {
+            if let readingRecord = currentReadingBook.readingProgress.dailyReadingRecords[dateKey] {
+                let isTodayCompletionDate = Calendar.current.isDate(todayDate,inSameDayAs: currentReadingBook.userSettings.targetEndDate)
+                
+                if Calendar.current.isDate(date, inSameDayAs: currentReadingBook.userSettings.targetEndDate) {
+                    Image(isTodayCompletionDate ? "completionGreenFlag" : "completionFlag")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 50, height: 50)
+                        .overlay(
+                            Text("완독")
+                                .fontStyle(.caption1, weight: .semibold)
+                                .foregroundStyle(isTodayCompletionDate ? Color.Fills.white : Color.Colors.green2)
+                                .padding(.bottom, 1)
+                                .padding(.leading, 2)
+                        )
+                } else if Calendar.current.isDate(date, inSameDayAs: todayDate) {
+                    // 오늘 날짜인 경우 - 초록색 배경에 목표 페이지 수 표시
+                    TotalCalendarTextBubble(
+                        text: "\(readingRecord.targetPages)",
+                        textColor: Color.Fills.white,
+                        backgroundColor: Color.Colors.green1,
+                        fontWeight: .regular,
+                        fontSize: .title2
+                    )
+                } else if readingRecord.pagesRead == readingRecord.targetPages {
+                    // 목표 페이지를 달성한 날 - 녹색 배경의 읽은 페이지 수 표시
+                    TotalCalendarTextBubble(
+                        text: "\(readingRecord.pagesRead)",
+                        textColor: Color.Labels.secondaryBlack2,
+                        backgroundColor: Color.Colors.green
+                    )
+                } else if date > todayDate {
+                    // 미래의 날짜로 계획이 설정된 날 - 회색 텍스트로 목표 페이지 수 표시
+                    TotalCalendarTextBubble(
+                        text: "\(readingRecord.targetPages)",
+                        textColor: Color.Labels.quaternaryBlack4,
+                        backgroundColor: .clear
+                    )
+                } else {
+                    // 과거 날짜에서 계획은 설정되었지만, 읽지 않은 날 - 회색 점으로 결석 표시
+                    TotalCalendarTextBubble(
+                        text: "•",
+                        textColor: Color.Labels.secondaryBlack2,
+                        backgroundColor: Color.Fills.lightGreen
+                    )
+                }
+            } else {
+                // 계획되지 않은 날 - 빈 배경
+                TotalCalendarTextBubble(
+                    text: "",
+                    textColor: Color.clear,
+                    backgroundColor: Color.Fills.lightGreen
+                )
+            }}
+        .frame(width: 50, height: 50, alignment: .center)
+    }
     
-    private var CompletionFooter: some View {
+    private func CompletionFooter(for currentReadingBook: FGUserBook) -> some View {
         HStack(alignment: .center) {
             Text("완독 종료일")
                 .fontStyle(.body, weight: .semibold)
@@ -221,13 +293,17 @@ struct TotalCalendarView: View {
         .padding(.horizontal, 16)
     }
     
-    private func previousMonth() {
-        currentMonth = Calendar.current.date(byAdding: .month, value: -1, to: currentMonth) ?? currentMonth
+    // MARK: - Month Navigation
+    
+    private func previousMonth(_ index: Int) {
+        currentMonths[index] = Calendar.current.date(byAdding: .month, value: -1, to: currentMonths[index]) ?? currentMonths[index]
     }
     
-    private func nextMonth() {
-        currentMonth = Calendar.current.date(byAdding: .month, value: 1, to: currentMonth) ?? currentMonth
+    private func nextMonth(_ index: Int) {
+        currentMonths[index] = Calendar.current.date(byAdding: .month, value: 1, to: currentMonths[index]) ?? currentMonths[index]
     }
+    
+    // MARK: - Date Formatting
     
     private func calendarHeaderString(for date: Date) -> String {
         let formatter = DateFormatter()
@@ -235,9 +311,9 @@ struct TotalCalendarView: View {
         return formatter.string(from: date)
     }
     
-    private func getDateFromCalendar() -> (Int, Int) {
+    private func getDateFromCalendar(for index: Int) -> (Int, Int) {
         let calendar = Calendar.current
-        let components = calendar.dateComponents([.year, .month], from: currentMonth)
+        let components = calendar.dateComponents([.year, .month], from: currentMonths[index])
         guard let firstDayOfCurrentMonth = calendar.date(from: components),
               let rangeOfMonth = calendar.range(of: .day, in: .month, for: firstDayOfCurrentMonth) else {
             return (0, 0)
@@ -248,8 +324,9 @@ struct TotalCalendarView: View {
         return (numberOfDaysInMonth, startDayOfWeek)
     }
     
-    private func getCurrentMonthAndYear() -> (year: Int, month: Int) {
-        let components = Calendar.current.dateComponents([.year, .month], from: currentMonth)
+    private func getCurrentMonthAndYear(for index: Int) -> (year: Int, month: Int) {
+        let date = currentMonths.indices.contains(index) ? currentMonths[index] : Date().adjustedDate()
+        let components = Calendar.current.dateComponents([.year, .month], from: date)
         return (components.year ?? 2024, components.month ?? 1)
     }
     
