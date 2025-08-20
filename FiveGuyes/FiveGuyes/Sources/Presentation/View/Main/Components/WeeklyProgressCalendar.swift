@@ -8,21 +8,20 @@
 import SwiftUI
 
 struct WeeklyProgressCalendar: View {
-    typealias UserBook = UserBookSchemaV2.UserBookV2
-    
-    let daysOfWeek = ["일", "월", "화", "수", "목", "금", "토"]
-    
-    let today = Date().adjustedDate()
-    
     @State private var allWeekStartDates: [Date] = []
     @State private var currentWeekPageIndex: Int = 0
-    
-    let todayIndex = Calendar.current.getAdjustedWeekdayIndex(from: Date())
     
     @State private var lastWeekIndex = 0
     @State private var lastDayIndex = 0
     
-    var userBook: UserBook
+    let daysOfWeek = ["일", "월", "화", "수", "목", "금", "토"]
+    
+    var userBook: FGUserBook
+    let today: Date
+    
+    private var todayIndex: Int {
+        Calendar.current.getAdjustedWeekdayIndex(from: today)
+    }
     
     var body: some View {
         ScrollViewReader { proxy in
@@ -67,7 +66,7 @@ struct WeeklyProgressCalendar: View {
             .scrollTargetBehavior(.paging)
             .onAppear {
                 // 모든 주 시작 날짜를 가져옴
-                allWeekStartDates = userBook.readingProgress.getAllWeekStartDates(for: userBook.userSettings)
+                allWeekStartDates = userBook.userSettings.weeklyStartDates(today: today)
                 
                 // 오늘 날짜가 포함된 주의 인덱스를 찾음
                 let todayWeekIndex = allWeekStartDates.firstIndex {
