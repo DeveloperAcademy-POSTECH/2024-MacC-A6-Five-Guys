@@ -49,6 +49,15 @@ struct FGUserSetting: Hashable {
         
         return startDates
     }
+    
+    func remainingReadingDays(today: Date) -> Int {
+        let remainingReadingDays = try? ReadingDateCalculator().calculateValidReadingDays(
+            startDate: Date().adjustedDate(),
+            endDate: targetEndDate,
+            excludedDates: excludedReadingDays)
+        
+        return remainingReadingDays ?? 0
+    }
 }
 
 struct FGReadingProgress: Hashable {
@@ -66,6 +75,8 @@ struct FGReadingProgress: Hashable {
             return dailyReadingRecords[date.toYearMonthDayString()]
         }
     }
+    
+    func getDailyReadingRecord(for date: Date) -> ReadingRecord? { dailyReadingRecords[date.toYearMonthDayString()] }
 }
 
 struct FGCompletionStatus: Hashable {
