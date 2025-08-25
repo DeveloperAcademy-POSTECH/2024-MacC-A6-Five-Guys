@@ -22,10 +22,7 @@ struct TotalCalendarTextBubble: View {
                 .fontWeight(fontWeight) // fontWeight 적용
                 .font(fontSize)
         }
-        // 카키한테 크기 맞도록 요청
-        .padding(.horizontal, 4)
-        .padding(.vertical, 6)
-        .frame(width: 50, height: 50, alignment: .center)
+        .frame(width: 47, height: 47, alignment: .center)
         .background(backgroundColor)
         .cornerRadius(99)
     }

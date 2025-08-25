@@ -30,7 +30,7 @@ struct TotalCalendarView: View {
     var body: some View {
         VStack(spacing: 0) {
             bookInfoHeader(for: currentReadingBooks[currentIndex ?? 0])
-                .padding(.top, 9)
+                .padding(.top, 10)
                 .padding(.bottom, 8)
                 .padding(.horizontal, 20)
             
@@ -39,6 +39,11 @@ struct TotalCalendarView: View {
                 .padding(.horizontal, 20)
             
             calendarScrollView()
+                .padding(.bottom, 12)
+            
+            CompletionFooter(for: currentReadingBooks[currentIndex ?? 0])
+                .padding(.leading, 32)
+                .padding(.trailing, 24)
             
             Spacer()
         }
@@ -61,6 +66,7 @@ struct TotalCalendarView: View {
                 .multilineTextAlignment(.leading)
                 .lineLimit(2)
                 .foregroundStyle(Color.Labels.primaryBlack1)
+                .frame(height: 68)
             
             Spacer()
             
@@ -90,46 +96,36 @@ struct TotalCalendarView: View {
         }
     }
     
-    // TODO: - 디자이너 작업 중
     private func calendarScrollView() -> some View {
-        ScrollView(.horizontal, showsIndicators: false) {
+       ScrollView(.horizontal, showsIndicators: false) {
             HStack(alignment: .top, spacing: 8) {
                 ForEach(currentReadingBooks.indices, id: \.self) { index in
                     VStack(spacing: 0) {
                         header(for: index)
-                            .padding(.top, 24)
-                            .padding(.bottom, 23)
+                            .padding(.vertical, 18)
+                            .padding(.horizontal, 20)
                         
                         dayLabels
-                            .padding(.bottom, 22)
+                            .padding(.bottom, 5)
+                            .padding(.horizontal, 8)
                         
                         calendarDays(for: currentReadingBooks[index], index: index)
-                            .padding(.horizontal, 5)
-                            .padding(.bottom, 16)
-                        
-                        Divider()
-                            .padding(.bottom, 12)
-                        
-                        CompletionFooter(for: currentReadingBooks[index])
-                            .padding(.bottom, 16)
+                            .padding(.bottom, 32)
                     }
-                    .padding(.horizontal, 16)
                     .background {
                         RoundedRectangle(cornerRadius: 16)
                             .inset(by: 0.5)
                             .stroke(Color.Separators.green, lineWidth: 1)
                             .foregroundStyle(Color.Backgrounds.primary)
                     }
-                    .frame(maxWidth: UIScreen.main.bounds.width - 48)
-//                    .containerRelativeFrame(.horizontal)
-                    .id(index)
+                    .containerRelativeFrame(.horizontal)
                 }
             }
-            .safeAreaPadding(.horizontal, 24)
             .scrollTargetLayout()
         }
         .scrollTargetBehavior(.viewAligned)
         .scrollPosition(id: $currentIndex)
+        .contentMargins(.horizontal, 24, for: .scrollContent)
     }
     
     private func header(for index: Int) -> some View {
@@ -161,19 +157,20 @@ struct TotalCalendarView: View {
     }
     
     private var dayLabels: some View {
-        LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7)) {
+        LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7),) {
             ForEach(["일", "월", "화", "수", "목", "금", "토"], id: \.self) { day in
                 Text(day)
-                    .fontStyle(.caption2, weight: .semibold) // TODO: 디자이너 확인중
+                    .fontStyle(.caption2, weight: .semibold)
                     .foregroundStyle(Color.Labels.tertiaryBlack3)
                     .frame(width: 32, height: 18, alignment: .center)
-                    .padding(.horizontal, 16)
+                    .padding(.horizontal, 8)
             }
         }
     }
     
     private func calendarDays(for currentReadingBook: FGUserBook, index: Int) -> some View {
-        LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7)) {
+        LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7),
+                  spacing: 0) {
             let (daysInMonth, startDayOfWeek) = getDateFromCalendar(for: index)
             let totalCells = startDayOfWeek + daysInMonth
             
@@ -186,6 +183,7 @@ struct TotalCalendarView: View {
                 )
             }
         }
+        .padding(.horizontal, 10)
     }
 
     private func calendarDayCell(
@@ -196,7 +194,7 @@ struct TotalCalendarView: View {
     ) -> some View {
         if cellIndex < startDayOfWeek {
             return AnyView(Text("")
-                .frame(width: 50, height: 50))
+                .frame(width: 47, height: 47))
         } else {
             let day = cellIndex - startDayOfWeek + 1
             
@@ -224,7 +222,7 @@ struct TotalCalendarView: View {
                     Image(isTodayCompletionDate ? "completionGreenFlag" : "completionFlag")
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 50, height: 50)
+                        .frame(width: 40, height: 40)
                         .overlay(
                             Text("완독")
                                 .fontStyle(.caption1, weight: .semibold)
@@ -271,7 +269,7 @@ struct TotalCalendarView: View {
                     backgroundColor: Color.Fills.lightGreen
                 )
             }}
-        .frame(width: 50, height: 50, alignment: .center)
+        .frame(width: 47, height: 47, alignment: .center)
     }
     
     private func CompletionFooter(for currentReadingBook: FGUserBook) -> some View {
@@ -290,7 +288,6 @@ struct TotalCalendarView: View {
                 .background(Color.Fills.lightGreen)
                 .cornerRadius(8)
         }
-        .padding(.horizontal, 16)
     }
     
     // MARK: - Month Navigation
