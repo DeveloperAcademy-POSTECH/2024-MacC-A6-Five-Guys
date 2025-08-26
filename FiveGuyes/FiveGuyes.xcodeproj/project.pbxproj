@@ -62,6 +62,7 @@
 		26890BBD2CAE98E2008DFF49 /* .swiftlint.yml in Resources */ = {isa = PBXBuildFile; fileRef = 26890BBC2CAE98E2008DFF49 /* .swiftlint.yml */; };
 		26CF82582D1D3216005037E4 /* ReadingDateCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26CF82572D1D3216005037E4 /* ReadingDateCalculator.swift */; };
 		26CF825A2D1D4B09005037E4 /* ReadingPagesCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26CF82592D1D4B09005037E4 /* ReadingPagesCalculator.swift */; };
+		26E4A7DE2E54658600AB1043 /* FGUserBook+PreviewDummy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26E4A7DD2E54658600AB1043 /* FGUserBook+PreviewDummy.swift */; };
 		26EBDE262CDE3C6000B3A2BC /* BookSettingInputModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDE252CDE3C6000B3A2BC /* BookSettingInputModel.swift */; };
 		26EBDE2A2CDF33D900B3A2BC /* Date+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDE292CDF33D900B3A2BC /* Date+Extension.swift */; };
 		26EBDE2C2CE1341800B3A2BC /* ReadingRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDE2B2CE1341800B3A2BC /* ReadingRecord.swift */; };
@@ -170,6 +171,7 @@
 		26CF82572D1D3216005037E4 /* ReadingDateCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadingDateCalculator.swift; sourceTree = "<group>"; };
 		26CF82592D1D4B09005037E4 /* ReadingPagesCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadingPagesCalculator.swift; sourceTree = "<group>"; };
 		26CF825F2D1D4D4D005037E4 /* ReadingDateCalculatorTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ReadingDateCalculatorTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		26E4A7DD2E54658600AB1043 /* FGUserBook+PreviewDummy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FGUserBook+PreviewDummy.swift"; sourceTree = "<group>"; };
 		26EBDE252CDE3C6000B3A2BC /* BookSettingInputModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookSettingInputModel.swift; sourceTree = "<group>"; };
 		26EBDE292CDF33D900B3A2BC /* Date+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Extension.swift"; sourceTree = "<group>"; };
 		26EBDE2B2CE1341800B3A2BC /* ReadingRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadingRecord.swift; sourceTree = "<group>"; };
@@ -279,6 +281,7 @@
 			isa = PBXGroup;
 			children = (
 				2621DAAC2DF136E800CB24FA /* FGUserBook+toUserBookV2.swift */,
+				26E4A7DD2E54658600AB1043 /* FGUserBook+PreviewDummy.swift */,
 			);
 			path = Extension;
 			sourceTree = "<group>";
@@ -870,6 +873,7 @@
 				26CF825A2D1D4B09005037E4 /* ReadingPagesCalculator.swift in Sources */,
 				2606F32F2D7DC7AA004E519C /* BookSettingPageModel.swift in Sources */,
 				264440502CD8A3AC0031A290 /* CompletionReviewView.swift in Sources */,
+				26E4A7DE2E54658600AB1043 /* FGUserBook+PreviewDummy.swift in Sources */,
 				26EBDEBE2CF2390C00B3A2BC /* CompletionStatusProtocol.swift in Sources */,
 				264440502CD8A3AC0031A290 /* CompletionReviewView.swift in Sources */,
 				2613B7652D3559D400AC717F /* UnfinishReadingView.swift in Sources */,
