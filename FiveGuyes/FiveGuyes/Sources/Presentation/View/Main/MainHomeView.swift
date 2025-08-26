@@ -9,7 +9,7 @@ import SwiftData
 import SwiftUI
 
 struct MainHomeView: View {
-    typealias UserBook = UserBookSchemaV2.UserBookV2
+    typealias SDUserBook = UserBookSchemaV2.UserBookV2
     
     @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
     @Environment(\.modelContext) private var modelContext
@@ -22,19 +22,19 @@ struct MainHomeView: View {
     private let notificationManager = NotificationManager()
     
     @Query(
-        filter: #Predicate<UserBook> {
+        filter: #Predicate<SDUserBook> {
             $0.completionStatus.isCompleted == false
         }
     )
-    private var currentlyReadingBooks: [UserBook]
+    private var SDReadingBooks: [SDUserBook]
     
     @State private var activeBookID: UUID?
     @State private var selectedBookIndex: Int?
     
     // MARK: 🐯 문제가 되는 프로퍼티
-    private var selectedBook: UserBook? {
-        if let selectedBookIndex, !currentlyReadingBooks.isEmpty && selectedBookIndex < currentlyReadingBooks.count {
-            return currentlyReadingBooks[selectedBookIndex]
+    private var selectedBook: SDUserBook? {
+        if let selectedBookIndex, !SDReadingBooks.isEmpty && selectedBookIndex < SDReadingBooks.count {
+            return SDReadingBooks[selectedBookIndex]
         }
         return nil
     }
@@ -47,7 +47,7 @@ struct MainHomeView: View {
                         Spacer()
                         notiButton {
                             // 독서 종료일이 제일 가까운 책을 기준으로 노티를 설정합니다.
-                            navigationCoordinator.push(.notiSetting(book: currentlyReadingBooks.first))
+                            navigationCoordinator.push(.notiSetting(book: SDReadingBooks.first))
                         }
                     }
                     .padding(.bottom, 49)
@@ -58,7 +58,7 @@ struct MainHomeView: View {
                         
                         Spacer()
                         
-                        if !currentlyReadingBooks.isEmpty { // 읽고 있는 책이 있는 경우
+                        if !SDReadingBooks.isEmpty { // 읽고 있는 책이 있는 경우
                             Menu {
                                 ReadingDateEditButton
                                 UserBookAddButton
@@ -120,7 +120,7 @@ struct MainHomeView: View {
         }
         .onChange(of: activeBookID) {
             if let activeBookID {
-                selectedBookIndex = currentlyReadingBooks.firstIndex(where: { $0.id == activeBookID })
+                selectedBookIndex = SDReadingBooks.firstIndex(where: { $0.id == activeBookID })
             } else {
                 selectedBookIndex = nil
             }
@@ -134,7 +134,7 @@ struct MainHomeView: View {
             initializeActiveBookID()
             
             // 독서 종료일이 제일 가까운 책을 기준으로 노티를 설정합니다.
-            if let currentReadingBook = currentlyReadingBooks.first {
+            if let currentReadingBook = SDReadingBooks.first {
                 await notificationManager.setupAllNotifications(currentReadingBook)
             } else {
                 print("노티 설정 실패 ❗️❗️❗️")
@@ -144,7 +144,7 @@ struct MainHomeView: View {
     
     // MARK: - View Property & Function
     
-    private func titleDescription(book: UserBook?) -> some View {
+    private func titleDescription(book: SDUserBook?) -> some View {
         VStack(alignment: .leading, spacing: 5) {
             if let book {
                 Text("<\(book.bookMetaData.title)>")
@@ -172,7 +172,7 @@ struct MainHomeView: View {
     }
     
     private var calendarFullScreenButton: some View {
-        let isReadingBookAvailable = !currentlyReadingBooks.isEmpty
+        let isReadingBookAvailable = !SDReadingBooks.isEmpty
         let backgroundColor = isReadingBookAvailable ? Color.Fills.white : Color.Fills.lightGreen
         let opacity = isReadingBookAvailable ? 1 : 0.2
         
@@ -205,7 +205,7 @@ struct MainHomeView: View {
     }
     
     private var mainActionButton: some View {
-        let isReadingBookAvailable = currentlyReadingBooks.first != nil
+        let isReadingBookAvailable = SDReadingBooks.first != nil
         
         return Button {
             if isReadingBookAvailable, let selectedBook {
@@ -256,7 +256,7 @@ struct MainHomeView: View {
     }
     
     // MARK: - Helper Method
-    private func getMainAlertText(book: UserBook?) -> String {
+    private func getMainAlertText(book: SDUserBook?) -> String {
         if let book {
             let title = book.bookMetaData.title
             return "현재 읽고 있는 <\(title)>\(title.postPositionParticle()) 책장에서 삭제할까요?"
@@ -265,7 +265,7 @@ struct MainHomeView: View {
         }
     }
     
-    private func getRemainingDays(book: UserBook) -> Int {
+    private func getRemainingDays(book: SDUserBook) -> Int {
         let redingDateCalculator = ReadingDateCalculator()
         let remainingReadingDays = try? redingDateCalculator.calculateValidReadingDays(
             startDate: Date().adjustedDate(),
@@ -276,9 +276,9 @@ struct MainHomeView: View {
     }
     
     private func deleteBook(at index: Int) {
-        guard index < currentlyReadingBooks.count else { return }
+        guard index < SDReadingBooks.count else { return }
         
-        let bookToDelete = currentlyReadingBooks[index]
+        let bookToDelete = SDReadingBooks[index]
         modelContext.delete(bookToDelete)
         
         // 데이터 저장
@@ -289,15 +289,15 @@ struct MainHomeView: View {
         }
         
         // 삭제 후 인덱스 업데이트
-        if currentlyReadingBooks.isEmpty {
+        if SDReadingBooks.isEmpty {
             selectedBookIndex = nil
-        } else if index >= currentlyReadingBooks.count {
-            selectedBookIndex = currentlyReadingBooks.count - 1
+        } else if index >= SDReadingBooks.count {
+            selectedBookIndex = SDReadingBooks.count - 1
         }
     }
     
     private func trackScreen() {
-        if currentlyReadingBooks.isEmpty {
+        if SDReadingBooks.isEmpty {
             Tracking.Screen.homeBeforeBookSetting.setTracking()
         } else {
             Tracking.Screen.homeAfterBookSetting.setTracking()
@@ -313,11 +313,11 @@ struct MainHomeView: View {
     }
     
     private func reassignReadingSchedules() {
-        guard !currentlyReadingBooks.isEmpty else { return }
+        guard !SDReadingBooks.isEmpty else { return }
         
         let readingScheduleCalculator = ReadingScheduleCalculator()
         
-        for book in currentlyReadingBooks {
+        for book in SDReadingBooks {
             do {
                 try readingScheduleCalculator
                     .reassignPagesFromLastReadDate(
@@ -342,6 +342,6 @@ struct MainHomeView: View {
     }
     
     private func initializeActiveBookID() {
-        activeBookID = currentlyReadingBooks.first?.id
+        activeBookID = SDReadingBooks.first?.id
     }
 }
