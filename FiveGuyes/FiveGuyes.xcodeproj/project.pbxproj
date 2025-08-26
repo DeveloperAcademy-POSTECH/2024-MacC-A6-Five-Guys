@@ -56,6 +56,7 @@
 		264443ED2CF870B0009422BA /* UserDefaultsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 264443EC2CF870B0009422BA /* UserDefaultsManager.swift */; };
 		2655532F2CF6D73900288037 /* NotiSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2655532E2CF6D73900288037 /* NotiSettingView.swift */; };
 		2657AE072DA2B44600B43D4E /* UserBookV2+toFGUserBook.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2657AE062DA2B44600B43D4E /* UserBookV2+toFGUserBook.swift */; };
+		267AE67F2E4C885100FEBDF8 /* ReadingBookProgressCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 267AE67E2E4C885100FEBDF8 /* ReadingBookProgressCell.swift */; };
 		26890B952CAE811A008DFF49 /* FiveGuyesApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26890B942CAE811A008DFF49 /* FiveGuyesApp.swift */; };
 		26890B992CAE811D008DFF49 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 26890B982CAE811D008DFF49 /* Assets.xcassets */; };
 		26890B9C2CAE811D008DFF49 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 26890B9B2CAE811D008DFF49 /* Preview Assets.xcassets */; };
@@ -163,6 +164,7 @@
 		264443EC2CF870B0009422BA /* UserDefaultsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsManager.swift; sourceTree = "<group>"; };
 		2655532E2CF6D73900288037 /* NotiSettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotiSettingView.swift; sourceTree = "<group>"; };
 		2657AE062DA2B44600B43D4E /* UserBookV2+toFGUserBook.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserBookV2+toFGUserBook.swift"; sourceTree = "<group>"; };
+		267AE67E2E4C885100FEBDF8 /* ReadingBookProgressCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadingBookProgressCell.swift; sourceTree = "<group>"; };
 		26890B912CAE811A008DFF49 /* FiveGuyes.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FiveGuyes.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		26890B942CAE811A008DFF49 /* FiveGuyesApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FiveGuyesApp.swift; sourceTree = "<group>"; };
 		26890B982CAE811D008DFF49 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -356,9 +358,10 @@
 		2622C81A2D30178500AA3FF4 /* Components */ = {
 			isa = PBXGroup;
 			children = (
-				26F19A692CD9FE5C00F41D6D /* WeeklyReadingProgressView.swift */,
 				2613B7512D329FD900AC717F /* WeeklyProgressPagingSlider.swift */,
+				26F19A692CD9FE5C00F41D6D /* WeeklyReadingProgressView.swift */,
 				26F19A6D2CDA74A600F41D6D /* WeeklyProgressCalendar.swift */,
+				267AE67E2E4C885100FEBDF8 /* ReadingBookProgressCell.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -883,6 +886,7 @@
 				26EBDE992CF07A7900B3A2BC /* FontWeight.swift in Sources */,
 				26EBDE972CF0764A00B3A2BC /* FontModifier.swift in Sources */,
 				26F19A6E2CDA74A600F41D6D /* WeeklyProgressCalendar.swift in Sources */,
+				267AE67F2E4C885100FEBDF8 /* ReadingBookProgressCell.swift in Sources */,
 				26EBDEBC2CF238FD00B3A2BC /* ReadingProgressProtocol.swift in Sources */,
 				264440532CD8B1540031A290 /* String+Extension.swift in Sources */,
 				264440572CD8E0D20031A290 /* CustomTextEditorStyle.swift in Sources */,
