@@ -31,7 +31,12 @@ struct MainHomeView: View {
     @State private var activeBookID: UUID?
     @State private var selectedBookIndex: Int?
     
-    // MARK: 🐯 문제가 되는 프로퍼티
+    private var readingBooks: [FGUserBook] {
+        SDReadingBooks.map { $0.toFGUserBook() }
+    }
+    
+    let today = Date().adjustedDate()
+    
     private var selectedBook: SDUserBook? {
         if let selectedBookIndex, !SDReadingBooks.isEmpty && selectedBookIndex < SDReadingBooks.count {
             return SDReadingBooks[selectedBookIndex]
@@ -90,12 +95,14 @@ struct MainHomeView: View {
                     .padding(.bottom, 10)
                     .padding(.horizontal, 20)
                     
-                    WeeklyProgressPagingSlider(readingBooks: currentlyReadingBooks, activeID: $activeBookID)
-                        .padding(.bottom, 16)
-                        .commonShadow()
-                        .safeAreaPadding(.horizontal, 30)
-                        .id(navigationCoordinator.getViewReloadTrigger())
-                        .onAppear(perform: navigationCoordinator.reloadView)
+                    ReadingBooksCarousel(
+                        readingBooks: readingBooks,
+                        today: today,
+                        activeID: $activeBookID
+                    )
+                    .padding(.bottom, 12)
+                    .id(navigationCoordinator.getViewReloadTrigger())
+                    .onAppear(perform: navigationCoordinator.reloadView)
                     
                     HStack(spacing: 16) {
                         calendarFullScreenButton
