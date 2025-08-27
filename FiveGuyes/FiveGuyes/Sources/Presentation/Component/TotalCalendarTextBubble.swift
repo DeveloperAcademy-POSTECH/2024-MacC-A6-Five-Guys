@@ -12,8 +12,8 @@ struct TotalCalendarTextBubble: View {
     var text: String
     var textColor: Color = Color.Labels.primaryBlack1
     var backgroundColor: Color = Color.Colors.green
-    var fontWeight: Font.Weight = .regular // 기본 글꼴 스타일을 regular으로 설정
-    var fontSize: Font = .title2  // 기본 글자 크기를 title2로 설정
+    let fontWeight: Font.Weight = .regular
+    let fontSize: Font = .title2
 
     var body: some View {
         VStack {

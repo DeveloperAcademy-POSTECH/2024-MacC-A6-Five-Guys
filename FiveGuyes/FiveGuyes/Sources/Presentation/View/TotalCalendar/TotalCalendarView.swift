@@ -235,9 +235,7 @@ struct TotalCalendarView: View {
                     TotalCalendarTextBubble(
                         text: "\(readingRecord.targetPages)",
                         textColor: Color.Fills.white,
-                        backgroundColor: Color.Colors.green1,
-                        fontWeight: .regular,
-                        fontSize: .title2
+                        backgroundColor: Color.Colors.green1
                     )
                 } else if readingRecord.pagesRead == readingRecord.targetPages {
                     // 목표 페이지를 달성한 날 - 녹색 배경의 읽은 페이지 수 표시
