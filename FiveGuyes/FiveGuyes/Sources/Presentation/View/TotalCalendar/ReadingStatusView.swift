@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct TotalCalendarView: View {
+struct ReadingStatusView: View {
     
     // MARK: - Properties
     
@@ -38,7 +38,7 @@ struct TotalCalendarView: View {
                 .padding(.bottom, 22)
                 .padding(.horizontal, 20)
             
-            calendarScrollView()
+            TotalCalendarView()
                 .padding(.bottom, 12)
             
             CompletionFooter(for: currentReadingBooks[currentIndex ?? 0])
@@ -98,7 +98,7 @@ struct TotalCalendarView: View {
         }
     }
     
-    private func calendarScrollView() -> some View {
+    private func TotalCalendarView() -> some View {
        ScrollView(.horizontal, showsIndicators: false) {
             HStack(alignment: .top, spacing: 8) {
                 ForEach(currentReadingBooks.indices, id: \.self) { index in
@@ -132,7 +132,7 @@ struct TotalCalendarView: View {
     
     private func header(for index: Int) -> some View {
         HStack(spacing: 0) {
-            Text(calendarHeaderString(for: currentMonths[index]))
+            Text(currentMonths[index].calendarHeaderString())
                 .fontStyle(.body, weight: .semibold)
                 .multilineTextAlignment(.center)
                 .foregroundStyle(Color.Labels.primaryBlack1)
@@ -279,7 +279,7 @@ struct TotalCalendarView: View {
             
             Spacer()
             
-            Text("\(formattedCompletionDateString(from: currentReadingBook.userSettings.targetEndDate))")
+            Text(currentReadingBook.userSettings.targetEndDate.formattedCompletionDateString())
                 .fontStyle(.body, weight: .regular)
                 .multilineTextAlignment(.center)
                 .foregroundStyle(Color.Colors.green2)
@@ -300,13 +300,7 @@ struct TotalCalendarView: View {
         currentMonths[index] = Calendar.current.date(byAdding: .month, value: 1, to: currentMonths[index]) ?? currentMonths[index]
     }
     
-    // MARK: - Date Formatting
-    
-    private func calendarHeaderString(for date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy년 M월"
-        return formatter.string(from: date)
-    }
+    // MARK: - Get Date
     
     private func getDateFromCalendar(for index: Int) -> (Int, Int) {
         let calendar = Calendar.current
@@ -325,11 +319,5 @@ struct TotalCalendarView: View {
         let date = currentMonths.indices.contains(index) ? currentMonths[index] : Date().adjustedDate()
         let components = Calendar.current.dateComponents([.year, .month], from: date)
         return (components.year ?? 2024, components.month ?? 1)
-    }
-    
-    private func formattedCompletionDateString(from date: Date) -> String {
-        let displayFormatter = DateFormatter()
-        displayFormatter.dateFormat = "M월 d일 EEEE"
-        return displayFormatter.string(from: date)
     }
 }

@@ -37,10 +37,24 @@ extension Date {
         return formatter.string(from: self)
     }
     
+    /// `yyyy년 M월` 형식으로 변환하여 문자열로 반환합니다.
+    func calendarHeaderString() -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy년 M월"
+        return formatter.string(from: self)
+    }
+    
     /// `MM월 dd일` 형식으로 변환하여 문자열로 반환합니다.
     func toKoreanDateStringWithoutYear() -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "MM월 dd일"
+        return formatter.string(from: self)
+    }
+    
+    /// `M월 d일 EEEE` 형식으로 변환하여 문자열로 반환합니다.
+    func formattedCompletionDateString() -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "M월 d일 EEEE"
         return formatter.string(from: self)
     }
     

@@ -40,7 +40,7 @@ final class NavigationCoordinator {
         case .bookSettingsManager:
             BookSettingsManagerView()
         case .totalCalendar(book: let book):
-            TotalCalendarView(currentReadingBooks: book)
+            ReadingStatusView(currentReadingBooks: book)
         case .dailyProgress(book: let book):
             DailyProgressView(userBook: book)
         case .completionCelebration(book: let book):
