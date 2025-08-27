@@ -49,36 +49,8 @@ extension View {
         )
     }
     
-    func clipRightSideRounded(radius: CGFloat) -> some View {
-        self.clipShape(RightSideRoundedShape(radius: radius))
-    }
-    
     /// 네비게이션 드래그 제스처를 비활성화합니다.
     func disableNavigationGesture() -> some View {
         self.gesture(DragGesture().onChanged { _ in })
-    }
-}
-
-struct RightSideRoundedShape: Shape {
-    var radius: CGFloat = 8
-    
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        path.move(to: CGPoint(x: rect.minX, y: rect.minY))
-        path.addLine(to: CGPoint(x: rect.maxX - radius, y: rect.minY))
-        path.addArc(center: CGPoint(x: rect.maxX - radius, y: rect.minY + radius),
-                    radius: radius,
-                    startAngle: .degrees(-90),
-                    endAngle: .degrees(0),
-                    clockwise: false)
-        path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY - radius))
-        path.addArc(center: CGPoint(x: rect.maxX - radius, y: rect.maxY - radius),
-                    radius: radius,
-                    startAngle: .degrees(0),
-                    endAngle: .degrees(90),
-                    clockwise: false)
-        path.addLine(to: CGPoint(x: rect.minX, y: rect.maxY))
-        path.addLine(to: CGPoint(x: rect.minX, y: rect.minY))
-        return path
     }
 }

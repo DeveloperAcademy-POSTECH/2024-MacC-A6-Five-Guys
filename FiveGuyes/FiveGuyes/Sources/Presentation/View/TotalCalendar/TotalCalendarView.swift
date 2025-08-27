@@ -76,7 +76,9 @@ struct TotalCalendarView: View {
                     image.resizable()
                         .scaledToFit()
                         .frame(width: 44, height: 68)
-                        .clipRightSideRounded(radius: 8)
+                        .clipShape(
+                            UnevenRoundedRectangle(cornerRadii: .init(bottomTrailing: 8, topTrailing: 8))
+                        )
                 } placeholder: {
                     ProgressView()
                 }
