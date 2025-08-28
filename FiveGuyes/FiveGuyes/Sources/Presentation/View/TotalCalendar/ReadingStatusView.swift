@@ -67,7 +67,7 @@ struct ReadingStatusView: View {
                 .multilineTextAlignment(.leading)
                 .lineLimit(2)
                 .foregroundStyle(Color.Labels.primaryBlack1)
-                .frame(height: 68)
+                .frame(height: 72, alignment: .top)
             
             Spacer()
             
@@ -75,7 +75,7 @@ struct ReadingStatusView: View {
                let url = URL(string: coverImageURLString) {
                 AsyncImage(url: url) { image in
                     image.resizable()
-                        .scaledToFit()
+                        .scaledToFill()
                         .frame(width: 44, height: 68)
                         .clipShape(
                             UnevenRoundedRectangle(cornerRadii: .init(bottomTrailing: 8, topTrailing: 8))
