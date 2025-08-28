@@ -22,7 +22,7 @@ struct ReadingStatusView: View {
     
     init(currentReadingBooks: [FGUserBook]) {
         self.currentReadingBooks = currentReadingBooks
-        _currentMonths = State(initialValue: currentReadingBooks.map { _ in Date().adjustedDate() })
+        _currentMonths = State(initialValue: Array(repeating: todayDate, count: currentReadingBooks.count))
     }
     
     // MARK: - Layout
@@ -316,7 +316,7 @@ struct ReadingStatusView: View {
     }
     
     private func getCurrentMonthAndYear(for index: Int) -> (year: Int, month: Int) {
-        let date = currentMonths.indices.contains(index) ? currentMonths[index] : Date().adjustedDate()
+        let date = currentMonths.indices.contains(index) ? currentMonths[index] : todayDate
         let components = Calendar.current.dateComponents([.year, .month], from: date)
         return (components.year ?? 2024, components.month ?? 1)
     }
