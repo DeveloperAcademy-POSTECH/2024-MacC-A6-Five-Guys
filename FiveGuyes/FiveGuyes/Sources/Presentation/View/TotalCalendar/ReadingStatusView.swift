@@ -38,7 +38,8 @@ struct ReadingStatusView: View {
                 .padding(.bottom, 22)
                 .padding(.horizontal, 20)
             
-            TotalCalendarView()
+            totalCalendarScrollView()
+                .contentMargins(.horizontal, 24, for: .scrollContent)
                 .padding(.bottom, 12)
             
             CompletionFooter(for: currentReadingBooks[currentIndex ?? 0])
@@ -98,180 +99,20 @@ struct ReadingStatusView: View {
         }
     }
     
-    private func TotalCalendarView() -> some View {
-       ScrollView(.horizontal, showsIndicators: false) {
+    private func totalCalendarScrollView() -> some View {
+        ScrollView(.horizontal, showsIndicators: false) {
             HStack(alignment: .top, spacing: 8) {
                 ForEach(currentReadingBooks.indices, id: \.self) { index in
-                    VStack(spacing: 0) {
-                        header(for: index)
-                            .padding(.vertical, 18)
-                            .padding(.horizontal, 20)
-                        
-                        dayLabels
-                            .padding(.bottom, 5)
-                            .padding(.horizontal, 8)
-                        
-                        calendarDays(for: currentReadingBooks[index], index: index)
-                            .padding(.bottom, 32)
-                    }
-                    .background {
-                        RoundedRectangle(cornerRadius: 16)
-                            .inset(by: 0.5)
-                            .stroke(Color.Separators.green, lineWidth: 1)
-                            .foregroundStyle(Color.Backgrounds.primary)
-                    }
-                    .containerRelativeFrame(.horizontal)
+                    TotalCalendarView(currentReadingBook: currentReadingBooks[index])
+                        .containerRelativeFrame(.horizontal)
                 }
             }
             .scrollTargetLayout()
         }
         .scrollTargetBehavior(.viewAligned)
         .scrollPosition(id: $currentIndex)
-        .contentMargins(.horizontal, 24, for: .scrollContent)
     }
-    
-    private func header(for index: Int) -> some View {
-        HStack(spacing: 0) {
-            Text(currentMonths[index].calendarHeaderString())
-                .fontStyle(.body, weight: .semibold)
-                .multilineTextAlignment(.center)
-                .foregroundStyle(Color.Labels.primaryBlack1)
-            
-            Spacer()
-            
-            HStack(alignment: .center, spacing: 24) {
-                Spacer()
-                
-                Button {
-                    previousMonth(index)
-                } label: {
-                    Image(systemName: "chevron.left")
-                }
-                
-                Button {
-                    nextMonth(index)
-                } label: {
-                    Image(systemName: "chevron.right")
-                }
-            }
-            .foregroundStyle(Color.Colors.green2)
-        }
-    }
-    
-    private var dayLabels: some View {
-        LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7),) {
-            ForEach(["일", "월", "화", "수", "목", "금", "토"], id: \.self) { day in
-                Text(day)
-                    .fontStyle(.caption2, weight: .semibold)
-                    .foregroundStyle(Color.Labels.tertiaryBlack3)
-                    .frame(width: 32, height: 18, alignment: .center)
-                    .padding(.horizontal, 8)
-            }
-        }
-    }
-    
-    private func calendarDays(for currentReadingBook: FGUserBook, index: Int) -> some View {
-        LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7),
-                  spacing: 0) {
-            let (daysInMonth, startDayOfWeek) = getDateFromCalendar(for: index)
-            let totalCells = startDayOfWeek + daysInMonth
-            
-            ForEach(0..<totalCells, id: \.self) { cellIndex in
-                calendarDayCell(
-                    cellIndex: cellIndex,
-                    startDayOfWeek: startDayOfWeek,
-                    currentReadingBook: currentReadingBook,
-                    index: index
-                )
-            }
-        }
-        .padding(.horizontal, 10)
-    }
-
-    private func calendarDayCell(
-        cellIndex: Int,
-        startDayOfWeek: Int,
-        currentReadingBook: FGUserBook,
-        index: Int
-    ) -> some View {
-        if cellIndex < startDayOfWeek {
-            return AnyView(Text("")
-                .frame(width: 47, height: 47))
-        } else {
-            let day = cellIndex - startDayOfWeek + 1
-            
-            guard let date = Calendar.current.date(
-                from: DateComponents(
-                    year: getCurrentMonthAndYear(for: index).year,
-                    month: getCurrentMonthAndYear(for: index).month,
-                    day: day)
-            ) else {
-                return AnyView(EmptyView())
-            }
-            
-            let dateKey = date.toYearMonthDayString()
-            
-            return AnyView(calendarDayContent(date: date, dateKey: dateKey, currentReadingBook: currentReadingBook))
-        }
-    }
-
-    private func calendarDayContent(date: Date, dateKey: String, currentReadingBook: FGUserBook) -> some View {
-        VStack(spacing: 0) {
-            if let readingRecord = currentReadingBook.readingProgress.dailyReadingRecords[dateKey] {
-                let isTodayCompletionDate = Calendar.current.isDate(todayDate,inSameDayAs: currentReadingBook.userSettings.targetEndDate)
-                
-                if Calendar.current.isDate(date, inSameDayAs: currentReadingBook.userSettings.targetEndDate) {
-                    Image(isTodayCompletionDate ? "completionGreenFlag" : "completionFlag")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 40, height: 40)
-                        .overlay(
-                            Text("완독")
-                                .fontStyle(.caption1, weight: .semibold)
-                                .foregroundStyle(isTodayCompletionDate ? Color.Fills.white : Color.Colors.green2)
-                                .padding(.bottom, 1)
-                                .padding(.leading, 2)
-                        )
-                } else if Calendar.current.isDate(date, inSameDayAs: todayDate) {
-                    // 오늘 날짜인 경우 - 초록색 배경에 목표 페이지 수 표시
-                    TotalCalendarTextBubble(
-                        text: "\(readingRecord.targetPages)",
-                        textColor: Color.Fills.white,
-                        backgroundColor: Color.Colors.green1
-                    )
-                } else if readingRecord.pagesRead == readingRecord.targetPages {
-                    // 목표 페이지를 달성한 날 - 녹색 배경의 읽은 페이지 수 표시
-                    TotalCalendarTextBubble(
-                        text: "\(readingRecord.pagesRead)",
-                        textColor: Color.Labels.secondaryBlack2,
-                        backgroundColor: Color.Colors.green
-                    )
-                } else if date > todayDate {
-                    // 미래의 날짜로 계획이 설정된 날 - 회색 텍스트로 목표 페이지 수 표시
-                    TotalCalendarTextBubble(
-                        text: "\(readingRecord.targetPages)",
-                        textColor: Color.Labels.quaternaryBlack4,
-                        backgroundColor: .clear
-                    )
-                } else {
-                    // 과거 날짜에서 계획은 설정되었지만, 읽지 않은 날 - 회색 점으로 결석 표시
-                    TotalCalendarTextBubble(
-                        text: "•",
-                        textColor: Color.Labels.secondaryBlack2,
-                        backgroundColor: Color.Fills.lightGreen
-                    )
-                }
-            } else {
-                // 계획되지 않은 날 - 빈 배경
-                TotalCalendarTextBubble(
-                    text: "",
-                    textColor: Color.clear,
-                    backgroundColor: Color.Fills.lightGreen
-                )
-            }}
-        .frame(width: 47, height: 47, alignment: .center)
-    }
-    
+        
     private func CompletionFooter(for currentReadingBook: FGUserBook) -> some View {
         HStack(alignment: .center) {
             Text("완독 종료일")
@@ -288,36 +129,5 @@ struct ReadingStatusView: View {
                 .background(Color.Fills.lightGreen)
                 .cornerRadius(8)
         }
-    }
-    
-    // MARK: - Month Navigation
-    
-    private func previousMonth(_ index: Int) {
-        currentMonths[index] = Calendar.current.date(byAdding: .month, value: -1, to: currentMonths[index]) ?? currentMonths[index]
-    }
-    
-    private func nextMonth(_ index: Int) {
-        currentMonths[index] = Calendar.current.date(byAdding: .month, value: 1, to: currentMonths[index]) ?? currentMonths[index]
-    }
-    
-    // MARK: - Get Date
-    
-    private func getDateFromCalendar(for index: Int) -> (Int, Int) {
-        let calendar = Calendar.current
-        let components = calendar.dateComponents([.year, .month], from: currentMonths[index])
-        guard let firstDayOfCurrentMonth = calendar.date(from: components),
-              let rangeOfMonth = calendar.range(of: .day, in: .month, for: firstDayOfCurrentMonth) else {
-            return (0, 0)
-        }
-        
-        let numberOfDaysInMonth = rangeOfMonth.count
-        let startDayOfWeek = calendar.component(.weekday, from: firstDayOfCurrentMonth) - 1
-        return (numberOfDaysInMonth, startDayOfWeek)
-    }
-    
-    private func getCurrentMonthAndYear(for index: Int) -> (year: Int, month: Int) {
-        let date = currentMonths.indices.contains(index) ? currentMonths[index] : todayDate
-        let components = Calendar.current.dateComponents([.year, .month], from: date)
-        return (components.year ?? 2024, components.month ?? 1)
     }
 }
