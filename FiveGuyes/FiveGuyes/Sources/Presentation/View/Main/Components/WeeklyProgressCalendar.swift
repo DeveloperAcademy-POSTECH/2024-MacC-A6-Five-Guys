@@ -63,6 +63,12 @@ struct WeeklyProgressCalendar: View {
                     }
                 }
             }
+            .padding(16)
+            .overlay {
+                RoundedRectangle(cornerRadius: 10)
+                    .inset(by: 0.5)
+                    .stroke(Color.Separators.green, lineWidth: 1)
+            }
             .scrollTargetBehavior(.paging)
             .onAppear {
                 // 모든 주 시작 날짜를 가져옴
@@ -286,4 +292,8 @@ struct WeeklyProgressCalendar: View {
     private func isLastDay(weekPageIndex: Int, dayIndex: Int) -> Bool {
         return weekPageIndex == lastWeekIndex && dayIndex == lastDayIndex
     }
+}
+
+#Preview {
+    WeeklyProgressCalendar(userBook: .dummy, today: Date())
 }

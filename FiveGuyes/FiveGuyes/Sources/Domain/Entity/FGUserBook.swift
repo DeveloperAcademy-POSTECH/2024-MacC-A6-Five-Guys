@@ -65,6 +65,36 @@ struct FGReadingProgress: Hashable {
     let lastReadDate: Date?
     let lastReadPage: Int
     
+    enum TodayReadingState: Equatable {
+        /// 해당 날짜의 목표 분량을 모두 읽은 상태
+        case completed
+        /// 00:00~03:59 유예 기간 동안 아직 목표 분량을 읽지 못한 상태
+        case gracePeriodUnfinished
+        /// 유예 기간 전까지 목표를 채우지 못한 상태 (남은 목표 페이지 수 포함)
+        case unfinished(targetPages: Int)
+        /// 오늘은 독서가 없는 쉬는 날
+        case rest
+    }
+    
+    /// 주어진 날짜의 독서 상태를 진행 상황과 시간대에 따라 반환합니다.
+    /// - Parameters:
+    ///   - date: 평가할 날짜.
+    ///   - boundaryStartHour: 하루 경계 시작 시각 (기본값은 새벽 4시).
+    func readingState(on date: Date, boundaryStartHour: Int = 4) -> TodayReadingState {
+        if let record = getDailyReadingRecord(for: date) {
+            let isMidnightWindow = date.isInHourRange(start: 0, end: boundaryStartHour)
+            if record.pagesRead == record.targetPages {
+                return .completed
+            } else if isMidnightWindow {
+                return .gracePeriodUnfinished
+            } else {
+                return .unfinished(targetPages: record.targetPages)
+            }
+        } else {
+            return .rest
+        }
+    }
+    
     /// 특정 주의 기록 가져오기
     func getAdjustedWeeklyRecorded(from today: Date) -> [ReadingRecord?] {
         let calendar = Calendar.current

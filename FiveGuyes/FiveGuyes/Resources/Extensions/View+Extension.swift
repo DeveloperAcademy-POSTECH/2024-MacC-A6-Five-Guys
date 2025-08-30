@@ -41,11 +41,13 @@ extension View {
     
     /// Clips the view into a shape resembling a book with rounded corners.
     func clipToBookShape(
-        bottomTrailingRadius: CGFloat = 6,
-        topTrailingRadius: CGFloat = 6
+        bottomTrailingRadius: CGFloat = 8,
+        topTrailingRadius: CGFloat = 8
     ) -> some View {
         self.clipShape(
-            RoundedRectangle(cornerSize: CGSize(width: bottomTrailingRadius, height: topTrailingRadius))
+            UnevenRoundedRectangle(cornerRadii:
+                    .init(bottomTrailing: bottomTrailingRadius, topTrailing: topTrailingRadius)
+            )
         )
     }
     

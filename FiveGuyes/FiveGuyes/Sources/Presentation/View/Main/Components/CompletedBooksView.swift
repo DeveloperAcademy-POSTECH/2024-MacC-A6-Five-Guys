@@ -1,5 +1,5 @@
 //
-//  CompletionListView.swift
+//  CompletedBooksView.swift
 //  FiveGuyes
 //
 //  Created by zaehorang on 11/5/24.
@@ -8,7 +8,7 @@
 import SwiftData
 import SwiftUI
 
-struct CompletionListView: View {
+struct CompletedBooksView: View {
     typealias UserBook = UserBookSchemaV2.UserBookV2
     
     @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
@@ -17,17 +17,13 @@ struct CompletionListView: View {
     @State private var selectedBookIndex: Int = 0
     @State var showCompletionAlert: Bool = false
     
-    // 완독한 책을 가져오는 쿼리
-    @Query(
-        filter: #Predicate<UserBook> { $0.completionStatus.isCompleted == true }
-    )
-    private var fetchCompletedBooks: [UserBook]
+    var completedBooks: [UserBook]
     
     let completionAlertMessage = "정말로 내용을 삭제할까요?"
     let completionAlertText = "삭제 후에는 복원할 수 없어요"
     
     var body: some View {
-        let completedBooks = Array(fetchCompletedBooks.reversed())
+        let completedBooks = Array(completedBooks.reversed())
         
         VStack(alignment: .leading, spacing: 16) {
             HStack {
