@@ -20,8 +20,9 @@ struct DotsIndicator: View {
     let animation: Animation = .easeInOut(duration: 0.2)
     
     var body: some View {
-        if count > 1 {
-            HStack(spacing: spacing) {
+        
+        HStack(spacing: spacing) {
+            if count > 1 {
                 ForEach(0..<max(count, 0), id: \.self) { idx in
                     let isSelected = idx == (selectedIndex ?? 0)
                     Circle()
@@ -29,9 +30,12 @@ struct DotsIndicator: View {
                         .foregroundStyle(isSelected ? activeColor : inactiveColor)
                 }
                 if includeTrailingSpacer { Spacer() }
+            } else {
+                Color.clear
+                    .frame(height: dotSize)
             }
-            .animation(animation, value: selectedIndex)
         }
+        .animation(animation, value: selectedIndex)
     }
 }
 
@@ -39,11 +43,11 @@ struct DotsIndicator: View {
     struct PreviewWrapper: View {
         @State private var selectedIndex: Int? = 0
         let total = 5
-
+        
         var body: some View {
             VStack(spacing: 20) {
                 DotsIndicator(count: total, selectedIndex: $selectedIndex)
-
+                
                 HStack {
                     Button("← Left") {
                         if let idx = selectedIndex, idx > 0 {
@@ -60,6 +64,6 @@ struct DotsIndicator: View {
             .padding()
         }
     }
-
+    
     return PreviewWrapper()
 }
