@@ -14,26 +14,22 @@ struct ReadingBooksCarousel: View {
     @Binding var activeID: UUID?
     
     var body: some View {
-        if !readingBooks.isEmpty {
-            ScrollView(.horizontal) {
-                HStack(spacing: 8) {
-                    ForEach(readingBooks) { book in
-                        ReadingBookProgressCell(
-                            book: book,
-                            today: today
-                        )
-                        .containerRelativeFrame(.horizontal)
-                    }
+        ScrollView(.horizontal) {
+            HStack(spacing: 8) {
+                ForEach(readingBooks) { book in
+                    ReadingBookProgressCell(
+                        book: book,
+                        today: today
+                    )
+                    .containerRelativeFrame(.horizontal)
                 }
-                .scrollTargetLayout()
             }
-            .safeAreaPadding(.horizontal, 16)
-            .scrollIndicators(.hidden)
-            .scrollTargetBehavior(.viewAligned)
-            .scrollPosition(id: $activeID)
-        } else {
-            // TODO: 등록된 책이 없는 경우 뷰 추가하기
+            .scrollTargetLayout()
         }
+        .safeAreaPadding(.horizontal, 16)
+        .scrollIndicators(.hidden)
+        .scrollTargetBehavior(.viewAligned)
+        .scrollPosition(id: $activeID)
     }
 }
 

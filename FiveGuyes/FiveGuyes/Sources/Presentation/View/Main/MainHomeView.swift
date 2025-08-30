@@ -117,14 +117,12 @@ struct MainHomeView: View {
                     .padding(.bottom, 10)
                     .padding(.horizontal, 20)
                     
-                    ReadingBooksCarousel(
-                        readingBooks: readingBooks,
-                        today: today,
-                        activeID: $activeBookID
-                    )
-                    .padding(.bottom, 12)
-                    .id(navigationCoordinator.getViewReloadTrigger())
-                    .onAppear(perform: navigationCoordinator.reloadView)
+                    // Home Main Section
+                    homeMainSection
+                        .padding(.bottom, 12)
+                        .shadow(color: .black.opacity(0.04), radius: 2, x: 0, y: 4)
+                        .id(navigationCoordinator.getViewReloadTrigger())
+                        .onAppear(perform: navigationCoordinator.reloadView)
                     
                     HStack(spacing: 16) {
                         calendarFullScreenButton
@@ -144,7 +142,7 @@ struct MainHomeView: View {
         .scrollIndicators(.hidden)
         .background(alignment: .top) {
             LinearGradient(colors: [Color(red: 0.81, green: 1, blue: 0.77), Color.Fills.white], startPoint: .top, endPoint: .bottom)
-                .frame(height: 448)
+                .frame(height: 561)
                 .ignoresSafeArea(edges: .top)
         }
         .onChange(of: activeBookID) {
@@ -214,12 +212,35 @@ struct MainHomeView: View {
         .foregroundStyle(Color.Labels.primaryBlack1)
     }
     
+    @ViewBuilder
+    private var homeMainSection: some View {
+        VStack {
+            Spacer()
+            
+            switch homeState {
+            case .reading:
+                ReadingBooksCarousel(
+                    readingBooks: readingBooks,
+                    today: today,
+                    activeID: $activeBookID
+                )
+            case .hasCompletedNoReading:
+                    EmptyReadingBooksView(state: .hasCompleted)
+                    .padding(.horizontal, 24)
+            case .noCompletedNoReading:
+                    EmptyReadingBooksView(state: .noCompleted)
+                    .padding(.horizontal, 24)
+            }
+        }
+        .frame(height: 275)
+    }
+    
     private func notiButton(action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Image(systemName: "bell")
                 .resizable()
-                .scaledToFill()
-                .frame(width: 17, height: 19)
+                .scaledToFit()
+                .frame(width: 21, height: 50)
                 .tint(Color.Labels.primaryBlack1)
         }
     }

@@ -57,7 +57,6 @@ struct ReadingBookProgressCell: View {
             .frame(height: 202)
             .foregroundStyle(Color.Backgrounds.primary)
             .cornerRadius(16)
-            .shadow(color: .black.opacity(0.04), radius: 2, x: 0, y: 4)
     }
     
     private func remainingDaysBadge(_ days: Int) -> some View {
