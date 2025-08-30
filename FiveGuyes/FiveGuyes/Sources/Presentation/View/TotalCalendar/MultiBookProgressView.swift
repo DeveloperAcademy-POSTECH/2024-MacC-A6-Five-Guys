@@ -1,5 +1,5 @@
 //
-//  ReadingStatusView.swift
+//  MultiBookProgressView.swift
 //  FiveGuyes
 //
 //  Created by Shim Hyeonhee on 11/6/24.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct ReadingStatusView: View {
+struct MultiBookProgressView: View {
     
     // MARK: - Properties
     
