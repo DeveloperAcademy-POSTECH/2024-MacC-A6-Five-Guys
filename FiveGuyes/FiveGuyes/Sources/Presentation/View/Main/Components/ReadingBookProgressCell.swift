@@ -71,30 +71,12 @@ struct ReadingBookProgressCell: View {
             }
     }
     
-    @ViewBuilder
     private func userBookImage(_ userBook: FGUserBook) -> some View {
-        if let coverURL = userBook.bookMetaData.coverImageURL,
-           let url = URL(string: coverURL) {
-            AsyncImage(url: url) { image in
-                image
-                    .resizable()
-            } placeholder: {
-                ProgressView()
-            }
-            .scaledToFit()
-            .frame(width: 104, height: 161)
-            .clipToBookShape()
-        } else {
-            emptyUserBookImage()
-        }
-    }
-    
-    private func emptyUserBookImage() -> some View {
-        Rectangle()
-            .foregroundStyle(Color.Fills.white)
-            .frame(width: 104, height: 161)
-            .clipToBookShape()
-            .commonShadow()
+        BookCoverImageView(
+            coverURL: userBook.bookMetaData.coverImageURL,
+            width: 104,
+            height: 161
+        )
     }
     
     private func promptTexts(for state: FGReadingProgress.TodayReadingState) -> (primary: String, secondary: String) {
