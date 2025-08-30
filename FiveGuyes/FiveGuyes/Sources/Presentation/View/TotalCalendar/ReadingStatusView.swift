@@ -1,5 +1,5 @@
 //
-//  TotalCalendarView.swift
+//  ReadingStatusView.swift
 //  FiveGuyes
 //
 //  Created by Shim Hyeonhee on 11/6/24.
