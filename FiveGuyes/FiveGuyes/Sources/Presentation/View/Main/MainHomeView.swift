@@ -11,6 +11,17 @@ import SwiftUI
 struct MainHomeView: View {
     typealias SDUserBook = UserBookSchemaV2.UserBookV2
     
+    // Derived UI State
+    private enum HomeState {
+        case reading(book: SDUserBook)
+        case hasCompletedNoReading
+        case noCompletedNoReading
+    }
+    
+    let notificationManager = NotificationManager()
+    let mainAlertMessage = "삭제 후에는 복원할 수 없어요"
+    let today = Date().adjustedDate()
+    
     @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
     @Environment(\.modelContext) private var modelContext
     
@@ -18,9 +29,9 @@ struct MainHomeView: View {
     @State private var showReadingBookAlert = false
     @State private var showCompletionAlert = false
     
-    let mainAlertMessage = "삭제 후에는 복원할 수 없어요"
-    private let notificationManager = NotificationManager()
-    
+    @State private var activeBookID: UUID?
+    @State private var selectedBookIndex: Int?
+
     @Query(
         filter: #Predicate<SDUserBook> {
             $0.completionStatus.isCompleted == false
@@ -33,21 +44,26 @@ struct MainHomeView: View {
         filter: #Predicate<SDUserBook> { $0.completionStatus.isCompleted == true }
     )
     private var SDCompletedBooks: [SDUserBook]
-    
-    @State private var activeBookID: UUID?
-    @State private var selectedBookIndex: Int?
-    
+
     private var readingBooks: [FGUserBook] {
         SDReadingBooks.map { $0.toFGUserBook() }
     }
-    
-    let today = Date().adjustedDate()
-    
+
     private var selectedBook: SDUserBook? {
         if let selectedBookIndex, !SDReadingBooks.isEmpty && selectedBookIndex < SDReadingBooks.count {
             return SDReadingBooks[selectedBookIndex]
         }
         return nil
+    }
+    
+    private var homeState: HomeState {
+        if let selectedBook {
+            return .reading(book: selectedBook)
+        }
+        if let firstReading = SDReadingBooks.first {
+            return .reading(book: firstReading)
+        }
+        return SDCompletedBooks.isEmpty ? .noCompletedNoReading : .hasCompletedNoReading
     }
     
     var body: some View {
@@ -61,11 +77,11 @@ struct MainHomeView: View {
                             navigationCoordinator.push(.notiSetting(book: SDReadingBooks.first))
                         }
                     }
-                    .padding(.bottom, 49)
+                    .padding(.bottom, 12)
                     .padding(.trailing, 20)
                     
-                    HStack(alignment: .top, spacing: 10) {
-                        titleDescription(book: selectedBook)
+                    HStack(alignment: .top, spacing: 20) {
+                        titleView()
                         
                         Spacer()
                         
@@ -114,7 +130,7 @@ struct MainHomeView: View {
                         calendarFullScreenButton
                             .frame(width: 107)
                         
-                        mainActionButton
+                        bookActionButton
                     }
                     .padding(.bottom, 40)
                     .padding(.horizontal, 20)
@@ -157,18 +173,42 @@ struct MainHomeView: View {
     
     // MARK: - View Property & Function
     
-    private func titleDescription(book: SDUserBook?) -> some View {
-        VStack(alignment: .leading, spacing: 5) {
-            if let book {
-                Text("<\(book.bookMetaData.title)>")
-                    .lineLimit(2)
-                Text("완독까지 \(getRemainingDays(book: book))일 남았어요!")
-                    .lineLimit(1)
-            } else {
-                Text("환영해요!")
-                Text("저와 함께 완독을 시작해볼까요?")
-            }
+    private var titleText: String {
+        switch homeState {
+        case .reading(let book):
+            return "\(book.bookMetaData.title)"
+        case .noCompletedNoReading:
+            return "반가워요,\n저와 함께 완독을 시작해볼까요?"
+        case .hasCompletedNoReading:
+            return "완독의 즐거움,\n다음 책에서도 이어나가볼까요?"
         }
+    }
+    
+    private var bookActionText: String {
+        switch homeState {
+        case .reading:
+            return "오늘 독서 현황 기록하기"
+        case .noCompletedNoReading:
+            return "완독할 책 등록하기"
+        case .hasCompletedNoReading:
+            return "완독할 책 추가하기"
+        }
+    }
+    
+    private func performBookAction() {
+        switch homeState {
+        case .reading(let book):
+            navigationCoordinator.push(.dailyProgress(book: book))
+        case .noCompletedNoReading, .hasCompletedNoReading:
+            navigationCoordinator.push(.bookSettingsManager)
+        }
+    }
+    
+    private func titleView() -> some View {
+        VStack(alignment: .leading) {
+            Text(titleText)
+        }
+        .lineLimit(2)
         .frame(height: 110, alignment: .topLeading)
         .fontStyle(.title1, weight: .semibold)
         .foregroundStyle(Color.Labels.primaryBlack1)
@@ -217,17 +257,13 @@ struct MainHomeView: View {
         .disabled(!isReadingBookAvailable)
     }
     
-    private var mainActionButton: some View {
+    private var bookActionButton: some View {
         let isReadingBookAvailable = SDReadingBooks.first != nil
         
         return Button {
-            if isReadingBookAvailable, let selectedBook {
-                navigationCoordinator.push(.dailyProgress(book: selectedBook))
-            } else {
-                navigationCoordinator.push(.bookSettingsManager)
-            }
+            performBookAction()
         } label: {
-            Text(isReadingBookAvailable ? "오늘 독서 현황 기록하기" : "+ 완독할 책 추가하기")
+            Text(bookActionText)
                 .fontStyle(.title2, weight: .semibold)
                 .foregroundStyle(Color.Fills.white)
                 .frame(maxWidth: .infinity)
