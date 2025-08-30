@@ -28,6 +28,12 @@ struct MainHomeView: View {
     )
     private var SDReadingBooks: [SDUserBook]
     
+    // 완독한 책을 가져오는 쿼리
+    @Query(
+        filter: #Predicate<SDUserBook> { $0.completionStatus.isCompleted == true }
+    )
+    private var SDCompletedBooks: [SDUserBook]
+    
     @State private var activeBookID: UUID?
     @State private var selectedBookIndex: Int?
     
@@ -114,7 +120,7 @@ struct MainHomeView: View {
                     .padding(.horizontal, 20)
                 }
                 
-                CompletedBooksView()
+                CompletedBooksView(completedBooks: SDCompletedBooks)
             }
             .padding(.top, topSafeAreaInset)
         }
