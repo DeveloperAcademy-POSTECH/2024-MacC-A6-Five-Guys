@@ -31,7 +31,7 @@ struct MainHomeView: View {
     
     @State private var activeBookID: UUID?
     @State private var selectedBookIndex: Int?
-
+    
     @Query(
         filter: #Predicate<SDUserBook> {
             $0.completionStatus.isCompleted == false
@@ -44,11 +44,11 @@ struct MainHomeView: View {
         filter: #Predicate<SDUserBook> { $0.completionStatus.isCompleted == true }
     )
     private var SDCompletedBooks: [SDUserBook]
-
+    
     private var readingBooks: [FGUserBook] {
         SDReadingBooks.map { $0.toFGUserBook() }
     }
-
+    
     private var selectedBook: SDUserBook? {
         if let selectedBookIndex, !SDReadingBooks.isEmpty && selectedBookIndex < SDReadingBooks.count {
             return SDReadingBooks[selectedBookIndex]
@@ -69,70 +69,72 @@ struct MainHomeView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 0) {
-                VStack(spacing: 0) {
-                    HStack {
-                        Spacer()
-                        notiButton {
-                            // 독서 종료일이 제일 가까운 책을 기준으로 노티를 설정합니다.
-                            navigationCoordinator.push(.notiSetting(book: SDReadingBooks.first))
-                        }
+                HStack {
+                    Spacer()
+                    notiButton {
+                        // 독서 종료일이 제일 가까운 책을 기준으로 노티를 설정합니다.
+                        navigationCoordinator.push(.notiSetting(book: SDReadingBooks.first))
                     }
-                    .padding(.bottom, 12)
-                    .padding(.trailing, 20)
-                    
-                    HStack(alignment: .top, spacing: 20) {
-                        titleView()
-                        
-                        Spacer()
-                        
-                        if !SDReadingBooks.isEmpty { // 읽고 있는 책이 있는 경우
-                            Menu {
-                                ReadingDateEditButton
-                                UserBookAddButton
-                                DeleteReadingBookButton
-                            } label: {
-                                Image(systemName: "ellipsis")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 20, height: 22)
-                                    .tint(Color.Labels.primaryBlack1)
-                            }
-                            .fontStyle(.body)
-                            .alert(isPresented: $showReadingBookAlert) {
-                                Alert(
-                                    title: Text(getMainAlertText(book: selectedBook))
-                                        .alertFontStyle(.title3, weight: .semibold),
-                                    message: Text(mainAlertMessage)
-                                        .alertFontStyle(.caption1),
-                                    primaryButton: .cancel(Text("취소하기")),
-                                    secondaryButton: .destructive(Text("삭제")) {
-                                        if let selectedBookIndex {
-                                            deleteBook(at: selectedBookIndex)
-                                        }
-                                    }
-                                )
-                            }
-                        }
-                    }
-                    .padding(.bottom, 10)
-                    .padding(.horizontal, 20)
-                    
-                    // Home Main Section
-                    homeMainSection
-                        .padding(.bottom, 12)
-                        .shadow(color: .black.opacity(0.04), radius: 2, x: 0, y: 4)
-                        .id(navigationCoordinator.getViewReloadTrigger())
-                        .onAppear(perform: navigationCoordinator.reloadView)
-                    
-                    HStack(spacing: 16) {
-                        calendarFullScreenButton
-                            .frame(width: 107)
-                        
-                        bookActionButton
-                    }
-                    .padding(.bottom, 40)
-                    .padding(.horizontal, 20)
                 }
+                .padding(.bottom, 12)
+                .padding(.trailing, 20)
+                
+                HStack(alignment: .center, spacing: 20) {
+                    titleView()
+                    
+                    Spacer()
+                    
+                    if !SDReadingBooks.isEmpty { // 읽고 있는 책이 있는 경우
+                        Menu {
+                            ReadingDateEditButton
+                            UserBookAddButton
+                            DeleteReadingBookButton
+                        } label: {
+                            Image(systemName: "ellipsis")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 20, height: 22)
+                                .tint(Color.Labels.primaryBlack1)
+                        }
+                        .fontStyle(.body)
+                        .alert(isPresented: $showReadingBookAlert) {
+                            Alert(
+                                title: Text(getMainAlertText(book: selectedBook))
+                                    .alertFontStyle(.title3, weight: .semibold),
+                                message: Text(mainAlertMessage)
+                                    .alertFontStyle(.caption1),
+                                primaryButton: .cancel(Text("취소하기")),
+                                secondaryButton: .destructive(Text("삭제")) {
+                                    if let selectedBookIndex {
+                                        deleteBook(at: selectedBookIndex)
+                                    }
+                                }
+                            )
+                        }
+                    }
+                }
+                .padding(.bottom, 8)
+                .padding(.horizontal, 20)
+                
+                DotsIndicator(count: readingBooks.count, selectedIndex: $selectedBookIndex)
+                    .padding(.bottom, 22)
+                    .padding(.horizontal, 20)
+                
+                // Home Main Section
+                homeMainSection
+                    .padding(.bottom, 12)
+                    .shadow(color: .black.opacity(0.04), radius: 2, x: 0, y: 4)
+                    .id(navigationCoordinator.getViewReloadTrigger())
+                    .onAppear(perform: navigationCoordinator.reloadView)
+                
+                HStack(spacing: 16) {
+                    calendarFullScreenButton
+                        .frame(width: 107)
+                    
+                    bookActionButton
+                }
+                .padding(.bottom, 40)
+                .padding(.horizontal, 20)
                 
                 CompletedBooksView(completedBooks: SDCompletedBooks)
             }
@@ -207,7 +209,7 @@ struct MainHomeView: View {
             Text(titleText)
         }
         .lineLimit(2)
-        .frame(height: 110, alignment: .topLeading)
+        .frame(height: 68, alignment: .topLeading)
         .fontStyle(.title1, weight: .semibold)
         .foregroundStyle(Color.Labels.primaryBlack1)
     }
@@ -225,10 +227,10 @@ struct MainHomeView: View {
                     activeID: $activeBookID
                 )
             case .hasCompletedNoReading:
-                    EmptyReadingBooksView(state: .hasCompleted)
+                EmptyReadingBooksView(state: .hasCompleted)
                     .padding(.horizontal, 24)
             case .noCompletedNoReading:
-                    EmptyReadingBooksView(state: .noCompleted)
+                EmptyReadingBooksView(state: .noCompleted)
                     .padding(.horizontal, 24)
             }
         }
@@ -279,9 +281,7 @@ struct MainHomeView: View {
     }
     
     private var bookActionButton: some View {
-        let isReadingBookAvailable = SDReadingBooks.first != nil
-        
-        return Button {
+        Button {
             performBookAction()
         } label: {
             Text(bookActionText)
