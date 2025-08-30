@@ -10,7 +10,7 @@ import SwiftUI
 struct DotsIndicator: View {
     let count: Int
     @Binding var selectedIndex: Int?
-
+    
     // Customization
     let dotSize: CGFloat = 6
     let spacing: CGFloat = 4
@@ -18,18 +18,20 @@ struct DotsIndicator: View {
     let inactiveColor: Color = Color.Labels.quaternaryBlack4
     let includeTrailingSpacer: Bool = true
     let animation: Animation = .easeInOut(duration: 0.2)
-
+    
     var body: some View {
-        HStack(spacing: spacing) {
-            ForEach(0..<max(count, 0), id: \.self) { idx in
-                let isSelected = idx == (selectedIndex ?? 0)
-                Circle()
-                    .frame(width: dotSize, height: dotSize)
-                    .foregroundStyle(isSelected ? activeColor : inactiveColor)
+        if count > 1 {
+            HStack(spacing: spacing) {
+                ForEach(0..<max(count, 0), id: \.self) { idx in
+                    let isSelected = idx == (selectedIndex ?? 0)
+                    Circle()
+                        .frame(width: dotSize, height: dotSize)
+                        .foregroundStyle(isSelected ? activeColor : inactiveColor)
+                }
+                if includeTrailingSpacer { Spacer() }
             }
-            if includeTrailingSpacer { Spacer() }
+            .animation(animation, value: selectedIndex)
         }
-        .animation(animation, value: selectedIndex)
     }
 }
 
