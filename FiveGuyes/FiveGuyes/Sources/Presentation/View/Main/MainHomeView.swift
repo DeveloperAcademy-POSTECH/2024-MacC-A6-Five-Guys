@@ -114,7 +114,7 @@ struct MainHomeView: View {
                     .padding(.horizontal, 20)
                 }
                 
-                CompletionListView()
+                CompletedBooksView()
             }
             .padding(.top, topSafeAreaInset)
         }

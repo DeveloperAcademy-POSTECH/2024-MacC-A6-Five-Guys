@@ -97,7 +97,7 @@
 		26EBDED82CF45B9300B3A2BC /* CompletionStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EBDED72CF45B9300B3A2BC /* CompletionStatus.swift */; };
 		26F19A682CD9EFD800F41D6D /* MainHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F19A672CD9EFD800F41D6D /* MainHomeView.swift */; };
 		26F19A6A2CD9FE5C00F41D6D /* WeeklyReadingProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F19A692CD9FE5C00F41D6D /* WeeklyReadingProgressView.swift */; };
-		26F19A6C2CDA0A2B00F41D6D /* CompletionListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F19A6B2CDA0A2B00F41D6D /* CompletionListView.swift */; };
+		26F19A6C2CDA0A2B00F41D6D /* CompletedBooksView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F19A6B2CDA0A2B00F41D6D /* CompletedBooksView.swift */; };
 		26F19A6E2CDA74A600F41D6D /* WeeklyProgressCalendar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F19A6D2CDA74A600F41D6D /* WeeklyProgressCalendar.swift */; };
 		26F19A722CDB267600F41D6D /* NavigationCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F19A712CDB267600F41D6D /* NavigationCoordinator.swift */; };
 		26F19A742CDB271E00F41D6D /* NavigationRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F19A732CDB271E00F41D6D /* NavigationRootView.swift */; };
@@ -203,7 +203,7 @@
 		26EBDED72CF45B9300B3A2BC /* CompletionStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletionStatus.swift; sourceTree = "<group>"; };
 		26F19A672CD9EFD800F41D6D /* MainHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainHomeView.swift; sourceTree = "<group>"; };
 		26F19A692CD9FE5C00F41D6D /* WeeklyReadingProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyReadingProgressView.swift; sourceTree = "<group>"; };
-		26F19A6B2CDA0A2B00F41D6D /* CompletionListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletionListView.swift; sourceTree = "<group>"; };
+		26F19A6B2CDA0A2B00F41D6D /* CompletedBooksView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletedBooksView.swift; sourceTree = "<group>"; };
 		26F19A6D2CDA74A600F41D6D /* WeeklyProgressCalendar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyProgressCalendar.swift; sourceTree = "<group>"; };
 		26F19A712CDB267600F41D6D /* NavigationCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationCoordinator.swift; sourceTree = "<group>"; };
 		26F19A732CDB271E00F41D6D /* NavigationRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationRootView.swift; sourceTree = "<group>"; };
@@ -365,6 +365,7 @@
 				26F19A6D2CDA74A600F41D6D /* WeeklyProgressCalendar.swift */,
 				267AE67E2E4C885100FEBDF8 /* ReadingBookProgressCell.swift */,
 				267AE6802E4C889400FEBDF8 /* ReadingBooksCarousel.swift */,
+				26F19A6B2CDA0A2B00F41D6D /* CompletedBooksView.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -582,7 +583,6 @@
 			children = (
 				264440562CD8E0D20031A290 /* CustomTextEditorStyle.swift */,
 				1A27D9612CDB05C000D1E14D /* CustomTextFieldStylePageCount.swift */,
-				26F19A6B2CDA0A2B00F41D6D /* CompletionListView.swift */,
 				1AA14A772CDDA30D00B763A6 /* TotalCalendarTextBubble.swift */,
 				24FAF9442CEC5224004FEC3F /* ToastView.swift */,
 				2622C7D72D2AC4C000AA3FF4 /* DividerLine.swift */,
@@ -896,7 +896,7 @@
 				264440572CD8E0D20031A290 /* CustomTextEditorStyle.swift in Sources */,
 				264440552CD8E0100031A290 /* KeyboardObserver.swift in Sources */,
 				2622C8082D2D945000AA3FF4 /* SwiftDataBookRepository.swift in Sources */,
-				26F19A6C2CDA0A2B00F41D6D /* CompletionListView.swift in Sources */,
+				26F19A6C2CDA0A2B00F41D6D /* CompletedBooksView.swift in Sources */,
 				26EBDE2F2CE3856900B3A2BC /* NotificationType.swift in Sources */,
 				1A27D9662CDB779000D1E14D /* TotalCalendarView.swift in Sources */,
 				2622C7DC2D2AC67800AA3FF4 /* PageTextModifier.swift in Sources */,

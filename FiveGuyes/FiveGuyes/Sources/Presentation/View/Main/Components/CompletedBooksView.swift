@@ -1,5 +1,5 @@
 //
-//  CompletionListView.swift
+//  CompletedBooksView.swift
 //  FiveGuyes
 //
 //  Created by zaehorang on 11/5/24.
@@ -8,7 +8,7 @@
 import SwiftData
 import SwiftUI
 
-struct CompletionListView: View {
+struct CompletedBooksView: View {
     typealias UserBook = UserBookSchemaV2.UserBookV2
     
     @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
