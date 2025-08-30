@@ -12,17 +12,17 @@ struct TotalCalendarTextBubble: View {
     var text: String
     var textColor: Color = Color.Labels.primaryBlack1
     var backgroundColor: Color = Color.Colors.green
-    var fontWeight: Font.Weight = .medium // 기본 글꼴 스타일을 medium으로 설정
+    let fontWeight: Font.Weight = .regular
+    let fontSize: Font = .title2
 
     var body: some View {
         VStack {
             Text(text)
                 .foregroundStyle(textColor)
                 .fontWeight(fontWeight) // fontWeight 적용
+                .font(fontSize)
         }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 10)
-        .frame(width: 50, height: 50, alignment: .center)
+        .frame(width: 47, height: 47, alignment: .center)
         .background(backgroundColor)
         .cornerRadius(99)
     }

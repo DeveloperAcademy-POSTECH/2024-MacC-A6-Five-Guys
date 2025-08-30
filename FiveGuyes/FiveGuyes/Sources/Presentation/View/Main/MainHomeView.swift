@@ -178,7 +178,7 @@ struct MainHomeView: View {
         
         return Button {
             if let selectedBook {
-                navigationCoordinator.push(.totalCalendar(book: selectedBook.toFGUserBook()))
+                navigationCoordinator.push(.totalCalendar(books: currentlyReadingBooks.map { $0.toFGUserBook() }))
             }
         } label: {
             HStack(spacing: 8) {
