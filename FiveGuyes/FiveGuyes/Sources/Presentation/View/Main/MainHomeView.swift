@@ -254,7 +254,7 @@ struct MainHomeView: View {
         
         return Button {
             if let selectedBook {
-                navigationCoordinator.push(.totalCalendar(books: currentlyReadingBooks.map { $0.toFGUserBook() }))
+                navigationCoordinator.push(.totalCalendar(books: readingBooks))
             }
         } label: {
             HStack(spacing: 8) {
