@@ -18,7 +18,7 @@ final class CalendarCellModel: ObservableObject {
     let adjustedToday: Date
     
     /// 날짜 계산에 사용할 캘린더 인스턴스
-    private let calendar = Calendar.current
+    private let calendar = Calendar.app
     
     /// 선택된 범위의 시작 날짜
     private var startDate: Date?
@@ -42,7 +42,7 @@ final class CalendarCellModel: ObservableObject {
     ///   - excludedDates: 제외된 날짜 리스트 (선택 사항)
     ///   - isConfirmed: 선택된 날짜가 확정되었는지 여부
     init(adjustedToday: Date, startDate: Date? = nil, endDate: Date? = nil, excludedDates: [Date] = [], isConfirmed: Bool = false) {
-        let calendar = Calendar.current
+        let calendar = Calendar.app
         
         self.adjustedToday = calendar.startOfDay(for: adjustedToday)
         self.startDate = startDate.map { calendar.startOfDay(for: $0) }

@@ -9,7 +9,7 @@ import Foundation
 
 extension Date {
     func startOfMonth() -> Date {
-        let calendar = Calendar.current
+        let calendar = Calendar.app
         let components = calendar.dateComponents([.year, .month], from: self)
         return calendar.date(from: components)!
     }
@@ -18,7 +18,7 @@ extension Date {
     /// - Parameter days: 추가할 일 수 (음수일 경우 감소)
     /// - Returns: UTC 기준으로 일 수가 추가된 새로운 `Date`
     func addDaysInUTC(_ days: Int) -> Date {
-        var utcCalendar = Calendar.current
+        var utcCalendar = Calendar.app
         utcCalendar.timeZone = TimeZone(secondsFromGMT: 0)! // UTC 시간대 설정
         return utcCalendar.date(byAdding: .day, value: days, to: self) ?? self
     }
@@ -27,7 +27,7 @@ extension Date {
     /// - Parameter days: 추가할 일 수 (음수일 경우 감소)
     /// - Returns: 일 수가 추가된 새로운 `Date`
     func addDays(_ days: Int) -> Date {
-        return Calendar.current.date(byAdding: .day, value: days, to: self) ?? self
+        return Calendar.app.date(byAdding: .day, value: days, to: self) ?? self
     }
     
     /// `yyyy년 MM월 dd일` 형식으로 변환하여 문자열로 반환합니다.
@@ -77,7 +77,7 @@ extension Date {
     
     /// 04:00 AM을 기준으로 날짜를 조정하여 "yyyy-MM-dd" 형식으로 반환
     func toAdjustedYearMonthDayString(hourOffset: Int = -4) -> String {
-        let calendar = Calendar.current
+        let calendar = Calendar.app
         let adjustedDate = calendar.date(byAdding: .hour, value: hourOffset, to: self) ?? self
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
@@ -86,14 +86,14 @@ extension Date {
     
     /// 기준 시각으로 조정된 날짜 반환
     func adjustedDate(hourOffset: Int = -4) -> Date {
-        let calendar = Calendar.current
+        let calendar = Calendar.app
         return calendar.date(byAdding: .hour, value: hourOffset, to: self) ?? self
     }
 }
 
 extension Date {
     /// 현재 날짜가 특정 시간 범위에 포함되어 있는지 확인하는 메서드
-    func isInHourRange(start: Int, end: Int, calendar: Calendar = Calendar.current) -> Bool {
+    func isInHourRange(start: Int, end: Int, calendar: Calendar = Calendar.app) -> Bool {
         let hour = calendar.component(.hour, from: self)
         return hour >= start && hour < end
     }
@@ -103,14 +103,14 @@ extension Date {
 extension Date {
     /// 시간 부분을 버리기
     var onlyDate: Date {
-        let component = Calendar.current.dateComponents([.year, .month, .day], from: self)
-        return Calendar.current.date(from: component) ?? Date()
+        let component = Calendar.app.dateComponents([.year, .month, .day], from: self)
+        return Calendar.app.date(from: component) ?? Date()
     }
     
     /// 날짜에 지정된 일(day)을 추가하거나 감소합니다.
     /// - Parameter days: 추가하거나 뺄 일수 (음수 값을 전달하면 감소)
     /// - Returns: 지정된 일수를 더하거나 뺀 새로운 날짜
     func addingDays(_ days: Int) -> Date {
-        return Calendar.current.date(byAdding: .day, value: days, to: self) ?? Date()
+        return Calendar.app.date(byAdding: .day, value: days, to: self) ?? Date()
     }
 }

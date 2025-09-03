@@ -24,7 +24,7 @@ struct ReadingDateCalculator {
         }
 
         // 시작 날짜와 종료 날짜 간의 차이 계산
-        let gap = Calendar.current.getDaysBetween(from: startDate.onlyDate, to: endDate.onlyDate)
+        let gap = Calendar.app.getDaysBetween(from: startDate.onlyDate, to: endDate.onlyDate)
         
         // 시작 날짜와 종료 날짜를 모두 포함하기 위해 1을 추가
         return gap + 1

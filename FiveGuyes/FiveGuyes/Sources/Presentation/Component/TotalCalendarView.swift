@@ -98,7 +98,7 @@ struct TotalCalendarView: View {
         } else {
             let day = cellIndex - startDayOfWeek + 1
             
-            guard let date = Calendar.current.date(from: DateComponents(
+            guard let date = Calendar.app.date(from: DateComponents(
                 year: getCurrentMonthAndYear().year,
                 month: getCurrentMonthAndYear().month,
                 day: day)
@@ -115,9 +115,9 @@ struct TotalCalendarView: View {
     private func calendarDayContent(date: Date, dateKey: String, currentReadingBook: FGUserBook) -> some View {
         VStack(spacing: 0) {
             if let readingRecord = currentReadingBook.readingProgress.dailyReadingRecords[dateKey] {
-                let isTodayCompletionDate = Calendar.current.isDate(todayDate, inSameDayAs: currentReadingBook.userSettings.targetEndDate)
+                let isTodayCompletionDate = Calendar.app.isDate(todayDate, inSameDayAs: currentReadingBook.userSettings.targetEndDate)
                 
-                if Calendar.current.isDate(date, inSameDayAs: currentReadingBook.userSettings.targetEndDate) {
+                if Calendar.app.isDate(date, inSameDayAs: currentReadingBook.userSettings.targetEndDate) {
                     Image(isTodayCompletionDate ? "completionGreenFlag" : "completionFlag")
                         .resizable()
                         .scaledToFit()
@@ -129,7 +129,7 @@ struct TotalCalendarView: View {
                                 .padding(.bottom, 1)
                                 .padding(.leading, 2)
                         )
-                } else if Calendar.current.isDate(date, inSameDayAs: todayDate) {
+                } else if Calendar.app.isDate(date, inSameDayAs: todayDate) {
                     // 오늘 날짜인 경우 - 초록색 배경에 목표 페이지 수 표시
                     TotalCalendarTextBubble(
                         text: "\(readingRecord.targetPages)",
@@ -172,17 +172,17 @@ struct TotalCalendarView: View {
     // MARK: - Month Navigation
     
     private func previousMonth() {
-        currentMonth = Calendar.current.date(byAdding: .month, value: -1, to: currentMonth) ?? currentMonth
+        currentMonth = Calendar.app.date(byAdding: .month, value: -1, to: currentMonth) ?? currentMonth
     }
     
     private func nextMonth() {
-        currentMonth = Calendar.current.date(byAdding: .month, value: 1, to: currentMonth) ?? currentMonth
+        currentMonth = Calendar.app.date(byAdding: .month, value: 1, to: currentMonth) ?? currentMonth
     }
     
     // MARK: - Get Date
     
     private func getDateFromCalendar() -> (Int, Int) {
-        let calendar = Calendar.current
+        let calendar = Calendar.app
         let components = calendar.dateComponents([.year, .month], from: currentMonth)
         guard let firstDayOfCurrentMonth = calendar.date(from: components),
               let rangeOfMonth = calendar.range(of: .day, in: .month, for: firstDayOfCurrentMonth) else {
@@ -195,7 +195,7 @@ struct TotalCalendarView: View {
     }
     
     private func getCurrentMonthAndYear() -> (year: Int, month: Int) {
-        let components = Calendar.current.dateComponents([.year, .month], from: currentMonth)
+        let components = Calendar.app.dateComponents([.year, .month], from: currentMonth)
         return (components.year ?? 2024, components.month ?? 1)
     }
 }

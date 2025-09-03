@@ -33,7 +33,7 @@ struct DailyProgressView: View {
         let userSettings: UserSettingsProtocol = userBook.userSettings
         let readingProgress: any ReadingProgressProtocol = userBook.readingProgress
         
-        let isTodayCompletionDate = Calendar.current.isDate(adjustedToday, inSameDayAs: userSettings.targetEndDate)
+        let isTodayCompletionDate = Calendar.app.isDate(adjustedToday, inSameDayAs: userSettings.targetEndDate)
         
         VStack(spacing: 0) {
             HStack {

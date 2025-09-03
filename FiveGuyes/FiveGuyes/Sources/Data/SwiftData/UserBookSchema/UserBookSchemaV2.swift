@@ -91,7 +91,7 @@ extension UserBookSchemaV2.UserBookV2 {
             startPage: 1,
             targetEndPage: 300,
             startDate: Date(), // 현재 날짜
-            targetEndDate: Calendar.current.date(byAdding: .day, value: 30, to: Date()) ?? Date(), // 30일 후
+            targetEndDate: Calendar.app.date(byAdding: .day, value: 30, to: Date()) ?? Date(), // 30일 후
             nonReadingDays: []
         ),
         readingProgress: ReadingProgress(
