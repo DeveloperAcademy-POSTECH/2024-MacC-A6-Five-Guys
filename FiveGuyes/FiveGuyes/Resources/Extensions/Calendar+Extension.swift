@@ -12,7 +12,7 @@ extension Calendar {
         // 한국식 주 규칙으로 고정
         var calendar = Calendar(identifier: .gregorian)
         calendar.locale = Locale(identifier: "ko_KR")
-        calendar.timeZone = TimeZone(identifier: "Asia/Seoul")!
+        calendar.timeZone = TimeZone(identifier: "Asia/Seoul") ?? .current
         calendar.firstWeekday = 1            // 일요일 시작
         calendar.minimumDaysInFirstWeek = 1  // 하루만 있어도 1주차
         return calendar
