@@ -37,7 +37,7 @@ final class ReadingProgress: ReadingProgressProtocol {
     
     /// 특정 주의 기록 가져오기
     func getAdjustedWeeklyRecorded(from today: Date) -> [ReadingRecord?] {
-        let calendar = Calendar.current
+        let calendar = Calendar.app
         let startOfWeek = calendar.dateInterval(of: .weekOfMonth, for: today)?.start ?? today
         
         return (0..<7).map { dayOffset in
@@ -56,7 +56,7 @@ final class ReadingProgress: ReadingProgressProtocol {
         // 오늘이 시작일보다 이전일 경우 처리
         let effectiveStartDay = today < firstDate ? today : firstDate
         
-        let calendar = Calendar.current
+        let calendar = Calendar.app
         let firstWeekStart = calendar.dateInterval(of: .weekOfMonth, for: effectiveStartDay)?.start ?? effectiveStartDay
         let lastWeekStart = calendar.dateInterval(of: .weekOfMonth, for: lastDate)?.start ?? lastDate
         

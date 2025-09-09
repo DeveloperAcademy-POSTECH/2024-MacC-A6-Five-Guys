@@ -36,7 +36,7 @@ struct NotiSettingView: View {
     
     // 시간 범위 설정: 04:00 ~ 23:55
     private var timeSelectionRange: ClosedRange<Date> {
-        let calendar = Calendar.current
+        let calendar = Calendar.app
         let now = Date()
         let startOfDay = calendar.startOfDay(for: now)
         let start = calendar.date(bySettingHour: 4, minute: 0, second: 0, of: startOfDay)!
@@ -223,7 +223,7 @@ struct NotiSettingView: View {
     // MARK: - Method
     // 시간과 분만 저장
     private func saveNotificationTime(_ time: Date) {
-        let calendar = Calendar.current
+        let calendar = Calendar.app
         let hour = calendar.component(.hour, from: time)
         let minute = calendar.component(.minute, from: time)
         print("Save: \(hour): \(minute)")
@@ -237,7 +237,7 @@ struct NotiSettingView: View {
     
     // 저장된 시간과 분 불러오기
     private func fetchNotificationTime() {
-        let calendar = Calendar.current
+        let calendar = Calendar.app
         let (hour, minute) = UserDefaultsManager.fetchNotificationReminderTime()
         
         selectedTime =

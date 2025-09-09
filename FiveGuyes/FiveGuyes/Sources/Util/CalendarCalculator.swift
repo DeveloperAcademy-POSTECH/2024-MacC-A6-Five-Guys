@@ -8,7 +8,7 @@
 import Foundation
 
 struct CalendarCalculator {
-    let calendar = Calendar.current
+    let calendar = Calendar.app
     
     /// 주어진 날짜가 속한 월의 첫 번째 날짜를 반환합니다.
     /// - Parameter month: 기준이 되는 날짜.
@@ -55,7 +55,7 @@ struct CalendarCalculator {
     }
     
     func getWeekdayHeaders() -> [String] {
-        let calendar = Calendar.current
+        let calendar = Calendar.app
         let weekdays = calendar.shortStandaloneWeekdaySymbols
         let firstWeekdayIndex = calendar.firstWeekday - 1
         let adjustedWeekdats = Array(weekdays[firstWeekdayIndex...] + weekdays[..<firstWeekdayIndex])

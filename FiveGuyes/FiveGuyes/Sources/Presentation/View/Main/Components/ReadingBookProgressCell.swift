@@ -54,7 +54,7 @@ struct ReadingBookProgressCell: View {
     
     private func backgroundCard() -> some View {
         Rectangle()
-            .frame(height: 202)
+            .frame(height: 210)
             .foregroundStyle(Color.Backgrounds.primary)
             .cornerRadius(16)
     }

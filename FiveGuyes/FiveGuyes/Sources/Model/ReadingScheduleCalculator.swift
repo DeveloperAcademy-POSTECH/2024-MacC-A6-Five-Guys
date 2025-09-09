@@ -147,9 +147,8 @@ struct ReadingScheduleCalculator {
             return
         }
         
-        // TODO: 독서 시작 날짜와 조정된 오늘 날짜가 같은 날에는 재할당 막기
-        // 불필요한 계산
-        if settings.startDate.toYearMonthDayString() == adjustedToday.toYearMonthDayString() {
+        // 시작일이 ‘오늘’이거나 ‘미래’인 경우 재할당을 수행하지 않음 (불필요한 계산 방지)
+        if settings.startDate.toYearMonthDayString() >= adjustedToday.toYearMonthDayString() {
             print("페이지 재분배2 ❌❌❌ ")
             return
         }

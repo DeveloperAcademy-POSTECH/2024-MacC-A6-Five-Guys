@@ -94,7 +94,7 @@ final class NotificationManager {
     }
     
     private func makeDateComponents(date: Date, _ notificationType: NotificationType) -> DateComponents {
-        let calendar = Calendar.current
+        let calendar = Calendar.app
         let day = calendar.component(.day, from: date)
         let month = calendar.component(.month, from: date)
         let year = calendar.component(.year, from: date)

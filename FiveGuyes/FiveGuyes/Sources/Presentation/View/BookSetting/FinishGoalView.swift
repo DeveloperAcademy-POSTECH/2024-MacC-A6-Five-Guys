@@ -91,7 +91,6 @@ struct FinishGoalView: View {
                         VStack(alignment: .leading, spacing: 8) {
                             VStack(alignment: .leading, spacing: 0) {
                                 // 책 제목
-                                
                                 Text(book.title)
                                     .fontStyle(.body, weight: .semibold)
                                     .padding(.top, 17)
@@ -179,20 +178,31 @@ struct FinishGoalView: View {
                 // 시작 페이지가 아직 읽지 않은 페이지임을 고려하여 초기 등록 시 -1 처리 추가
                 let readingProgress = ReadingProgress(lastPagesRead: startPage - 1)
                 let completionStatus = CompletionStatus()
-  
+                
                 calculator.calculateInitialDailyTargets(for: userSettings, progress: readingProgress)
                 
-                let bookData = UserBook(bookMetaData: bookMetaData, userSettings: userSettings, readingProgress: readingProgress, completionStatus: completionStatus)
+                let bookData = UserBook(
+                    bookMetaData: bookMetaData,
+                    userSettings: userSettings,
+                    readingProgress: readingProgress,
+                    completionStatus: completionStatus
+                )
                 
                 userBook = bookData
                 
-                // TODO: !!!!!!!!
-                let totalDays = try! ReadingDateCalculator().calculateValidReadingDays(startDate: userSettings.startDate, endDate: userSettings.targetEndDate, excludedDates: userSettings.nonReadingDays)
+                let totalDays = try! ReadingDateCalculator()
+                    .calculateValidReadingDays(
+                        startDate: userSettings.startDate,
+                        endDate: userSettings.targetEndDate,
+                        excludedDates: userSettings.nonReadingDays
+                    )
                 
-                pagesPerDay = ReadingPagesCalculator().calculatePagesPerDayAndRemainder(
-                    totalDays: totalDays,
-                    startPage: userSettings.startPage,
-                    endPage: userSettings.targetEndPage).pagesPerDay
+                pagesPerDay = ReadingPagesCalculator()
+                    .calculatePagesPerDayAndRemainder(
+                        totalDays: totalDays,
+                        startPage: userSettings.startPage,
+                        endPage: userSettings.targetEndPage
+                    ).pagesPerDay
             }
             .onAppear {
                 // GA4 Tracking

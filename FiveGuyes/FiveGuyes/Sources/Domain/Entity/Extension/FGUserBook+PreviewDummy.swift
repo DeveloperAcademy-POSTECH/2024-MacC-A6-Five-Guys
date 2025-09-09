@@ -8,7 +8,6 @@
 import Foundation
 
 // FGUserBook+PreviewDummy.swift
-#if DEBUG
 extension FGUserBook {
     static var dummy: FGUserBook {
         FGUserBook(
@@ -38,4 +37,3 @@ extension FGUserBook {
         )
     }
 }
-#endif
