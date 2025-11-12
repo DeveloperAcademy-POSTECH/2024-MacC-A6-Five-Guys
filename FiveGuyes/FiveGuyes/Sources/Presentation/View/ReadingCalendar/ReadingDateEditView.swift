@@ -84,8 +84,6 @@ struct ReadingDateEditView: View {
             nextButton()
         }
         .navigationTitle("목표기간 수정하기")
-        .navigationBarTitleDisplayMode(.inline)
-        .navigationBarBackButtonHidden(true)
         .customNavigationBackButton()
     }
     

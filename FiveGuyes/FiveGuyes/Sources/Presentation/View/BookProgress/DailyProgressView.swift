@@ -152,8 +152,6 @@ struct DailyProgressView: View {
             )
         }
         .navigationTitle("오늘 독서 현황 기록하기")
-        .navigationBarTitleDisplayMode(.inline)
-        .navigationBarBackButtonHidden(true)
         .customNavigationBackButton()
         .onAppear {
             // ⏰

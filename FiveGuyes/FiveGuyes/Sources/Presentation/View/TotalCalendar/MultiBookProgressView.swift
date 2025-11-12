@@ -49,8 +49,6 @@ struct MultiBookProgressView: View {
             Spacer()
         }
         .navigationTitle("전체 독서 현황")
-        .navigationBarTitleDisplayMode(.inline)
-        .navigationBarBackButtonHidden(true)
         .customNavigationBackButton()
         .onAppear {
             // GA4 Tracking

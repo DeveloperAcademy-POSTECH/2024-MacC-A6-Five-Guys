@@ -12,21 +12,15 @@ struct CustomBackButton: View {
     var action: (() -> Void)? // 추가 액션을 위한 옵셔널 클로저
     
     var body: some View {
-        HStack {
-            Button {
-                action?() // 액션이 있으면 실행
-                presentationMode.wrappedValue.dismiss()
-            } label: {
-                HStack {
-                    Image(systemName: "chevron.left")
-                        .resizable()
-                        .scaledToFit()
-                        .tint(Color.Labels.primaryBlack1)
-                }
-            }
-            Spacer()
+        Button {
+            action?() // 액션이 있으면 실행
+            presentationMode.wrappedValue.dismiss()
+        } label: {
+            Image(systemName: "chevron.left")
+                .resizable()
+                .scaledToFit()
+                .tint(Color.Labels.primaryBlack1)
         }
-        .background(Color.clear)
     }
 }
 
@@ -35,8 +29,13 @@ struct NavigationBackButtonModifier: ViewModifier {
     
     func body(content: Content) -> some View {
         content
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    CustomBackButton(action: action)
+                }
+            }
             .navigationBarBackButtonHidden(true)
-            .navigationBarItems(leading: CustomBackButton(action: action))
     }
 }
 
@@ -48,7 +47,7 @@ extension View {
 
 #Preview {
     NavigationStack {
-        EmptyView()
+        Color.red
             .customNavigationBackButton()
     }
 }
