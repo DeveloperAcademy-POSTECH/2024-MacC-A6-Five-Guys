@@ -10,10 +10,10 @@ import SwiftData
 
 @Model
 final class BookMetaData: BookMetaDataProtocol {
-    let title: String
-    let author: String
-    let coverURL: String?
-    let totalPages: Int
+    var title: String
+    var author: String
+    var coverURL: String?
+    var totalPages: Int
     
     init(title: String, author: String, coverURL: String?, totalPages: Int) {
         self.title = title

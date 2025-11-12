@@ -72,10 +72,8 @@ struct NotiSettingView: View {
         }
         .padding(.horizontal, 20)
         .padding(.top, 10)
-        .navigationBarTitleDisplayMode(.inline)
-        .navigationBarBackButtonHidden(true)
-        .customNavigationBackButton()
         .navigationTitle("알림 설정")
+        .customNavigationBackButton()
         .task {
             isSystemNotificationEnabled = await notificationManager.requestAuthorization()
         }
@@ -270,9 +268,3 @@ struct NotiSettingView: View {
         await notificationManager.updateNotification(notificationType: .morning(readingBook: userBook))
     }
 }
-
-//#Preview {
-//    NavigationStack {
-//        NotiSettingView()
-//    }
-//}
