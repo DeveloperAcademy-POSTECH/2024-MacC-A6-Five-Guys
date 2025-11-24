@@ -16,9 +16,20 @@
 		26EBDEB22CF1C5C900B3A2BC /* FirebaseRemoteConfig in Frameworks */ = {isa = PBXBuildFile; productRef = 26EBDEB12CF1C5C900B3A2BC /* FirebaseRemoteConfig */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		2621F1572ED495A800CC5D72 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 26890B892CAE811A008DFF49 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 26890B902CAE811A008DFF49;
+			remoteInfo = FiveGuyes;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		24F8A2162CEB290B00A01A76 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		2621EE202ED468E400CC5D72 /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
+		2621F1532ED495A800CC5D72 /* FiveGuyesTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FiveGuyesTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		26890B912CAE811A008DFF49 /* FiveGuyes.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FiveGuyes.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -34,9 +45,17 @@
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		2621F0EF2ED46BCE00CC5D72 /* FiveGuyes */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (2621F1482ED46BCE00CC5D72 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = FiveGuyes; sourceTree = "<group>"; };
+		2621F1542ED495A800CC5D72 /* FiveGuyesTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = FiveGuyesTests; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		2621F1502ED495A800CC5D72 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		26890B8E2CAE811A008DFF49 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -59,6 +78,7 @@
 				2621EE202ED468E400CC5D72 /* .swiftlint.yml */,
 				24F8A2162CEB290B00A01A76 /* Config.xcconfig */,
 				2621F0EF2ED46BCE00CC5D72 /* FiveGuyes */,
+				2621F1542ED495A800CC5D72 /* FiveGuyesTests */,
 				26890B922CAE811A008DFF49 /* Products */,
 				26EBDE2D2CE3307C00B3A2BC /* Recovered References */,
 			);
@@ -68,6 +88,7 @@
 			isa = PBXGroup;
 			children = (
 				26890B912CAE811A008DFF49 /* FiveGuyes.app */,
+				2621F1532ED495A800CC5D72 /* FiveGuyesTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -82,6 +103,29 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		2621F1522ED495A800CC5D72 /* FiveGuyesTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2621F1592ED495A800CC5D72 /* Build configuration list for PBXNativeTarget "FiveGuyesTests" */;
+			buildPhases = (
+				2621F14F2ED495A800CC5D72 /* Sources */,
+				2621F1502ED495A800CC5D72 /* Frameworks */,
+				2621F1512ED495A800CC5D72 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				2621F1582ED495A800CC5D72 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				2621F1542ED495A800CC5D72 /* FiveGuyesTests */,
+			);
+			name = FiveGuyesTests;
+			packageProductDependencies = (
+			);
+			productName = FiveGuyesTests;
+			productReference = 2621F1532ED495A800CC5D72 /* FiveGuyesTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		26890B902CAE811A008DFF49 /* FiveGuyes */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 26890B9F2CAE811D008DFF49 /* Build configuration list for PBXNativeTarget "FiveGuyes" */;
@@ -119,9 +163,13 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1620;
+				LastSwiftUpdateCheck = 2600;
 				LastUpgradeCheck = 2600;
 				TargetAttributes = {
+					2621F1522ED495A800CC5D72 = {
+						CreatedOnToolsVersion = 26.0.1;
+						TestTargetID = 26890B902CAE811A008DFF49;
+					};
 					26890B902CAE811A008DFF49 = {
 						CreatedOnToolsVersion = 15.2;
 					};
@@ -145,11 +193,19 @@
 			projectRoot = "";
 			targets = (
 				26890B902CAE811A008DFF49 /* FiveGuyes */,
+				2621F1522ED495A800CC5D72 /* FiveGuyesTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		2621F1512ED495A800CC5D72 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		26890B8F2CAE811A008DFF49 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -186,6 +242,13 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		2621F14F2ED495A800CC5D72 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		26890B8D2CAE811A008DFF49 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -196,6 +259,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		2621F1582ED495A800CC5D72 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 26890B902CAE811A008DFF49 /* FiveGuyes */;
+			targetProxy = 2621F1572ED495A800CC5D72 /* PBXContainerItemProxy */;
+		};
 		26890BBB2CAE9896008DFF49 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			productRef = 26890BBA2CAE9896008DFF49 /* SwiftLintBuildToolPlugin */;
@@ -203,6 +271,50 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		2621F15A2ED495A800CC5D72 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = LYC8XX4ZNC;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.zaehorang.FiveGuyesTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FiveGuyes.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/FiveGuyes";
+			};
+			name = Debug;
+		};
+		2621F15B2ED495A800CC5D72 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = LYC8XX4ZNC;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.zaehorang.FiveGuyesTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FiveGuyes.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/FiveGuyes";
+			};
+			name = Release;
+		};
 		26890B9D2CAE811D008DFF49 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 24F8A2162CEB290B00A01A76 /* Config.xcconfig */;
@@ -341,6 +453,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "\"FiveGuyes/Preview Content\"";
+				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FiveGuyes/Info.plist;
@@ -383,6 +496,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "\"FiveGuyes/Preview Content\"";
+				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FiveGuyes/Info.plist;
@@ -418,6 +532,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		2621F1592ED495A800CC5D72 /* Build configuration list for PBXNativeTarget "FiveGuyesTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2621F15A2ED495A800CC5D72 /* Debug */,
+				2621F15B2ED495A800CC5D72 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		26890B8C2CAE811A008DFF49 /* Build configuration list for PBXProject "FiveGuyes" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

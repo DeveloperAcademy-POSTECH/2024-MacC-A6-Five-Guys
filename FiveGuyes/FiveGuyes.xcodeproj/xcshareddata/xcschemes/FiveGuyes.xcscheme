@@ -40,6 +40,17 @@
                ReferencedContainer = "container:FiveGuyes.xcodeproj">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "2621F1522ED495A800CC5D72"
+               BuildableName = "FiveGuyesTests.xctest"
+               BlueprintName = "FiveGuyesTests"
+               ReferencedContainer = "container:FiveGuyes.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction
