@@ -45,40 +45,7 @@ struct ReadingScheduleCalculatorV2Tests {
         )
     }
 
-    /// 테스트용 FGReadingProgress 생성 헬퍼
-    private func makeProgress(
-        dailyReadingRecords: [String: ReadingRecord] = [:],
-        lastReadDate: Date? = nil,
-        lastReadPage: Int = 0
-    ) -> FGReadingProgress {
-        return FGReadingProgress(
-            dailyReadingRecords: dailyReadingRecords,
-            lastReadDate: lastReadDate,
-            lastReadPage: lastReadPage
-        )
-    }
-
     // MARK: - Test Fixture Factories
-
-    /// 완전한 초기 스케줄 생성 (createInitialSchedule 호출)
-    /// - 실제 앱처럼 모든 유효 날짜에 대한 기록이 생성됨
-    private func makeCompleteSchedule(
-        startDate: Date,
-        endDate: Date,
-        startPage: Int = 1,
-        targetEndPage: Int = 100,
-        excludedDays: [Date] = []
-    ) throws -> FGReadingProgress {
-        let settings = makeSettings(
-            startPage: startPage,
-            targetEndPage: targetEndPage,
-            startDate: startDate,
-            targetEndDate: endDate,
-            excludedReadingDays: excludedDays
-        )
-
-        return try calculator.createInitialSchedule(settings: settings)
-    }
 
     /// 특정 날짜에 독서 기록이 있는 완전한 스케줄 생성
     /// - 초기 스케줄을 만든 후 지정된 날짜에 applyTodayReading을 적용
@@ -138,6 +105,8 @@ struct ReadingScheduleCalculatorV2Tests {
 
         // 첫날 목표: 10페이지
         #expect(result.dailyReadingRecords["2025-01-10"]?.targetPages == 10)
+        // 첫날 목표: 20페이지
+        #expect(result.dailyReadingRecords["2025-01-11"]?.targetPages == 20)
         // 마지막 날 목표: 100페이지
         #expect(result.dailyReadingRecords["2025-01-19"]?.targetPages == 100)
     }
@@ -190,7 +159,9 @@ struct ReadingScheduleCalculatorV2Tests {
         #expect(result.dailyReadingRecords["2025-01-15"] == nil)
 
         // 첫날은 기록 있음
-        #expect(result.dailyReadingRecords["2025-01-10"] != nil)
+        #expect(result.dailyReadingRecords["2025-01-10"]?.targetPages == 12)
+        #expect(result.dailyReadingRecords["2025-01-11"]?.targetPages == 24)
+        #expect(result.dailyReadingRecords["2025-01-19"]?.targetPages == 100)
     }
 
     /// 단일 날짜 케이스
@@ -222,10 +193,7 @@ struct ReadingScheduleCalculatorV2Tests {
         )
 
         // 완전한 초기 스케줄 생성 (10일간 매일 10페이지)
-        let progress = try makeCompleteSchedule(
-            startDate: makeDate("2025-01-10"),
-            endDate: makeDate("2025-01-19")
-        )
+        let progress = try calculator.createInitialSchedule(settings: settings)
 
         // 첫날 목표(10페이지) 정확히 달성
         let result = try calculator.applyTodayReading(
@@ -256,17 +224,7 @@ struct ReadingScheduleCalculatorV2Tests {
         )
 
         // 초기 스케줄: 매일 20페이지씩
-        let progress = makeProgress(
-            dailyReadingRecords: [
-                "2025-01-10": ReadingRecord(targetPages: 20, pagesRead: 0),
-                "2025-01-11": ReadingRecord(targetPages: 40, pagesRead: 0),
-                "2025-01-12": ReadingRecord(targetPages: 60, pagesRead: 0),
-                "2025-01-13": ReadingRecord(targetPages: 80, pagesRead: 0),
-                "2025-01-14": ReadingRecord(targetPages: 100, pagesRead: 0)
-            ],
-            lastReadDate: nil,
-            lastReadPage: 0
-        )
+        let progress = try calculator.createInitialSchedule(settings: settings)
 
         // 첫날 30페이지 읽음 (목표 20 초과)
         let result = try calculator.applyTodayReading(
@@ -296,17 +254,7 @@ struct ReadingScheduleCalculatorV2Tests {
             targetEndDate: makeDate("2025-01-14")  // 5일
         )
 
-        let progress = makeProgress(
-            dailyReadingRecords: [
-                "2025-01-10": ReadingRecord(targetPages: 20, pagesRead: 0),
-                "2025-01-11": ReadingRecord(targetPages: 40, pagesRead: 0),
-                "2025-01-12": ReadingRecord(targetPages: 60, pagesRead: 0),
-                "2025-01-13": ReadingRecord(targetPages: 80, pagesRead: 0),
-                "2025-01-14": ReadingRecord(targetPages: 100, pagesRead: 0)
-            ],
-            lastReadDate: nil,
-            lastReadPage: 0
-        )
+        let progress = try calculator.createInitialSchedule(settings: settings)
 
         // 첫날 10페이지만 읽음 (목표 20 미달)
         let result = try calculator.applyTodayReading(
@@ -340,11 +288,7 @@ struct ReadingScheduleCalculatorV2Tests {
         )
 
         // 완전한 초기 스케줄 생성 (제외일 제외한 4일: 100÷4 = 25페이지씩)
-        let progress = try makeCompleteSchedule(
-            startDate: makeDate("2025-01-10"),
-            endDate: makeDate("2025-01-14"),
-            excludedDays: [makeDate("2025-01-11")]
-        )
+        let progress = try calculator.createInitialSchedule(settings: settings)
 
         // 제외일(1/11)에 독서 기록
         let result = try calculator.applyTodayReading(
@@ -385,16 +329,12 @@ struct ReadingScheduleCalculatorV2Tests {
             targetEndDate: makeDate("2025-01-14")
         )
 
-        let progress = makeProgress(
-            dailyReadingRecords: [
-                "2025-01-10": ReadingRecord(targetPages: 30, pagesRead: 30),  // 이미 읽음
-                "2025-01-11": ReadingRecord(targetPages: 40, pagesRead: 0),
-                "2025-01-12": ReadingRecord(targetPages: 60, pagesRead: 0),
-                "2025-01-13": ReadingRecord(targetPages: 80, pagesRead: 0),
-                "2025-01-14": ReadingRecord(targetPages: 100, pagesRead: 0)
-            ],
-            lastReadDate: makeDate("2025-01-10"),
-            lastReadPage: 30
+        let progress = try makeProgressWithReadingHistory(
+            startDate: makeDate("2025-01-10"),
+            endDate: makeDate("2025-01-14"),
+            readDates: [
+                makeDate("2025-01-10"): 30  // 첫날만 목표 달성
+            ]
         )
 
         // 1/10 이후 재조정 (70페이지를 4일에 분배 -> 17...2)
@@ -450,15 +390,15 @@ struct ReadingScheduleCalculatorV2Tests {
         #expect(result.dailyReadingRecords["2025-01-10"]?.pagesRead == 10)
         #expect(result.dailyReadingRecords["2025-01-10"]?.targetPages == 10)
 
-        // 1/13부터 새 스케줄 (남은 90페이지를 7일에 분배)
-        #expect(result.dailyReadingRecords["2025-01-13"] != nil)
+        // 1/13부터 새 스케줄 (남은 90페이지를 7일에 분배 12...6)
         #expect(result.dailyReadingRecords["2025-01-13"]?.targetPages == 22)
+        #expect(result.dailyReadingRecords["2025-01-14"]?.targetPages == 35)
         #expect(result.dailyReadingRecords["2025-01-19"]?.targetPages == 100)
     }
 
     /// 에러 케이스: 목표일 지남
     @Test("rescheduleOnAppOpen - targetDatePassed 에러")
-    func rescheduleOnAppOpen_targetDatePassed() {
+    func rescheduleOnAppOpen_targetDatePassed() throws {
         let settings = makeSettings(
             startPage: 1,
             targetEndPage: 100,
@@ -466,7 +406,7 @@ struct ReadingScheduleCalculatorV2Tests {
             targetEndDate: makeDate("2025-01-15")
         )
 
-        let progress = makeProgress()
+        let progress = try calculator.createInitialSchedule(settings: settings)
 
         // 목표일 이후 재접속
         #expect(throws: ScheduleCalculationError.self) {
@@ -505,6 +445,10 @@ struct ReadingScheduleCalculatorV2Tests {
         #expect(progress.dailyReadingRecords["2025-01-12"]?.pagesRead == 50)
         #expect(progress.lastReadPage == 50)
 
+        #expect(progress.dailyReadingRecords["2025-01-13"]?.targetPages == 66)
+        #expect(progress.dailyReadingRecords["2025-01-14"]?.targetPages == 83)
+        #expect(progress.dailyReadingRecords["2025-01-15"]?.targetPages == 100)
+        
         // 1/12에 재접속 (오늘 이미 읽음)
         let result = try calculator.rescheduleOnAppOpen(
             settings: settings,
@@ -514,8 +458,12 @@ struct ReadingScheduleCalculatorV2Tests {
 
         // 변경 없음 - 오늘 이미 읽었으므로 재분배 불필요
         #expect(result.lastReadPage == 50)
-        #expect(result.dailyReadingRecords["2025-01-12"]?.pagesRead == 50)
         #expect(result.dailyReadingRecords["2025-01-10"]?.pagesRead == 16)
+        #expect(result.dailyReadingRecords["2025-01-12"]?.pagesRead == 50)
+        
+        #expect(result.dailyReadingRecords["2025-01-13"]?.targetPages == 66)
+        #expect(result.dailyReadingRecords["2025-01-14"]?.targetPages == 83)
+        #expect(result.dailyReadingRecords["2025-01-15"]?.targetPages == 100)
     }
 
     // MARK: - rescheduleForSettingsChange Tests
@@ -528,17 +476,22 @@ struct ReadingScheduleCalculatorV2Tests {
             targetEndDate: makeDate("2025-01-20")
         )
 
+        let progress = try makeProgressWithReadingHistory(
+            startDate: makeDate("2025-01-10"),
+            endDate: makeDate("2025-01-20"),
+            readDates: [
+                makeDate("2025-01-10"): 10  // 첫날 목표 달성
+            ]
+        )
+        
+        // 이전 계획으로 생성된 Schedule
+        #expect(progress.dailyReadingRecords["2025-01-10"]?.targetPages == 10)
+        
         let newSettings = makeSettings(
             startDate: makeDate("2025-01-25"),  // 미래로 변경
             targetEndDate: makeDate("2025-02-05")
         )
-
-        let progress = makeProgress(
-            dailyReadingRecords: [
-                "2025-01-10": ReadingRecord(targetPages: 10, pagesRead: 10)
-            ]
-        )
-
+        
         let result = try calculator.rescheduleForSettingsChange(
             oldSettings: oldSettings,
             newSettings: newSettings,
@@ -547,6 +500,7 @@ struct ReadingScheduleCalculatorV2Tests {
         )
 
         // 전체 새로 계산됨
+        #expect(result.dailyReadingRecords["2025-01-10"] == nil)
         #expect(result.dailyReadingRecords["2025-01-25"] != nil)
     }
 
@@ -563,14 +517,16 @@ struct ReadingScheduleCalculatorV2Tests {
             targetEndDate: makeDate("2025-01-25")  // 종료일 연장
         )
 
-        let progress = makeProgress(
-            dailyReadingRecords: [
-                "2025-01-10": ReadingRecord(targetPages: 30, pagesRead: 30)
-            ],
-            lastReadDate: makeDate("2025-01-10"),
-            lastReadPage: 30
+        let progress =  try makeProgressWithReadingHistory(
+            startDate: makeDate("2025-01-10"),
+            endDate: makeDate("2025-01-20"),
+            readDates: [
+                makeDate("2025-01-10"): 30  // 첫날 목표 달성
+            ]
         )
-
+        
+        #expect(progress.dailyReadingRecords["2025-01-25"] == nil)
+        
         let result = try calculator.rescheduleForSettingsChange(
             oldSettings: oldSettings,
             newSettings: newSettings,
@@ -641,12 +597,7 @@ struct ReadingScheduleCalculatorV2Tests {
         )
 
         // 초기 스케줄: 30~100 = 71페이지, 71÷5 = 14...1
-        let progress = try makeCompleteSchedule(
-            startDate: makeDate("2025-01-10"),
-            endDate: makeDate("2025-01-14"),
-            startPage: 30,
-            targetEndPage: 100
-        )
+        let progress = try calculator.createInitialSchedule(settings: settings)
 
         // 첫날 목표 확인 (30페이지부터 14페이지를 읽으면 목표는 43)
         #expect(progress.dailyReadingRecords["2025-01-10"]?.targetPages == 43)
@@ -664,6 +615,7 @@ struct ReadingScheduleCalculatorV2Tests {
         #expect(result.progress.lastReadPage == 50)
 
         // 남은 50페이지를 4일에 재분배: 50÷4 = 12...2
+        #expect(result.progress.dailyReadingRecords["2025-01-11"]?.targetPages == 62)
         #expect(result.progress.dailyReadingRecords["2025-01-14"]?.targetPages == 100)
     }
 }

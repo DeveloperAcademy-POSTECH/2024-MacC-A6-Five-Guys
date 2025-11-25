@@ -65,13 +65,7 @@ struct ReadingScheduleCalculatorV2 {
                 startPageExclusive: settings.startPage - 1  // 시작 페이지 이전
             )
 
-            // 2. 마지막 날 목표를 정확히 targetEndPage로 맞춤
-            records = adjustLastDayTarget(
-                records: records,
-                settings: settings
-            )
-
-            // 3. 새로운 FGReadingProgress 반환
+            // 2. 새로운 FGReadingProgress 반환
             return FGReadingProgress(
                 dailyReadingRecords: records,
                 lastReadDate: nil,  // 아직 독서 시작 전
@@ -193,13 +187,7 @@ struct ReadingScheduleCalculatorV2 {
                 startPageExclusive: progress.lastReadPage  // 현재까지 읽은 페이지
             )
 
-            // 3. 마지막 날 목표 조정
-            newSegment = adjustLastDayTarget(
-                records: newSegment,
-                settings: settings
-            )
-
-            // 4. 기존 progress와 병합 (fromDate 이후만 교체)
+            // 3. 기존 progress와 병합 (fromDate 이후만 교체)
             let mergedProgress = mergeProgress(
                 base: progress,
                 replacingFrom: nextDay,
@@ -257,13 +245,7 @@ struct ReadingScheduleCalculatorV2 {
                 startPageExclusive: progress.lastReadPage  // 마지막까지 읽은 페이지
             )
 
-            // 5. 마지막 날 목표 조정
-            newSegment = adjustLastDayTarget(
-                records: newSegment,
-                settings: settings
-            )
-
-            // 6. 기존 progress와 병합 (today 이후만 교체)
+            // 5. 기존 progress와 병합 (today 이후만 교체)
             let mergedProgress = mergeProgress(
                 base: progress,
                 replacingFrom: today,
@@ -324,13 +306,7 @@ struct ReadingScheduleCalculatorV2 {
                 startPageExclusive: cleanedBase.lastReadPage
             )
 
-            // 5. 마지막 날 목표 조정
-            newSegment = adjustLastDayTarget(
-                records: newSegment,
-                settings: newSettings
-            )
-
-            // 6. 기존 progress와 병합
+            // 5. 기존 progress와 병합
             let mergedProgress = mergeProgress(
                 base: cleanedBase,
                 replacingFrom: today,
@@ -378,45 +354,45 @@ struct ReadingScheduleCalculatorV2 {
             over: validDays
         )
 
-        // 4. 앞에서부터 일일 페이지 분배
+        // 4. 유효 일자 수만큼 "일일 분배량 배열" 준비
+        //    - 앞쪽 (validDays - remainder)일 → daily
+        //    - 뒤쪽 remainder일 → daily + 1
+        var pagesPerValidDay: [Int] = []
+        pagesPerValidDay.reserveCapacity(validDays)
+
+        let extraStartIndex = validDays - divisionResult.remainder
+        for index in 0..<validDays {
+            let isExtraDay = index >= extraStartIndex
+            let pagesForDay = divisionResult.daily + (isExtraDay ? 1 : 0)
+            pagesPerValidDay.append(pagesForDay)
+        }
+
+        // 5. 날짜를 순회하며 제외일이 아닌 날에만 pagesPerValidDay를 소비
         var records: [String: ReadingRecord] = [:]
         var cumulativePages = startPageExclusive
         var currentDate = startDate
-
         let excludedKeys = Set(settings.excludedReadingDays.map { $0.toYearMonthDayString() })
+        var validDayIndex = 0
 
-        while currentDate.toYearMonthDayString() <= settings.targetEndDate.toYearMonthDayString() {
+        let endKey = settings.targetEndDate.toYearMonthDayString()
+
+        while currentDate.toYearMonthDayString() <= endKey,
+              validDayIndex < pagesPerValidDay.count {
             let key = currentDate.toYearMonthDayString()
 
-            // 제외일이 아닌 경우에만 목표 설정
             if !excludedKeys.contains(key) {
-                cumulativePages += divisionResult.daily
+                let pagesForDay = pagesPerValidDay[validDayIndex]
+                cumulativePages += pagesForDay
+
                 records[key] = ReadingRecord(
                     targetPages: cumulativePages,
                     pagesRead: 0
                 )
+
+                validDayIndex += 1
             }
 
-            // 다음 날로 이동
             currentDate = currentDate.addDays(1)
-        }
-
-        // 5. 뒤에서부터 나머지 페이지 분배
-        var remainingOffset = divisionResult.remainder
-        var targetDate = settings.targetEndDate
-
-        while remainingOffset > 0 {
-            let key = targetDate.toYearMonthDayString()
-
-            // 해당 날짜에 기록이 있으면 나머지 1페이지 추가
-            if var record = records[key] {
-                record.targetPages += 1
-                records[key] = record
-                remainingOffset -= 1
-            }
-
-            // 이전 날짜로 이동
-            targetDate = targetDate.addDays(-1)
         }
 
         return records
@@ -483,26 +459,5 @@ struct ReadingScheduleCalculatorV2 {
             lastReadDate: progress.lastReadDate,
             lastReadPage: progress.lastReadPage
         )
-    }
-
-    /// 마지막 날의 목표 페이지를 targetEndPage로 조정합니다.
-    ///
-    /// - Parameters:
-    ///   - records: 조정할 독서 기록 Dictionary
-    ///   - settings: 독서 설정 (targetEndDate, targetEndPage 정보 포함)
-    /// - Returns: 조정된 독서 기록 Dictionary
-    private func adjustLastDayTarget(
-        records: [String: ReadingRecord],
-        settings: FGUserSetting
-    ) -> [String: ReadingRecord] {
-        var adjustedRecords = records
-        let endKey = settings.targetEndDate.toYearMonthDayString()
-
-        if var lastRecord = adjustedRecords[endKey] {
-            lastRecord.targetPages = settings.targetEndPage
-            adjustedRecords[endKey] = lastRecord
-        }
-
-        return adjustedRecords
     }
 }
