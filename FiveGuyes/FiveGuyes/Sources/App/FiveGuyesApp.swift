@@ -23,10 +23,7 @@ struct FiveGuyesApp: App {
     
     init() {
         do {
-            self.container = try ModelContainer(
-                for: SDUserBook.self,
-                migrationPlan: MigrationPlan.self
-            )
+            self.container = try ModelContainer(for: SDUserBook.self)
         } catch {
             fatalError("Failed to initialize model container.")
         }

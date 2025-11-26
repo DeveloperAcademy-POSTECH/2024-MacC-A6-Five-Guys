@@ -20,10 +20,7 @@ final class SwiftDataBookRepository: BookRepository {
     
     @MainActor init(modleContainer: ModelContainer) {
         do {
-            self.modelContainer = try ModelContainer(
-                for: SDUserBook.self,
-                migrationPlan: MigrationPlan.self
-            )
+            self.modelContainer = try ModelContainer(for: SDUserBook.self)
             
             self.modelContext = modelContainer.mainContext
         } catch {
