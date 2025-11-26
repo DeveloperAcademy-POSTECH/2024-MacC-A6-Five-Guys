@@ -79,7 +79,7 @@ final class SwiftDataBookRepository: BookRepository {
     // MARK: - Filtering Operations
 
     func getCompletedBooks() async throws -> [FGUserBook] {
-        var fetchDescriptor: FetchDescriptor<SDUserBook> = .init(
+        let fetchDescriptor: FetchDescriptor<SDUserBook> = .init(
             predicate: #Predicate { book in
                 book.completionStatus.isCompleted == true
             }
@@ -94,7 +94,7 @@ final class SwiftDataBookRepository: BookRepository {
     }
 
     func getReadingBooks() async throws -> [FGUserBook] {
-        var fetchDescriptor: FetchDescriptor<SDUserBook> = .init(
+        let fetchDescriptor: FetchDescriptor<SDUserBook> = .init(
             predicate: #Predicate { book in
                 book.completionStatus.isCompleted == false
             }

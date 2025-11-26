@@ -59,7 +59,7 @@ struct ReadingScheduleCalculatorV2 {
     ) throws -> FGReadingProgress {
         do {
             // 1. 시작일부터 종료일까지의 스케줄 생성
-            var records = try makeScheduleSegment(
+            let records = try makeScheduleSegment(
                 settings: settings,
                 startDate: settings.startDate,
                 startPageExclusive: settings.startPage - 1  // 시작 페이지 이전
@@ -181,7 +181,7 @@ struct ReadingScheduleCalculatorV2 {
             let nextDay = fromDate.addDays(1)
 
             // 2. 다음날부터 종료일까지의 새 스케줄 생성
-            var newSegment = try makeScheduleSegment(
+            let newSegment = try makeScheduleSegment(
                 settings: settings,
                 startDate: nextDay,
                 startPageExclusive: progress.lastReadPage  // 현재까지 읽은 페이지
@@ -239,7 +239,7 @@ struct ReadingScheduleCalculatorV2 {
 
         do {
             // 4. 오늘부터 종료일까지의 새 스케줄 생성
-            var newSegment = try makeScheduleSegment(
+            let newSegment = try makeScheduleSegment(
                 settings: settings,
                 startDate: today,
                 startPageExclusive: progress.lastReadPage  // 마지막까지 읽은 페이지
@@ -300,7 +300,7 @@ struct ReadingScheduleCalculatorV2 {
 
         // 4. 오늘부터 재분배
         do {
-            var newSegment = try makeScheduleSegment(
+            let newSegment = try makeScheduleSegment(
                 settings: newSettings,
                 startDate: today,
                 startPageExclusive: cleanedBase.lastReadPage
