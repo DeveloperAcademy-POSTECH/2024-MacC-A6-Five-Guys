@@ -8,9 +8,7 @@
 import SwiftUI
 
 struct DailyProgressView: View {
-    @State private var pagesToReadToday: Int = 0
-    @State private var showAlert = false
-    @State private var isSubmitting = false
+    @State private var viewModel = DailyProgressViewModel()
     
     @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
     @Environment(AppDependencies.self) private var appDependencies
@@ -25,6 +23,7 @@ struct DailyProgressView: View {
     let userBook: FGUserBook
     
     var body: some View {
+        @Bindable var bindableViewModel = viewModel
         let title = userBook.bookMetaData.title
         let targetEndPage = userBook.userSettings.targetEndPage
         let targetEndDate = userBook.userSettings.targetEndDate
@@ -45,7 +44,7 @@ struct DailyProgressView: View {
             HStack {
                 Spacer()
                 
-                TextField("", value: $pagesToReadToday, format: .number)
+                TextField("", value: $bindableViewModel.pagesToReadToday, format: .number)
                     .frame(width: 180, height: 68)
                     .background(Color.Fills.lightGreen)
                     .cornerRadius(16)
@@ -66,13 +65,11 @@ struct DailyProgressView: View {
             
             if isTextTextFieldFocused {
                 Button {
-                    if pagesToReadToday > targetEndPage {
-                        // 최종 목표보다 더 큰 페이지를 입력하면
-                        showAlert = true
-                        return
+                    if viewModel.requestSubmit(targetEndPage: targetEndPage) {
+                        Task {
+                            await submitReading()
+                        }
                     }
-
-                    submitReading()
                 } label: {
                     Text("완료")
                         .frame(maxWidth: .infinity)
@@ -82,11 +79,11 @@ struct DailyProgressView: View {
                     
                 }
                 .ignoresSafeArea(.keyboard, edges: .bottom)
-                .disabled(isSubmitting)
+                .disabled(viewModel.isSubmitting)
             }
             
         }
-        .alert(isPresented: $showAlert) {
+        .alert(isPresented: $bindableViewModel.showTargetExceededAlert) {
             // TODO: 커스텀스타일 적용 어려워서 임의로 스타일 지정함 확인필요
             Alert(
                 title: Text(alertText)
@@ -95,24 +92,23 @@ struct DailyProgressView: View {
                     .alertFontStyle(.caption1),
                 primaryButton: .cancel(Text("다시 작성하기")) {
                     // "다시 작성하기" 로직 (입력값 초기화)
-                    pagesToReadToday = 0
+                    viewModel.pagesToReadToday = 0
                     isTextTextFieldFocused = true
                 },
                 secondaryButton: .default(Text("확인")) {
                     // "확인" 버튼 로직 (최종 타켓 페이지로 수정 및 완독 기록)
-                    pagesToReadToday = targetEndPage
-                    submitReading()
+                    viewModel.applyMaximumTargetPages(targetEndPage)
+                    Task {
+                        await submitReading()
+                    }
                 }
             )
         }
         .navigationTitle("오늘 독서 현황 기록하기")
         .customNavigationBackButton()
         .onAppear {
-            // ⏰
-            if let readingRecord = userBook.readingProgress.getDailyReadingRecord(for: adjustedToday) {
-                pagesToReadToday = readingRecord.targetPages
-            }
-            
+            viewModel.configure(bookManagementService: appDependencies.bookManagementService)
+            viewModel.preloadPages(userBook: userBook, adjustedToday: adjustedToday)
             isTextTextFieldFocused = true
         }
         .onAppear {
@@ -122,43 +118,14 @@ struct DailyProgressView: View {
     }
 
     @MainActor
-    private func submitReading() {
-        guard !isSubmitting else { return }
-        isSubmitting = true
-
-        let pagesRead = pagesToReadToday
-        Task {
-            do {
-                let result = try await appDependencies.bookManagementService.recordReading(
-                    bookId: userBook.id,
-                    pagesRead: pagesRead,
-                    readDate: adjustedToday
-                )
-
-                await MainActor.run {
-                    isSubmitting = false
-                    handleRecordResult(result)
-                }
-            } catch {
-                await MainActor.run {
-                    isSubmitting = false
-                }
-                print("독서 기록 저장 중 오류 발생: \(error.localizedDescription)")
-            }
-        }
-    }
-
-    @MainActor
-    private func handleRecordResult(_ result: RecordReadingResult) {
-        switch result {
-        case .recorded:
+    private func submitReading() async {
+        switch await viewModel.submit(bookId: userBook.id, readDate: adjustedToday) {
+        case .none:
+            return
+        case .popToRoot:
             navigationCoordinator.popToRoot()
-        case .dateExtended:
-            navigationCoordinator.popToRoot()
-        case .completed(let updatedBook):
+        case .completionCelebration(let updatedBook):
             navigationCoordinator.push(.completionCelebration(book: updatedBook))
-        case .exceedsTarget:
-            showAlert = true
         }
     }
 }

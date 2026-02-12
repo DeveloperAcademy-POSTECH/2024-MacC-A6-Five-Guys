@@ -10,9 +10,7 @@ import SwiftUI
 struct CompletionReviewView: View {
     private let placeholder: String = "책 속 한 줄이 남긴 여운은 무엇인가요?"
     
-    @State private var reflectionText: String = ""
-    @State private var showAlert = false
-    @State private var isSubmitting = false
+    @State private var viewModel = CompletionReviewViewModel()
     @FocusState private var isFocusedTextEditor: Bool
     @ObservedObject private var keyboardObserver = KeyboardObserver()
     
@@ -26,6 +24,7 @@ struct CompletionReviewView: View {
     let userBook: FGUserBook
     
     var body: some View {
+        @Bindable var bindableViewModel = viewModel
         let title = userBook.bookMetaData.title
         
         ZStack {
@@ -41,8 +40,11 @@ struct CompletionReviewView: View {
                     .foregroundStyle(Color.Labels.primaryBlack1)
                     .lineLimit(1)
                     
-                    TextEditor(text: $reflectionText)
-                        .customStyleEditor(placeholder: placeholder, userInput: $reflectionText)
+                    TextEditor(text: $bindableViewModel.reflectionText)
+                        .customStyleEditor(
+                            placeholder: placeholder,
+                            userInput: $bindableViewModel.reflectionText
+                        )
                         .frame(height: 222)
                         .focused($isFocusedTextEditor)
                 }
@@ -52,7 +54,9 @@ struct CompletionReviewView: View {
                 
                 if keyboardObserver.keyboardIsVisible {
                     Button {
-                        submitReview()
+                        Task {
+                            await submitReview()
+                        }
                     } label: {
                         Text("저장")
                             .frame(maxWidth: .infinity)
@@ -61,59 +65,33 @@ struct CompletionReviewView: View {
                             .foregroundStyle(Color.Fills.white)
                     }
                     .ignoresSafeArea(.keyboard, edges: .bottom)
-                    .disabled(isSubmitting)
+                    .disabled(viewModel.isSubmitting)
                 }
             }
         }
-        .alert(isPresented: $showAlert) {
+        .alert(isPresented: $bindableViewModel.showEmptyReviewAlert) {
             Alert(title: Text("내용을 입력해주세요")
                 .alertFontStyle(.title3, weight: .semibold),
                   dismissButton: .default(Text("확인")))
         }
         .customNavigationBackButton()
         .onAppear {
-            reflectionText = userBook.completionStatus.reviewAfterCompletion
+            viewModel.configure(bookManagementService: appDependencies.bookManagementService)
+            viewModel.preloadReview(userBook.completionStatus.reviewAfterCompletion)
             isFocusedTextEditor = true
         }
     }
 
     @MainActor
-    private func submitReview() {
-        guard !isSubmitting else { return }
+    private func submitReview() async {
+        let outcome = await viewModel.submit(
+            userBookId: userBook.id,
+            isUpdateMode: isUpdateMode,
+            completionDate: Date().adjustedDate()
+        )
 
-        if reflectionText.isEmpty {
-            showAlert = true
-            return
-        }
-
-        isSubmitting = true
-        let review = reflectionText
-
-        Task {
-            do {
-                if isUpdateMode {
-                    try await appDependencies.bookManagementService.updateCompletionReview(
-                        id: userBook.id,
-                        review: review
-                    )
-                } else {
-                    try await appDependencies.bookManagementService.completeBook(
-                        id: userBook.id,
-                        completionDate: Date().adjustedDate(),
-                        review: review
-                    )
-                }
-
-                await MainActor.run {
-                    isSubmitting = false
-                    navigationCoordinator.popToRoot()
-                }
-            } catch {
-                await MainActor.run {
-                    isSubmitting = false
-                }
-                print("완독 소감 저장 중 오류 발생: \(error.localizedDescription)")
-            }
+        if case .popToRoot = outcome {
+            navigationCoordinator.popToRoot()
         }
     }
 }

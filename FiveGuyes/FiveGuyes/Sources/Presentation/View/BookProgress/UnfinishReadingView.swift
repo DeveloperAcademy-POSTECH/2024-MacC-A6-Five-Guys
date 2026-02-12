@@ -11,6 +11,7 @@ struct UnfinishReadingView: View {
     @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
     @Environment(AppDependencies.self) private var appDependencies
 
+    @State private var viewModel = UnfinishReadingViewModel()
     private let userBook: FGUserBook
     
     // MARK: - init
@@ -56,6 +57,9 @@ struct UnfinishReadingView: View {
         .disableNavigationGesture()
         .customNavigationBackButton {
             markBookAsCompletedInBackground()
+        }
+        .onAppear {
+            viewModel.configure(bookManagementService: appDependencies.bookManagementService)
         }
     }
     
@@ -111,7 +115,7 @@ struct UnfinishReadingView: View {
             }
     }
     
-    private func readingDateEtidButton(actions: @escaping () -> ()) -> some View {
+    private func readingDateEtidButton(actions: @escaping () -> Void) -> some View {
         Button(action: actions) {
             Text("목표 기간 연장하기")
                 .fontStyle(.title2, weight: .semibold)
@@ -123,9 +127,10 @@ struct UnfinishReadingView: View {
                         .foregroundStyle(Color.Colors.green1)
                 }
         }
+        .disabled(viewModel.isCompleting)
     }
     
-    private func cancelButton(actions: @escaping () -> ()) -> some View {
+    private func cancelButton(actions: @escaping () -> Void) -> some View {
         Button(action: actions) {
             Text("닫기")
                 .fontStyle(.title2, weight: .semibold)
@@ -136,35 +141,20 @@ struct UnfinishReadingView: View {
                         .foregroundStyle(Color.Fills.white)
                 }
         }
+        .disabled(viewModel.isCompleting)
     }
     
     // MARK: - Helper Methods
     
     @MainActor
     private func completeAndPopToRoot() async {
-        do {
-            try await appDependencies.bookManagementService.completeBook(
-                id: userBook.id,
-                completionDate: userBook.userSettings.targetEndDate,
-                review: ""
-            )
-        } catch {
-            print("미완독 종료 처리 중 오류 발생: \(error.localizedDescription)")
-        }
+        _ = await viewModel.completeBook(userBook)
         navigationCoordinator.popToRoot()
     }
 
     private func markBookAsCompletedInBackground() {
         Task {
-            do {
-                try await appDependencies.bookManagementService.completeBook(
-                    id: userBook.id,
-                    completionDate: userBook.userSettings.targetEndDate,
-                    review: ""
-                )
-            } catch {
-                print("미완독 종료 처리 중 오류 발생: \(error.localizedDescription)")
-            }
+            _ = await viewModel.completeBook(userBook)
         }
     }
 }

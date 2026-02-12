@@ -25,6 +25,11 @@ The change is observable when the core screens still behave the same in the simu
 - [x] (2026-02-12 13:40Z) Revalidated full test suite after query/payload refactor (`xcodebuild test` -> `** TEST SUCCEEDED **`).
 - [x] (2026-02-12 13:44Z) Decoupled notification flow from SwiftData payload (`NotiSettingView`, `NotificationManager`, `NotificationType` now use `FGUserBook`; added `FGReadingProgress+Notification` helper extension).
 - [x] (2026-02-12 13:44Z) Revalidated full test suite after notification decoupling (`xcodebuild test` -> `** TEST SUCCEEDED **`).
+- [x] (2026-02-13 01:10) Verified post-merge baseline on `develop`: working tree clean, presentation boundary check (`@Query`, `modelContext`, `ReadingScheduleCalculator(`) returns no active runtime violations, full `xcodebuild test` passes on iPhone 17 simulator.
+- [x] (2026-02-13 01:24) Extracted remaining service-calling screens (`DailyProgress`, `CompletionReview`, `ReadingDateEdit`, `FinishGoal`, `UnfinishReading`) into feature ViewModels so Views stop owning async command flow/state transitions.
+- [x] (2026-02-13 01:26) Introduced notification settings ViewModel and abstraction seam (`NotiSettingViewModel`, `NotificationManaging`, `NotificationSettingsStoring`) so `NotiSettingView` no longer directly coordinates `NotificationManager`/`UserDefaultsManager`.
+- [x] (2026-02-13 01:28) Added ViewModel-focused tests in `FiveGuyesTests/PresentationViewModelTests.swift` for new action/state paths (daily progress, completion review, date edit, finish goal, unfinish flow, notification settings).
+- [x] (2026-02-13 01:30) Revalidated full test suite (`xcodebuild test -project FiveGuyes/FiveGuyes.xcodeproj -scheme FiveGuyes -destination "platform=iOS Simulator,name=iPhone 17"` -> `** TEST SUCCEEDED **`).
 
 ## Surprises & Discoveries
 
@@ -45,6 +50,12 @@ The change is observable when the core screens still behave the same in the simu
 
 - Observation: Notification decoupling required moving "next reading day/pages" helper behavior from SwiftData model APIs to domain extension APIs.
   Evidence: Added `FGReadingProgress+Notification.swift` and switched `NotificationManager`/`NotificationType` inputs to `FGUserBook`.
+
+- Observation: Presentation boundary hardening succeeded, but action/state orchestration is still concentrated in several Views and not yet covered by dedicated ViewModel tests.
+  Evidence: `DailyProgressView`, `CompletionReviewView`, `FinishGoalView`, `ReadingDateEditView`, `UnfinishReadingView`, `NotiSettingView` still own async action handlers and local submit/task guards; test target currently covers calculators/services/repository only.
+
+- Observation: `@Bindable` local bindings inside computed `some View` properties can require explicit `return` when additional local declarations are present.
+  Evidence: `NotiSettingView.timePicker` needed explicit `return VStack { ... }` after introducing `@Bindable var bindableViewModel`.
 
 ## Decision Log
 
@@ -80,6 +91,14 @@ The change is observable when the core screens still behave the same in the simu
   Rationale: This removes the last presentation-level SwiftData dependency without reintroducing persistence coupling into UI flows.
   Date/Author: 2026-02-12 / Codex
 
+- Decision: Start Phase 2 with "feature ViewModel extraction + ViewModel tests" instead of broad architecture replacement.
+  Rationale: ADR-0001 selected incremental MVVM migration; the highest remaining risk is untested action orchestration in Views, not missing persistence boundaries.
+  Date/Author: 2026-02-13 / Codex
+
+- Decision: Introduce thin protocol seams for notification dependencies (`NotificationManaging`, `NotificationSettingsStoring`) in Presentation ViewModel layer.
+  Rationale: Noti 설정 흐름의 비동기 상태 전이를 ViewModel 단위에서 테스트하기 위해, 시스템/저장소 호출을 최소 추상화로 분리했다.
+  Date/Author: 2026-02-13 / Codex
+
 ## Outcomes & Retrospective
 
 Current outcome: composition root wiring is in place (`AppDependencies` injected at app root), and core write paths in reading/registration/completion/date-edit flows now route through domain service boundaries:
@@ -93,7 +112,9 @@ Current outcome: composition root wiring is in place (`AppDependencies` injected
 - `ReadingDateEditView` -> `BookManagementService.updateReadingPlan`
 - `CompletedBooksView` delete flow -> `BookManagementService.deleteBook`
 
-Behavioral parity was validated through repeated `xcodebuild test` runs on iPhone 17 simulator (26.2), including after notification-layer decoupling. `MainHomeView` query state is ViewModel-owned, and all major navigation/notification payloads are now domain-typed (`FGUserBook`). Phase 1 boundary goal is met; optional follow-up work is additional ViewModel extraction for more complex screens.
+Behavioral parity was validated through repeated `xcodebuild test` runs on iPhone 17 simulator (26.2), including after notification-layer decoupling and a post-merge baseline rerun on 2026-02-13. `MainHomeView` query state is ViewModel-owned, and all major navigation/notification payloads are now domain-typed (`FGUserBook`).
+
+Phase 2 outcome (2026-02-13): action-heavy screens now route through feature ViewModels (`DailyProgressViewModel`, `CompletionReviewViewModel`, `ReadingDateEditViewModel`, `FinishGoalViewModel`, `UnfinishReadingViewModel`, `NotiSettingViewModel`) and no longer execute domain service commands directly in View button handlers. New ViewModel tests were added in `FiveGuyesTests/PresentationViewModelTests.swift`, and full regression tests pass (`** TEST SUCCEEDED **`).
 
 ## Context and Orientation
 
@@ -120,6 +141,20 @@ Milestone 4 migrates completion and date edit flows to service commands (`comple
 Milestone 5 removes legacy runtime calculator usage from migrated flows and consolidates schedule behavior on V2 calculators. Preserve old code only if still needed by untouched screens.
 
 Milestone 6 expands tests: ViewModel state transitions with mocked service, domain service command paths with mock repository, and existing repository tests retained as persistence contract checks.
+
+### Phase 2 (Post-Boundary Hardening) Milestones
+
+Milestone 7 extracts async command/query orchestration out of action-heavy Views into feature ViewModels:
+
+- `DailyProgressView` -> `DailyProgressViewModel`
+- `CompletionReviewView` -> `CompletionReviewViewModel`
+- `ReadingDateEditView` -> `ReadingDateEditViewModel`
+- `FinishGoalView` -> `FinishGoalViewModel`
+- `UnfinishReadingView` -> `UnfinishReadingViewModel`
+
+Milestone 8 introduces notification-settings orchestration in a dedicated ViewModel (`NotiSettingViewModel`) with testable abstraction seams for notification authorization/request updates and local preference persistence.
+
+Milestone 9 adds test coverage for new ViewModels (happy path + failure + duplicate submit/task guard) and keeps existing service/repository tests as regression backstop.
 
 ## Concrete Steps
 
@@ -154,12 +189,14 @@ Acceptance is behavior-first:
 3. Registration flow still saves a new book with an initial schedule and returns to root.
 4. Completion flow still stores completion review and completion status.
 5. Existing calculator and repository tests pass, and new ViewModel tests cover success/failure/loading states.
+6. Notification setting 화면에서 권한/시간/토글 변화 시 기존과 동일한 사용자 동작을 유지한다.
 
 Technical acceptance:
 
 - Migrated views no longer import SwiftData.
 - Migrated views do not call `modelContext.insert/save/delete`.
 - Migrated views do not call legacy `ReadingScheduleCalculator` directly.
+- Phase 2 target Views do not directly call `BookManagementService`/`NotificationManager` in button action handlers; ViewModel methods own async orchestration and submission guards.
 
 ## Idempotence and Recovery
 
@@ -219,3 +256,5 @@ Revision Note (2026-02-12): Migrated `MainHomeView` query state to `MainHomeView
 Revision Note (2026-02-12): Removed duplicate refactoring design memo (`docs/architecture-refactoring.md`) and consolidated canonical records into `ARCHITECTURE.md`, ADR, and this ExecPlan.
 Revision Note (2026-02-12): Re-ran full test suite after latest payload/type migration and confirmed `** TEST SUCCEEDED **`.
 Revision Note (2026-02-12): Completed notification-flow decoupling to `FGUserBook` (`NotiSettingView`, `NotificationManager`, `NotificationType`) and revalidated the full test suite with `** TEST SUCCEEDED **`.
+Revision Note (2026-02-13): Added Phase 2 scope (feature ViewModel extraction + notification setting orchestration + ViewModel tests), recorded clean post-merge baseline verification on `develop`, and aligned acceptance criteria with remaining refactoring risk.
+Revision Note (2026-02-13): Implemented Phase 2 extraction for action-heavy screens and notification settings, introduced notification abstraction seams for testability, added `PresentationViewModelTests`, and verified full suite success on iPhone 17 simulator.
