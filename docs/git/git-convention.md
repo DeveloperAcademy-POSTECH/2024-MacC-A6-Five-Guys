@@ -57,14 +57,18 @@ Examples:
    - `git diff [base-branch]...HEAD`
 
 ### PR Writing Rules
-- Write the PR title and description in **English**.
-- Recommended: use the same format as commit messages for the PR title  
-  Example: `feat: add profile edit`
+- Write the PR title and description in **Korean**.
+- Use `.github/pull_request_template.md` as the default PR description format.
+- Recommended: keep commit `type` in English and write the PR title as `<type>: <한글 요약>`  
+  Example: `refactor: 메인 홈 독서 흐름 MVVM 전환`
 
 ### Must Include in PR Description
-- **Summary**: what changed and why (3–5 key lines)
-- **Test Plan**: how you verified it / results (local, simulator, unit tests, etc.)
-- **TODO / Follow-ups**: remaining work and next PR plan
+- `## 📝 작업 내용`
+  - 이번 PR의 핵심 변경 사항과 변경 이유
+  - 테스트 수행 내역/결과
+  - 후속 작업(TODO / Follow-ups)
+- `### 스크린샷 (선택)` 필요 시 첨부
+- `## 💬 리뷰 요구사항(선택)` 리뷰어 확인 포인트 작성
 
 ### Branch Push Rule
 - For the first push of a new branch, set upstream:
