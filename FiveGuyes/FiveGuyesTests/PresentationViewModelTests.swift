@@ -558,6 +558,70 @@ struct PresentationViewModelTests {
         #expect(notificationManager.updateNotificationCallCount == 1)
     }
 
+    @Test("BookSearchViewModel: 검색 성공 시 목록 갱신")
+    func bookSearch_searchBooks_success_updatesBooks() async {
+        let store = BookSearchStoreStub()
+        let expectedBook = makeAPIBook(title: "테스트 도서")
+        store.fetchBooksResult = [expectedBook]
+        let viewModel = BookSearchViewModel(bookSearchStore: store)
+
+        await viewModel.searchBooks(query: "테스트")
+
+        #expect(viewModel.books.count == 1)
+        #expect(viewModel.books.first?.title == "테스트 도서")
+        #expect(store.fetchBooksQueries == ["테스트"])
+    }
+
+    @Test("BookSearchViewModel: 검색 실패 시 기존 목록 유지")
+    func bookSearch_searchBooks_failure_keepsBooks() async {
+        let store = BookSearchStoreStub()
+        let expectedBook = makeAPIBook(title: "초기 도서")
+        store.fetchBooksResult = [expectedBook]
+        let viewModel = BookSearchViewModel(bookSearchStore: store)
+        await viewModel.searchBooks(query: "초기")
+        store.fetchBooksError = TestError.forced
+
+        await viewModel.searchBooks(query: "실패")
+
+        #expect(viewModel.books.count == 1)
+        #expect(viewModel.books.first?.title == "초기 도서")
+        #expect(store.fetchBooksQueries == ["초기", "실패"])
+    }
+
+    @Test("BookSearchViewModel: 총 페이지 조회 성공 시 문자열 반환")
+    func bookSearch_fetchTotalPages_success() async {
+        let store = BookSearchStoreStub()
+        store.fetchBookTotalPagesResult = 412
+        let viewModel = BookSearchViewModel(bookSearchStore: store)
+
+        let totalPages = await viewModel.fetchBookTotalPages(isbn: "9781234567890")
+
+        #expect(totalPages == "412")
+        #expect(store.fetchTotalPagesISBNs == ["9781234567890"])
+    }
+
+    @Test("BookSearchViewModel: 총 페이지 조회 실패 시 0 반환")
+    func bookSearch_fetchTotalPages_failure_returnsZero() async {
+        let store = BookSearchStoreStub()
+        store.fetchBookTotalPagesError = TestError.forced
+        let viewModel = BookSearchViewModel(bookSearchStore: store)
+
+        let totalPages = await viewModel.fetchBookTotalPages(isbn: "9781234567890")
+
+        #expect(totalPages == "0")
+    }
+
+    @Test("BookSearchViewModel: 책 선택 상태 갱신")
+    func bookSearch_selectBook_updatesSelectedBook() {
+        let store = BookSearchStoreStub()
+        let viewModel = BookSearchViewModel(bookSearchStore: store)
+        let selectedBook = makeAPIBook(title: "선택 도서")
+
+        viewModel.selectBook(selectedBook)
+
+        #expect(viewModel.selectedBook?.title == "선택 도서")
+    }
+
     private func makeBook(id: UUID = UUID(), isCompleted: Bool = false) -> FGUserBook {
         FGUserBook(
             id: id,
@@ -583,6 +647,17 @@ struct PresentationViewModelTests {
                 isCompleted: isCompleted,
                 reviewAfterCompletion: ""
             )
+        )
+    }
+
+    private func makeAPIBook(title: String) -> Book {
+        Book(
+            title: title,
+            author: "테스트 저자",
+            cover: nil,
+            publisher: "테스트 출판사",
+            isbn13: "9781234567890",
+            pubDate: "20250101"
         )
     }
 
@@ -786,5 +861,28 @@ private final class NotificationSettingsStoreStub: NotificationSettingsStoring {
 
     func fetchNotificationReminderTime() -> (hour: Int, minute: Int) {
         (storedReminderHour, storedReminderMinute)
+    }
+}
+
+private final class BookSearchStoreStub: BookSearching {
+    var fetchBooksResult: [Book] = []
+    var fetchBookTotalPagesResult: Int = 0
+
+    var fetchBooksError: Error?
+    var fetchBookTotalPagesError: Error?
+
+    var fetchBooksQueries: [String] = []
+    var fetchTotalPagesISBNs: [String] = []
+
+    func fetchBooks(query: String) async throws -> [Book] {
+        fetchBooksQueries.append(query)
+        if let fetchBooksError { throw fetchBooksError }
+        return fetchBooksResult
+    }
+
+    func fetchBookTotalPages(isbn: String) async throws -> Int {
+        fetchTotalPagesISBNs.append(isbn)
+        if let fetchBookTotalPagesError { throw fetchBookTotalPagesError }
+        return fetchBookTotalPagesResult
     }
 }
