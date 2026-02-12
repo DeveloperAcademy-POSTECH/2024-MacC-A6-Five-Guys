@@ -97,7 +97,11 @@ struct BookSettingsManagerView: View {
     private var pageView: some View {
         switch BookSettingsPage(rawValue: pageModel.currentPage) {
         case .bookSearch:
-            BookSearchView()
+            BookSearchView(
+                viewModel: BookSearchViewModel(
+                    bookSearchStore: appDependencies.bookSearchStore
+                )
+            )
         case .bookPageSetting:
             BookPageSettingView()
         case .bookSettingDone:
