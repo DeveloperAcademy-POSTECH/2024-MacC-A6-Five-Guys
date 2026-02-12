@@ -97,10 +97,9 @@ final class NotiSettingViewModel {
     func handleNotificationStatusChange(userBook: FGUserBook?) {
         notificationStatusTask?.cancel()
         let isDisabled = isNotificationDisabled
+        settingsStore.saveNotificationDisabled(isDisabled)
 
         notificationStatusTask = Task {
-            settingsStore.saveNotificationDisabled(isDisabled)
-
             guard let userBook else { return }
             guard !Task.isCancelled else { return }
 
@@ -115,10 +114,9 @@ final class NotiSettingViewModel {
     func handleNotificationTimeChange(userBook: FGUserBook?) {
         notificationTimeTask?.cancel()
         let currentSelectedTime = selectedTime
+        saveNotificationTime(currentSelectedTime)
 
         notificationTimeTask = Task {
-            saveNotificationTime(currentSelectedTime)
-
             guard let userBook else { return }
             guard !Task.isCancelled else { return }
 

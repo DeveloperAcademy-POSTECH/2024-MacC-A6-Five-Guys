@@ -148,8 +148,11 @@ struct UnfinishReadingView: View {
     
     @MainActor
     private func completeAndPopToRoot() async {
-        _ = await viewModel.completeBook(userBook)
-        navigationCoordinator.popToRoot()
+        let isCompleted = await viewModel.completeBook(userBook)
+
+        if isCompleted {
+            navigationCoordinator.popToRoot()
+        }
     }
 
     private func markBookAsCompletedInBackground() {
