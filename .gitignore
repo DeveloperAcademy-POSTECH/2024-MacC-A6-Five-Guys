@@ -95,11 +95,3 @@ iOSInjectionProject/
 *.xcconfig
 
 GoogleService-Info.plist
-
-# For Agents🐯
-.claude
-.codex
-AGENTS.md
-CLAUDE.md
-Docs
-Tasks
