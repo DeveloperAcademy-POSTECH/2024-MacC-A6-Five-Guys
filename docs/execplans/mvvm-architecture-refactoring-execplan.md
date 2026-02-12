@@ -37,6 +37,8 @@ The change is observable when the core screens still behave the same in the simu
 - [x] (2026-02-12 18:26Z) Updated `PresentationViewModelTests` for constructor injection and revalidated full suite (`xcodebuild test -project FiveGuyes/FiveGuyes.xcodeproj -scheme FiveGuyes -destination "platform=iOS Simulator,name=iPhone 17"` -> `** TEST SUCCEEDED **`).
 - [x] (2026-02-13 03:31Z) Extended constructor injection/assembly consistency to notification settings flow: `NotiSettingView` no longer self-instantiates `NotiSettingViewModel`, and coordinator now assembles it from `AppDependencies`.
 - [x] (2026-02-13 03:31Z) Revalidated architecture boundary checks (`configure(bookManagementService:)`, presentation `modelContext`/`@Query`/`ReadingScheduleCalculator(`) and full `xcodebuild test` on iPhone 17 (`** TEST SUCCEEDED **`).
+- [x] (2026-02-12 18:53Z) Migrated book search flow to constructor-injected external API seam: `BookSearchViewModel` now depends on `BookSearching`, and `BookSettingsManagerView` assembles it via `AppDependencies.bookSearchStore`.
+- [x] (2026-02-12 18:55Z) Added `BookSearchViewModel` tests (search success/failure, total pages success/failure, selected book state) and revalidated full suite (`xcodebuild test -project FiveGuyes/FiveGuyes.xcodeproj -scheme FiveGuyes -destination "platform=iOS Simulator,name=iPhone 17"` -> `** TEST SUCCEEDED **`).
 
 ## Surprises & Discoveries
 
@@ -72,6 +74,9 @@ The change is observable when the core screens still behave the same in the simu
 
 - Observation: Notification settings remained the last feature flow with in-View ViewModel instantiation after constructor injection migration.
   Evidence: `NotiSettingView` had `@State private var viewModel = NotiSettingViewModel()` while coordinator only passed route payload.
+
+- Observation: `APIStore` requires runtime `API_KEY` resolution in initializer, so previews/tests need explicit stub injection once book search moves to constructor DI.
+  Evidence: `APIStore.init` uses `Bundle.main.object(forInfoDictionaryKey: "API_KEY")` with `fatalError`, and `BookListView` preview now passes `BookSearchStorePreviewStub`.
 
 ## Decision Log
 
@@ -127,6 +132,10 @@ The change is observable when the core screens still behave the same in the simu
   Rationale: 알림 설정 플로우도 동일한 composition root 정책으로 통일해, View/ViewModel 내부의 숨은 concrete 의존성 생성을 제거한다.
   Date/Author: 2026-02-13 / Codex
 
+- Decision: Treat book search as the same composition-root dependency problem and replace `BookSearchViewModel`'s concrete `APIStore` construction with an injected `BookSearching` seam.
+  Rationale: 등록 플로우도 feature ViewModel이 concrete 외부 API 객체를 직접 생성하지 않도록 통일해야 테스트 가능성/교체 가능성이 유지된다.
+  Date/Author: 2026-02-12 / Codex
+
 ## Outcomes & Retrospective
 
 Current outcome: composition root wiring is in place (`AppDependencies` injected at app root), and core write paths in reading/registration/completion/date-edit flows now route through domain service boundaries:
@@ -149,6 +158,8 @@ Phase 3 incremental outcome (2026-02-13): Home entry flow notification setup als
 Phase 4 incremental outcome (2026-02-13): feature ViewModels now receive `BookManagementService` through constructors and are created at navigation/page assembly points, removing runtime `configure(...)` calls from Views. `NavigationCoordinator` is now `@MainActor` to align with dependency/viewmodel isolation rules, and all regression tests still pass.
 
 Phase 5 incremental outcome (2026-02-13): notification settings flow now follows the same constructor injection assembly model as other features. `NotiSettingView` receives a preconfigured `NotiSettingViewModel` from `NavigationCoordinator`, and its dependencies (`NotificationManaging`, `NotificationSettingsStoring`) are provided by `AppDependencies`.
+
+Phase 6 incremental outcome (2026-02-12): book registration search flow now follows constructor injection as well. `BookSearchViewModel` no longer constructs `APIStore` directly, `BookSettingsManagerView` assembles it using `AppDependencies.bookSearchStore`, and dedicated `PresentationViewModelTests` coverage was added for search and total-page query behavior.
 
 ## Context and Orientation
 
@@ -194,6 +205,8 @@ Milestone 10 removes the remaining Home-side notification orchestration from `Ma
 
 Milestone 11 removes post-init ViewModel configuration for book-management flows by adopting constructor injection and coordinator-level ViewModel assembly.
 
+Milestone 12 migrates the book-search flow (`BookSearchViewModel`, `BookSearchView`, `BookSettingsManagerView`) to composition-root-injected search dependency (`BookSearching`) and adds dedicated ViewModel tests for search and total-page lookup behavior.
+
 ## Concrete Steps
 
 Run all commands from repository root `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys`.
@@ -238,6 +251,7 @@ Technical acceptance:
 - `MainHomeView` does not construct `NotificationManager`; notification side effects are triggered only via `MainHomeViewModel`.
 - Views do not call `configure(bookManagementService:)`; affected feature ViewModels are created with dependencies at initialization.
 - `NotiSettingView` does not instantiate `NotiSettingViewModel` directly; coordinator/composition root provides its dependencies.
+- `BookSearchViewModel` does not instantiate `APIStore` directly; book search dependency is injected via `BookSearching`.
 
 ## Idempotence and Recovery
 
@@ -283,6 +297,14 @@ New interfaces to add during implementation:
 
     var bookManagementService: BookManagementService { get }
     var notificationManager: NotificationManaging { get }
+    var bookSearchStore: BookSearching { get }
+
+- Book-search seam in `FiveGuyes/FiveGuyes/Sources/Store/APIStore.swift`:
+
+    protocol BookSearching {
+        func fetchBooks(query: String) async throws -> [Book]
+        func fetchBookTotalPages(isbn: String) async throws -> Int
+    }
 
 - Feature ViewModels (for each migrated flow) that expose:
 
@@ -302,3 +324,4 @@ Revision Note (2026-02-13): Added Phase 2 scope (feature ViewModel extraction + 
 Revision Note (2026-02-13): Implemented Phase 2 extraction for action-heavy screens and notification settings, introduced notification abstraction seams for testability, added `PresentationViewModelTests`, and verified full suite success on iPhone 17 simulator.
 Revision Note (2026-02-13): Completed the next incremental architecture step by moving Home notification setup from `MainHomeView` to `MainHomeViewModel`, extending `AppDependencies` with `NotificationManaging`, adding Home ViewModel tests, and revalidating full suite success.
 Revision Note (2026-02-13): Standardized constructor injection for book-management feature ViewModels, removed `configure` call sites in Views, moved ViewModel assembly to navigation/page construction points, resolved `@MainActor` isolation by annotating `NavigationCoordinator`, and revalidated full suite success.
+Revision Note (2026-02-12): Added the next architecture step for book-registration search flow by introducing `BookSearching` protocol injection in `BookSearchViewModel`, wiring it through `AppDependencies`/`BookSettingsManagerView`, adding `BookSearchViewModel` tests, and revalidating full suite success.
