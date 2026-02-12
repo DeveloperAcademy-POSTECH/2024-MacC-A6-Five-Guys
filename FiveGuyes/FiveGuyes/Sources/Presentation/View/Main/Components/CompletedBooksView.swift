@@ -9,12 +9,12 @@ import SwiftUI
 
 struct CompletedBooksView: View {
     @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
-    @Environment(AppDependencies.self) private var appDependencies
     
     @State private var selectedBookIndex: Int = 0
     @State var showCompletionAlert: Bool = false
     
     var completedBooks: [FGUserBook]
+    let onDeleteBook: @MainActor (UUID) async -> Bool
     
     let completionAlertMessage = "정말로 내용을 삭제할까요?"
     let completionAlertText = "삭제 후에는 복원할 수 없어요"
@@ -157,12 +157,8 @@ struct CompletedBooksView: View {
 
     @MainActor
     private func deleteCompletedBook(id: UUID, currentCount: Int) async {
-        do {
-            try await appDependencies.bookManagementService.deleteBook(id: id)
-        } catch {
-            print("완독 리스트 삭제 중 오류 발생: \(error.localizedDescription)")
-            return
-        }
+        let deleted = await onDeleteBook(id)
+        guard deleted else { return }
 
         if currentCount <= 1 {
             selectedBookIndex = 0

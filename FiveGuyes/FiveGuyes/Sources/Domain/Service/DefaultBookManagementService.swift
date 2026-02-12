@@ -156,8 +156,13 @@ final class DefaultBookManagementService: BookManagementService {
         // 1. Repository에서 삭제
         try await repository.deleteBook(by: id)
 
-        // 2. 알림 취소 (모든 알림을 제거)
-        await notificationManager.clearRequests()
+        // 2. 남은 읽는 책 기준으로 알림 상태를 재구성
+        let remainingReadingBooks = try await repository.getReadingBooks()
+        if let nextReadingBook = remainingReadingBooks.first {
+            await notificationManager.setupAllNotifications(nextReadingBook)
+        } else {
+            await notificationManager.clearRequests()
+        }
     }
 
     func completeBook(id: UUID, completionDate: Date, review: String) async throws {

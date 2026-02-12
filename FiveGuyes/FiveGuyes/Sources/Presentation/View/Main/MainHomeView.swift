@@ -125,7 +125,12 @@ struct MainHomeView: View {
                 .padding(.bottom, 40)
                 .padding(.horizontal, 20)
 
-                CompletedBooksView(completedBooks: completedBooks)
+                CompletedBooksView(
+                    completedBooks: completedBooks,
+                    onDeleteBook: { id in
+                        await viewModel.deleteBook(id: id)
+                    }
+                )
             }
             .padding(.top, topSafeAreaInset)
         }
