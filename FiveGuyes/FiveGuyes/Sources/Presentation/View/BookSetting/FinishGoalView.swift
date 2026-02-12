@@ -8,17 +8,12 @@
 import SwiftUI
 
 struct FinishGoalView: View {
-    typealias UserBook = UserBookSchemaV2.UserBookV2
-    
     @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
     @Environment(BookSettingInputModel.self) var bookSettingInputModel: BookSettingInputModel
-    @Environment(\.modelContext) private var modelContext
+    @Environment(AppDependencies.self) private var appDependencies
     
     @State private var pagesPerDay: Int = 0
-    @State var userBook: UserBook?
-    
-    private let calculator = ReadingScheduleCalculator()
-    private let notificationManager = NotificationManager()
+    @State private var isSubmitting = false
     
     var body: some View {
         
@@ -140,18 +135,13 @@ struct FinishGoalView: View {
                     Spacer()
                     
                     Button {
-                        // 책 정보 저장하기
-                        if let userBook = userBook {
-                            modelContext.insert(userBook) // SwiftData에 새로운 책 저장
-                            
-                            // 노티 세팅하기
-                            Task {
-                                await notificationManager.setupAllNotifications(userBook)
-                            }
-                            navigationCoordinator.popToRoot()
-                        } else {
-                            print("책 정보 없음")
-                        }
+                        registerBook(
+                            selectedBook: book,
+                            startPage: startPage,
+                            targetEndPage: totalPages,
+                            startDate: startDate,
+                            endDate: endDate
+                        )
                     } label: {
                         HStack {
                             Text("확인")
@@ -165,44 +155,18 @@ struct FinishGoalView: View {
                         .cornerRadius(16)
                         .padding(.horizontal, 16)
                     }
+                    .disabled(isSubmitting)
                     
                 }
                 
             }
             .onAppear {
-                // 1일 할당량 계산
-                // TODO: 해당 모델 객체를 더 잘 만들 방식 고민하기
-                let bookMetaData = BookMetaData(title: book.title, author: book.author, coverURL: book.cover, totalPages: totalPages)
-                let userSettings = UserSettings(startPage: startPage, targetEndPage: totalPages, startDate: startDate, targetEndDate: endDate, nonReadingDays: bookSettingInputModel.nonReadingDays)
-                
-                // 시작 페이지가 아직 읽지 않은 페이지임을 고려하여 초기 등록 시 -1 처리 추가
-                let readingProgress = ReadingProgress(lastPagesRead: startPage - 1)
-                let completionStatus = CompletionStatus()
-                
-                calculator.calculateInitialDailyTargets(for: userSettings, progress: readingProgress)
-                
-                let bookData = UserBook(
-                    bookMetaData: bookMetaData,
-                    userSettings: userSettings,
-                    readingProgress: readingProgress,
-                    completionStatus: completionStatus
+                calculateRecommendedPagesPerDay(
+                    startPage: startPage,
+                    targetEndPage: totalPages,
+                    startDate: startDate,
+                    endDate: endDate
                 )
-                
-                userBook = bookData
-                
-                let totalDays = try! ReadingDateCalculator()
-                    .calculateValidReadingDays(
-                        startDate: userSettings.startDate,
-                        endDate: userSettings.targetEndDate,
-                        excludedDates: userSettings.nonReadingDays
-                    )
-                
-                pagesPerDay = ReadingPagesCalculator()
-                    .calculatePagesPerDayAndRemainder(
-                        totalDays: totalDays,
-                        startPage: userSettings.startPage,
-                        endPage: userSettings.targetEndPage
-                    ).pagesPerDay
             }
             .onAppear {
                 // GA4 Tracking
@@ -210,6 +174,75 @@ struct FinishGoalView: View {
             }
         }
         
+    }
+
+    private func calculateRecommendedPagesPerDay(
+        startPage: Int,
+        targetEndPage: Int,
+        startDate: Date,
+        endDate: Date
+    ) {
+        let excludedDays = bookSettingInputModel.nonReadingDays
+        let totalDays = try? ReadingDateCalculator().calculateValidReadingDays(
+            startDate: startDate,
+            endDate: endDate,
+            excludedDates: excludedDays
+        )
+
+        guard let totalDays, totalDays > 0 else {
+            pagesPerDay = 0
+            return
+        }
+
+        pagesPerDay = ReadingPagesCalculator()
+            .calculatePagesPerDayAndRemainder(
+                totalDays: totalDays,
+                startPage: startPage,
+                endPage: targetEndPage
+            ).pagesPerDay
+    }
+
+    @MainActor
+    private func registerBook(
+        selectedBook: Book,
+        startPage: Int,
+        targetEndPage: Int,
+        startDate: Date,
+        endDate: Date
+    ) {
+        guard !isSubmitting else { return }
+        isSubmitting = true
+
+        let input = RegisterBookInput(
+            bookMetaData: FGBookMetaData(
+                title: selectedBook.title,
+                author: selectedBook.author,
+                coverImageURL: selectedBook.cover,
+                totalPages: targetEndPage
+            ),
+            userSettings: FGUserSetting(
+                startPage: startPage,
+                targetEndPage: targetEndPage,
+                startDate: startDate,
+                targetEndDate: endDate,
+                excludedReadingDays: bookSettingInputModel.nonReadingDays
+            )
+        )
+
+        Task {
+            do {
+                _ = try await appDependencies.bookManagementService.registerBook(input)
+                await MainActor.run {
+                    isSubmitting = false
+                    navigationCoordinator.popToRoot()
+                }
+            } catch {
+                await MainActor.run {
+                    isSubmitting = false
+                }
+                print("책 등록 중 오류 발생: \(error.localizedDescription)")
+            }
+        }
     }
 }
 

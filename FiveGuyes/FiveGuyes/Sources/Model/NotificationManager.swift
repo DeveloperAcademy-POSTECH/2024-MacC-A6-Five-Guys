@@ -8,8 +8,6 @@
 import UserNotifications
 
 final class NotificationManager {
-    typealias UserBook = UserBookSchemaV2.UserBookV2
-    
     private let notificationCenter = UNUserNotificationCenter.current()
     
     /// 모든 노티를 요청하는 메서드
@@ -20,7 +18,7 @@ final class NotificationManager {
     }
     
     /// 노티를 요청하는 메서드
-    func setupAllNotifications(_ readingBook: UserBook) async {
+    func setupAllNotifications(_ readingBook: FGUserBook) async {
         Task {
             await self.clearRequests()
             

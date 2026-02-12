@@ -8,13 +8,13 @@
 import SwiftUI
 
 struct ReadingDateEditView: View {
-    typealias UserBook = UserBookSchemaV2.UserBookV2
-    
     @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
+    @Environment(AppDependencies.self) private var appDependencies
     
-    private let userBook: UserBook
+    private let userBook: FGUserBook
     
     @StateObject private var calendarCellModel: CalendarCellModel
+    @State private var isSubmitting = false
     
     private var adjustedToday: Date
     private let calendarCalculator = CalendarCalculator()
@@ -49,7 +49,7 @@ struct ReadingDateEditView: View {
         }
     }
     
-    init(userBook: UserBook) {
+    init(userBook: FGUserBook) {
         self.adjustedToday = Date().adjustedDate()
         self.userBook = userBook
         
@@ -59,7 +59,7 @@ struct ReadingDateEditView: View {
             adjustedToday: adjustedToday,
             startDate: userSettings.startDate,
             endDate: userSettings.targetEndDate,
-            excludedDates: userSettings.nonReadingDays,
+            excludedDates: userSettings.excludedReadingDays,
             isConfirmed: false)
         
         self._calendarCellModel = StateObject(wrappedValue: calendarCellModel)
@@ -107,10 +107,7 @@ struct ReadingDateEditView: View {
                     calendarCellModel.confirmDates()
                 }
             } else {
-                // 페이지 재할당 로직 호출
-                reassignPages()
-                // 페이지 나가기
-                navigationCoordinator.popToRoot()
+                submitReadingPlanUpdate()
             }
         } label: {
             RoundedRectangle(cornerRadius: 16)
@@ -127,7 +124,7 @@ struct ReadingDateEditView: View {
         .padding(.top, 14)
         .padding(.bottom, 21)
         .padding(.horizontal, 16)
-        .disabled(!calendarCellModel.isRangeComplete())
+        .disabled(!calendarCellModel.isRangeComplete() || isSubmitting)
     }
     
     private func goalSelectionText() -> some View {
@@ -157,26 +154,42 @@ struct ReadingDateEditView: View {
         }
     }
     
-    private func reassignPages() {
-        let userSetting = userBook.userSettings
-        guard let startDate = calendarCellModel.getStartDate(), let endDate = calendarCellModel.getEndDate() else { return }
-        
-        userSetting.startDate = startDate
-        userSetting.targetEndDate = endDate
-        userSetting.nonReadingDays = calendarCellModel.getExcludedDates()
-        
-        let readingScheduleCalculator = ReadingScheduleCalculator()
-        
-        readingScheduleCalculator.reassignPagesForUpdatedDates(
-            settings: userSetting,
-            progress: userBook.readingProgress
-        )
-    }
-    
     private func restDaySelectionText() -> some View {
         HStack(alignment: .top) {
             Text("쉬는 날을 다시 설정할 수 있어요!\n건너뛰어도 괜찮아요")
             Spacer()
+        }
+    }
+
+    @MainActor
+    private func submitReadingPlanUpdate() {
+        guard !isSubmitting else { return }
+        guard let startDate = calendarCellModel.getStartDate(),
+              let endDate = calendarCellModel.getEndDate() else { return }
+
+        isSubmitting = true
+        let excludedDays = calendarCellModel.getExcludedDates()
+
+        Task {
+            do {
+                try await appDependencies.bookManagementService.updateReadingPlan(
+                    bookId: userBook.id,
+                    startDate: startDate,
+                    targetEndDate: endDate,
+                    excludedReadingDays: excludedDays,
+                    today: adjustedToday
+                )
+
+                await MainActor.run {
+                    isSubmitting = false
+                    navigationCoordinator.popToRoot()
+                }
+            } catch {
+                await MainActor.run {
+                    isSubmitting = false
+                }
+                print("목표기간 수정 저장 중 오류 발생: \(error.localizedDescription)")
+            }
         }
     }
 }

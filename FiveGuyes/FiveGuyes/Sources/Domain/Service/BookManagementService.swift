@@ -42,6 +42,29 @@ protocol BookManagementService {
     /// - Throws: 완료 처리 실패 시 에러
     func completeBook(id: UUID, completionDate: Date, review: String) async throws
 
+    /// 완독 소감만 수정합니다.
+    /// - Parameters:
+    ///   - id: 대상 책 ID
+    ///   - review: 수정할 소감
+    /// - Throws: 수정 실패 시 에러
+    func updateCompletionReview(id: UUID, review: String) async throws
+
+    /// 목표 기간/휴일 변경을 반영해 스케줄을 재분배합니다.
+    /// - Parameters:
+    ///   - bookId: 대상 책 ID
+    ///   - startDate: 변경된 시작일
+    ///   - targetEndDate: 변경된 종료일
+    ///   - excludedReadingDays: 변경된 쉬는 날 목록
+    ///   - today: 기준 날짜 (보정된 날짜)
+    /// - Throws: 재분배 또는 저장 실패 시 에러
+    func updateReadingPlan(
+        bookId: UUID,
+        startDate: Date,
+        targetEndDate: Date,
+        excludedReadingDays: [Date],
+        today: Date
+    ) async throws
+
     // MARK: - Query (읽기 작업)
 
     /// 읽는 중인 책 목록을 조회합니다.
@@ -59,4 +82,11 @@ protocol BookManagementService {
     /// - Returns: 책 상세 정보
     /// - Throws: 조회 실패 시 에러
     func fetchBookDetail(id: UUID) async throws -> FGUserBook
+
+    /// 앱 재진입 시 오늘 기준으로 남은 독서 스케줄을 재분배합니다.
+    /// - Parameters:
+    ///   - bookId: 대상 책 ID
+    ///   - today: 기준 날짜 (보정된 날짜)
+    /// - Throws: 재분배 실패 또는 목표일 초과 에러
+    func rescheduleOnAppOpen(bookId: UUID, today: Date) async throws
 }

@@ -5,12 +5,9 @@
 //  Created by zaehorang on 11/27/24.
 //
 
-import SwiftData
 import SwiftUI
 
 struct NotiSettingView: View {
-    typealias UserBook = UserBookSchemaV2.UserBookV2
-    
     @Environment(\.scenePhase) private var scenePhase // 앱 상태 감지
     
     @State private var selectedTime: Date = Date() // 데이트 피커에 사용될 시간
@@ -22,7 +19,7 @@ struct NotiSettingView: View {
     @State private var notificationStatusTask: Task<Void, Never>?
     @State private var notificationTimeTask: Task<Void, Never>?
     
-    let userBook: UserBook?
+    let userBook: FGUserBook?
     
     private let notificationManager = NotificationManager()
     
@@ -246,7 +243,7 @@ struct NotiSettingView: View {
         isNotificationDisabled = UserDefaultsManager.fetchNotificationDisabled()
     }
     
-    private func handleNotificationStatusChange(isDisabled: Bool, userBook: UserBook?) async {
+    private func handleNotificationStatusChange(isDisabled: Bool, userBook: FGUserBook?) async {
         saveNotificationStatus(isDisabled)
         
         // 등록된 책이 없을 때는 노티 설정 X
@@ -259,7 +256,7 @@ struct NotiSettingView: View {
         }
     }
     
-    private func handleNotificationTimeChange(newTime: Date, userBook: UserBook?) async {
+    private func handleNotificationTimeChange(newTime: Date, userBook: FGUserBook?) async {
         saveNotificationTime(newTime)
         
         // 등록된 책이 없을 때는 노티 설정 X

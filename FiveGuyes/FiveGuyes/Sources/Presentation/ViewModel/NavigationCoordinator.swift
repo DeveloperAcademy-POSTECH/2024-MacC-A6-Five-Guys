@@ -9,18 +9,17 @@ import SwiftUI
 
 // TODO: 추가되는 뷰 추가하기
 enum Screens: Hashable {
-    typealias UserBook = UserBookSchemaV2.UserBookV2
     case empty
     case mainHome
-    case notiSetting(book: UserBook?)
+    case notiSetting(book: FGUserBook?)
     case bookSettingsManager
     case totalCalendar(books: [FGUserBook])
-    case dailyProgress(book: UserBook)
-    case completionCelebration(book: UserBook)
-    case completionReview(book: UserBook)
-    case completionReviewUpdate(book: UserBook)
-    case readingDateEdit(book: UserBook)
-    case unfinishReading(book: UserBook)
+    case dailyProgress(book: FGUserBook)
+    case completionCelebration(book: FGUserBook)
+    case completionReview(book: FGUserBook)
+    case completionReviewUpdate(book: FGUserBook)
+    case readingDateEdit(book: FGUserBook)
+    case unfinishReading(book: FGUserBook)
 }
 
 @Observable

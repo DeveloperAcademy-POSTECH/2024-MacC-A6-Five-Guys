@@ -438,4 +438,60 @@ struct DefaultBookManagementServiceTests {
         #expect(updatedBook.userSettings.startDate == earlyCompletionDate)
         #expect(updatedBook.userSettings.targetEndDate == earlyCompletionDate)
     }
+
+    @Test("updateCompletionReview로 완독 소감만 수정")
+    func testUpdateCompletionReview() async throws {
+        let mockRepository = MockBookRepository()
+        let service = DefaultBookManagementService(repository: mockRepository)
+
+        var testBook = createTestBook(totalPages: 300, isCompleted: true)
+        testBook.completionStatus = FGCompletionStatus(
+            isCompleted: true,
+            reviewAfterCompletion: "기존 소감"
+        )
+        await mockRepository.setBooks([testBook])
+
+        try await service.updateCompletionReview(id: testBook.id, review: "수정된 소감")
+
+        let updatedBook = try await mockRepository.fetchBook(by: testBook.id)
+        #expect(updatedBook.completionStatus.isCompleted == true)
+        #expect(updatedBook.completionStatus.reviewAfterCompletion == "수정된 소감")
+        #expect(updatedBook.userSettings.targetEndDate == testBook.userSettings.targetEndDate)
+    }
+
+    @Test("updateReadingPlan으로 목표기간/쉬는날 변경 시 설정과 진행률이 갱신됨")
+    func testUpdateReadingPlan() async throws {
+        let mockRepository = MockBookRepository()
+        let service = DefaultBookManagementService(repository: mockRepository)
+
+        var testBook = createTestBook(totalPages: 300, isCompleted: false)
+        testBook.readingProgress = FGReadingProgress(
+            dailyReadingRecords: [
+                makeDate("2025-01-01").toYearMonthDayString(): ReadingRecord(targetPages: 10, pagesRead: 10),
+                makeDate("2025-01-02").toYearMonthDayString(): ReadingRecord(targetPages: 20, pagesRead: 20),
+            ],
+            lastReadDate: makeDate("2025-01-02"),
+            lastReadPage: 20
+        )
+        await mockRepository.setBooks([testBook])
+
+        let newStartDate = makeDate("2025-01-01")
+        let newEndDate = makeDate("2025-02-10")
+        let excludedDays = [makeDate("2025-01-05")]
+        let today = makeDate("2025-01-03")
+
+        try await service.updateReadingPlan(
+            bookId: testBook.id,
+            startDate: newStartDate,
+            targetEndDate: newEndDate,
+            excludedReadingDays: excludedDays,
+            today: today
+        )
+
+        let updatedBook = try await mockRepository.fetchBook(by: testBook.id)
+        #expect(updatedBook.userSettings.startDate == newStartDate)
+        #expect(updatedBook.userSettings.targetEndDate == newEndDate)
+        #expect(updatedBook.userSettings.excludedReadingDays == excludedDays)
+        #expect(updatedBook.readingProgress != testBook.readingProgress)
+    }
 }
