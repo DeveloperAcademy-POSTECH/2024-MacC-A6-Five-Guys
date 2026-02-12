@@ -12,8 +12,7 @@ struct FinishGoalView: View {
     @Environment(BookSettingInputModel.self) var bookSettingInputModel: BookSettingInputModel
     @Environment(AppDependencies.self) private var appDependencies
     
-    @State private var pagesPerDay: Int = 0
-    @State private var isSubmitting = false
+    @State private var viewModel = FinishGoalViewModel()
     
     var body: some View {
         
@@ -49,7 +48,7 @@ struct FinishGoalView: View {
                     HStack(spacing: 0) {
                         TextView(text: "매일 ")
                         
-                        Text("\(pagesPerDay)")
+                        Text("\(viewModel.pagesPerDay)")
                             .fontStyle(.title1, weight: .semibold)
                             .padding(.horizontal, 8)
                             .padding(.vertical, 4)
@@ -110,7 +109,7 @@ struct FinishGoalView: View {
                                 .cornerRadius(8)
                             
                             // 하루 권장 독서량
-                            Text("하루 권장 독서량 : \(pagesPerDay)쪽")
+                            Text("하루 권장 독서량 : \(viewModel.pagesPerDay)쪽")
                                 .foregroundStyle(Color.Colors.green2)
                                 .fontStyle(.body)
                                 .lineLimit(1)
@@ -135,13 +134,15 @@ struct FinishGoalView: View {
                     Spacer()
                     
                     Button {
-                        registerBook(
-                            selectedBook: book,
-                            startPage: startPage,
-                            targetEndPage: totalPages,
-                            startDate: startDate,
-                            endDate: endDate
-                        )
+                        Task {
+                            await registerBook(
+                                selectedBook: book,
+                                startPage: startPage,
+                                targetEndPage: totalPages,
+                                startDate: startDate,
+                                endDate: endDate
+                            )
+                        }
                     } label: {
                         HStack {
                             Text("확인")
@@ -155,17 +156,19 @@ struct FinishGoalView: View {
                         .cornerRadius(16)
                         .padding(.horizontal, 16)
                     }
-                    .disabled(isSubmitting)
+                    .disabled(viewModel.isSubmitting)
                     
                 }
                 
             }
             .onAppear {
-                calculateRecommendedPagesPerDay(
+                viewModel.configure(bookManagementService: appDependencies.bookManagementService)
+                viewModel.calculateRecommendedPagesPerDay(
                     startPage: startPage,
                     targetEndPage: totalPages,
                     startDate: startDate,
-                    endDate: endDate
+                    endDate: endDate,
+                    excludedDays: bookSettingInputModel.nonReadingDays
                 )
             }
             .onAppear {
@@ -176,32 +179,6 @@ struct FinishGoalView: View {
         
     }
 
-    private func calculateRecommendedPagesPerDay(
-        startPage: Int,
-        targetEndPage: Int,
-        startDate: Date,
-        endDate: Date
-    ) {
-        let excludedDays = bookSettingInputModel.nonReadingDays
-        let totalDays = try? ReadingDateCalculator().calculateValidReadingDays(
-            startDate: startDate,
-            endDate: endDate,
-            excludedDates: excludedDays
-        )
-
-        guard let totalDays, totalDays > 0 else {
-            pagesPerDay = 0
-            return
-        }
-
-        pagesPerDay = ReadingPagesCalculator()
-            .calculatePagesPerDayAndRemainder(
-                totalDays: totalDays,
-                startPage: startPage,
-                endPage: targetEndPage
-            ).pagesPerDay
-    }
-
     @MainActor
     private func registerBook(
         selectedBook: Book,
@@ -209,39 +186,18 @@ struct FinishGoalView: View {
         targetEndPage: Int,
         startDate: Date,
         endDate: Date
-    ) {
-        guard !isSubmitting else { return }
-        isSubmitting = true
-
-        let input = RegisterBookInput(
-            bookMetaData: FGBookMetaData(
-                title: selectedBook.title,
-                author: selectedBook.author,
-                coverImageURL: selectedBook.cover,
-                totalPages: targetEndPage
-            ),
-            userSettings: FGUserSetting(
-                startPage: startPage,
-                targetEndPage: targetEndPage,
-                startDate: startDate,
-                targetEndDate: endDate,
-                excludedReadingDays: bookSettingInputModel.nonReadingDays
-            )
+    ) async {
+        let registered = await viewModel.registerBook(
+            selectedBook: selectedBook,
+            startPage: startPage,
+            targetEndPage: targetEndPage,
+            startDate: startDate,
+            endDate: endDate,
+            excludedReadingDays: bookSettingInputModel.nonReadingDays
         )
 
-        Task {
-            do {
-                _ = try await appDependencies.bookManagementService.registerBook(input)
-                await MainActor.run {
-                    isSubmitting = false
-                    navigationCoordinator.popToRoot()
-                }
-            } catch {
-                await MainActor.run {
-                    isSubmitting = false
-                }
-                print("책 등록 중 오류 발생: \(error.localizedDescription)")
-            }
+        if registered {
+            navigationCoordinator.popToRoot()
         }
     }
 }

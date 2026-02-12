@@ -13,8 +13,8 @@ struct ReadingDateEditView: View {
     
     private let userBook: FGUserBook
     
+    @State private var viewModel = ReadingDateEditViewModel()
     @StateObject private var calendarCellModel: CalendarCellModel
-    @State private var isSubmitting = false
     
     private var adjustedToday: Date
     private let calendarCalculator = CalendarCalculator()
@@ -85,6 +85,9 @@ struct ReadingDateEditView: View {
         }
         .navigationTitle("목표기간 수정하기")
         .customNavigationBackButton()
+        .onAppear {
+            viewModel.configure(bookManagementService: appDependencies.bookManagementService)
+        }
     }
     
     private func descriptionText() -> some View {
@@ -107,7 +110,9 @@ struct ReadingDateEditView: View {
                     calendarCellModel.confirmDates()
                 }
             } else {
-                submitReadingPlanUpdate()
+                Task {
+                    await submitReadingPlanUpdate()
+                }
             }
         } label: {
             RoundedRectangle(cornerRadius: 16)
@@ -124,7 +129,7 @@ struct ReadingDateEditView: View {
         .padding(.top, 14)
         .padding(.bottom, 21)
         .padding(.horizontal, 16)
-        .disabled(!calendarCellModel.isRangeComplete() || isSubmitting)
+        .disabled(!calendarCellModel.isRangeComplete() || viewModel.isSubmitting)
     }
     
     private func goalSelectionText() -> some View {
@@ -162,34 +167,22 @@ struct ReadingDateEditView: View {
     }
 
     @MainActor
-    private func submitReadingPlanUpdate() {
-        guard !isSubmitting else { return }
+    private func submitReadingPlanUpdate() async {
         guard let startDate = calendarCellModel.getStartDate(),
               let endDate = calendarCellModel.getEndDate() else { return }
 
-        isSubmitting = true
         let excludedDays = calendarCellModel.getExcludedDates()
 
-        Task {
-            do {
-                try await appDependencies.bookManagementService.updateReadingPlan(
-                    bookId: userBook.id,
-                    startDate: startDate,
-                    targetEndDate: endDate,
-                    excludedReadingDays: excludedDays,
-                    today: adjustedToday
-                )
+        let isUpdated = await viewModel.submitReadingPlanUpdate(
+            bookId: userBook.id,
+            startDate: startDate,
+            endDate: endDate,
+            excludedReadingDays: excludedDays,
+            today: adjustedToday
+        )
 
-                await MainActor.run {
-                    isSubmitting = false
-                    navigationCoordinator.popToRoot()
-                }
-            } catch {
-                await MainActor.run {
-                    isSubmitting = false
-                }
-                print("목표기간 수정 저장 중 오류 발생: \(error.localizedDescription)")
-            }
+        if isUpdated {
+            navigationCoordinator.popToRoot()
         }
     }
 }
