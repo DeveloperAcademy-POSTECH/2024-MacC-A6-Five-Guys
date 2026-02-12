@@ -8,10 +8,9 @@
 import SwiftUI
 
 struct DailyProgressView: View {
-    @State private var viewModel = DailyProgressViewModel()
+    @State private var viewModel: DailyProgressViewModel
     
     @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
-    @Environment(AppDependencies.self) private var appDependencies
     
     private let alertText = "전체쪽수를 초과해서 작성했어요!"
     private let alertMessage = "끝까지 읽은 게 맞나요?"
@@ -20,7 +19,12 @@ struct DailyProgressView: View {
     
     @FocusState private var isTextTextFieldFocused: Bool
     
-    let userBook: FGUserBook
+    private let userBook: FGUserBook
+
+    init(userBook: FGUserBook, viewModel: DailyProgressViewModel) {
+        self.userBook = userBook
+        _viewModel = State(initialValue: viewModel)
+    }
     
     var body: some View {
         @Bindable var bindableViewModel = viewModel
@@ -107,7 +111,6 @@ struct DailyProgressView: View {
         .navigationTitle("오늘 독서 현황 기록하기")
         .customNavigationBackButton()
         .onAppear {
-            viewModel.configure(bookManagementService: appDependencies.bookManagementService)
             viewModel.preloadPages(userBook: userBook, adjustedToday: adjustedToday)
             isTextTextFieldFocused = true
         }

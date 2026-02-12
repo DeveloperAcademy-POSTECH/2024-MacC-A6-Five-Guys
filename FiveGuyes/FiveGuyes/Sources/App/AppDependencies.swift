@@ -12,9 +12,13 @@ import SwiftData
 @Observable
 final class AppDependencies {
     let bookManagementService: any BookManagementService
+    let notificationManager: any NotificationManaging
+    let notificationSettingsStore: any NotificationSettingsStoring
 
     init(modelContainer: ModelContainer) {
         let repository = SwiftDataBookRepository(modelContainer: modelContainer)
         self.bookManagementService = DefaultBookManagementService(repository: repository)
+        self.notificationManager = NotificationManager()
+        self.notificationSettingsStore = UserDefaultsNotificationSettingsStore()
     }
 }

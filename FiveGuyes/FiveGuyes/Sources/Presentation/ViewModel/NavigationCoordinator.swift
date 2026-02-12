@@ -23,35 +23,78 @@ enum Screens: Hashable {
 }
 
 @Observable
+@MainActor
 final class NavigationCoordinator {
+    private let appDependencies: AppDependencies
     var paths = NavigationPath()
     private(set) var viewReloadTrigger = UUID()
+
+    init(appDependencies: AppDependencies) {
+        self.appDependencies = appDependencies
+    }
     
     @ViewBuilder
      func navigate(to screen: Screens) -> some View {
          // TODO: 추가되는 뷰 추가하기
         switch screen {
         case .empty: EmptyView()
-        case .mainHome: 
-            MainHomeView()
+        case .mainHome:
+            MainHomeView(
+                viewModel: MainHomeViewModel(
+                    bookManagementService: appDependencies.bookManagementService,
+                    notificationManager: appDependencies.notificationManager
+                )
+            )
         case .notiSetting(book: let book):
-            NotiSettingView(userBook: book)
+            NotiSettingView(
+                userBook: book,
+                viewModel: NotiSettingViewModel(
+                    notificationManager: appDependencies.notificationManager,
+                    settingsStore: appDependencies.notificationSettingsStore
+                )
+            )
         case .bookSettingsManager:
             BookSettingsManagerView()
         case .totalCalendar(books: let books):
             MultiBookProgressView(currentReadingBooks: books)
         case .dailyProgress(book: let book):
-            DailyProgressView(userBook: book)
+            DailyProgressView(
+                userBook: book,
+                viewModel: DailyProgressViewModel(
+                    bookManagementService: appDependencies.bookManagementService
+                )
+            )
         case .completionCelebration(book: let book):
             CompletionCelebrationView(userBook: book)
         case .completionReview(book: let book):
-            CompletionReviewView(userBook: book)
+            CompletionReviewView(
+                userBook: book,
+                viewModel: CompletionReviewViewModel(
+                    bookManagementService: appDependencies.bookManagementService
+                )
+            )
         case .completionReviewUpdate(book: let book):
-            CompletionReviewView(isUpdateMode: true, userBook: book)
+            CompletionReviewView(
+                isUpdateMode: true,
+                userBook: book,
+                viewModel: CompletionReviewViewModel(
+                    bookManagementService: appDependencies.bookManagementService
+                )
+            )
         case .readingDateEdit(book: let book):
-            ReadingDateEditView(userBook: book)
+            ReadingDateEditView(
+                userBook: book,
+                viewModel: ReadingDateEditViewModel(
+                    bookManagementService: appDependencies.bookManagementService
+                )
+            )
         case .unfinishReading(book: let book):
-            UnfinishReadingView(userBook: book)
+            UnfinishReadingView(
+                userBook: book,
+                viewModel: UnfinishReadingViewModel(
+                    bookManagementService: appDependencies.bookManagementService
+                )
+            )
         }
     }
 

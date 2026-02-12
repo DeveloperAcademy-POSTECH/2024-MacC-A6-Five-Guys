@@ -21,10 +21,9 @@ final class DailyProgressViewModel {
     var showTargetExceededAlert = false
     private(set) var isSubmitting = false
 
-    private var bookManagementService: (any BookManagementService)?
+    private let bookManagementService: any BookManagementService
 
-    func configure(bookManagementService: any BookManagementService) {
-        guard self.bookManagementService == nil else { return }
+    init(bookManagementService: any BookManagementService) {
         self.bookManagementService = bookManagementService
     }
 
@@ -47,7 +46,6 @@ final class DailyProgressViewModel {
 
     func submit(bookId: UUID, readDate: Date) async -> SubmitOutcome {
         guard !isSubmitting else { return .none }
-        guard let bookManagementService else { return .none }
 
         isSubmitting = true
         let pagesRead = pagesToReadToday

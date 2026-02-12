@@ -14,7 +14,8 @@ import Testing
 struct PresentationViewModelTests {
     @Test("DailyProgressViewModel: 목표 초과 입력 시 제출 차단")
     func dailyProgress_overTarget_preventsSubmit() {
-        let viewModel = DailyProgressViewModel()
+        let service = BookManagementServiceStub()
+        let viewModel = DailyProgressViewModel(bookManagementService: service)
         viewModel.pagesToReadToday = 101
 
         let canSubmit = viewModel.requestSubmit(targetEndPage: 100)
@@ -29,8 +30,7 @@ struct PresentationViewModelTests {
         let service = BookManagementServiceStub(book: book)
         service.recordReadingResult = .completed(updatedBook: book)
 
-        let viewModel = DailyProgressViewModel()
-        viewModel.configure(bookManagementService: service)
+        let viewModel = DailyProgressViewModel(bookManagementService: service)
         viewModel.pagesToReadToday = 300
 
         let outcome = await viewModel.submit(bookId: book.id, readDate: makeDate("2025-01-03"))
@@ -51,8 +51,7 @@ struct PresentationViewModelTests {
         let service = BookManagementServiceStub(book: book)
         service.recordReadingError = TestError.forced
 
-        let viewModel = DailyProgressViewModel()
-        viewModel.configure(bookManagementService: service)
+        let viewModel = DailyProgressViewModel(bookManagementService: service)
         viewModel.pagesToReadToday = 120
 
         let outcome = await viewModel.submit(bookId: book.id, readDate: makeDate("2025-01-03"))
@@ -72,8 +71,7 @@ struct PresentationViewModelTests {
         service.recordReadingDelayNanoseconds = 80_000_000
         service.recordReadingResult = .recorded(updatedBook: book)
 
-        let viewModel = DailyProgressViewModel()
-        viewModel.configure(bookManagementService: service)
+        let viewModel = DailyProgressViewModel(bookManagementService: service)
         viewModel.pagesToReadToday = 10
 
         async let first = viewModel.submit(bookId: book.id, readDate: makeDate("2025-01-03"))
@@ -91,8 +89,7 @@ struct PresentationViewModelTests {
     @Test("CompletionReviewViewModel: 빈 입력이면 경고 표시")
     func completionReview_emptyReview_showsAlert() async {
         let service = BookManagementServiceStub()
-        let viewModel = CompletionReviewViewModel()
-        viewModel.configure(bookManagementService: service)
+        let viewModel = CompletionReviewViewModel(bookManagementService: service)
         viewModel.preloadReview("   ")
 
         let outcome = await viewModel.submit(
@@ -113,8 +110,7 @@ struct PresentationViewModelTests {
     func completionReview_updateMode_callsUpdateCommand() async {
         let book = makeBook(isCompleted: true)
         let service = BookManagementServiceStub(book: book)
-        let viewModel = CompletionReviewViewModel()
-        viewModel.configure(bookManagementService: service)
+        let viewModel = CompletionReviewViewModel(bookManagementService: service)
         viewModel.preloadReview("수정된 소감")
 
         let outcome = await viewModel.submit(
@@ -137,8 +133,7 @@ struct PresentationViewModelTests {
         let service = BookManagementServiceStub(book: book)
         service.completeBookError = TestError.forced
 
-        let viewModel = CompletionReviewViewModel()
-        viewModel.configure(bookManagementService: service)
+        let viewModel = CompletionReviewViewModel(bookManagementService: service)
         viewModel.preloadReview("완독 소감")
 
         let outcome = await viewModel.submit(
@@ -161,8 +156,7 @@ struct PresentationViewModelTests {
         let service = BookManagementServiceStub(book: book)
         service.completeBookDelayNanoseconds = 80_000_000
 
-        let viewModel = CompletionReviewViewModel()
-        viewModel.configure(bookManagementService: service)
+        let viewModel = CompletionReviewViewModel(bookManagementService: service)
         viewModel.preloadReview("완독 소감")
 
         async let first = viewModel.submit(
@@ -189,8 +183,7 @@ struct PresentationViewModelTests {
     func readingDateEdit_success() async {
         let book = makeBook()
         let service = BookManagementServiceStub(book: book)
-        let viewModel = ReadingDateEditViewModel()
-        viewModel.configure(bookManagementService: service)
+        let viewModel = ReadingDateEditViewModel(bookManagementService: service)
 
         let isUpdated = await viewModel.submitReadingPlanUpdate(
             bookId: book.id,
@@ -209,8 +202,7 @@ struct PresentationViewModelTests {
         let book = makeBook()
         let service = BookManagementServiceStub(book: book)
         service.updateReadingPlanError = TestError.forced
-        let viewModel = ReadingDateEditViewModel()
-        viewModel.configure(bookManagementService: service)
+        let viewModel = ReadingDateEditViewModel(bookManagementService: service)
 
         let isUpdated = await viewModel.submitReadingPlanUpdate(
             bookId: book.id,
@@ -230,8 +222,7 @@ struct PresentationViewModelTests {
         let service = BookManagementServiceStub(book: book)
         service.updateReadingPlanDelayNanoseconds = 200_000_000
 
-        let viewModel = ReadingDateEditViewModel()
-        viewModel.configure(bookManagementService: service)
+        let viewModel = ReadingDateEditViewModel(bookManagementService: service)
 
         let firstTask = Task {
             await viewModel.submitReadingPlanUpdate(
@@ -262,8 +253,7 @@ struct PresentationViewModelTests {
     func finishGoal_registerBook_success() async {
         let book = makeBook()
         let service = BookManagementServiceStub(book: book)
-        let viewModel = FinishGoalViewModel()
-        viewModel.configure(bookManagementService: service)
+        let viewModel = FinishGoalViewModel(bookManagementService: service)
 
         let apiBook = Book(
             title: "테스트 도서",
@@ -292,8 +282,7 @@ struct PresentationViewModelTests {
         let book = makeBook()
         let service = BookManagementServiceStub(book: book)
         service.registerBookError = TestError.forced
-        let viewModel = FinishGoalViewModel()
-        viewModel.configure(bookManagementService: service)
+        let viewModel = FinishGoalViewModel(bookManagementService: service)
 
         let apiBook = Book(
             title: "테스트 도서",
@@ -322,8 +311,7 @@ struct PresentationViewModelTests {
         let book = makeBook()
         let service = BookManagementServiceStub(book: book)
         service.registerBookDelayNanoseconds = 200_000_000
-        let viewModel = FinishGoalViewModel()
-        viewModel.configure(bookManagementService: service)
+        let viewModel = FinishGoalViewModel(bookManagementService: service)
 
         let apiBook = Book(
             title: "테스트 도서",
@@ -365,8 +353,7 @@ struct PresentationViewModelTests {
     func unfinishReading_completeBook_success() async {
         let book = makeBook()
         let service = BookManagementServiceStub(book: book)
-        let viewModel = UnfinishReadingViewModel()
-        viewModel.configure(bookManagementService: service)
+        let viewModel = UnfinishReadingViewModel(bookManagementService: service)
 
         let completed = await viewModel.completeBook(book)
 
@@ -379,8 +366,7 @@ struct PresentationViewModelTests {
         let book = makeBook()
         let service = BookManagementServiceStub(book: book)
         service.completeBookError = TestError.forced
-        let viewModel = UnfinishReadingViewModel()
-        viewModel.configure(bookManagementService: service)
+        let viewModel = UnfinishReadingViewModel(bookManagementService: service)
 
         let completed = await viewModel.completeBook(book)
 
@@ -393,8 +379,7 @@ struct PresentationViewModelTests {
         let book = makeBook()
         let service = BookManagementServiceStub(book: book)
         service.completeBookDelayNanoseconds = 80_000_000
-        let viewModel = UnfinishReadingViewModel()
-        viewModel.configure(bookManagementService: service)
+        let viewModel = UnfinishReadingViewModel(bookManagementService: service)
 
         async let first = viewModel.completeBook(book)
         await Task.yield()
@@ -403,6 +388,64 @@ struct PresentationViewModelTests {
 
         #expect(!second)
         #expect(service.completeBookCallCount == 1)
+    }
+
+    @Test("MainHomeViewModel: 현재 읽는 책 기준으로 알림 재설정")
+    func mainHome_setupNotificationsForCurrentBook() async {
+        let firstBook = makeBook()
+        let secondBook = makeBook()
+        let service = BookManagementServiceStub(book: firstBook)
+        service.fetchReadingBooksResult = [firstBook, secondBook]
+        service.fetchCompletedBooksResult = []
+        let notificationManager = NotificationManagerStub()
+        let viewModel = MainHomeViewModel(
+            bookManagementService: service,
+            notificationManager: notificationManager
+        )
+
+        await viewModel.loadBooks()
+        await viewModel.setupNotificationsForCurrentBook()
+
+        #expect(notificationManager.setupAllNotificationsCallCount == 1)
+        #expect(notificationManager.setupAllNotificationsBookIDs == [firstBook.id])
+    }
+
+    @Test("MainHomeViewModel: 읽는 책이 없으면 알림 재설정 생략")
+    func mainHome_setupNotificationsWithoutReadingBook() async {
+        let service = BookManagementServiceStub()
+        service.fetchReadingBooksResult = []
+        service.fetchCompletedBooksResult = []
+        let notificationManager = NotificationManagerStub()
+        let viewModel = MainHomeViewModel(
+            bookManagementService: service,
+            notificationManager: notificationManager
+        )
+
+        await viewModel.loadBooks()
+        await viewModel.setupNotificationsForCurrentBook()
+
+        #expect(notificationManager.setupAllNotificationsCallCount == 0)
+    }
+
+    @Test("MainHomeViewModel: 목표일 초과 책을 재스케줄 결과로 반환")
+    func mainHome_reschedule_returnsOverdueBooks() async {
+        let overdueBook = makeBook()
+        let service = BookManagementServiceStub(book: overdueBook)
+        service.fetchReadingBooksResult = [overdueBook]
+        service.fetchCompletedBooksResult = []
+        service.rescheduleOnAppOpenError = ScheduleCalculationError.targetDatePassed
+        let notificationManager = NotificationManagerStub()
+        let viewModel = MainHomeViewModel(
+            bookManagementService: service,
+            notificationManager: notificationManager
+        )
+
+        await viewModel.loadBooks()
+        let overdueBooks = await viewModel.rescheduleOnAppOpen(today: makeDate("2025-01-15"))
+
+        #expect(overdueBooks.count == 1)
+        #expect(overdueBooks.first?.id == overdueBook.id)
+        #expect(service.rescheduleOnAppOpenCallCount == 1)
     }
 
     @Test("NotiSettingViewModel: 저장된 설정 로드")
@@ -683,6 +726,7 @@ private final class NotificationManagerStub: NotificationManaging {
     var requestAuthorizationCallCount = 0
     var clearRequestsCallCount = 0
     var setupAllNotificationsCallCount = 0
+    var setupAllNotificationsBookIDs: [UUID] = []
     var updateNotificationCallCount = 0
     var updateNotificationDelayNanoseconds: UInt64 = 0
     var ignoreCancelledCalls = false
@@ -698,6 +742,7 @@ private final class NotificationManagerStub: NotificationManaging {
 
     func setupAllNotifications(_ readingBook: FGUserBook) async {
         setupAllNotificationsCallCount += 1
+        setupAllNotificationsBookIDs.append(readingBook.id)
     }
 
     func updateNotification(notificationType: NotificationType) async {

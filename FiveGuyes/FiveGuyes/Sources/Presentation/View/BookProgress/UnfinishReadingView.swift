@@ -9,15 +9,15 @@ import SwiftUI
 
 struct UnfinishReadingView: View {
     @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
-    @Environment(AppDependencies.self) private var appDependencies
 
-    @State private var viewModel = UnfinishReadingViewModel()
+    @State private var viewModel: UnfinishReadingViewModel
     private let userBook: FGUserBook
     
     // MARK: - init
     
-    init(userBook: FGUserBook) {
+    init(userBook: FGUserBook, viewModel: UnfinishReadingViewModel) {
         self.userBook = userBook
+        _viewModel = State(initialValue: viewModel)
     }
     
     var body: some View {
@@ -57,9 +57,6 @@ struct UnfinishReadingView: View {
         .disableNavigationGesture()
         .customNavigationBackButton {
             markBookAsCompletedInBackground()
-        }
-        .onAppear {
-            viewModel.configure(bookManagementService: appDependencies.bookManagementService)
         }
     }
     
@@ -163,5 +160,10 @@ struct UnfinishReadingView: View {
 }
 
 #Preview {
-    UnfinishReadingView(userBook: .dummy)
+    UnfinishReadingView(
+        userBook: .dummy,
+        viewModel: UnfinishReadingViewModel(
+            bookManagementService: DefaultBookManagementService(repository: MockBookRepository())
+        )
+    )
 }

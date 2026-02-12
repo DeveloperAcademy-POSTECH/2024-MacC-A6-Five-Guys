@@ -58,8 +58,8 @@ final class NotiSettingViewModel {
     private let nowProvider: () -> Date
 
     init(
-        notificationManager: any NotificationManaging = NotificationManager(),
-        settingsStore: any NotificationSettingsStoring = UserDefaultsNotificationSettingsStore(),
+        notificationManager: any NotificationManaging,
+        settingsStore: any NotificationSettingsStoring,
         nowProvider: @escaping () -> Date = Date.init
     ) {
         self.notificationManager = notificationManager

@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 enum BookSettingsPage: Int {
     case bookSearch = 1
@@ -17,6 +18,7 @@ enum BookSettingsPage: Int {
 
 struct BookSettingsManagerView: View {
     @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
+    @Environment(AppDependencies.self) private var appDependencies
     
     @State private var bookSettingInputModel = BookSettingInputModel()
     @State private var pageModel = BookSettingPageModel()
@@ -99,7 +101,11 @@ struct BookSettingsManagerView: View {
         case .bookPageSetting:
             BookPageSettingView()
         case .bookSettingDone:
-            FinishGoalView()
+            FinishGoalView(
+                viewModel: FinishGoalViewModel(
+                    bookManagementService: appDependencies.bookManagementService
+                )
+            )
         default:
             EmptyView()
         }
@@ -107,6 +113,9 @@ struct BookSettingsManagerView: View {
 }
 
 #Preview {
+    let container = try! ModelContainer(for: UserBookSchemaV2.UserBookV2.self)
+    let dependencies = AppDependencies(modelContainer: container)
     BookSettingsManagerView()
-        .environment(NavigationCoordinator())
+        .environment(NavigationCoordinator(appDependencies: dependencies))
+        .environment(dependencies)
 }

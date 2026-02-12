@@ -35,7 +35,7 @@ struct FiveGuyesApp: App {
     
     var body: some Scene {
         WindowGroup {
-            NavigationRootView()
+            NavigationRootView(appDependencies: dependencies)
                 .environment(dependencies)
                 .modelContainer(container)
         }
