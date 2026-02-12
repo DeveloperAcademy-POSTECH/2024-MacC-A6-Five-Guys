@@ -12,6 +12,7 @@ import SwiftUI
 
 import FirebaseCore
 
+@MainActor
 @main
 struct FiveGuyesApp: App {
     typealias SDUserBook = UserBookSchemaV2.UserBookV2
@@ -20,10 +21,13 @@ struct FiveGuyesApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     
     var container: ModelContainer
+    @State private var dependencies: AppDependencies
     
     init() {
         do {
-            self.container = try ModelContainer(for: SDUserBook.self)
+            let modelContainer = try ModelContainer(for: SDUserBook.self)
+            self.container = modelContainer
+            _dependencies = State(initialValue: AppDependencies(modelContainer: modelContainer))
         } catch {
             fatalError("Failed to initialize model container.")
         }
@@ -32,6 +36,7 @@ struct FiveGuyesApp: App {
     var body: some Scene {
         WindowGroup {
             NavigationRootView()
+                .environment(dependencies)
                 .modelContainer(container)
         }
     }

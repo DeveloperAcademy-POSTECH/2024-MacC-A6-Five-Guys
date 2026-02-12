@@ -5,39 +5,35 @@
 //  Created by 신혜연 on 11/5/24.
 //
 
-import SwiftData
 import SwiftUI
 
 struct DailyProgressView: View {
-    typealias UserBook = UserBookSchemaV2.UserBookV2
-    
     @State private var pagesToReadToday: Int = 0
     @State private var showAlert = false
+    @State private var isSubmitting = false
     
     @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
+    @Environment(AppDependencies.self) private var appDependencies
     
     private let alertText = "전체쪽수를 초과해서 작성했어요!"
     private let alertMessage = "끝까지 읽은 게 맞나요?"
-    
-    private let notificationManager = NotificationManager()
-    private let readingScheduleCalculator = ReadingScheduleCalculator()
     
     private let adjustedToday = Date().adjustedDate()
     
     @FocusState private var isTextTextFieldFocused: Bool
     
-    let userBook: UserBook
+    let userBook: FGUserBook
     
     var body: some View {
-        let bookMetadata: BookMetaDataProtocol = userBook.bookMetaData
-        let userSettings: UserSettingsProtocol = userBook.userSettings
-        let readingProgress: any ReadingProgressProtocol = userBook.readingProgress
+        let title = userBook.bookMetaData.title
+        let targetEndPage = userBook.userSettings.targetEndPage
+        let targetEndDate = userBook.userSettings.targetEndDate
         
-        let isTodayCompletionDate = Calendar.app.isDate(adjustedToday, inSameDayAs: userSettings.targetEndDate)
+        let isTodayCompletionDate = Calendar.app.isDate(adjustedToday, inSameDayAs: targetEndDate)
         
         VStack(spacing: 0) {
             HStack {
-                Text(isTodayCompletionDate ? "오늘은 <\(bookMetadata.title)>\(bookMetadata.title.postPositionParticle()) 완독하는\n마지막 날이에요"
+                Text(isTodayCompletionDate ? "오늘은 <\(title)>\(title.postPositionParticle()) 완독하는\n마지막 날이에요"
                      : "지금까지 읽은 쪽수를\n알려주세요")
                 .fontStyle(.title2, weight: .semibold)
                 Spacer()
@@ -70,53 +66,13 @@ struct DailyProgressView: View {
             
             if isTextTextFieldFocused {
                 Button {
-                    if pagesToReadToday > userSettings.targetEndPage {
+                    if pagesToReadToday > targetEndPage {
                         // 최종 목표보다 더 큰 페이지를 입력하면
                         showAlert = true
                         return
-                    } else if isTodayCompletionDate && pagesToReadToday < userSettings.targetEndPage {
-                        // 오늘이 마지막 날인데, 최종 목표를 다 읽지 못하면
-                        
-                        // 목표 날짜를 하루 연장 (자동 연장)
-                        userSettings.targetEndDate = userSettings.targetEndDate.addDays(1)
-                        
-                        readingScheduleCalculator.updateReadingProgress(
-                            for: userSettings,
-                            progress: readingProgress,
-                            pagesRead: pagesToReadToday,
-                            from: adjustedToday
-                        )
-                        
-                        // 노티 세팅하기
-                        Task {
-                            await notificationManager.setupAllNotifications(userBook)
-                        }
-                        
-                        navigationCoordinator.popToRoot()
-                    } else {
-                        // 오늘 할당량 기록
-                        readingScheduleCalculator.updateReadingProgress(
-                            for: userSettings,
-                            progress: readingProgress,
-                            pagesRead: pagesToReadToday,
-                            from: adjustedToday
-                        )
-                        
-                        // 노티 세팅하기
-                        Task {
-                            await notificationManager.setupAllNotifications(userBook)
-                        }
-                        
-                        if pagesToReadToday != userSettings.targetEndPage {
-                            navigationCoordinator.popToRoot()
-                        } else {
-                            // 완독한 경우
-                            // TODO: 🐯선택된 책 넣어주기
-                            // TODO:  완독 날짜 변경은 최종 저장할 때 수정하기
-                            navigationCoordinator.push(.completionCelebration(book: userBook))
-                        }
                     }
-                    
+
+                    submitReading()
                 } label: {
                     Text("완료")
                         .frame(maxWidth: .infinity)
@@ -126,6 +82,7 @@ struct DailyProgressView: View {
                     
                 }
                 .ignoresSafeArea(.keyboard, edges: .bottom)
+                .disabled(isSubmitting)
             }
             
         }
@@ -143,11 +100,8 @@ struct DailyProgressView: View {
                 },
                 secondaryButton: .default(Text("확인")) {
                     // "확인" 버튼 로직 (최종 타켓 페이지로 수정 및 완독 기록)
-                    pagesToReadToday = userSettings.targetEndPage
-                    
-                    readingScheduleCalculator.updateReadingProgress(for: userSettings, progress: readingProgress, pagesRead: pagesToReadToday, from: adjustedToday)
-                    // TODO: 🐯선택된 책 넣어주기
-                    navigationCoordinator.push(.completionCelebration(book: userBook))
+                    pagesToReadToday = targetEndPage
+                    submitReading()
                 }
             )
         }
@@ -155,7 +109,7 @@ struct DailyProgressView: View {
         .customNavigationBackButton()
         .onAppear {
             // ⏰
-            if let readingRecord = readingProgress.getAdjustedReadingRecord(for: adjustedToday) {
+            if let readingRecord = userBook.readingProgress.getDailyReadingRecord(for: adjustedToday) {
                 pagesToReadToday = readingRecord.targetPages
             }
             
@@ -164,6 +118,47 @@ struct DailyProgressView: View {
         .onAppear {
             // GA4 Tracking
             Tracking.Screen.dailyProgress.setTracking()
+        }
+    }
+
+    @MainActor
+    private func submitReading() {
+        guard !isSubmitting else { return }
+        isSubmitting = true
+
+        let pagesRead = pagesToReadToday
+        Task {
+            do {
+                let result = try await appDependencies.bookManagementService.recordReading(
+                    bookId: userBook.id,
+                    pagesRead: pagesRead,
+                    readDate: adjustedToday
+                )
+
+                await MainActor.run {
+                    isSubmitting = false
+                    handleRecordResult(result)
+                }
+            } catch {
+                await MainActor.run {
+                    isSubmitting = false
+                }
+                print("독서 기록 저장 중 오류 발생: \(error.localizedDescription)")
+            }
+        }
+    }
+
+    @MainActor
+    private func handleRecordResult(_ result: RecordReadingResult) {
+        switch result {
+        case .recorded:
+            navigationCoordinator.popToRoot()
+        case .dateExtended:
+            navigationCoordinator.popToRoot()
+        case .completed(let updatedBook):
+            navigationCoordinator.push(.completionCelebration(book: updatedBook))
+        case .exceedsTarget:
+            showAlert = true
         }
     }
 }

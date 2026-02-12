@@ -5,19 +5,16 @@
 //  Created by zaehorang on 11/5/24.
 //
 
-import SwiftData
 import SwiftUI
 
 struct CompletedBooksView: View {
-    typealias UserBook = UserBookSchemaV2.UserBookV2
-    
     @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
-    @Environment(\.modelContext) private var modelContext
     
     @State private var selectedBookIndex: Int = 0
     @State var showCompletionAlert: Bool = false
     
-    var completedBooks: [UserBook]
+    var completedBooks: [FGUserBook]
+    let onDeleteBook: @MainActor (UUID) async -> Bool
     
     let completionAlertMessage = "정말로 내용을 삭제할까요?"
     let completionAlertText = "삭제 후에는 복원할 수 없어요"
@@ -36,6 +33,8 @@ struct CompletedBooksView: View {
             .padding(.horizontal, 20)
             
             if !completedBooks.isEmpty {
+                let safeSelectedIndex = min(selectedBookIndex, completedBooks.count - 1)
+
                 VStack(alignment: .leading, spacing: 16) {
                     // 가로 스크롤로 completedBooks 보여주기
                     ScrollView(.horizontal, showsIndicators: false) {
@@ -44,7 +43,7 @@ struct CompletedBooksView: View {
                                 let book = completedBooks[index]
                                 
                                 VStack(alignment: .leading, spacing: 6) {
-                                    if let coverURL = book.bookMetaData.coverURL, let url = URL(string: coverURL) {
+                                    if let coverURL = book.bookMetaData.coverImageURL, let url = URL(string: coverURL) {
                                         AsyncImage(url: url) { image in
                                             image
                                                 .resizable()
@@ -83,10 +82,10 @@ struct CompletedBooksView: View {
                     }
                     
                     // 선택된 책의 소감문 및 기타 정보 표시
-                    let selectedBook = completedBooks[selectedBookIndex] 
+                    let selectedBook = completedBooks[safeSelectedIndex]
                     
                     VStack(alignment: .leading, spacing: 10) {
-                        Text(selectedBook.completionStatus.completionReview)
+                        Text(selectedBook.completionStatus.reviewAfterCompletion)
                             .fontStyle(.body)
                             .foregroundStyle(Color.Labels.primaryBlack1)
                             .padding(.bottom, 10)
@@ -97,7 +96,7 @@ struct CompletedBooksView: View {
                             
                             Menu {
                                 Button {
-                                    navigationCoordinator.push(.completionReviewUpdate(book: completedBooks[selectedBookIndex]))
+                                    navigationCoordinator.push(.completionReviewUpdate(book: completedBooks[safeSelectedIndex]))
                                 } label: {
                                     Label("내용 수정하기", systemImage: "pencil")
                                 }
@@ -145,21 +144,26 @@ struct CompletedBooksView: View {
                     .alertFontStyle(.caption1),
                 primaryButton: .cancel(Text("취소하기")),
                 secondaryButton: .destructive(Text("삭제")) {
-                    let book = completedBooks[selectedBookIndex]
-                    
-                    modelContext.delete(book)
-                    
-                    // 처음 셀로 선택하기
-                    selectedBookIndex = 0
-                    
-                    // 데이저 저장이 느려서 직접 저장해주기
-                    do {
-                        try modelContext.save()
-                    } catch {
-                        print(error.localizedDescription)
+                    let safeSelectedIndex = min(selectedBookIndex, completedBooks.count - 1)
+                    let book = completedBooks[safeSelectedIndex]
+
+                    Task {
+                        await deleteCompletedBook(id: book.id, currentCount: completedBooks.count)
                     }
                 }
             )
+        }
+    }
+
+    @MainActor
+    private func deleteCompletedBook(id: UUID, currentCount: Int) async {
+        let deleted = await onDeleteBook(id)
+        guard deleted else { return }
+
+        if currentCount <= 1 {
+            selectedBookIndex = 0
+        } else if selectedBookIndex >= currentCount - 1 {
+            selectedBookIndex = currentCount - 2
         }
     }
 }

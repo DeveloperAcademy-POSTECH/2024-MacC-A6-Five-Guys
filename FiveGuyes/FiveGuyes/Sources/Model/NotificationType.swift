@@ -8,10 +8,8 @@
 import Foundation
 
 enum NotificationType {
-    typealias UserBook = UserBookSchemaV2.UserBookV2
-    
-    case morning(readingBook: UserBook)
-    case night(readingBook: UserBook)
+    case morning(readingBook: FGUserBook)
+    case night(readingBook: FGUserBook)
     
     func descriptionContent() -> (title: String, body: String) {
         switch self {

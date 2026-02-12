@@ -5,33 +5,28 @@
 //  Created by zaehorang on 11/4/24.
 //
 
-import SwiftData
 import SwiftUI
 
 struct CompletionReviewView: View {
-    typealias UserBook = UserBookSchemaV2.UserBookV2
-    
     private let placeholder: String = "책 속 한 줄이 남긴 여운은 무엇인가요?"
     
     @State private var reflectionText: String = ""
     @State private var showAlert = false
+    @State private var isSubmitting = false
     @FocusState private var isFocusedTextEditor: Bool
     @ObservedObject private var keyboardObserver = KeyboardObserver()
     
     @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
+    @Environment(AppDependencies.self) private var appDependencies
     
     // 업데이트 상황을 나타내는 불 변수
     var isUpdateMode: Bool = false
         
     // 외부에서 주입받을 수 있는 책 변수
-    var userBook: UserBook
+    let userBook: FGUserBook
     
     var body: some View {
-        let bookMetadata: BookMetaDataProtocol = userBook.bookMetaData
-        var completionStatus: CompletionStatusProtocol = userBook.completionStatus
-        let userSettings = userBook.userSettings
-        
-        let title = bookMetadata.title
+        let title = userBook.bookMetaData.title
         
         ZStack {
             Color.Fills.white.ignoresSafeArea()
@@ -57,25 +52,7 @@ struct CompletionReviewView: View {
                 
                 if keyboardObserver.keyboardIsVisible {
                     Button {
-                        if reflectionText.isEmpty {
-                            showAlert = true
-                        } else {
-                            
-                            if !isUpdateMode {
-                                completionStatus.markAsCompleted(review: reflectionText)
-                                
-                                // TODO: 해당 로직 모델로 옮기기 🐯
-                                userSettings.targetEndDate = Date()
-                                if userSettings.startDate > userSettings.targetEndDate {
-                                    userSettings.startDate = userSettings.targetEndDate
-                                }
-                            } else {
-                                // 업데이트 모드인 경우
-                                completionStatus.completionReview = reflectionText
-                            }
-                            
-                            navigationCoordinator.popToRoot()
-                        }
+                        submitReview()
                     } label: {
                         Text("저장")
                             .frame(maxWidth: .infinity)
@@ -84,6 +61,7 @@ struct CompletionReviewView: View {
                             .foregroundStyle(Color.Fills.white)
                     }
                     .ignoresSafeArea(.keyboard, edges: .bottom)
+                    .disabled(isSubmitting)
                 }
             }
         }
@@ -94,8 +72,48 @@ struct CompletionReviewView: View {
         }
         .customNavigationBackButton()
         .onAppear {
-            reflectionText = completionStatus.completionReview
+            reflectionText = userBook.completionStatus.reviewAfterCompletion
             isFocusedTextEditor = true
+        }
+    }
+
+    @MainActor
+    private func submitReview() {
+        guard !isSubmitting else { return }
+
+        if reflectionText.isEmpty {
+            showAlert = true
+            return
+        }
+
+        isSubmitting = true
+        let review = reflectionText
+
+        Task {
+            do {
+                if isUpdateMode {
+                    try await appDependencies.bookManagementService.updateCompletionReview(
+                        id: userBook.id,
+                        review: review
+                    )
+                } else {
+                    try await appDependencies.bookManagementService.completeBook(
+                        id: userBook.id,
+                        completionDate: Date().adjustedDate(),
+                        review: review
+                    )
+                }
+
+                await MainActor.run {
+                    isSubmitting = false
+                    navigationCoordinator.popToRoot()
+                }
+            } catch {
+                await MainActor.run {
+                    isSubmitting = false
+                }
+                print("완독 소감 저장 중 오류 발생: \(error.localizedDescription)")
+            }
         }
     }
 }

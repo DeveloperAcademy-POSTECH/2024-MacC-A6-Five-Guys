@@ -9,7 +9,6 @@ import SwiftUI
 
 struct NavigationRootView: View {
     @State private var coordinator = NavigationCoordinator()
-    @Environment(\.modelContext) private var modelContext
     
     var body: some View {
         NavigationStack(path: $coordinator.paths) {

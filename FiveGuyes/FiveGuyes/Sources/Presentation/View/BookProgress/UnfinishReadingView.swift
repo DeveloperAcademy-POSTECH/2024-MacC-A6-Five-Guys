@@ -8,17 +8,14 @@
 import SwiftUI
 
 struct UnfinishReadingView: View {
-    typealias UserBook = UserBookSchemaV2.UserBookV2
-    
     @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
-    
-    @Environment(\.modelContext) private var modelContext
-    
-    private var userBook: UserBook
+    @Environment(AppDependencies.self) private var appDependencies
+
+    private let userBook: FGUserBook
     
     // MARK: - init
     
-    init(userBook: UserBook) {
+    init(userBook: FGUserBook) {
         self.userBook = userBook
     }
     
@@ -29,7 +26,7 @@ struct UnfinishReadingView: View {
             unfinishTitle("목표 기간 종료!")
                 .padding(.bottom, 16)
             
-            unFinishDescription("총 \(userBook.readingProgress.lastPagesRead) 쪽까지 읽었어요!\n지속적인 노력이 중요하죠")
+            unFinishDescription("총 \(userBook.readingProgress.lastReadPage) 쪽까지 읽었어요!\n지속적인 노력이 중요하죠")
                 .padding(.bottom, 90)
                 
             userBookImage(book: userBook)
@@ -41,8 +38,9 @@ struct UnfinishReadingView: View {
             
             HStack(spacing: 16) {
                 cancelButton {
-                    markBookAsCompleted()
-                    navigationCoordinator.popToRoot()
+                    Task {
+                        await completeAndPopToRoot()
+                    }
                 }
                 
                 readingDateEtidButton {
@@ -57,7 +55,7 @@ struct UnfinishReadingView: View {
         .background(Color.Fills.lightGreen.ignoresSafeArea())
         .disableNavigationGesture()
         .customNavigationBackButton {
-            markBookAsCompleted()
+            markBookAsCompletedInBackground()
         }
     }
     
@@ -80,9 +78,9 @@ struct UnfinishReadingView: View {
             .multilineTextAlignment(.center)
     }
     
-    private func userBookImage(book: UserBook) -> some View {
+    private func userBookImage(book: FGUserBook) -> some View {
         Group {
-            if let urlString = book.bookMetaData.coverURL {
+            if let urlString = book.bookMetaData.coverImageURL {
                 AsyncImage(url: URL(string: urlString)) { image in
                     image
                         .resizable()
@@ -142,16 +140,35 @@ struct UnfinishReadingView: View {
     
     // MARK: - Helper Methods
     
-    private func markBookAsCompleted() {
-        userBook.completionStatus.markAsCompleted(review: "")
+    @MainActor
+    private func completeAndPopToRoot() async {
         do {
-            try modelContext.save()
+            try await appDependencies.bookManagementService.completeBook(
+                id: userBook.id,
+                completionDate: userBook.userSettings.targetEndDate,
+                review: ""
+            )
         } catch {
-            print("Error saving context: \(error)")
+            print("미완독 종료 처리 중 오류 발생: \(error.localizedDescription)")
+        }
+        navigationCoordinator.popToRoot()
+    }
+
+    private func markBookAsCompletedInBackground() {
+        Task {
+            do {
+                try await appDependencies.bookManagementService.completeBook(
+                    id: userBook.id,
+                    completionDate: userBook.userSettings.targetEndDate,
+                    review: ""
+                )
+            } catch {
+                print("미완독 종료 처리 중 오류 발생: \(error.localizedDescription)")
+            }
         }
     }
 }
 
 #Preview {
-    UnfinishReadingView(userBook: UserBookSchemaV2.UserBookV2.dummyUserBookV2)
+    UnfinishReadingView(userBook: .dummy)
 }

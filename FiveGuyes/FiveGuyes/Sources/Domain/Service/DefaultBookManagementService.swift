@@ -44,6 +44,30 @@ final class DefaultBookManagementService: BookManagementService {
         return try await repository.fetchBook(by: id)
     }
 
+    func rescheduleOnAppOpen(bookId: UUID, today: Date) async throws {
+        let currentBook = try await repository.fetchBook(by: bookId)
+
+        let updatedProgress = try scheduleCalculator.rescheduleOnAppOpen(
+            settings: currentBook.userSettings,
+            progress: currentBook.readingProgress,
+            today: today
+        )
+
+        guard updatedProgress != currentBook.readingProgress else {
+            return
+        }
+
+        let updatedBook = FGUserBook(
+            id: currentBook.id,
+            bookMetaData: currentBook.bookMetaData,
+            userSettings: currentBook.userSettings,
+            readingProgress: updatedProgress,
+            completionStatus: currentBook.completionStatus
+        )
+
+        try await repository.updateBook(updatedBook)
+    }
+
     // MARK: - Command Operations (향후 구현 예정)
 
     func registerBook(_ input: RegisterBookInput) async throws -> FGUserBook {
@@ -62,9 +86,8 @@ final class DefaultBookManagementService: BookManagementService {
         // 3. Repository에 저장
         try await repository.addBook(bookWithSchedule)
 
-        // 4. 알림 설정 (NotificationManager는 SwiftData 모델 요구)
-        let sdUserBook = bookWithSchedule.toUserBookV2()
-        await notificationManager.setupAllNotifications(sdUserBook)
+        // 4. 알림 설정
+        await notificationManager.setupAllNotifications(bookWithSchedule)
 
         return bookWithSchedule
     }
@@ -119,8 +142,7 @@ final class DefaultBookManagementService: BookManagementService {
         try await repository.updateBook(updatedBook)
 
         // 7. 알림 재설정
-        let sdUserBook = updatedBook.toUserBookV2()
-        await notificationManager.setupAllNotifications(sdUserBook)
+        await notificationManager.setupAllNotifications(updatedBook)
 
         // 8. 완독 여부 확인
         if pagesRead >= currentBook.userSettings.targetEndPage {
@@ -134,8 +156,13 @@ final class DefaultBookManagementService: BookManagementService {
         // 1. Repository에서 삭제
         try await repository.deleteBook(by: id)
 
-        // 2. 알림 취소 (모든 알림을 제거)
-        await notificationManager.clearRequests()
+        // 2. 남은 읽는 책 기준으로 알림 상태를 재구성
+        let remainingReadingBooks = try await repository.getReadingBooks()
+        if let nextReadingBook = remainingReadingBooks.first {
+            await notificationManager.setupAllNotifications(nextReadingBook)
+        } else {
+            await notificationManager.clearRequests()
+        }
     }
 
     func completeBook(id: UUID, completionDate: Date, review: String) async throws {
@@ -179,6 +206,54 @@ final class DefaultBookManagementService: BookManagementService {
         await notificationManager.clearRequests()
     }
 
+    func updateCompletionReview(id: UUID, review: String) async throws {
+        let currentBook = try await repository.fetchBook(by: id)
+
+        let updatedStatus = FGCompletionStatus(
+            isCompleted: currentBook.completionStatus.isCompleted,
+            reviewAfterCompletion: review
+        )
+
+        try await repository.updateCompletionStatus(bookId: id, status: updatedStatus)
+    }
+
+    func updateReadingPlan(
+        bookId: UUID,
+        startDate: Date,
+        targetEndDate: Date,
+        excludedReadingDays: [Date],
+        today: Date
+    ) async throws {
+        let currentBook = try await repository.fetchBook(by: bookId)
+
+        let newSettings = FGUserSetting(
+            startPage: currentBook.userSettings.startPage,
+            targetEndPage: currentBook.userSettings.targetEndPage,
+            startDate: startDate,
+            targetEndDate: targetEndDate,
+            excludedReadingDays: excludedReadingDays
+        )
+
+        let updatedProgress = try scheduleCalculator.rescheduleForSettingsChange(
+            oldSettings: currentBook.userSettings,
+            newSettings: newSettings,
+            progress: currentBook.readingProgress,
+            today: today
+        )
+
+        let updatedBook = FGUserBook(
+            id: currentBook.id,
+            bookMetaData: currentBook.bookMetaData,
+            userSettings: newSettings,
+            readingProgress: updatedProgress,
+            completionStatus: currentBook.completionStatus
+        )
+
+        try await repository.updateBook(updatedBook)
+
+        await notificationManager.setupAllNotifications(updatedBook)
+    }
+
     // MARK: - Private Helper Methods
 
     /// 목표 날짜 자동 연장 처리
@@ -220,7 +295,6 @@ final class DefaultBookManagementService: BookManagementService {
         try await repository.updateBook(updatedBook)
 
         // 알림 재설정
-        let sdUserBook = updatedBook.toUserBookV2()
-        await notificationManager.setupAllNotifications(sdUserBook)
+        await notificationManager.setupAllNotifications(updatedBook)
     }
 }
