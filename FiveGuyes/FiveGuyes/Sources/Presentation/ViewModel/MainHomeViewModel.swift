@@ -25,9 +25,8 @@ final class MainHomeViewModel {
         guard let bookManagementService else { return }
 
         do {
-            async let readingResult = bookManagementService.fetchReadingBooks()
-            async let completedResult = bookManagementService.fetchCompletedBooks()
-            let (readingBooks, completedBooks) = try await (readingResult, completedResult)
+            let readingBooks = try await bookManagementService.fetchReadingBooks()
+            let completedBooks = try await bookManagementService.fetchCompletedBooks()
 
             self.readingBooks = readingBooks
             self.completedBooks = completedBooks
