@@ -87,6 +87,13 @@ Examples:
 - Do **not** leave only top-level PR comments for code findings.
 - Use one finding per comment with a priority tag: `[P0]`, `[P1]`, `[P2]`, `[P3]`.
 - If inline is impossible, leave a top-level comment and explicitly state why inline is not possible.
+- When leaving a top-level review comment (summary or fallback), start the first line with `[Agent Review]`.
+
+### Exception: Reviewing Your Own PR
+- GitHub does not allow `request-changes` on your own PR.
+- In this case, keep all findings as inline comments (same as normal review).
+- Use a top-level `--comment` review only as a summary; do not replace inline findings with top-level-only comments.
+- If you must use top-level comments for a finding, explicitly explain why inline was not possible.
 
 ### Required Inline Command (`gh`)
 ```bash
