@@ -1,0 +1,4 @@
+// Copy this file to Config.xcconfig and fill in local secrets.
+// This file is safe to commit because it contains placeholders only.
+
+API_KEY = YOUR_ALADIN_API_KEY
