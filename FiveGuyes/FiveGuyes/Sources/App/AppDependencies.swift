@@ -14,13 +14,22 @@ final class AppDependencies {
     let bookManagementService: any BookManagementService
     let notificationManager: any NotificationManaging
     let notificationSettingsStore: any NotificationSettingsStoring
-    let bookSearchStore: any BookSearching
+    private var cachedBookSearchStore: (any BookSearching)?
 
     init(modelContainer: ModelContainer) {
         let repository = SwiftDataBookRepository(modelContainer: modelContainer)
         self.bookManagementService = DefaultBookManagementService(repository: repository)
         self.notificationManager = NotificationManager()
         self.notificationSettingsStore = UserDefaultsNotificationSettingsStore()
-        self.bookSearchStore = APIStore()
+    }
+
+    func makeBookSearchStore() -> any BookSearching {
+        if let cachedBookSearchStore {
+            return cachedBookSearchStore
+        }
+
+        let store = APIStore()
+        self.cachedBookSearchStore = store
+        return store
     }
 }

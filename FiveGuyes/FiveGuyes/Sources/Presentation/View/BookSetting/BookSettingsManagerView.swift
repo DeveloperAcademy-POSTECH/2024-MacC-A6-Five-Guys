@@ -99,7 +99,7 @@ struct BookSettingsManagerView: View {
         case .bookSearch:
             BookSearchView(
                 viewModel: BookSearchViewModel(
-                    bookSearchStore: appDependencies.bookSearchStore
+                    bookSearchStore: appDependencies.makeBookSearchStore()
                 )
             )
         case .bookPageSetting:
