@@ -213,8 +213,22 @@ struct TextView: View {
     }
 }
 
-#Preview {
+#Preview("완독 목표 요약") {
     let inputModel = PreviewSupport.makeBookSettingInputModel()
+
+    return NavigationStack {
+        FinishGoalView(
+            viewModel: FinishGoalViewModel(
+                bookManagementService: PreviewBookManagementService()
+            )
+        )
+    }
+    .environment(PreviewSupport.makeCoordinator())
+    .environment(inputModel)
+}
+
+#Preview("입력 누락 상태") {
+    let inputModel = BookSettingInputModel()
 
     return NavigationStack {
         FinishGoalView(

@@ -67,16 +67,16 @@ struct BookListView: View {
     }
 }
 
-#Preview {
+#Preview("검색 결과 없음") {
     BookListView(
-        bookSearchViewModel: BookSearchViewModel(
-            bookSearchStore: BookSearchStorePreviewStub()
-        )
+        bookSearchViewModel: PreviewSupport.makeBookSearchViewModel(books: [])
     )
 }
 
-private struct BookSearchStorePreviewStub: BookSearching {
-    func fetchBooks(query: String) async throws -> [Book] { [] }
-
-    func fetchBookTotalPages(isbn: String) async throws -> Int { 0 }
+#Preview("검색 결과 있음") {
+    BookListView(
+        bookSearchViewModel: PreviewSupport.makeBookSearchViewModel(
+            books: PreviewSupport.sampleSearchBooks
+        )
+    )
 }

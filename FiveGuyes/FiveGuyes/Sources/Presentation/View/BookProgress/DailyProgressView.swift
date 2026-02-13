@@ -133,12 +133,31 @@ struct DailyProgressView: View {
     }
 }
 
-#Preview {
+#Preview("일반 진행 상태") {
     NavigationStack {
         DailyProgressView(
             userBook: PreviewSupport.sampleReadingBook,
             viewModel: DailyProgressViewModel(
                 bookManagementService: PreviewBookManagementService()
+            )
+        )
+    }
+    .environment(PreviewSupport.makeCoordinator())
+}
+
+#Preview("완독 마감일") {
+    let dueTodayBook = PreviewSupport.makeBook(
+        title: "오늘 완독 목표 도서",
+        isCompleted: false,
+        targetEndDateOffset: 0,
+        lastReadPage: 300
+    )
+
+    return NavigationStack {
+        DailyProgressView(
+            userBook: dueTodayBook,
+            viewModel: DailyProgressViewModel(
+                bookManagementService: PreviewBookManagementService(readingBooks: [dueTodayBook], completedBooks: [])
             )
         )
     }

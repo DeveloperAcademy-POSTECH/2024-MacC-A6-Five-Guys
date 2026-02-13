@@ -141,9 +141,22 @@ struct CompletionCelebrationView: View {
     }
 }
 
-#Preview {
+#Preview("기본 완독 축하") {
     NavigationStack {
         CompletionCelebrationView(userBook: PreviewSupport.sampleCompletedBook)
+    }
+    .environment(PreviewSupport.makeCoordinator())
+}
+
+#Preview("표지 이미지 있는 완독") {
+    let completedWithCover = PreviewSupport.makeBook(
+        title: "표지가 있는 도서",
+        isCompleted: true,
+        coverImageURL: "https://example.com/sample-cover.jpg"
+    )
+
+    return NavigationStack {
+        CompletionCelebrationView(userBook: completedWithCover)
     }
     .environment(PreviewSupport.makeCoordinator())
 }

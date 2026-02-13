@@ -144,8 +144,20 @@ struct BookPageSettingView: View {
     }
 }
 
-#Preview {
+#Preview("책 정보 있음") {
     let inputModel = PreviewSupport.makeBookSettingInputModel()
+    let pageModel = BookSettingPageModel()
+
+    return NavigationStack {
+        BookPageSettingView()
+    }
+    .environment(PreviewSupport.makeCoordinator())
+    .environment(inputModel)
+    .environment(pageModel)
+}
+
+#Preview("책 정보 없음") {
+    let inputModel = BookSettingInputModel()
     let pageModel = BookSettingPageModel()
 
     return NavigationStack {

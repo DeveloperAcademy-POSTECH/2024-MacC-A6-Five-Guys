@@ -22,6 +22,14 @@ struct BookSettingsManagerView: View {
     
     @State private var bookSettingInputModel = BookSettingInputModel()
     @State private var pageModel = BookSettingPageModel()
+
+    init(
+        bookSettingInputModel: BookSettingInputModel = BookSettingInputModel(),
+        pageModel: BookSettingPageModel = BookSettingPageModel()
+    ) {
+        _bookSettingInputModel = State(initialValue: bookSettingInputModel)
+        _pageModel = State(initialValue: pageModel)
+    }
     
     var body: some View {
         ZStack(alignment: .top) {
@@ -116,10 +124,60 @@ struct BookSettingsManagerView: View {
     }
 }
 
-#Preview {
+#Preview("도서 검색 단계") {
     let container = try! ModelContainer(for: UserBookSchemaV2.UserBookV2.self)
     let dependencies = AppDependencies(modelContainer: container)
-    BookSettingsManagerView()
+
+    return BookSettingsManagerView()
         .environment(NavigationCoordinator(appDependencies: dependencies))
         .environment(dependencies)
+}
+
+#Preview("페이지 설정 단계") {
+    let container = try! ModelContainer(for: UserBookSchemaV2.UserBookV2.self)
+    let dependencies = AppDependencies(modelContainer: container)
+    let pageModel = BookSettingPageModel()
+    pageModel.nextPage()
+    let inputModel = PreviewSupport.makeBookSettingInputModel()
+
+    return BookSettingsManagerView(
+        bookSettingInputModel: inputModel,
+        pageModel: pageModel
+    )
+    .environment(NavigationCoordinator(appDependencies: dependencies))
+    .environment(dependencies)
+}
+
+#Preview("기간 선택 단계") {
+    let container = try! ModelContainer(for: UserBookSchemaV2.UserBookV2.self)
+    let dependencies = AppDependencies(modelContainer: container)
+    let pageModel = BookSettingPageModel()
+    pageModel.nextPage()
+    pageModel.nextPage()
+    let inputModel = PreviewSupport.makeBookSettingInputModel()
+
+    return BookSettingsManagerView(
+        bookSettingInputModel: inputModel,
+        pageModel: pageModel
+    )
+    .environment(NavigationCoordinator(appDependencies: dependencies))
+    .environment(dependencies)
+}
+
+#Preview("완독 목표 완료 단계") {
+    let container = try! ModelContainer(for: UserBookSchemaV2.UserBookV2.self)
+    let dependencies = AppDependencies(modelContainer: container)
+    let pageModel = BookSettingPageModel()
+    pageModel.nextPage()
+    pageModel.nextPage()
+    pageModel.nextPage()
+    pageModel.nextPage()
+    let inputModel = PreviewSupport.makeBookSettingInputModel()
+
+    return BookSettingsManagerView(
+        bookSettingInputModel: inputModel,
+        pageModel: pageModel
+    )
+    .environment(NavigationCoordinator(appDependencies: dependencies))
+    .environment(dependencies)
 }

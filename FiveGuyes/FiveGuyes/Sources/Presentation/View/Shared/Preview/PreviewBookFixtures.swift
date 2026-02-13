@@ -28,19 +28,25 @@ extension PreviewSupport {
 
     static func makeBook(
         title: String,
-        isCompleted: Bool
+        isCompleted: Bool,
+        coverImageURL: String? = nil,
+        targetEndDateOffset: Int = 10,
+        lastReadPage: Int? = nil,
+        reviewAfterCompletion: String? = nil
     ) -> FGUserBook {
         let today = Date().adjustedDate()
         let recordKey = today.toYearMonthDayString()
         let readingRecords = [recordKey: ReadingRecord(targetPages: 20, pagesRead: isCompleted ? 20 : 12)]
-        let targetEndDate = Calendar.app.date(byAdding: .day, value: 10, to: today) ?? today
+        let targetEndDate = Calendar.app.date(byAdding: .day, value: targetEndDateOffset, to: today) ?? today
+        let resolvedLastReadPage = lastReadPage ?? (isCompleted ? 320 : 120)
+        let resolvedReview = reviewAfterCompletion ?? (isCompleted ? "프리뷰용 완독 소감입니다." : "")
 
         return FGUserBook(
             id: UUID(),
             bookMetaData: FGBookMetaData(
                 title: title,
                 author: "샘플 저자",
-                coverImageURL: nil,
+                coverImageURL: coverImageURL,
                 totalPages: 320
             ),
             userSettings: FGUserSetting(
@@ -53,11 +59,11 @@ extension PreviewSupport {
             readingProgress: FGReadingProgress(
                 dailyReadingRecords: readingRecords,
                 lastReadDate: today,
-                lastReadPage: isCompleted ? 320 : 120
+                lastReadPage: resolvedLastReadPage
             ),
             completionStatus: FGCompletionStatus(
                 isCompleted: isCompleted,
-                reviewAfterCompletion: isCompleted ? "프리뷰용 완독 소감입니다." : ""
+                reviewAfterCompletion: resolvedReview
             )
         )
     }

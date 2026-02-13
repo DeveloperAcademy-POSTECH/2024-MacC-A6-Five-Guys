@@ -1,5 +1,5 @@
 //
-//  ReadingScheduleCalculatorV2Tests.swift
+//  ReadingScheduleCalculatorTests.swift
 //  FiveGuyesTests
 //
 //  Created by zaehorang on 2025-10-24.
@@ -9,11 +9,11 @@
 import Foundation
 import Testing
 
-/// ReadingScheduleCalculatorV2에 대한 Swift Testing 기반 테스트
-@Suite("ReadingScheduleCalculatorV2 테스트")
-struct ReadingScheduleCalculatorV2Tests {
+/// ReadingScheduleCalculator에 대한 Swift Testing 기반 테스트
+@Suite("ReadingScheduleCalculator 테스트")
+struct ReadingScheduleCalculatorTests {
 
-    let calculator = ReadingScheduleCalculatorV2()
+    let calculator = ReadingScheduleCalculator()
 
     // MARK: - Helper Methods
 

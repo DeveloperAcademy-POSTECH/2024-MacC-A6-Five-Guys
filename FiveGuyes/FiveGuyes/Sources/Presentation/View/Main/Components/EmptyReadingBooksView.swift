@@ -66,11 +66,10 @@ struct EmptyReadingBooksView: View {
     }
 }
 
-#Preview {
-    VStack(spacing: 50) {
-        EmptyReadingBooksView(state: .noCompleted)
-        EmptyReadingBooksView(state: .hasCompleted)
-    }
-    .background(.blue)
-    
+#Preview("완독/독서 모두 없음") {
+    EmptyReadingBooksView(state: .noCompleted)
+}
+
+#Preview("완독 있음, 독서 없음") {
+    EmptyReadingBooksView(state: .hasCompleted)
 }

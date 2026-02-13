@@ -1,5 +1,5 @@
 //
-//  ReadingScheduleCalculatorV2.swift
+//  ReadingScheduleCalculator.swift
 //  FiveGuyes
 //
 //  Created by zaehorang on 2025-10-24.
@@ -21,10 +21,10 @@ enum ScheduleCalculationError: Error {
     case calculationFailed(underlying: Error)
 }
 
-// MARK: - ReadingScheduleCalculatorV2
+// MARK: - ReadingScheduleCalculator
 
-/// 독서 스케줄을 계산하는 Pure Function 기반 Calculator (V2)
-struct ReadingScheduleCalculatorV2 {
+/// 독서 스케줄을 계산하는 Pure Function 기반 Calculator
+struct ReadingScheduleCalculator {
 
     // MARK: - Properties
 

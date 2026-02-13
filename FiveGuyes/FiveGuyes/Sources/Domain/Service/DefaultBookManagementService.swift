@@ -16,14 +16,14 @@ final class DefaultBookManagementService: BookManagementService {
 
     private let repository: BookRepository
     private let notificationManager: NotificationManager
-    private let scheduleCalculator: ReadingScheduleCalculatorV2
+    private let scheduleCalculator: ReadingScheduleCalculator
 
     // MARK: - Initialization
 
     init(
         repository: BookRepository,
         notificationManager: NotificationManager = NotificationManager(),
-        scheduleCalculator: ReadingScheduleCalculatorV2 = ReadingScheduleCalculatorV2()
+        scheduleCalculator: ReadingScheduleCalculator = ReadingScheduleCalculator()
     ) {
         self.repository = repository
         self.notificationManager = notificationManager
@@ -71,7 +71,7 @@ final class DefaultBookManagementService: BookManagementService {
     // MARK: - Command Operations (향후 구현 예정)
 
     func registerBook(_ input: RegisterBookInput) async throws -> FGUserBook {
-        // 1. ReadingScheduleCalculatorV2로 초기 스케줄 계산 (immutable)
+        // 1. ReadingScheduleCalculator로 초기 스케줄 계산 (immutable)
         let initialProgress = try scheduleCalculator.createInitialSchedule(settings: input.userSettings)
 
         // 2. FGUserBook 생성 (초기 스케줄 포함)

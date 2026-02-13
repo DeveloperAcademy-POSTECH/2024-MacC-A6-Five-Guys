@@ -104,12 +104,34 @@ struct CompletionReviewView: View {
     }
 }
 
-#Preview {
+#Preview("완독 소감 작성") {
     NavigationStack {
         CompletionReviewView(
             userBook: PreviewSupport.sampleCompletedBook,
             viewModel: CompletionReviewViewModel(
                 bookManagementService: PreviewBookManagementService()
+            )
+        )
+    }
+    .environment(PreviewSupport.makeCoordinator())
+}
+
+#Preview("완독 소감 수정") {
+    let reviewedBook = PreviewSupport.makeBook(
+        title: "소감이 있는 도서",
+        isCompleted: true,
+        reviewAfterCompletion: "이미 남겨둔 완독 소감입니다."
+    )
+
+    return NavigationStack {
+        CompletionReviewView(
+            isUpdateMode: true,
+            userBook: reviewedBook,
+            viewModel: CompletionReviewViewModel(
+                bookManagementService: PreviewBookManagementService(
+                    readingBooks: [],
+                    completedBooks: [reviewedBook]
+                )
             )
         )
     }

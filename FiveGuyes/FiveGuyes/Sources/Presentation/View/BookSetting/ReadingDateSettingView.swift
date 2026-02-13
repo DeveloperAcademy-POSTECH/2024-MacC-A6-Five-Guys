@@ -178,6 +178,25 @@ struct ReadingDateSettingView: View {
     }
 }
 
-#Preview {
-    ReadingDateSettingView()
+#Preview("목표 기간 선택 단계") {
+    let inputModel = PreviewSupport.makeBookSettingInputModel()
+    let pageModel = BookSettingPageModel()
+    pageModel.nextPage()
+    pageModel.nextPage()
+
+    return ReadingDateSettingView()
+        .environment(inputModel)
+        .environment(pageModel)
+}
+
+#Preview("쉬는 날 선택 단계") {
+    let inputModel = PreviewSupport.makeBookSettingInputModel()
+    let pageModel = BookSettingPageModel()
+    pageModel.nextPage()
+    pageModel.nextPage()
+    pageModel.nextPage()
+
+    return ReadingDateSettingView()
+        .environment(inputModel)
+        .environment(pageModel)
 }
