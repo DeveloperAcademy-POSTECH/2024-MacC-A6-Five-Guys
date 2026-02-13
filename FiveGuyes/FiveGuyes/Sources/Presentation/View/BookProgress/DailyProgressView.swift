@@ -132,3 +132,15 @@ struct DailyProgressView: View {
         }
     }
 }
+
+#Preview {
+    NavigationStack {
+        DailyProgressView(
+            userBook: PreviewSupport.sampleReadingBook,
+            viewModel: DailyProgressViewModel(
+                bookManagementService: PreviewBookManagementService()
+            )
+        )
+    }
+    .environment(PreviewSupport.makeCoordinator())
+}

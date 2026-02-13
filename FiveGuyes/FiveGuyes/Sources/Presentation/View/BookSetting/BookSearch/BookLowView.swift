@@ -62,3 +62,12 @@ struct BookRowView: View {
             .padding(.vertical, 24)
     }
 }
+
+#Preview {
+    let viewModel = PreviewSupport.makeBookSearchViewModel()
+    let book = PreviewSupport.sampleAPIBook
+    viewModel.selectedBook = book
+
+    return BookRowView(viewModel: viewModel, book: book)
+        .padding(.vertical, 24)
+}

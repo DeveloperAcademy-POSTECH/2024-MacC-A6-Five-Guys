@@ -104,6 +104,14 @@ struct CompletionReviewView: View {
     }
 }
 
-//#Preview {
-//    CompletionReviewView()
-//}
+#Preview {
+    NavigationStack {
+        CompletionReviewView(
+            userBook: PreviewSupport.sampleCompletedBook,
+            viewModel: CompletionReviewViewModel(
+                bookManagementService: PreviewBookManagementService()
+            )
+        )
+    }
+    .environment(PreviewSupport.makeCoordinator())
+}

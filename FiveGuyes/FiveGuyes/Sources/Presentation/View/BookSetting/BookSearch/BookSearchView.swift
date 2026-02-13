@@ -60,3 +60,14 @@ struct BookSearchView: View {
             }
     }
 }
+
+#Preview {
+    let inputModel = PreviewSupport.makeBookSettingInputModel()
+    let pageModel = BookSettingPageModel()
+
+    return NavigationStack {
+        BookSearchView(viewModel: PreviewSupport.makeBookSearchViewModel())
+    }
+    .environment(inputModel)
+    .environment(pageModel)
+}

@@ -183,3 +183,15 @@ struct ReadingDateEditView: View {
         }
     }
 }
+
+#Preview {
+    NavigationStack {
+        ReadingDateEditView(
+            userBook: PreviewSupport.sampleReadingBook,
+            viewModel: ReadingDateEditViewModel(
+                bookManagementService: PreviewBookManagementService()
+            )
+        )
+    }
+    .environment(PreviewSupport.makeCoordinator())
+}

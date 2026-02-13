@@ -140,3 +140,10 @@ struct CompletionCelebrationView: View {
         }
     }
 }
+
+#Preview {
+    NavigationStack {
+        CompletionCelebrationView(userBook: PreviewSupport.sampleCompletedBook)
+    }
+    .environment(PreviewSupport.makeCoordinator())
+}

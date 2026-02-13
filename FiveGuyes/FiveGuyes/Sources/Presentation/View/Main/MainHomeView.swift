@@ -376,3 +376,10 @@ struct MainHomeView: View {
         await viewModel.setupNotificationsForCurrentBook()
     }
 }
+
+#Preview {
+    MainHomeView(
+        viewModel: PreviewSupport.makeMainHomeViewModel()
+    )
+    .environment(PreviewSupport.makeCoordinator())
+}

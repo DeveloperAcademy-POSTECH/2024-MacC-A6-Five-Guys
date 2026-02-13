@@ -143,3 +143,15 @@ struct BookPageSettingView: View {
         isEndPageFieldFoucsed = false
     }
 }
+
+#Preview {
+    let inputModel = PreviewSupport.makeBookSettingInputModel()
+    let pageModel = BookSettingPageModel()
+
+    return NavigationStack {
+        BookPageSettingView()
+    }
+    .environment(PreviewSupport.makeCoordinator())
+    .environment(inputModel)
+    .environment(pageModel)
+}

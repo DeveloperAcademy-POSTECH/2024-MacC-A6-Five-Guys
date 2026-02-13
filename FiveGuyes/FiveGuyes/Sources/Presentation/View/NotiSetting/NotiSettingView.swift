@@ -188,3 +188,15 @@ struct NotiSettingView: View {
         }
     }
 }
+
+#Preview {
+    NavigationStack {
+        NotiSettingView(
+            userBook: PreviewSupport.sampleReadingBook,
+            viewModel: NotiSettingViewModel(
+                notificationManager: PreviewNotificationManager(),
+                settingsStore: PreviewNotificationSettingsStore()
+            )
+        )
+    }
+}

@@ -129,3 +129,9 @@ struct MultiBookProgressView: View {
         }
     }
 }
+
+#Preview {
+    NavigationStack {
+        MultiBookProgressView(currentReadingBooks: PreviewSupport.sampleBooksForCarousel)
+    }
+}

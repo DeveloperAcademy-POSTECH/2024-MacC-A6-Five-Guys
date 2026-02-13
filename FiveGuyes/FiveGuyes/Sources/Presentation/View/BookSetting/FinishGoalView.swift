@@ -212,3 +212,17 @@ struct TextView: View {
             .fontStyle(.title1, weight: .semibold)
     }
 }
+
+#Preview {
+    let inputModel = PreviewSupport.makeBookSettingInputModel()
+
+    return NavigationStack {
+        FinishGoalView(
+            viewModel: FinishGoalViewModel(
+                bookManagementService: PreviewBookManagementService()
+            )
+        )
+    }
+    .environment(PreviewSupport.makeCoordinator())
+    .environment(inputModel)
+}
