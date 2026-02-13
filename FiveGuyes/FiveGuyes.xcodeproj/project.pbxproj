@@ -237,8 +237,8 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${BUILD_DIR%/Build/*}/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/run\"\n";
-		};
+				shellScript = "if [ \"$CONFIGURATION\" != \"Release\" ]; then\n  echo \"Skipping Crashlytics upload for $CONFIGURATION configuration\"\n  exit 0\nfi\n\nGOOGLE_SERVICE_INFO_PLIST=\"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/GoogleService-Info.plist\"\nif [ ! -f \"$GOOGLE_SERVICE_INFO_PLIST\" ]; then\n  echo \"Skipping Crashlytics upload: $GOOGLE_SERVICE_INFO_PLIST not found\"\n  exit 0\nfi\n\n\"${BUILD_DIR%/Build/*}/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/run\"\n";
+			};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
