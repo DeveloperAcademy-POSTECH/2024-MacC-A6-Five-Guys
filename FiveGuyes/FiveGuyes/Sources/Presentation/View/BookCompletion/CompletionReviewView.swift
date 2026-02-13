@@ -10,18 +10,27 @@ import SwiftUI
 struct CompletionReviewView: View {
     private let placeholder: String = "책 속 한 줄이 남긴 여운은 무엇인가요?"
     
-    @State private var viewModel = CompletionReviewViewModel()
+    @State private var viewModel: CompletionReviewViewModel
     @FocusState private var isFocusedTextEditor: Bool
     @ObservedObject private var keyboardObserver = KeyboardObserver()
     
     @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
-    @Environment(AppDependencies.self) private var appDependencies
     
     // 업데이트 상황을 나타내는 불 변수
     var isUpdateMode: Bool = false
         
     // 외부에서 주입받을 수 있는 책 변수
     let userBook: FGUserBook
+
+    init(
+        isUpdateMode: Bool = false,
+        userBook: FGUserBook,
+        viewModel: CompletionReviewViewModel
+    ) {
+        self.isUpdateMode = isUpdateMode
+        self.userBook = userBook
+        _viewModel = State(initialValue: viewModel)
+    }
     
     var body: some View {
         @Bindable var bindableViewModel = viewModel
@@ -76,7 +85,6 @@ struct CompletionReviewView: View {
         }
         .customNavigationBackButton()
         .onAppear {
-            viewModel.configure(bookManagementService: appDependencies.bookManagementService)
             viewModel.preloadReview(userBook.completionStatus.reviewAfterCompletion)
             isFocusedTextEditor = true
         }

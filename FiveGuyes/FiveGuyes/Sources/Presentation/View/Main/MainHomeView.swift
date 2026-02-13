@@ -15,19 +15,21 @@ struct MainHomeView: View {
         case noCompletedNoReading
     }
 
-    let notificationManager = NotificationManager()
     let mainAlertMessage = "삭제 후에는 복원할 수 없어요"
     let today = Date().adjustedDate()
 
     @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
-    @Environment(AppDependencies.self) private var appDependencies
 
-    @State private var viewModel = MainHomeViewModel()
+    @State private var viewModel: MainHomeViewModel
     @State private var topSafeAreaInset: CGFloat = 0
     @State private var showReadingBookAlert = false
 
     @State private var activeBookID: UUID?
     @State private var selectedBookIndex: Int?
+
+    init(viewModel: MainHomeViewModel) {
+        _viewModel = State(initialValue: viewModel)
+    }
 
     private var readingBooks: [FGUserBook] {
         viewModel.readingBooks
@@ -361,27 +363,16 @@ struct MainHomeView: View {
         }
     }
 
-    @MainActor
-    private func setupNotificationsForCurrentBook() async {
-        // 독서 종료일이 제일 가까운 책을 기준으로 노티를 설정합니다.
-        if let currentReadingBook = readingBooks.first {
-            await notificationManager.setupAllNotifications(currentReadingBook)
-        } else {
-            print("노티 설정 실패 ❗️❗️❗️")
-        }
-    }
-
     private func initializeActiveBookID() {
         activeBookID = readingBooks.first?.id
     }
 
     @MainActor
     private func initializeHomeData() async {
-        viewModel.configure(bookManagementService: appDependencies.bookManagementService)
         await viewModel.loadBooks()
         await reassignReadingSchedules()
         trackScreen()
         initializeActiveBookID()
-        await setupNotificationsForCurrentBook()
+        await viewModel.setupNotificationsForCurrentBook()
     }
 }

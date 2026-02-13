@@ -27,3 +27,9 @@ When performing PR review, you must:
 
 For source file header rules, follow:
 - `./docs/conventions/file-header-convention.md`
+
+# Change Scope Guard (Mandatory)
+
+- Code changes must be limited strictly to the user-requested scope.
+- Do not modify unrelated files, logic, UI, naming, formatting, or refactors unless explicitly requested.
+- If an out-of-scope change is necessary to complete the requested fix safely, ask the user first and proceed only after approval.

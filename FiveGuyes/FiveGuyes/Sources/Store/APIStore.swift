@@ -7,7 +7,12 @@
 
 import Foundation
 
-class APIStore {
+protocol BookSearching {
+    func fetchBooks(query: String) async throws -> [Book]
+    func fetchBookTotalPages(isbn: String) async throws -> Int
+}
+
+class APIStore: BookSearching {
     
     private var apiKey: String
     

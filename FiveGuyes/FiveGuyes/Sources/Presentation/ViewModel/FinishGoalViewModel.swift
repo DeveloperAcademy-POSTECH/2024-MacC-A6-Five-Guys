@@ -14,10 +14,9 @@ final class FinishGoalViewModel {
     var pagesPerDay = 0
     private(set) var isSubmitting = false
 
-    private var bookManagementService: (any BookManagementService)?
+    private let bookManagementService: any BookManagementService
 
-    func configure(bookManagementService: any BookManagementService) {
-        guard self.bookManagementService == nil else { return }
+    init(bookManagementService: any BookManagementService) {
         self.bookManagementService = bookManagementService
     }
 
@@ -55,7 +54,6 @@ final class FinishGoalViewModel {
         excludedReadingDays: [Date]
     ) async -> Bool {
         guard !isSubmitting else { return false }
-        guard let bookManagementService else { return false }
 
         isSubmitting = true
         defer { isSubmitting = false }

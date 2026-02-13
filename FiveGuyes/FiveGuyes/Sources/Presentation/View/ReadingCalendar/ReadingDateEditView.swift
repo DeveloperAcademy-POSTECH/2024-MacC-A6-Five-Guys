@@ -9,11 +9,10 @@ import SwiftUI
 
 struct ReadingDateEditView: View {
     @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
-    @Environment(AppDependencies.self) private var appDependencies
     
     private let userBook: FGUserBook
     
-    @State private var viewModel = ReadingDateEditViewModel()
+    @State private var viewModel: ReadingDateEditViewModel
     @StateObject private var calendarCellModel: CalendarCellModel
     
     private var adjustedToday: Date
@@ -49,9 +48,10 @@ struct ReadingDateEditView: View {
         }
     }
     
-    init(userBook: FGUserBook) {
+    init(userBook: FGUserBook, viewModel: ReadingDateEditViewModel) {
         self.adjustedToday = Date().adjustedDate()
         self.userBook = userBook
+        _viewModel = State(initialValue: viewModel)
         
         let userSettings = userBook.userSettings
         
@@ -85,9 +85,6 @@ struct ReadingDateEditView: View {
         }
         .navigationTitle("목표기간 수정하기")
         .customNavigationBackButton()
-        .onAppear {
-            viewModel.configure(bookManagementService: appDependencies.bookManagementService)
-        }
     }
     
     private func descriptionText() -> some View {

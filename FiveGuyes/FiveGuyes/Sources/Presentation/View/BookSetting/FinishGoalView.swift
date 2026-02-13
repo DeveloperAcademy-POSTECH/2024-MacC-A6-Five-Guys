@@ -10,9 +10,12 @@ import SwiftUI
 struct FinishGoalView: View {
     @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
     @Environment(BookSettingInputModel.self) var bookSettingInputModel: BookSettingInputModel
-    @Environment(AppDependencies.self) private var appDependencies
     
-    @State private var viewModel = FinishGoalViewModel()
+    @State private var viewModel: FinishGoalViewModel
+
+    init(viewModel: FinishGoalViewModel) {
+        _viewModel = State(initialValue: viewModel)
+    }
     
     var body: some View {
         
@@ -162,7 +165,6 @@ struct FinishGoalView: View {
                 
             }
             .onAppear {
-                viewModel.configure(bookManagementService: appDependencies.bookManagementService)
                 viewModel.calculateRecommendedPagesPerDay(
                     startPage: startPage,
                     targetEndPage: totalPages,

@@ -14,16 +14,18 @@ final class MainHomeViewModel {
     private(set) var readingBooks: [FGUserBook] = []
     private(set) var completedBooks: [FGUserBook] = []
 
-    private var bookManagementService: (any BookManagementService)?
+    private let bookManagementService: any BookManagementService
+    private let notificationManager: any NotificationManaging
 
-    func configure(bookManagementService: any BookManagementService) {
-        guard self.bookManagementService == nil else { return }
+    init(
+        bookManagementService: any BookManagementService,
+        notificationManager: any NotificationManaging
+    ) {
         self.bookManagementService = bookManagementService
+        self.notificationManager = notificationManager
     }
 
     func loadBooks() async {
-        guard let bookManagementService else { return }
-
         do {
             let readingBooks = try await bookManagementService.fetchReadingBooks()
             let completedBooks = try await bookManagementService.fetchCompletedBooks()
@@ -36,8 +38,6 @@ final class MainHomeViewModel {
     }
 
     func deleteBook(id: UUID) async -> Bool {
-        guard let bookManagementService else { return false }
-
         do {
             try await bookManagementService.deleteBook(id: id)
             await loadBooks()
@@ -49,7 +49,6 @@ final class MainHomeViewModel {
     }
 
     func rescheduleOnAppOpen(today: Date) async -> [FGUserBook] {
-        guard let bookManagementService else { return [] }
         guard !readingBooks.isEmpty else { return [] }
 
         let currentBooks = readingBooks
@@ -70,5 +69,11 @@ final class MainHomeViewModel {
 
         await loadBooks()
         return overdueBooks
+    }
+
+    func setupNotificationsForCurrentBook() async {
+        guard let currentReadingBook = readingBooks.first else { return }
+
+        await notificationManager.setupAllNotifications(currentReadingBook)
     }
 }

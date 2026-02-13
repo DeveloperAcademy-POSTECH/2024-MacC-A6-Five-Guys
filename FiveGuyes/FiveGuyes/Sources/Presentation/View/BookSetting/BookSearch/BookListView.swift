@@ -68,5 +68,15 @@ struct BookListView: View {
 }
 
 #Preview {
-    BookListView(bookSearchViewModel: BookSearchViewModel())
+    BookListView(
+        bookSearchViewModel: BookSearchViewModel(
+            bookSearchStore: BookSearchStorePreviewStub()
+        )
+    )
+}
+
+private struct BookSearchStorePreviewStub: BookSearching {
+    func fetchBooks(query: String) async throws -> [Book] { [] }
+
+    func fetchBookTotalPages(isbn: String) async throws -> Int { 0 }
 }

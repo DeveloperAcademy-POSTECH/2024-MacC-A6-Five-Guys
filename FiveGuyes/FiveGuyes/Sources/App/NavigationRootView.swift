@@ -6,10 +6,17 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct NavigationRootView: View {
-    @State private var coordinator = NavigationCoordinator()
-    
+    @State private var coordinator: NavigationCoordinator
+
+    init(appDependencies: AppDependencies) {
+        _coordinator = State(
+            initialValue: NavigationCoordinator(appDependencies: appDependencies)
+        )
+    }
+
     var body: some View {
         NavigationStack(path: $coordinator.paths) {
             
@@ -24,5 +31,8 @@ struct NavigationRootView: View {
 }
 
 #Preview {
-    NavigationRootView()
+    let container = try! ModelContainer(for: UserBookSchemaV2.UserBookV2.self)
+    let dependencies = AppDependencies(modelContainer: container)
+    NavigationRootView(appDependencies: dependencies)
+        .environment(dependencies)
 }

@@ -12,16 +12,14 @@ import Observation
 final class UnfinishReadingViewModel {
     private(set) var isCompleting = false
 
-    private var bookManagementService: (any BookManagementService)?
+    private let bookManagementService: any BookManagementService
 
-    func configure(bookManagementService: any BookManagementService) {
-        guard self.bookManagementService == nil else { return }
+    init(bookManagementService: any BookManagementService) {
         self.bookManagementService = bookManagementService
     }
 
     func completeBook(_ userBook: FGUserBook) async -> Bool {
         guard !isCompleting else { return false }
-        guard let bookManagementService else { return false }
 
         isCompleting = true
         defer { isCompleting = false }

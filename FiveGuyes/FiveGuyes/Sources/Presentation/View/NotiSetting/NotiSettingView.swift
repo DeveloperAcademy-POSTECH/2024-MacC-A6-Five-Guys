@@ -9,10 +9,14 @@ import SwiftUI
 
 struct NotiSettingView: View {
     @Environment(\.scenePhase) private var scenePhase // 앱 상태 감지
-    
-    @State private var viewModel = NotiSettingViewModel()
-    
+
+    @State private var viewModel: NotiSettingViewModel
     let userBook: FGUserBook?
+
+    init(userBook: FGUserBook?, viewModel: NotiSettingViewModel) {
+        self.userBook = userBook
+        self._viewModel = State(initialValue: viewModel)
+    }
     
     // Toggle 바인딩 변수
     private var isNotificationToggleEnabled: Binding<Bool> {

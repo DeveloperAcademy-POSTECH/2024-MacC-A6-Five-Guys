@@ -20,10 +20,9 @@ final class CompletionReviewViewModel {
     var showEmptyReviewAlert = false
     private(set) var isSubmitting = false
 
-    private var bookManagementService: (any BookManagementService)?
+    private let bookManagementService: any BookManagementService
 
-    func configure(bookManagementService: any BookManagementService) {
-        guard self.bookManagementService == nil else { return }
+    init(bookManagementService: any BookManagementService) {
         self.bookManagementService = bookManagementService
     }
 
@@ -39,8 +38,6 @@ final class CompletionReviewViewModel {
             showEmptyReviewAlert = true
             return .none
         }
-
-        guard let bookManagementService else { return .none }
 
         isSubmitting = true
         defer { isSubmitting = false }
