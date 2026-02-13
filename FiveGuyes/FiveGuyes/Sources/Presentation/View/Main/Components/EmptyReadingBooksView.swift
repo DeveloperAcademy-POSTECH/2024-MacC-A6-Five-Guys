@@ -66,6 +66,7 @@ struct EmptyReadingBooksView: View {
     }
 }
 
+#if DEBUG
 #Preview("완독/독서 모두 없음") {
     EmptyReadingBooksView(state: .noCompleted)
 }
@@ -73,3 +74,4 @@ struct EmptyReadingBooksView: View {
 #Preview("완독 있음, 독서 없음") {
     EmptyReadingBooksView(state: .hasCompleted)
 }
+#endif

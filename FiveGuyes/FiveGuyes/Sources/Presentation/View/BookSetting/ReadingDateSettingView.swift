@@ -178,25 +178,30 @@ struct ReadingDateSettingView: View {
     }
 }
 
+#if DEBUG
 #Preview("목표 기간 선택 단계") {
-    let inputModel = PreviewSupport.makeBookSettingInputModel()
-    let pageModel = BookSettingPageModel()
-    pageModel.nextPage()
-    pageModel.nextPage()
-
-    return ReadingDateSettingView()
-        .environment(inputModel)
-        .environment(pageModel)
+    makeReadingDateSettingPreview(pageAdvanceCount: 2)
 }
 
 #Preview("쉬는 날 선택 단계") {
+    makeReadingDateSettingPreview(pageAdvanceCount: 3)
+}
+
+@MainActor
+private func makeReadingDateSettingPreview(pageAdvanceCount: Int) -> some View {
     let inputModel = PreviewSupport.makeBookSettingInputModel()
-    let pageModel = BookSettingPageModel()
-    pageModel.nextPage()
-    pageModel.nextPage()
-    pageModel.nextPage()
+    let pageModel = makeReadingDateSettingPreviewPageModel(advanceCount: pageAdvanceCount)
 
     return ReadingDateSettingView()
         .environment(inputModel)
         .environment(pageModel)
 }
+
+private func makeReadingDateSettingPreviewPageModel(advanceCount: Int) -> BookSettingPageModel {
+    let model = BookSettingPageModel()
+    for _ in 0..<advanceCount {
+        model.nextPage()
+    }
+    return model
+}
+#endif

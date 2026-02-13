@@ -144,11 +144,12 @@ struct BookPageSettingView: View {
     }
 }
 
+#if DEBUG
 #Preview("책 정보 있음") {
     let inputModel = PreviewSupport.makeBookSettingInputModel()
     let pageModel = BookSettingPageModel()
 
-    return NavigationStack {
+    NavigationStack {
         BookPageSettingView()
     }
     .environment(PreviewSupport.makeCoordinator())
@@ -160,10 +161,11 @@ struct BookPageSettingView: View {
     let inputModel = BookSettingInputModel()
     let pageModel = BookSettingPageModel()
 
-    return NavigationStack {
+    NavigationStack {
         BookPageSettingView()
     }
     .environment(PreviewSupport.makeCoordinator())
     .environment(inputModel)
     .environment(pageModel)
 }
+#endif

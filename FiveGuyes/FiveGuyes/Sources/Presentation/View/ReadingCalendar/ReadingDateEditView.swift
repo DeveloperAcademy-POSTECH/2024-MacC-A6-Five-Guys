@@ -191,6 +191,7 @@ struct ReadingDateEditView: View {
     }
 }
 
+#if DEBUG
 #Preview("기간 재설정 단계") {
     NavigationStack {
         ReadingDateEditView(
@@ -216,7 +217,7 @@ struct ReadingDateEditView: View {
         isConfirmed: true
     )
 
-    return NavigationStack {
+    NavigationStack {
         ReadingDateEditView(
             userBook: PreviewSupport.sampleReadingBook,
             viewModel: ReadingDateEditViewModel(
@@ -227,3 +228,4 @@ struct ReadingDateEditView: View {
     }
     .environment(PreviewSupport.makeCoordinator())
 }
+#endif

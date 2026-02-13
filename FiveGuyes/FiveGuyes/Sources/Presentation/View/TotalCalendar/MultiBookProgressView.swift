@@ -130,6 +130,7 @@ struct MultiBookProgressView: View {
     }
 }
 
+#if DEBUG
 #Preview("여러 권 진행 중") {
     NavigationStack {
         MultiBookProgressView(currentReadingBooks: PreviewSupport.sampleBooksForCarousel)
@@ -141,3 +142,4 @@ struct MultiBookProgressView: View {
         MultiBookProgressView(currentReadingBooks: [PreviewSupport.sampleReadingBook])
     }
 }
+#endif

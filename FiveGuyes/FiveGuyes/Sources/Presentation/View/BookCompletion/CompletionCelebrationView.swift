@@ -141,6 +141,7 @@ struct CompletionCelebrationView: View {
     }
 }
 
+#if DEBUG
 #Preview("기본 완독 축하") {
     NavigationStack {
         CompletionCelebrationView(userBook: PreviewSupport.sampleCompletedBook)
@@ -155,8 +156,9 @@ struct CompletionCelebrationView: View {
         coverImageURL: "https://example.com/sample-cover.jpg"
     )
 
-    return NavigationStack {
+    NavigationStack {
         CompletionCelebrationView(userBook: completedWithCover)
     }
     .environment(PreviewSupport.makeCoordinator())
 }
+#endif

@@ -168,6 +168,7 @@ struct CompletedBooksView: View {
     }
 }
 
+#if DEBUG
 #Preview("완독 도서 있음") {
     NavigationStack {
         CompletedBooksView(
@@ -190,3 +191,4 @@ struct CompletedBooksView: View {
     }
     .environment(PreviewSupport.makeCoordinator())
 }
+#endif

@@ -189,6 +189,7 @@ struct NotiSettingView: View {
     }
 }
 
+#if DEBUG
 #Preview("기본 상태") {
     NavigationStack {
         NotiSettingView(
@@ -245,3 +246,4 @@ private func makeNotiSettingPreviewViewModel(
     viewModel.isReminderTimePickerVisible = isReminderTimePickerVisible
     return viewModel
 }
+#endif

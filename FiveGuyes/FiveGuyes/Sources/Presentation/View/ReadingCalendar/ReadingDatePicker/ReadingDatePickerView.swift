@@ -49,6 +49,7 @@ struct ReadingDatePickerView: View {
     }
 }
 
+#if DEBUG
 #Preview("기본 상태") {
     ReadingDatePickerView(adjustedToday: Date(), calendarCalculator: CalendarCalculator(), calendarCellManager: CalendarCellModel(adjustedToday: Date()))
 }
@@ -59,7 +60,7 @@ struct ReadingDatePickerView: View {
     let startDate = calendar.date(byAdding: .day, value: 1, to: today) ?? today
     let endDate = calendar.date(byAdding: .day, value: 10, to: today) ?? today
 
-    return ReadingDatePickerView(
+    ReadingDatePickerView(
         adjustedToday: today,
         calendarCalculator: CalendarCalculator(),
         calendarCellManager: CalendarCellModel(
@@ -71,3 +72,4 @@ struct ReadingDatePickerView: View {
         )
     )
 }
+#endif

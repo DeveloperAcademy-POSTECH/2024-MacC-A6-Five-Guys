@@ -377,6 +377,7 @@ struct MainHomeView: View {
     }
 }
 
+#if DEBUG
 #Preview("읽는 책 있음") {
     MainHomeView(
         viewModel: PreviewSupport.makeMainHomeViewModel()
@@ -403,3 +404,4 @@ struct MainHomeView: View {
     )
     .environment(PreviewSupport.makeCoordinator())
 }
+#endif

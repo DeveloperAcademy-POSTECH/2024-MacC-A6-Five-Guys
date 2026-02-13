@@ -213,10 +213,11 @@ struct TextView: View {
     }
 }
 
+#if DEBUG
 #Preview("완독 목표 요약") {
     let inputModel = PreviewSupport.makeBookSettingInputModel()
 
-    return NavigationStack {
+    NavigationStack {
         FinishGoalView(
             viewModel: FinishGoalViewModel(
                 bookManagementService: PreviewBookManagementService()
@@ -230,7 +231,7 @@ struct TextView: View {
 #Preview("입력 누락 상태") {
     let inputModel = BookSettingInputModel()
 
-    return NavigationStack {
+    NavigationStack {
         FinishGoalView(
             viewModel: FinishGoalViewModel(
                 bookManagementService: PreviewBookManagementService()
@@ -240,3 +241,4 @@ struct TextView: View {
     .environment(PreviewSupport.makeCoordinator())
     .environment(inputModel)
 }
+#endif

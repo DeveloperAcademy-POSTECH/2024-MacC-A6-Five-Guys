@@ -161,6 +161,7 @@ struct CalendarGridView: View {
     }
 }
 
+#if DEBUG
 #Preview("기본 상태") {
     let today = Date()
     CalendarGridView(
@@ -178,7 +179,7 @@ struct CalendarGridView: View {
     let endDate = calendar.date(byAdding: .day, value: 7, to: today) ?? today
     let excludedDate = calendar.date(byAdding: .day, value: 3, to: today) ?? today
 
-    return CalendarGridView(
+    CalendarGridView(
         month: today,
         calendarCalculator: CalendarCalculator(),
         calendarCellModel: CalendarCellModel(
@@ -191,3 +192,4 @@ struct CalendarGridView: View {
         toastViewModel: ToastViewModel()
     )
 }
+#endif

@@ -104,6 +104,7 @@ struct CompletionReviewView: View {
     }
 }
 
+#if DEBUG
 #Preview("완독 소감 작성") {
     NavigationStack {
         CompletionReviewView(
@@ -123,7 +124,7 @@ struct CompletionReviewView: View {
         reviewAfterCompletion: "이미 남겨둔 완독 소감입니다."
     )
 
-    return NavigationStack {
+    NavigationStack {
         CompletionReviewView(
             isUpdateMode: true,
             userBook: reviewedBook,
@@ -137,3 +138,4 @@ struct CompletionReviewView: View {
     }
     .environment(PreviewSupport.makeCoordinator())
 }
+#endif

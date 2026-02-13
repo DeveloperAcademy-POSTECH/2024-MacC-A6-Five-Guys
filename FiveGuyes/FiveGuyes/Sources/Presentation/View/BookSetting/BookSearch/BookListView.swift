@@ -67,6 +67,7 @@ struct BookListView: View {
     }
 }
 
+#if DEBUG
 #Preview("검색 결과 없음") {
     BookListView(
         bookSearchViewModel: PreviewSupport.makeBookSearchViewModel(books: [])
@@ -80,3 +81,4 @@ struct BookListView: View {
         )
     )
 }
+#endif

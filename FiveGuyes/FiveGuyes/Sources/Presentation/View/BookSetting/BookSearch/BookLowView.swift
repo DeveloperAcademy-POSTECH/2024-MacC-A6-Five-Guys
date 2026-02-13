@@ -63,12 +63,16 @@ struct BookRowView: View {
     }
 }
 
+#if DEBUG
 #Preview("선택된 책") {
-    let viewModel = PreviewSupport.makeBookSearchViewModel()
     let book = PreviewSupport.sampleAPIBook
-    viewModel.selectedBook = book
+    let viewModel: BookSearchViewModel = {
+        let model = PreviewSupport.makeBookSearchViewModel()
+        model.selectedBook = book
+        return model
+    }()
 
-    return BookRowView(viewModel: viewModel, book: book)
+    BookRowView(viewModel: viewModel, book: book)
         .padding(.vertical, 24)
 }
 
@@ -79,6 +83,7 @@ struct BookRowView: View {
         selectedBook: nil
     )
 
-    return BookRowView(viewModel: viewModel, book: book)
+    BookRowView(viewModel: viewModel, book: book)
         .padding(.vertical, 24)
 }
+#endif

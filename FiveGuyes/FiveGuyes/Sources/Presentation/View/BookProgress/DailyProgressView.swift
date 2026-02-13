@@ -133,6 +133,7 @@ struct DailyProgressView: View {
     }
 }
 
+#if DEBUG
 #Preview("일반 진행 상태") {
     NavigationStack {
         DailyProgressView(
@@ -153,7 +154,7 @@ struct DailyProgressView: View {
         lastReadPage: 300
     )
 
-    return NavigationStack {
+    NavigationStack {
         DailyProgressView(
             userBook: dueTodayBook,
             viewModel: DailyProgressViewModel(
@@ -163,3 +164,4 @@ struct DailyProgressView: View {
     }
     .environment(PreviewSupport.makeCoordinator())
 }
+#endif

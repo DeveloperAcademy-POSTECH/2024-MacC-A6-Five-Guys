@@ -159,6 +159,7 @@ struct UnfinishReadingView: View {
     }
 }
 
+#if DEBUG
 #Preview("기본 상태") {
     NavigationStack {
         UnfinishReadingView(
@@ -183,7 +184,7 @@ struct UnfinishReadingView: View {
         lastReadPage: 210
     )
 
-    return NavigationStack {
+    NavigationStack {
         UnfinishReadingView(
             userBook: bookWithCover,
             viewModel: UnfinishReadingViewModel(
@@ -193,3 +194,4 @@ struct UnfinishReadingView: View {
     }
     .environment(PreviewSupport.makeCoordinator())
 }
+#endif
