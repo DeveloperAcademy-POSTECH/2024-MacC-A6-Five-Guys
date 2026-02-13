@@ -28,6 +28,11 @@ When performing PR review, you must:
 For source file header rules, follow:
 - `./docs/conventions/file-header-convention.md`
 
+# Preview/Simulator Troubleshooting
+
+If SwiftUI Preview is broken, or simulator build/run has runtime-state errors, check and apply:
+- `./docs/setup/swiftui-preview-troubleshooting.md`
+
 # Change Scope Guard (Mandatory)
 
 - Code changes must be limited strictly to the user-requested scope.
