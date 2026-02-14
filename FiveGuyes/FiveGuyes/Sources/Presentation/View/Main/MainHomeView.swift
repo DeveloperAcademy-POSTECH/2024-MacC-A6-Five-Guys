@@ -240,7 +240,12 @@ struct MainHomeView: View {
 
         return Button {
             if isReadingBookAvailable {
-                navigationCoordinator.push(.totalCalendar(books: readingBooks))
+                navigationCoordinator.push(
+                    .totalCalendar(
+                        books: readingBooks,
+                        today: viewModel.today()
+                    )
+                )
             }
         } label: {
             HStack(spacing: 8) {

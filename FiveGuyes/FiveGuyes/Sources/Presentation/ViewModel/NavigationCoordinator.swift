@@ -14,7 +14,7 @@ enum Screens: Hashable {
     case mainHome
     case notiSetting(book: FGUserBook?)
     case bookSettingsManager
-    case totalCalendar(books: [FGUserBook])
+    case totalCalendar(books: [FGUserBook], today: Date)
     case dailyProgress(book: FGUserBook)
     case completionCelebration(book: FGUserBook)
     case completionReview(book: FGUserBook)
@@ -58,9 +58,16 @@ final class NavigationCoordinator {
                 )
             )
         case .bookSettingsManager:
-            BookSettingsManagerView()
-        case .totalCalendar(books: let books):
-            MultiBookProgressView(currentReadingBooks: books)
+            BookSettingsManagerView(
+                viewModel: BookSettingsManagerViewModel(
+                    readingPlanUseCase: appDependencies.readingPlanUseCase
+                )
+            )
+        case .totalCalendar(books: let books, today: let today):
+            MultiBookProgressView(
+                currentReadingBooks: books,
+                today: today
+            )
         case .dailyProgress(book: let book):
             DailyProgressView(
                 userBook: book,

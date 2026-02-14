@@ -14,15 +14,16 @@ struct MultiBookProgressView: View {
     @State private var currentIndex: Int? = 0
     
     @State private var currentMonths: [Date]
-    private let todayDate = DefaultReadingDateProvider().today()
+    private let todayDate: Date
     
     let currentReadingBooks: [FGUserBook]
     
     // MARK: - Initializer
     
-    init(currentReadingBooks: [FGUserBook]) {
+    init(currentReadingBooks: [FGUserBook], today: Date) {
         self.currentReadingBooks = currentReadingBooks
-        _currentMonths = State(initialValue: Array(repeating: todayDate, count: currentReadingBooks.count))
+        self.todayDate = today
+        _currentMonths = State(initialValue: Array(repeating: today, count: currentReadingBooks.count))
     }
     
     // MARK: - Layout
@@ -101,7 +102,10 @@ struct MultiBookProgressView: View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(alignment: .top, spacing: 8) {
                 ForEach(currentReadingBooks.indices, id: \.self) { index in
-                    TotalCalendarView(currentReadingBook: currentReadingBooks[index])
+                    TotalCalendarView(
+                        currentReadingBook: currentReadingBooks[index],
+                        today: todayDate
+                    )
                         .containerRelativeFrame(.horizontal)
                 }
             }
@@ -135,7 +139,10 @@ struct MultiBookProgressView: View {
 // 입력 없이도 이 분기 UI가 맞는지 빠르게 확인하려고 만든 예시입니다.
 #Preview("여러 권 진행 중") {
     NavigationStack {
-        MultiBookProgressView(currentReadingBooks: PreviewSupport.sampleBooksForCarousel)
+        MultiBookProgressView(
+            currentReadingBooks: PreviewSupport.sampleBooksForCarousel,
+            today: Date()
+        )
     }
 }
 
@@ -143,7 +150,10 @@ struct MultiBookProgressView: View {
 // 입력 없이도 이 분기 UI가 맞는지 빠르게 확인하려고 만든 예시입니다.
 #Preview("한 권 진행 중") {
     NavigationStack {
-        MultiBookProgressView(currentReadingBooks: [PreviewSupport.sampleReadingBook])
+        MultiBookProgressView(
+            currentReadingBooks: [PreviewSupport.sampleReadingBook],
+            today: Date()
+        )
     }
 }
 #endif

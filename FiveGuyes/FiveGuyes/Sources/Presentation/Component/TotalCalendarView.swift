@@ -12,9 +12,9 @@ struct TotalCalendarView: View {
     let todayDate: Date
     let currentReadingBook: FGUserBook
 
-    init(currentReadingBook: FGUserBook) {
+    init(currentReadingBook: FGUserBook, today: Date) {
         self.currentReadingBook = currentReadingBook
-        self.todayDate = DefaultReadingDateProvider().today()
+        self.todayDate = today
         _currentMonth = State(initialValue: self.todayDate)
     }
     

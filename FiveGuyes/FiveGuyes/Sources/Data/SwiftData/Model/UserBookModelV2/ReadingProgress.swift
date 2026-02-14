@@ -24,32 +24,6 @@ final class ReadingProgress {
         date.toYearMonthDayString()
     }
     
-    func getAdjustedReadingRecordsKey(_ date: Date) -> String {
-        DayBoundary.shared.adjustedDayKey(from: date)
-    }
-    
-    func getAdjustedReadingRecord(for date: Date) -> ReadingRecord? {
-        let dateKey = getAdjustedReadingRecordsKey(date)
-        return readingRecords[dateKey]
-    }
-    
-    /// 특정 주의 기록 가져오기
-    func getAdjustedWeeklyRecorded(from today: Date) -> [ReadingRecord?] {
-        let calendar = Calendar.app
-        let startOfWeek = calendar.dateInterval(of: .weekOfMonth, for: today)?.start ?? today
-        
-        return (0..<7).map { dayOffset in
-            let date = calendar.date(byAdding: .day, value: dayOffset, to: startOfWeek)!
-            return readingRecords[date.toYearMonthDayString()]
-        }
-    }
-    
-    // 모든 주 시작 날짜를 계산
-    // 독서 기간을 주 단위로 나눌 때 기준이 되는 시작일 목록을 만들어, 주간 요약/캘린더 계산의 기준을 맞춥니다.
-    func getAllWeekStartDates(for settings: UserSettings) -> [Date] {
-        settings.toFGUserSetting().weeklyStartDates(today: DayBoundary.shared.adjustedNow())
-    }
-    
     // ReadingProgressCalculatable 구현
     func nonZeroReadingDaysCount() -> Int {
         let readingDays = toFGReadingProgress().dailyReadingRecords.values.filter { $0.pagesRead > 0 }

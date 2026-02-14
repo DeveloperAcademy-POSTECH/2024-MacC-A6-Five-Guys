@@ -34,8 +34,7 @@ struct ReadingDateSettingView: View {
             ?? totalPages
     }
     
-    init() {
-        let today = DefaultReadingDateProvider().today()
+    init(today: Date) {
         // 오늘 날짜를 시작 날짜로 추가
         let calendarCellModel = CalendarCellModel(today: today, startDate: today)
         
@@ -182,8 +181,9 @@ struct ReadingDateSettingView: View {
 private func makeReadingDateSettingPreview(pageAdvanceCount: Int) -> some View {
     let inputModel = PreviewSupport.makeBookSettingInputModel()
     let pageModel = makeReadingDateSettingPreviewPageModel(advanceCount: pageAdvanceCount)
+    let today = Date()
 
-    return ReadingDateSettingView()
+    return ReadingDateSettingView(today: today)
         .environment(inputModel)
         .environment(pageModel)
 }

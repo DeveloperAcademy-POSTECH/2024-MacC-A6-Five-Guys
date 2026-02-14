@@ -19,15 +19,18 @@ struct BookSettingsManagerView: View {
     @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
     @Environment(AppDependencies.self) private var appDependencies
     
+    @State private var viewModel: BookSettingsManagerViewModel
     @State private var bookSettingInputModel = BookSettingInputModel()
     @State private var pageModel = BookSettingPageModel()
 
     // 필요한 값을 밖에서 받아 시작할 수 있게 만든 생성자입니다.
     // 이렇게 해야 프리뷰/테스트에서 원하는 상황을 정확히 다시 만들 수 있습니다.
     init(
+        viewModel: BookSettingsManagerViewModel,
         bookSettingInputModel: BookSettingInputModel = BookSettingInputModel(),
         pageModel: BookSettingPageModel = BookSettingPageModel()
     ) {
+        _viewModel = State(initialValue: viewModel)
         _bookSettingInputModel = State(initialValue: bookSettingInputModel)
         _pageModel = State(initialValue: pageModel)
     }
@@ -37,7 +40,7 @@ struct BookSettingsManagerView: View {
             if [BookSettingsPage.bookDurationSetting.rawValue,
                 BookSettingsPage.bookNoneReadingDaySetting.rawValue]
                 .contains(pageModel.currentPage) {
-                ReadingDateSettingView()
+                ReadingDateSettingView(today: viewModel.today())
             } else {
                 pageView
             }
@@ -176,9 +179,13 @@ private func makeBookSettingsManagerPreview(
     let coordinator = NavigationCoordinator(appDependencies: dependencies)
     // 원하는 단계 화면을 바로 보려고 페이지 단계를 미리 앞으로 이동시킵니다.
     // 이 값을 맞추면 중간 단계를 매번 반복하지 않아도 됩니다.
+    let viewModel = BookSettingsManagerViewModel(
+        readingPlanUseCase: dependencies.readingPlanUseCase
+    )
     let pageModel = makeBookSettingsPreviewPageModel(advanceCount: pageAdvanceCount)
 
     return BookSettingsManagerView(
+        viewModel: viewModel,
         bookSettingInputModel: inputModel,
         pageModel: pageModel
     )
