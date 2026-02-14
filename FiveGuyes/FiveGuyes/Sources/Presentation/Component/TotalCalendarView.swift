@@ -14,7 +14,7 @@ struct TotalCalendarView: View {
 
     init(currentReadingBook: FGUserBook) {
         self.currentReadingBook = currentReadingBook
-        self.todayDate = Date().adjustedDate()
+        self.todayDate = DefaultReadingDateProvider().today()
         _currentMonth = State(initialValue: self.todayDate)
     }
     

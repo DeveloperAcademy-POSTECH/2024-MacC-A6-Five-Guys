@@ -16,7 +16,6 @@ struct MainHomeView: View {
     }
 
     let mainAlertMessage = "삭제 후에는 복원할 수 없어요"
-    let today = Date().adjustedDate()
 
     @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
 
@@ -210,7 +209,7 @@ struct MainHomeView: View {
             case .reading:
                 ReadingBooksCarousel(
                     readingBooks: readingBooks,
-                    today: today,
+                    today: viewModel.today(),
                     activeID: $activeBookID
                 )
             case .hasCompletedNoReading:
@@ -355,7 +354,7 @@ struct MainHomeView: View {
 
     @MainActor
     private func reassignReadingSchedules() async {
-        let overdueBooks = await viewModel.rescheduleOnAppOpen(today: today)
+        let overdueBooks = await viewModel.rescheduleOnAppOpen()
         guard !overdueBooks.isEmpty else { return }
 
         for book in overdueBooks {
@@ -378,6 +377,8 @@ struct MainHomeView: View {
 }
 
 #if DEBUG
+// 이 프리뷰는 "읽는 책 있음" 화면을 바로 열어,
+// 입력 없이도 이 분기 UI가 맞는지 빠르게 확인하려고 만든 예시입니다.
 #Preview("읽는 책 있음") {
     MainHomeView(
         viewModel: PreviewSupport.makeMainHomeViewModel()
@@ -385,6 +386,8 @@ struct MainHomeView: View {
     .environment(PreviewSupport.makeCoordinator())
 }
 
+// 이 프리뷰는 "읽는 책 없음 + 완독 있음" 화면을 바로 열어,
+// 입력 없이도 이 분기 UI가 맞는지 빠르게 확인하려고 만든 예시입니다.
 #Preview("읽는 책 없음 + 완독 있음") {
     MainHomeView(
         viewModel: PreviewSupport.makeMainHomeViewModel(
@@ -395,6 +398,8 @@ struct MainHomeView: View {
     .environment(PreviewSupport.makeCoordinator())
 }
 
+// 이 프리뷰는 "읽는 책/완독 모두 없음" 화면을 바로 열어,
+// 입력 없이도 이 분기 UI가 맞는지 빠르게 확인하려고 만든 예시입니다.
 #Preview("읽는 책/완독 모두 없음") {
     MainHomeView(
         viewModel: PreviewSupport.makeMainHomeViewModel(

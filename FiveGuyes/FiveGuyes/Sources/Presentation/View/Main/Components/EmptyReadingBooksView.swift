@@ -67,10 +67,14 @@ struct EmptyReadingBooksView: View {
 }
 
 #if DEBUG
+// 이 프리뷰는 "완독/독서 모두 없음" 화면을 바로 열어,
+// 입력 없이도 이 분기 UI가 맞는지 빠르게 확인하려고 만든 예시입니다.
 #Preview("완독/독서 모두 없음") {
     EmptyReadingBooksView(state: .noCompleted)
 }
 
+// 이 프리뷰는 "완독 있음, 독서 없음" 화면을 바로 열어,
+// 입력 없이도 이 분기 UI가 맞는지 빠르게 확인하려고 만든 예시입니다.
 #Preview("완독 있음, 독서 없음") {
     EmptyReadingBooksView(state: .hasCompleted)
 }

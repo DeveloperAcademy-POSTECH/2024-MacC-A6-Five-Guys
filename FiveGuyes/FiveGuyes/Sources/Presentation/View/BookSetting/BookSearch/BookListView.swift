@@ -68,12 +68,16 @@ struct BookListView: View {
 }
 
 #if DEBUG
+// 이 프리뷰는 "검색 결과 없음" 화면을 바로 열어,
+// 입력 없이도 이 분기 UI가 맞는지 빠르게 확인하려고 만든 예시입니다.
 #Preview("검색 결과 없음") {
     BookListView(
         bookSearchViewModel: PreviewSupport.makeBookSearchViewModel(books: [])
     )
 }
 
+// 이 프리뷰는 "검색 결과 있음" 화면을 바로 열어,
+// 입력 없이도 이 분기 UI가 맞는지 빠르게 확인하려고 만든 예시입니다.
 #Preview("검색 결과 있음") {
     BookListView(
         bookSearchViewModel: PreviewSupport.makeBookSearchViewModel(

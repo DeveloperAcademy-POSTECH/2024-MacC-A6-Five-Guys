@@ -14,9 +14,7 @@ struct DailyProgressView: View {
     
     private let alertText = "전체쪽수를 초과해서 작성했어요!"
     private let alertMessage = "끝까지 읽은 게 맞나요?"
-    
-    private let adjustedToday = Date().adjustedDate()
-    
+
     @FocusState private var isTextTextFieldFocused: Bool
     
     private let userBook: FGUserBook
@@ -28,11 +26,12 @@ struct DailyProgressView: View {
     
     var body: some View {
         @Bindable var bindableViewModel = viewModel
+        let today = viewModel.today()
         let title = userBook.bookMetaData.title
         let targetEndPage = userBook.userSettings.targetEndPage
         let targetEndDate = userBook.userSettings.targetEndDate
         
-        let isTodayCompletionDate = Calendar.app.isDate(adjustedToday, inSameDayAs: targetEndDate)
+        let isTodayCompletionDate = Calendar.app.isDate(today, inSameDayAs: targetEndDate)
         
         VStack(spacing: 0) {
             HStack {
@@ -111,7 +110,7 @@ struct DailyProgressView: View {
         .navigationTitle("오늘 독서 현황 기록하기")
         .customNavigationBackButton()
         .onAppear {
-            viewModel.preloadPages(userBook: userBook, adjustedToday: adjustedToday)
+            viewModel.preloadPages(userBook: userBook)
             isTextTextFieldFocused = true
         }
         .onAppear {
@@ -122,7 +121,7 @@ struct DailyProgressView: View {
 
     @MainActor
     private func submitReading() async {
-        switch await viewModel.submit(bookId: userBook.id, readDate: adjustedToday) {
+        switch await viewModel.submit(bookId: userBook.id) {
         case .none:
             return
         case .popToRoot:
@@ -134,18 +133,24 @@ struct DailyProgressView: View {
 }
 
 #if DEBUG
+// 이 프리뷰는 "일반 진행 상태" 화면을 바로 열어,
+// 입력 없이도 이 분기 UI가 맞는지 빠르게 확인하려고 만든 예시입니다.
 #Preview("일반 진행 상태") {
+    let service = PreviewBookManagementService()
+
     NavigationStack {
         DailyProgressView(
             userBook: PreviewSupport.sampleReadingBook,
             viewModel: DailyProgressViewModel(
-                bookManagementService: PreviewBookManagementService()
+                dailyReadingUseCase: PreviewDailyReadingUseCaseAdapter(service: service)
             )
         )
     }
     .environment(PreviewSupport.makeCoordinator())
 }
 
+// 이 프리뷰는 "완독 마감일" 화면을 바로 열어,
+// 입력 없이도 이 분기 UI가 맞는지 빠르게 확인하려고 만든 예시입니다.
 #Preview("완독 마감일") {
     let dueTodayBook = PreviewSupport.makeBook(
         title: "오늘 완독 목표 도서",
@@ -153,12 +158,13 @@ struct DailyProgressView: View {
         targetEndDateOffset: 0,
         lastReadPage: 300
     )
+    let service = PreviewBookManagementService(readingBooks: [dueTodayBook], completedBooks: [])
 
     NavigationStack {
         DailyProgressView(
             userBook: dueTodayBook,
             viewModel: DailyProgressViewModel(
-                bookManagementService: PreviewBookManagementService(readingBooks: [dueTodayBook], completedBooks: [])
+                dailyReadingUseCase: PreviewDailyReadingUseCaseAdapter(service: service)
             )
         )
     }

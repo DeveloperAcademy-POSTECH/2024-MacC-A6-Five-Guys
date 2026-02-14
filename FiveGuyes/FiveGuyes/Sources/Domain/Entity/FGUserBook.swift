@@ -51,11 +51,12 @@ struct FGUserSetting: Hashable {
     }
     
     func remainingReadingDays(today: Date) -> Int {
-        let remainingReadingDays = try? ReadingDateCalculator().calculateValidReadingDays(
-            startDate: Date().adjustedDate(),
-            endDate: targetEndDate,
-            excludedDates: excludedReadingDays)
-        
+        let remainingReadingDays = try? DateMathCalculator().validDays(
+            from: today,
+            to: targetEndDate,
+            excluding: excludedReadingDays
+        )
+
         return remainingReadingDays ?? 0
     }
 }

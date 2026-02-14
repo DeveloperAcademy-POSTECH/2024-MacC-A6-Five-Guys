@@ -25,7 +25,7 @@ final class ReadingProgress {
     }
     
     func getAdjustedReadingRecordsKey(_ date: Date) -> String {
-        date.toAdjustedYearMonthDayString()
+        DayBoundary.shared.adjustedDayKey(from: date)
     }
     
     func getAdjustedReadingRecord(for date: Date) -> ReadingRecord? {
@@ -45,66 +45,26 @@ final class ReadingProgress {
     }
     
     // 모든 주 시작 날짜를 계산
+    // 독서 기간을 주 단위로 나눌 때 기준이 되는 시작일 목록을 만들어, 주간 요약/캘린더 계산의 기준을 맞춥니다.
     func getAllWeekStartDates(for settings: UserSettings) -> [Date] {
-        let firstDate = settings.startDate
-        let lastDate = settings.targetEndDate
-        
-        let today = Date().adjustedDate()
-
-        // 오늘이 시작일보다 이전일 경우 처리
-        let effectiveStartDay = today < firstDate ? today : firstDate
-        
-        let calendar = Calendar.app
-        let firstWeekStart = calendar.dateInterval(of: .weekOfMonth, for: effectiveStartDay)?.start ?? effectiveStartDay
-        let lastWeekStart = calendar.dateInterval(of: .weekOfMonth, for: lastDate)?.start ?? lastDate
-        
-        var startDates: [Date] = []
-        var currentStart = firstWeekStart
-        
-        while currentStart <= lastWeekStart {
-            startDates.append(currentStart)
-            currentStart = calendar.date(byAdding: .weekOfMonth, value: 1, to: currentStart) ?? currentStart
-        }
-        
-        return startDates
+        settings.toFGUserSetting().weeklyStartDates(today: DayBoundary.shared.adjustedNow())
     }
     
     // ReadingProgressCalculatable 구현
     func nonZeroReadingDaysCount() -> Int {
-        let readingDays = readingRecords.values.filter { $0.pagesRead > 0 }
+        let readingDays = toFGReadingProgress().dailyReadingRecords.values.filter { $0.pagesRead > 0 }
         return readingDays.isEmpty ? 1 : readingDays.count
     }
     
-    func findNextReadingDay() -> Date? {
-        let today = lastReadDate ?? Date()
-        let todayString = today.toAdjustedYearMonthDayString()
-        
-        for dateString in readingRecords.keys.sorted()
-        where dateString >= todayString {
-            let record = readingRecords[dateString]
-            if record?.pagesRead == 0 {
-                return dateString.toDate()
-            }
-        }
-        return nil
+    func findNextReadingDay(today: Date) -> Date? {
+        toFGReadingProgress().findNextReadingDay(today: today)
     }
     
-    func findNextReadingPagesPerDay(for settings: UserSettings) -> Int {
-        let readingPagesCalculator = ReadingPagesCalculator()
-        let readingDateCalculator = ReadingDateCalculator()
-        // TODO: !!!!!!!!!
-        let adjustedToday = Date().adjustedDate()
-        do {
-            let totalDays = try readingDateCalculator.calculateValidReadingDays(startDate: adjustedToday, endDate: settings.targetEndDate, excludedDates: settings.nonReadingDays)
-            
-            return readingPagesCalculator.calculatePagesPerDayAndRemainder(
-                totalDays: totalDays,
-                startPage: self.lastPagesRead,
-                endPage: settings.targetEndPage)
-            .pagesPerDay
-            
-        } catch {
-            return 1
-        }
+    // 마지막 기록 이후 남은 기간을 기준으로 다음 독서일 목표 페이지를 계산해, 사용자가 바로 다음 목표를 확인할 수 있게 합니다.
+    func findNextReadingPagesPerDay(for settings: UserSettings, today: Date) -> Int {
+        toFGReadingProgress().findNextReadingPagesPerDay(
+            for: settings.toFGUserSetting(),
+            today: today
+        )
     }
 }

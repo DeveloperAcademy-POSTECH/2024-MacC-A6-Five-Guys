@@ -95,7 +95,7 @@ struct CompletionCelebrationView: View {
     }
     
     private func readingSummary(userSettings: FGUserSetting, readingProgress: FGReadingProgress) -> some View {
-        let readingPagesCalculator = ReadingPagesCalculator()
+        let pageMath = PageMathCalculator()
         
         // TODO: 완독을 수정할 수도 있기 때문에 완독 날짜가 바뀔 수 있음, 그래서 완독 날짜는 최종에서 업데이트하고 여기서는 오늘 날짜로 보여주기 -> 초기 설정 날보다 빠를 수도 있음 🐯
         let endDateText = Date().toKoreanDateString()
@@ -107,9 +107,12 @@ struct CompletionCelebrationView: View {
             readingProgress.dailyReadingRecords.values.filter { $0.pagesRead > 0 }.count,
             1
         )
-        let totalReadingPages = readingPagesCalculator.calculatePagesBetween(endPage: userSettings.targetEndPage, startPage: userSettings.startPage)
+        let totalReadingPages = (try? pageMath.pagesBetween(
+            from: userSettings.startPage,
+            to: userSettings.targetEndPage
+        )) ?? 0
 
-        let pagesPerDay = (try? readingPagesCalculator.calculatePagesPerDay(totalPages: totalReadingPages, totalDays: totalReadingDays))
+        let pagesPerDay = (try? pageMath.pagesPerDay(totalPages: totalReadingPages, totalDays: totalReadingDays))
             ?? totalReadingPages
         
         return Text("\(startDateText)부터 \(endDateText)까지\n꾸준히 \(pagesPerDay)쪽씩 \(totalReadingDays)일동안 읽었어요 🎉")

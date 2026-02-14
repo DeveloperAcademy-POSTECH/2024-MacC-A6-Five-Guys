@@ -8,6 +8,8 @@
 #if DEBUG
 import Foundation
 
+// 화면 값은 메인 스레드에서만 바꿔야 안전합니다.
+// 이 표시를 붙여, 다른 스레드가 끼어들어 상태가 꼬이는 일을 막습니다.
 @MainActor
 extension PreviewSupport {
     static var sampleReadingBook: FGUserBook {
@@ -26,6 +28,8 @@ extension PreviewSupport {
         ]
     }
 
+    // 화면 분기를 확인할 때 쓸 샘플 책을 빠르게 만드는 함수입니다.
+    // 완독/미완독 상태를 쉽게 바꿔 다양한 화면을 검증합니다.
     static func makeBook(
         title: String,
         isCompleted: Bool,
@@ -34,7 +38,9 @@ extension PreviewSupport {
         lastReadPage: Int? = nil,
         reviewAfterCompletion: String? = nil
     ) -> FGUserBook {
-        let today = Date().adjustedDate()
+        // 계산 기준이 흔들리지 않게 오늘 날짜를 먼저 고정합니다.
+        // 기준이 매번 바뀌면 같은 프리뷰가 다르게 보여 디버깅이 어려워집니다.
+        let today = DefaultReadingDateProvider().today()
         let recordKey = today.toYearMonthDayString()
         let readingRecords = [recordKey: ReadingRecord(targetPages: 20, pagesRead: isCompleted ? 20 : 12)]
         let targetEndDate = Calendar.app.date(byAdding: .day, value: targetEndDateOffset, to: today) ?? today

@@ -190,6 +190,8 @@ struct NotiSettingView: View {
 }
 
 #if DEBUG
+// 이 프리뷰는 "기본 상태" 화면을 바로 열어,
+// 입력 없이도 이 분기 UI가 맞는지 빠르게 확인하려고 만든 예시입니다.
 #Preview("기본 상태") {
     NavigationStack {
         NotiSettingView(
@@ -199,6 +201,8 @@ struct NotiSettingView: View {
     }
 }
 
+// 이 프리뷰는 "시스템 알림 비활성화" 화면을 바로 열어,
+// 입력 없이도 이 분기 UI가 맞는지 빠르게 확인하려고 만든 예시입니다.
 #Preview("시스템 알림 비활성화") {
     NavigationStack {
         NotiSettingView(
@@ -208,6 +212,8 @@ struct NotiSettingView: View {
     }
 }
 
+// 이 프리뷰는 "리마인드 시간 피커 열림" 화면을 바로 열어,
+// 입력 없이도 이 분기 UI가 맞는지 빠르게 확인하려고 만든 예시입니다.
 #Preview("리마인드 시간 피커 열림") {
     NavigationStack {
         NotiSettingView(
@@ -220,7 +226,11 @@ struct NotiSettingView: View {
     }
 }
 
+// 화면 값은 메인 스레드에서만 바꿔야 안전합니다.
+// 이 표시를 붙여, 다른 스레드가 끼어들어 상태가 꼬이는 일을 막습니다.
 @MainActor
+// 알림 화면 검증에 필요한 권한, 토글, 시간 값을 한 번에 만드는 헬퍼입니다.
+// 값이 흩어지면 같은 시나리오를 다시 만들기 어려워집니다.
 private func makeNotiSettingPreviewViewModel(
     isSystemNotificationEnabled: Bool = true,
     isNotificationDisabled: Bool = false,

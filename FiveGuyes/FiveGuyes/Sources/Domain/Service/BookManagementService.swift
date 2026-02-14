@@ -24,10 +24,9 @@ protocol BookManagementService {
     /// - Parameters:
     ///   - bookId: 책 ID
     ///   - pagesRead: 읽은 페이지 수
-    ///   - readDate: 독서 날짜
     /// - Returns: 기록 결과 (완독, 일반 기록, 날짜 연장, 목표 초과)
     /// - Throws: 기록 실패 시 에러
-    func recordReading(bookId: UUID, pagesRead: Int, readDate: Date) async throws -> RecordReadingResult
+    func recordReading(bookId: UUID, pagesRead: Int) async throws -> RecordReadingResult
 
     /// 책을 삭제하고 관련 알림을 취소합니다.
     /// - Parameter id: 삭제할 책 ID
@@ -37,10 +36,9 @@ protocol BookManagementService {
     /// 책을 완독 처리하고 알림을 취소합니다.
     /// - Parameters:
     ///   - id: 완료할 책 ID
-    ///   - completionDate: 완독 날짜
     ///   - review: 완독 소감
     /// - Throws: 완료 처리 실패 시 에러
-    func completeBook(id: UUID, completionDate: Date, review: String) async throws
+    func completeBook(id: UUID, review: String) async throws
 
     /// 완독 소감만 수정합니다.
     /// - Parameters:
@@ -55,14 +53,12 @@ protocol BookManagementService {
     ///   - startDate: 변경된 시작일
     ///   - targetEndDate: 변경된 종료일
     ///   - excludedReadingDays: 변경된 쉬는 날 목록
-    ///   - today: 기준 날짜 (보정된 날짜)
     /// - Throws: 재분배 또는 저장 실패 시 에러
     func updateReadingPlan(
         bookId: UUID,
         startDate: Date,
         targetEndDate: Date,
-        excludedReadingDays: [Date],
-        today: Date
+        excludedReadingDays: [Date]
     ) async throws
 
     // MARK: - Query (읽기 작업)
@@ -84,9 +80,10 @@ protocol BookManagementService {
     func fetchBookDetail(id: UUID) async throws -> FGUserBook
 
     /// 앱 재진입 시 오늘 기준으로 남은 독서 스케줄을 재분배합니다.
-    /// - Parameters:
-    ///   - bookId: 대상 책 ID
-    ///   - today: 기준 날짜 (보정된 날짜)
+    /// - Parameter bookId: 대상 책 ID
     /// - Throws: 재분배 실패 또는 목표일 초과 에러
-    func rescheduleOnAppOpen(bookId: UUID, today: Date) async throws
+    func rescheduleOnAppOpen(bookId: UUID) async throws
+
+    /// 도메인 기준 "오늘"(04:00 경계 보정)을 반환합니다.
+    func today() -> Date
 }

@@ -214,13 +214,18 @@ struct TextView: View {
 }
 
 #if DEBUG
+// 이 프리뷰는 "완독 목표 요약" 화면을 바로 열어,
+// 입력 없이도 이 분기 UI가 맞는지 빠르게 확인하려고 만든 예시입니다.
 #Preview("완독 목표 요약") {
+    // 프리뷰에서 단계 화면을 바로 보여주려고 입력 모델을 먼저 채워 둡니다.
+    // 초기값이 있어야 다음 단계 UI를 안정적으로 확인할 수 있습니다.
     let inputModel = PreviewSupport.makeBookSettingInputModel()
+    let service = PreviewBookManagementService()
 
     NavigationStack {
         FinishGoalView(
             viewModel: FinishGoalViewModel(
-                bookManagementService: PreviewBookManagementService()
+                bookRegistrationUseCase: PreviewBookRegistrationUseCaseAdapter(service: service)
             )
         )
     }
@@ -228,13 +233,18 @@ struct TextView: View {
     .environment(inputModel)
 }
 
+// 이 프리뷰는 "입력 누락 상태" 화면을 바로 열어,
+// 입력 없이도 이 분기 UI가 맞는지 빠르게 확인하려고 만든 예시입니다.
 #Preview("입력 누락 상태") {
+    // 프리뷰에서 단계 화면을 바로 보여주려고 입력 모델을 먼저 채워 둡니다.
+    // 초기값이 있어야 다음 단계 UI를 안정적으로 확인할 수 있습니다.
     let inputModel = BookSettingInputModel()
+    let service = PreviewBookManagementService()
 
     NavigationStack {
         FinishGoalView(
             viewModel: FinishGoalViewModel(
-                bookManagementService: PreviewBookManagementService()
+                bookRegistrationUseCase: PreviewBookRegistrationUseCaseAdapter(service: service)
             )
         )
     }

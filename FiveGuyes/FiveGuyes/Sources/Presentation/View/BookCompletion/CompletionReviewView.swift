@@ -94,8 +94,7 @@ struct CompletionReviewView: View {
     private func submitReview() async {
         let outcome = await viewModel.submit(
             userBookId: userBook.id,
-            isUpdateMode: isUpdateMode,
-            completionDate: Date().adjustedDate()
+            isUpdateMode: isUpdateMode
         )
 
         if case .popToRoot = outcome {
@@ -105,23 +104,33 @@ struct CompletionReviewView: View {
 }
 
 #if DEBUG
+// 이 프리뷰는 "완독 소감 작성" 화면을 바로 열어,
+// 입력 없이도 이 분기 UI가 맞는지 빠르게 확인하려고 만든 예시입니다.
 #Preview("완독 소감 작성") {
+    let service = PreviewBookManagementService()
+
     NavigationStack {
         CompletionReviewView(
             userBook: PreviewSupport.sampleCompletedBook,
             viewModel: CompletionReviewViewModel(
-                bookManagementService: PreviewBookManagementService()
+                bookCompletionUseCase: PreviewBookCompletionUseCaseAdapter(service: service)
             )
         )
     }
     .environment(PreviewSupport.makeCoordinator())
 }
 
+// 이 프리뷰는 "완독 소감 수정" 화면을 바로 열어,
+// 입력 없이도 이 분기 UI가 맞는지 빠르게 확인하려고 만든 예시입니다.
 #Preview("완독 소감 수정") {
     let reviewedBook = PreviewSupport.makeBook(
         title: "소감이 있는 도서",
         isCompleted: true,
         reviewAfterCompletion: "이미 남겨둔 완독 소감입니다."
+    )
+    let service = PreviewBookManagementService(
+        readingBooks: [],
+        completedBooks: [reviewedBook]
     )
 
     NavigationStack {
@@ -129,10 +138,7 @@ struct CompletionReviewView: View {
             isUpdateMode: true,
             userBook: reviewedBook,
             viewModel: CompletionReviewViewModel(
-                bookManagementService: PreviewBookManagementService(
-                    readingBooks: [],
-                    completedBooks: [reviewedBook]
-                )
+                bookCompletionUseCase: PreviewBookCompletionUseCaseAdapter(service: service)
             )
         )
     }

@@ -8,7 +8,16 @@
 import UserNotifications
 
 final class NotificationManager {
-    private let notificationCenter = UNUserNotificationCenter.current()
+    private let notificationCenter: UNUserNotificationCenter
+    private let todayProvider: any ReadingDateProviding
+
+    init(
+        notificationCenter: UNUserNotificationCenter = .current(),
+        todayProvider: any ReadingDateProviding = DefaultReadingDateProvider()
+    ) {
+        self.notificationCenter = notificationCenter
+        self.todayProvider = todayProvider
+    }
     
     /// 모든 노티를 요청하는 메서드
     func canSendNotifications() async -> Bool {
@@ -68,14 +77,15 @@ final class NotificationManager {
     }
     
     private func scheduleReminderNotification(notificationType: NotificationType) async {
+        let today = todayProvider.today()
         // dateContent가 nil일 경우 알림을 보내지 않음
-        guard let date = notificationType.dateContent() else {
+        guard let date = notificationType.dateContent(today: today) else {
             print("❌ NotificationManager: 다음 읽기 날짜가 없어 알림을 생성하지 않습니다.")
             return
         }
         
         let dateComponents = makeDateComponents(date: date, notificationType)
-        let content = makeNotificationContent(notificationType)
+        let content = makeNotificationContent(notificationType, today: today)
         
         let identifier = notificationType.identifier()
         
@@ -101,12 +111,17 @@ final class NotificationManager {
         return DateComponents(year: year, month: month, day: day, hour: hour, minute: minute)
     }
     
-    private func makeNotificationContent(_ notificationType: NotificationType) -> UNMutableNotificationContent {
+    private func makeNotificationContent(
+        _ notificationType: NotificationType,
+        today: Date
+    ) -> UNMutableNotificationContent {
         let content = UNMutableNotificationContent()
-        let (title, body) = notificationType.descriptionContent()
+        let (title, body) = notificationType.descriptionContent(today: today)
         content.title = title
         content.body = body
         
         return content
     }
 }
+
+extension NotificationManager: ReadingNotificationScheduling {}

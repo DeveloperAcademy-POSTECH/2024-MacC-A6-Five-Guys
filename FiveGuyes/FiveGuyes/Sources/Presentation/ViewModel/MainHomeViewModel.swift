@@ -14,24 +14,23 @@ final class MainHomeViewModel {
     private(set) var readingBooks: [FGUserBook] = []
     private(set) var completedBooks: [FGUserBook] = []
 
-    private let bookManagementService: any BookManagementService
+    private let readingLibraryUseCase: any ReadingLibraryUsing
     private let notificationManager: any NotificationManaging
 
     init(
-        bookManagementService: any BookManagementService,
+        readingLibraryUseCase: any ReadingLibraryUsing,
         notificationManager: any NotificationManaging
     ) {
-        self.bookManagementService = bookManagementService
+        self.readingLibraryUseCase = readingLibraryUseCase
         self.notificationManager = notificationManager
     }
 
     func loadBooks() async {
         do {
-            let readingBooks = try await bookManagementService.fetchReadingBooks()
-            let completedBooks = try await bookManagementService.fetchCompletedBooks()
+            let bookLists = try await readingLibraryUseCase.fetchLibrarySnapshot()
 
-            self.readingBooks = readingBooks
-            self.completedBooks = completedBooks
+            self.readingBooks = bookLists.readingBooks
+            self.completedBooks = bookLists.completedBooks
         } catch {
             print("홈 목록 조회 중 오류 발생: \(error.localizedDescription)")
         }
@@ -39,7 +38,7 @@ final class MainHomeViewModel {
 
     func deleteBook(id: UUID) async -> Bool {
         do {
-            try await bookManagementService.deleteBook(id: id)
+            try await readingLibraryUseCase.deleteBook(id: id)
             await loadBooks()
             return true
         } catch {
@@ -48,7 +47,11 @@ final class MainHomeViewModel {
         }
     }
 
-    func rescheduleOnAppOpen(today: Date) async -> [FGUserBook] {
+    func today() -> Date {
+        readingLibraryUseCase.today()
+    }
+
+    func rescheduleOnAppOpen() async -> [FGUserBook] {
         guard !readingBooks.isEmpty else { return [] }
 
         let currentBooks = readingBooks
@@ -56,10 +59,7 @@ final class MainHomeViewModel {
 
         for book in currentBooks {
             do {
-                try await bookManagementService.rescheduleOnAppOpen(
-                    bookId: book.id,
-                    today: today
-                )
+                try await readingLibraryUseCase.rescheduleOnAppOpen(bookId: book.id)
             } catch ScheduleCalculationError.targetDatePassed {
                 overdueBooks.append(book)
             } catch {

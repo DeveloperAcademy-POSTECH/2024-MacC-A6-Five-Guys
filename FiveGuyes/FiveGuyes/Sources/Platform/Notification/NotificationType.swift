@@ -11,7 +11,7 @@ enum NotificationType {
     case morning(readingBook: FGUserBook)
     case night(readingBook: FGUserBook)
     
-    func descriptionContent() -> (title: String, body: String) {
+    func descriptionContent(today: Date) -> (title: String, body: String) {
         switch self {
         case .morning(let readingBook):
             // 랜덤 타이틀 선택
@@ -21,7 +21,10 @@ enum NotificationType {
             // 타이틀에 %d가 있으면 페이지 수 대입
             var title: String {
                 if titleTemplate.contains("%d") {
-                    let pages = readingBook.readingProgress.findNextReadingPagesPerDay(for: readingBook.userSettings)
+                    let pages = readingBook.readingProgress.findNextReadingPagesPerDay(
+                        for: readingBook.userSettings,
+                        today: today
+                    )
                     return String(format: titleTemplate, pages)
                 } else {
                     return titleTemplate
@@ -38,10 +41,10 @@ enum NotificationType {
         }
     }
     
-    func dateContent() -> Date? {
+    func dateContent(today: Date) -> Date? {
         switch self {
         case .morning(let readingBook), .night(let readingBook):
-            return readingBook.readingProgress.findNextReadingDay()
+            return readingBook.readingProgress.findNextReadingDay(today: today)
         }
     }
     

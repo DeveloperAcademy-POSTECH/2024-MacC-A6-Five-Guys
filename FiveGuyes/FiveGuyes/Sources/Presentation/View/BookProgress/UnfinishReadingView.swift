@@ -160,7 +160,11 @@ struct UnfinishReadingView: View {
 }
 
 #if DEBUG
+// 이 프리뷰는 "기본 상태" 화면을 바로 열어,
+// 입력 없이도 이 분기 UI가 맞는지 빠르게 확인하려고 만든 예시입니다.
 #Preview("기본 상태") {
+    let service = PreviewBookManagementService()
+
     NavigationStack {
         UnfinishReadingView(
             userBook: PreviewSupport.makeBook(
@@ -169,13 +173,15 @@ struct UnfinishReadingView: View {
                 lastReadPage: 184
             ),
             viewModel: UnfinishReadingViewModel(
-                bookManagementService: PreviewBookManagementService()
+                bookCompletionUseCase: PreviewBookCompletionUseCaseAdapter(service: service)
             )
         )
     }
     .environment(PreviewSupport.makeCoordinator())
 }
 
+// 이 프리뷰는 "표지 이미지 있는 상태" 화면을 바로 열어,
+// 입력 없이도 이 분기 UI가 맞는지 빠르게 확인하려고 만든 예시입니다.
 #Preview("표지 이미지 있는 상태") {
     let bookWithCover = PreviewSupport.makeBook(
         title: "표지 있는 미완독 도서",
@@ -183,12 +189,13 @@ struct UnfinishReadingView: View {
         coverImageURL: "https://example.com/sample-cover.jpg",
         lastReadPage: 210
     )
+    let service = PreviewBookManagementService(readingBooks: [bookWithCover], completedBooks: [])
 
     NavigationStack {
         UnfinishReadingView(
             userBook: bookWithCover,
             viewModel: UnfinishReadingViewModel(
-                bookManagementService: PreviewBookManagementService(readingBooks: [bookWithCover], completedBooks: [])
+                bookCompletionUseCase: PreviewBookCompletionUseCaseAdapter(service: service)
             )
         )
     }

@@ -26,8 +26,9 @@ FiveGuyes는 사용자의 책/목표일/목표페이지를 입력받아, 매일 
 - 앱 진입점: `FiveGuyes/FiveGuyes/Sources/App/FiveGuyesApp.swift`
 - 루트 네비게이션: `FiveGuyes/FiveGuyes/Sources/App/NavigationRootView.swift`
 - 화면 라우팅 정의: `FiveGuyes/FiveGuyes/Sources/Presentation/ViewModel/NavigationCoordinator.swift`
-- 도메인 퍼사드 서비스: `FiveGuyes/FiveGuyes/Sources/Domain/Service/BookManagementService.swift`
-- 서비스 구현체: `FiveGuyes/FiveGuyes/Sources/Domain/Service/DefaultBookManagementService.swift`
+- 도메인 실행 단위(UseCase): `FiveGuyes/FiveGuyes/Sources/Domain/UseCase/BookManagement/BookManagementUseCases.swift`
+- 하루 경계 단일 진입(Service Provider): `FiveGuyes/FiveGuyes/Sources/Domain/Service/ReadingDateProviding.swift`
+- 호환 계층(Preview/Test): `FiveGuyes/FiveGuyes/Sources/Domain/Service/BookManagementService.swift` (프로토콜 + 테스트/프리뷰 스텁)
 
 ## 3) Code map
 
@@ -36,8 +37,9 @@ FiveGuyes는 사용자의 책/목표일/목표페이지를 입력받아, 매일 
 - `Presentation/`: SwiftUI View, UI 상태/네비게이션
 - `Domain/`: 엔티티, 서비스 인터페이스, 비즈니스 규칙
 - `Data/`: Repository 구현, SwiftData 스키마/매핑
-- `Model/`, `Util/`: 레거시 계산기 + V2 계산기/유틸리티
-- `Store/`: 외부 API 연동(도서 검색)
+- `Platform/`: 알림/분석/시스템 설정 같은 OS 연동 구현
+- `Store/`: 외부 API 연동(도서 검색) + API 전용 모델
+- `Util/`: 도메인 계산기가 조합해서 쓰는 순수 계산 유틸리티
 
 주요 컴포넌트:
 
@@ -45,17 +47,18 @@ FiveGuyes는 사용자의 책/목표일/목표페이지를 입력받아, 매일 
 
 - 책임: 사용자 입력 수집, 화면 렌더링, 화면 전환
 - 소유 상태: 포커스/입력값/토글/선택 인덱스 같은 UI 상태
-- 의존: Domain 서비스 프로토콜, Domain 엔티티
+- 의존: Domain UseCase 프로토콜, Domain 엔티티
 - 금지 의존(목표): SwiftData 모델 타입(`UserBookSchemaV2.UserBookV2`)과 직접 저장 로직
 - 경계 상태: 앱의 최외곽 입력 경계
 
 ### Domain
 
-- 책임: 책 등록/기록/완독/삭제, 스케줄 계산, 유효성 규칙
+- 책임: 책 등록/기록/완독/삭제, 스케줄 계산, 유효성 규칙, UseCase 실행 단위 제공
 - 소유 상태: 불변 데이터 구조(`FGUserBook`, `FGUserSetting`, `FGReadingProgress`)
-- 의존: Repository/알림/시간 공급자 같은 추상화
+- 의존: Repository/알림/시간 정책 같은 추상화
 - 금지 의존: SwiftUI, SwiftData, View 타입
 - 경계 상태: 앱의 핵심 규칙 계층
+- 구현 메모: 운영 경계는 `ViewModel -> UseCase` 직접 의존으로 고정되었고, `BookManagementService`는 Preview/Test 호환 프로토콜로만 유지(기본 구현체 제거)
 
 ### Data
 
@@ -74,7 +77,7 @@ FiveGuyes는 사용자의 책/목표일/목표페이지를 입력받아, 매일 
 
 **Architecture Invariant: Domain 데이터는 `FG*` 타입으로만 계층 경계를 넘는다**
 - Rationale: 저장소 기술(SwiftData) 변경 시 UI/도메인 영향 최소화
-- Enforced by: `BookRepository`, `BookManagementService` 시그니처
+- Enforced by: `BookRepository`, `BookManagementUseCases` 시그니처
 - Violation symptoms: View에서 SwiftData 모델 필드 직접 수정
 
 **Architecture Invariant: SwiftData fetch/save는 Data 계층에서만 수행한다**
@@ -82,33 +85,33 @@ FiveGuyes는 사용자의 책/목표일/목표페이지를 입력받아, 매일 
 - Enforced by: `SwiftDataBookRepository`로 영속성 집중
 - Violation symptoms: View의 `modelContext.insert/save/delete`
 
-**Architecture Invariant: 스케줄 계산 로직은 V2 계산기 단일 경로를 사용한다**
+**Architecture Invariant: 스케줄 계산 로직은 단일 계산기 경로를 사용한다**
 - Rationale: 중복 계산식 제거 및 결과 일관성 확보
-- Enforced by: `ReadingScheduleCalculatorV2`, `DateMathCalculator`, `PageMathCalculator`
+- Enforced by: `ReadingScheduleCalculator`, `DateMathCalculator`, `PageMathCalculator`
 - Violation symptoms: 화면별 다른 계산 결과, 같은 입력의 상이한 목표 페이지
 
-**Architecture Invariant: 화면은 Command/Query를 서비스 경유로 호출한다**
-- Rationale: Use case 단위 테스트 가능 구조 유지
-- Enforced by: `BookManagementService` API
-- Violation symptoms: View에서 엔티티를 직접 mutate하고 저장 시점이 분산됨
+**Architecture Invariant: 화면은 Command/Query를 UseCase 경유로 호출한다**
+- Rationale: 화면이 필요한 실행 단위만 의존해 경계/테스트를 단순화
+- Enforced by: `AppDependencies`의 UseCase 조립 + ViewModel 생성자 시그니처 (`...Using`)
+- Violation symptoms: ViewModel이 과도한 파사드 인터페이스 또는 저장소를 직접 참조
 
 **Architecture Invariant: 변환 로직은 매핑 확장 파일에서만 수행한다**
 - Rationale: 매핑 규칙의 단일 소스 유지
 - Enforced by: `FGUserBook+toUserBookV2.swift`, `UserBookV2+toFGUserBook.swift`
 - Violation symptoms: 임의의 View/Service에서 ad-hoc 변환 코드 생성
 
-**Architecture Invariant: 날짜 경계(자정 유예 포함)는 공용 Date 확장/도우미로 정규화한다**
+**Architecture Invariant: 날짜 경계(04:00~03:59)는 단일 정책(`DayBoundaryProviding`)으로 정규화한다**
 - Rationale: 날짜 비교/집계 오차 방지
-- Enforced by: `Date+Extension`, V2 계산기의 date key 처리
+- Enforced by: `DayBoundaryProviding`, `DefaultDayBoundaryPolicy`, `Date+Extension` 위임 경로
 - Violation symptoms: 화면별 날짜 키 불일치, 기록 누락/중복
 
-2026-02-12 기준 1차 리팩터링 범위에서 위 불변식을 만족하도록 경계 이행을 완료했습니다. 후속 개선(추가 ViewModel 분리 등)은 `./docs/execplans/mvvm-architecture-refactoring-execplan.md`에서 추적합니다.
+2026-02-14 기준 운영 경로의 UseCase-first 경계 이행, `ReadingDateProviding` 도입, `DefaultBookManagementService` 제거를 반영했습니다. 남은 정리 항목은 `./docs/execplans/tech-debt-tracker.md`에서 추적합니다.
 
 ## 5) Boundaries & API surfaces
 
-Boundary A: 도메인 퍼사드 `BookManagementService`
+Boundary A: 도메인 실행 경계 `UseCase` 인터페이스
 - 넘어오는 것: 사용자 액션 의도(등록/기록/완독/삭제/조회)
-- 금지되는 것: SwiftData 모델 객체 자체
+- 금지되는 것: SwiftData 모델 객체 자체, View 상태 객체
 
 Boundary B: 영속성 인터페이스 `BookRepository`
 - 넘어오는 것: `FGUserBook`, `FGReadingProgress`, `FGUserSetting` 등 Domain 타입
@@ -118,9 +121,13 @@ Boundary C: DTO/모델 매핑 확장
 - 파일: `FGUserBook+toUserBookV2.swift`, `UserBookV2+toFGUserBook.swift`
 - 규칙: 모델 변환은 여기서만 수행
 
-Boundary D: 알림/시스템 연동
+Boundary D: 인프라 서비스 경계 (`ReadingNotificationScheduling`, `NotificationManaging`, `NotificationSettingsStoring`, `BookSearching`, `DayBoundaryProviding`)
 - 넘어오는 것: Domain 기반 상태(책 정보, 알림 시간 설정)
-- 금지되는 것: Presentation 계층에서 직접 시스템 권한/요청 생성
+- 금지되는 것: Presentation 계층에서 직접 시스템 권한/요청 생성, UseCase의 concrete 플랫폼 타입 직접 의존
+
+Boundary E: 호환 파사드 경계 (`BookManagementService`)
+- 사용처: Preview/Test 어댑터 및 스텁
+- 금지되는 것: 운영 ViewModel/App 조립 경로에서 신규 의존 추가
 
 "only here" 규칙:
 - SwiftData IO는 `Data/RepositoryImpl`에서만 수행
@@ -130,9 +137,11 @@ Boundary D: 알림/시스템 연동
 ## 6) Cross-cutting concerns
 
 테스트 전략(경계 기준):
-- Pure 계산 테스트: `FiveGuyes/FiveGuyesTests/DateMathCalculatorTests.swift`, `PageMathCalculatorTests.swift`, `ReadingScheduleCalculatorV2Tests.swift`
-- 서비스 테스트: `FiveGuyes/FiveGuyesTests/DefaultBookManagementServiceTests.swift` (Mock Repository 사용)
-- 저장소 테스트: `FiveGuyes/FiveGuyesTests/SwiftDataBookRepositoryTests.swift` (In-memory SwiftData)
+- Pure 계산 테스트: `FiveGuyes/FiveGuyesTests/Domain/Calculator/DateMathCalculatorTests.swift`, `FiveGuyes/FiveGuyesTests/Domain/Calculator/PageMathCalculatorTests.swift`, `FiveGuyes/FiveGuyesTests/Domain/Calculator/ReadingScheduleCalculator*.swift`
+- UseCase/화면 경계 테스트: `FiveGuyes/FiveGuyesTests/Presentation/ViewModel/*.swift`
+- UseCase 실행 테스트: `FiveGuyes/FiveGuyesTests/Domain/UseCase/BookManagementUseCases*.swift` (Mock Repository + NotificationSchedulerSpy 사용)
+- 알림/다음 독서 계산 테스트: `FiveGuyes/FiveGuyesTests/Domain/Entity/FGReadingProgressNotificationTests.swift`
+- 저장소 테스트: `FiveGuyes/FiveGuyesTests/Data/Repository/SwiftDataBookRepositoryTests.swift` (In-memory SwiftData)
 
 에러 처리 전략:
 - Data 계층은 `RepositoryError`로 저장소 실패를 표준화
@@ -143,4 +152,5 @@ Boundary D: 알림/시스템 연동
 
 - 리팩터링 실행/결과 기록: `./docs/execplans/mvvm-architecture-refactoring-execplan.md`
 - Presentation 패턴 결정 기록(ADR): `./docs/decisions/adr-0001-presentation-architecture.md`
+- UseCase/Service 경계 결정 기록(ADR): `./docs/decisions/adr-0002-usecase-first-boundary.md`
 - 실행 계획 표준: `./PLANS.md`

@@ -9,6 +9,8 @@ import Foundation
 
 /// 페이지 수 계산을 담당하는 Pure Function 수학 유틸리티
 struct PageMathCalculator {
+    // 페이지 계산 규칙을 분리해 둔 유틸입니다.
+    // 본 계산기는 일정 흐름만 담당하게 해 코드 이해를 쉽게 만듭니다.
 
     // MARK: - Error Types
 

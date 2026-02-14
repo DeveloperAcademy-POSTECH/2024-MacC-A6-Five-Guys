@@ -162,28 +162,40 @@ struct CalendarGridView: View {
 }
 
 #if DEBUG
+// 이 프리뷰는 "기본 상태" 화면을 바로 열어,
+// 입력 없이도 이 분기 UI가 맞는지 빠르게 확인하려고 만든 예시입니다.
 #Preview("기본 상태") {
     let today = Date()
     CalendarGridView(
         month: today,
         calendarCalculator: CalendarCalculator(),
-        calendarCellModel: CalendarCellModel(adjustedToday: today),
+        calendarCellModel: CalendarCellModel(today: today),
         toastViewModel: ToastViewModel()
     )
 }
 
+// 이 프리뷰는 "기간 선택 확정 상태" 화면을 바로 열어,
+// 입력 없이도 이 분기 UI가 맞는지 빠르게 확인하려고 만든 예시입니다.
 #Preview("기간 선택 확정 상태") {
-    let today = Date().adjustedDate()
+    // 계산 기준이 흔들리지 않게 오늘 날짜를 먼저 고정합니다.
+    // 기준이 매번 바뀌면 같은 프리뷰가 다르게 보여 디버깅이 어려워집니다.
+    let today = DefaultReadingDateProvider().today()
     let calendar = Calendar.app
+    // 시작 날짜를 명확히 정해 둡니다.
+    // 그래야 이후 페이지 계산과 캘린더 표시가 같은 기준으로 움직입니다.
     let startDate = calendar.date(byAdding: .day, value: 1, to: today) ?? today
+    // 종료 날짜를 정해 목표 기간 길이를 확정합니다.
+    // 이 값이 없으면 하루 목표 계산 자체를 할 수 없습니다.
     let endDate = calendar.date(byAdding: .day, value: 7, to: today) ?? today
+    // 쉬는 날이 선택된 상황을 재현하려고 샘플 날짜를 하나 넣습니다.
+    // 이 값이 있어야 제외일 관련 캘린더 표시가 올바른지 확인할 수 있습니다.
     let excludedDate = calendar.date(byAdding: .day, value: 3, to: today) ?? today
 
     CalendarGridView(
         month: today,
         calendarCalculator: CalendarCalculator(),
         calendarCellModel: CalendarCellModel(
-            adjustedToday: today,
+            today: today,
             startDate: startDate,
             endDate: endDate,
             excludedDates: [excludedDate],

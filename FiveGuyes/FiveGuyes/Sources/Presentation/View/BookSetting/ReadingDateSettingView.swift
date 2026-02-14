@@ -15,38 +15,31 @@ struct ReadingDateSettingView: View {
     
     @State var totalPages = 0
     
-    private var adjustedToday: Date
+    private var today: Date
     private let calendarCalculator = CalendarCalculator()
+    private let dateMathCalculator = DateMathCalculator()
+    private let pageMathCalculator = PageMathCalculator()
     
     private var dayCount: Int {
         if let startDate = calendarCellModel.getStartDate(),
            let endDate = calendarCellModel.getEndDate() {
-            let readingcalculator = ReadingDateCalculator()
-            do {
-                return try readingcalculator.calculateDaysBetween(startDate: startDate, endDate: endDate)
-            } catch {
-                fatalError(error.localizedDescription)
-            }
+            return (try? dateMathCalculator.daysBetween(from: startDate, to: endDate)) ?? 1
         } else {
             return 1
         }
     }
     
     private var pagesPerDay: Int {
-        let readingPagesCalculator = ReadingPagesCalculator()
-        do {
-            return try readingPagesCalculator.calculatePagesPerDay(totalPages: totalPages, totalDays: dayCount)
-        } catch {
-            fatalError(error.localizedDescription)
-        }
+        return (try? pageMathCalculator.pagesPerDay(totalPages: totalPages, totalDays: dayCount))
+            ?? totalPages
     }
     
     init() {
-        let adjustedToday = Date().adjustedDate()
+        let today = DefaultReadingDateProvider().today()
         // 오늘 날짜를 시작 날짜로 추가
-        let calendarCellModel = CalendarCellModel(adjustedToday: adjustedToday, startDate: adjustedToday)
+        let calendarCellModel = CalendarCellModel(today: today, startDate: today)
         
-        self.adjustedToday = adjustedToday
+        self.today = today
         
         self._calendarCellModel = StateObject(wrappedValue: calendarCellModel)
     }
@@ -62,7 +55,7 @@ struct ReadingDateSettingView: View {
             
             DividerLine()
             
-            ReadingDatePickerView(adjustedToday: adjustedToday, calendarCalculator: calendarCalculator, calendarCellManager: calendarCellModel)
+            ReadingDatePickerView(today: today, calendarCalculator: calendarCalculator, calendarCellManager: calendarCellModel)
             
             DividerLine()
             
@@ -72,12 +65,10 @@ struct ReadingDateSettingView: View {
             // GA4 Tracking
             Tracking.Screen.dateSelection.setTracking()
             
-            let readingPagesCalculator = ReadingPagesCalculator()
-            
-            totalPages = readingPagesCalculator.calculatePagesBetween(
-                endPage: bookSettingInputModel.targetEndPage,
-                startPage: bookSettingInputModel.startPage
-            )
+            totalPages = (try? pageMathCalculator.pagesBetween(
+                from: bookSettingInputModel.startPage,
+                to: bookSettingInputModel.targetEndPage
+            )) ?? 0
         }
         .onAppear {
             if pageModel.currentPage == BookSettingsPage.bookNoneReadingDaySetting.rawValue {

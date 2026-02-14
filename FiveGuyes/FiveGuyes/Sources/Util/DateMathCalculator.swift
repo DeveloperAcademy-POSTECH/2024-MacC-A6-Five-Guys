@@ -9,6 +9,8 @@ import Foundation
 
 /// 날짜 및 일수 계산을 담당하는 Pure Function 수학 유틸리티
 struct DateMathCalculator {
+    // 날짜 계산 규칙을 따로 분리해 둔 유틸입니다.
+    // 규칙이 바뀌어도 이 파일만 고치면 되어 영향 범위가 작아집니다.
 
     // MARK: - Error Types
 

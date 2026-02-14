@@ -15,7 +15,7 @@ final class CalendarCellModel: ObservableObject {
     // MARK: - Properties
     
     /// 오늘 날짜 (시간 제외)
-    let adjustedToday: Date
+    let today: Date
     
     /// 날짜 계산에 사용할 캘린더 인스턴스
     private let calendar = Calendar.app
@@ -36,15 +36,15 @@ final class CalendarCellModel: ObservableObject {
     
     /// 모델 초기화
     /// - Parameters:
-    ///   - adjustedToday: 기준이 되는 오늘 날짜 (-4시간 조정된 날짜)
+    ///   - today: 기준이 되는 오늘 날짜 (-4시간 조정된 날짜)
     ///   - startDate: 선택된 범위의 시작 날짜 (선택 사항)
     ///   - endDate: 선택된 범위의 종료 날짜 (선택 사항)
     ///   - excludedDates: 제외된 날짜 리스트 (선택 사항)
     ///   - isConfirmed: 선택된 날짜가 확정되었는지 여부
-    init(adjustedToday: Date, startDate: Date? = nil, endDate: Date? = nil, excludedDates: [Date] = [], isConfirmed: Bool = false) {
+    init(today: Date, startDate: Date? = nil, endDate: Date? = nil, excludedDates: [Date] = [], isConfirmed: Bool = false) {
         let calendar = Calendar.app
         
-        self.adjustedToday = calendar.startOfDay(for: adjustedToday)
+        self.today = calendar.startOfDay(for: today)
         self.startDate = startDate.map { calendar.startOfDay(for: $0) }
         self.endDate = endDate.map { calendar.startOfDay(for: $0) }
         self.excludedDates = excludedDates.map { calendar.startOfDay(for: $0) }
@@ -74,7 +74,7 @@ final class CalendarCellModel: ObservableObject {
     /// - Returns: 오늘 이전 날짜이면 `true`, 그렇지 않으면 `false`.
     func isPastDate(for date: Date) -> Bool {
         let day = calendar.startOfDay(for: date)
-        return day < adjustedToday
+        return day < today
     }
     
     /// 특정 날짜가 시작 날짜 또는 종료 날짜인지 확인합니다.
@@ -101,7 +101,7 @@ final class CalendarCellModel: ObservableObject {
         let day = calendar.startOfDay(for: date)
         
         // 과거 날짜인 경우 클로저 실행 후 종료
-        guard day >= adjustedToday else {
+        guard day >= today else {
             onPastDateSelected()
             return
         }

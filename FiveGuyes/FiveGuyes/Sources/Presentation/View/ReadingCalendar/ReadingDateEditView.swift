@@ -15,37 +15,30 @@ struct ReadingDateEditView: View {
     @State private var viewModel: ReadingDateEditViewModel
     @StateObject private var calendarCellModel: CalendarCellModel
     
-    private var adjustedToday: Date
+    private var today: Date
     private let calendarCalculator = CalendarCalculator()
+    private let dateMathCalculator = DateMathCalculator()
+    private let pageMathCalculator = PageMathCalculator()
     
     private var dayCount: Int {
         if let startDate = calendarCellModel.getStartDate(),
            let endDate = calendarCellModel.getEndDate() {
-            let readingcalculator = ReadingDateCalculator()
-            do {
-                return try readingcalculator.calculateDaysBetween(startDate: startDate, endDate: endDate)
-            } catch {
-                fatalError(error.localizedDescription)
-            }
+            return (try? dateMathCalculator.daysBetween(from: startDate, to: endDate)) ?? 1
         } else {
             return 1
         }
     }
     
     private var pagesPerDay: Int {
-        let readingPagesCalculator = ReadingPagesCalculator()
         let userSettings = userBook.userSettings
         
-        let totalPages = readingPagesCalculator.calculatePagesBetween(
-            endPage: userSettings.targetEndPage,
-            startPage: userSettings.startPage
-        )
-        
-        do {
-            return try readingPagesCalculator.calculatePagesPerDay(totalPages: totalPages, totalDays: dayCount)
-        } catch {
-            fatalError(error.localizedDescription)
-        }
+        let totalPages = (try? pageMathCalculator.pagesBetween(
+            from: userSettings.startPage,
+            to: userSettings.targetEndPage
+        )) ?? 0
+
+        return (try? pageMathCalculator.pagesPerDay(totalPages: totalPages, totalDays: dayCount))
+            ?? totalPages
     }
     
     init(
@@ -53,7 +46,7 @@ struct ReadingDateEditView: View {
         viewModel: ReadingDateEditViewModel,
         calendarCellModel: CalendarCellModel? = nil
     ) {
-        self.adjustedToday = Date().adjustedDate()
+        self.today = viewModel.today()
         self.userBook = userBook
         _viewModel = State(initialValue: viewModel)
 
@@ -64,7 +57,7 @@ struct ReadingDateEditView: View {
 
         let userSettings = userBook.userSettings
         let defaultCalendarCellModel = CalendarCellModel(
-            adjustedToday: adjustedToday,
+            today: today,
             startDate: userSettings.startDate,
             endDate: userSettings.targetEndDate,
             excludedDates: userSettings.excludedReadingDays,
@@ -84,7 +77,7 @@ struct ReadingDateEditView: View {
             
             DividerLine()
             
-            ReadingDatePickerView(adjustedToday: adjustedToday, calendarCalculator: calendarCalculator, calendarCellManager: calendarCellModel)
+            ReadingDatePickerView(today: today, calendarCalculator: calendarCalculator, calendarCellManager: calendarCellModel)
             
             DividerLine()
             
@@ -181,8 +174,7 @@ struct ReadingDateEditView: View {
             bookId: userBook.id,
             startDate: startDate,
             endDate: endDate,
-            excludedReadingDays: excludedDays,
-            today: adjustedToday
+            excludedReadingDays: excludedDays
         )
 
         if isUpdated {
@@ -193,11 +185,13 @@ struct ReadingDateEditView: View {
 
 #if DEBUG
 #Preview("기간 재설정 단계") {
+    let service = PreviewBookManagementService()
+
     NavigationStack {
         ReadingDateEditView(
             userBook: PreviewSupport.sampleReadingBook,
             viewModel: ReadingDateEditViewModel(
-                bookManagementService: PreviewBookManagementService()
+                readingPlanUseCase: PreviewReadingPlanUseCaseAdapter(service: service)
             )
         )
     }
@@ -205,23 +199,24 @@ struct ReadingDateEditView: View {
 }
 
 #Preview("쉬는 날 재설정 단계") {
-    let today = Date().adjustedDate()
+    let today = DefaultReadingDateProvider().today()
     let startDate = Calendar.app.date(byAdding: .day, value: 1, to: today) ?? today
     let endDate = Calendar.app.date(byAdding: .day, value: 10, to: today) ?? today
     let excludedDate = Calendar.app.date(byAdding: .day, value: 4, to: today) ?? today
     let calendarCellModel = CalendarCellModel(
-        adjustedToday: today,
+        today: today,
         startDate: startDate,
         endDate: endDate,
         excludedDates: [excludedDate],
         isConfirmed: true
     )
+    let service = PreviewBookManagementService()
 
     NavigationStack {
         ReadingDateEditView(
             userBook: PreviewSupport.sampleReadingBook,
             viewModel: ReadingDateEditViewModel(
-                bookManagementService: PreviewBookManagementService()
+                readingPlanUseCase: PreviewReadingPlanUseCaseAdapter(service: service)
             ),
             calendarCellModel: calendarCellModel
         )

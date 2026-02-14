@@ -64,6 +64,8 @@ struct BookRowView: View {
 }
 
 #if DEBUG
+// 이 프리뷰는 "선택된 책" 화면을 바로 열어,
+// 입력 없이도 이 분기 UI가 맞는지 빠르게 확인하려고 만든 예시입니다.
 #Preview("선택된 책") {
     let book = PreviewSupport.sampleAPIBook
     let viewModel: BookSearchViewModel = {
@@ -76,6 +78,8 @@ struct BookRowView: View {
         .padding(.vertical, 24)
 }
 
+// 이 프리뷰는 "선택되지 않은 책" 화면을 바로 열어,
+// 입력 없이도 이 분기 UI가 맞는지 빠르게 확인하려고 만든 예시입니다.
 #Preview("선택되지 않은 책") {
     let book = PreviewSupport.sampleAPIBook
     let viewModel = PreviewSupport.makeBookSearchViewModel(

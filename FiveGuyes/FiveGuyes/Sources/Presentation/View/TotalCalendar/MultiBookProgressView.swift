@@ -14,7 +14,7 @@ struct MultiBookProgressView: View {
     @State private var currentIndex: Int? = 0
     
     @State private var currentMonths: [Date]
-    private let todayDate = Date().adjustedDate()
+    private let todayDate = DefaultReadingDateProvider().today()
     
     let currentReadingBooks: [FGUserBook]
     
@@ -131,12 +131,16 @@ struct MultiBookProgressView: View {
 }
 
 #if DEBUG
+// 이 프리뷰는 "여러 권 진행 중" 화면을 바로 열어,
+// 입력 없이도 이 분기 UI가 맞는지 빠르게 확인하려고 만든 예시입니다.
 #Preview("여러 권 진행 중") {
     NavigationStack {
         MultiBookProgressView(currentReadingBooks: PreviewSupport.sampleBooksForCarousel)
     }
 }
 
+// 이 프리뷰는 "한 권 진행 중" 화면을 바로 열어,
+// 입력 없이도 이 분기 UI가 맞는지 빠르게 확인하려고 만든 예시입니다.
 #Preview("한 권 진행 중") {
     NavigationStack {
         MultiBookProgressView(currentReadingBooks: [PreviewSupport.sampleReadingBook])
