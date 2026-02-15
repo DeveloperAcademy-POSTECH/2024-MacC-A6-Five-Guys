@@ -151,6 +151,7 @@ Boundary E: 호환 파사드 경계 (`BookManagementService`)
 ## 7) Related docs
 
 - 리팩터링 실행/결과 기록: `./docs/execplans/mvvm-architecture-refactoring-execplan.md`
+- ReadingRecord key migration 경량화 기록: `./docs/execplans/reading-record-key-migration-lightweight-refactor-execplan.md`
 - Presentation 패턴 결정 기록(ADR): `./docs/decisions/adr-0001-presentation-architecture.md`
 - UseCase/Service 경계 결정 기록(ADR): `./docs/decisions/adr-0002-usecase-first-boundary.md`
 - 실행 계획 표준: `./PLANS.md`

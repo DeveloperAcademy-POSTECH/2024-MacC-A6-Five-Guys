@@ -143,30 +143,44 @@
 
 ## TD-007: 날짜 키 시맨틱/타입 분리 부족 + 키 포맷 타임존 명시 누락
 
-- Status: Open
-- Fix Required: Yes
+- Status: Open (Compatibility migration + scoped completion key applied)
+- Fix Required: Partial
 - Decision:
-  - `toYearMonthDayString()`의 타임존 명시 누락은 환경 의존적 키 불일치 가능성이 있어 수정 대상입니다.
-  - 즉시 장애가 재현되지 않더라도, 다음 도메인 날짜/키 정비 작업에서 우선 반영해야 합니다.
+  - `toYearMonthDayString()`/`toDate()` 타임존 명시는 반영 완료했습니다(`ReadingDateKey` 경유).
+  - 저장 키 시맨틱은 `ReadingDateKey` value object로 1차 고정했지만, 저장 딕셔너리(`[String: ReadingRecord]`)는 호환을 위해 유지했습니다.
+  - `SwiftDataBookRepository` fetch 경계에 1회 호환 마이그레이션을 도입해 legacy 저장 키를 정책 키로 정리했습니다.
+  - 마이그레이션 구현은 repository 내부 구조체(`ReadingRecordKeyMigrationV1`) + `UserDefaults` 직접 접근으로 경량화해 추후 삭제 경계를 repository 내부로 고정했습니다.
+  - 완료 플래그는 앱/스토어/버전 스코프 키를 기본으로 사용하고, 기존 단일 키는 fallback 읽기 후 승격합니다.
+  - 앱 시작 시 prewarm을 선실행하고 fetch 경계 호출은 fallback 재시도 경계로 유지합니다.
+  - 남은 범위는 raw string 저장 경계 축소, `toAdjustedYearMonthDayString`/`adjustedDate` 호출 경계 제한, 글로벌 타임존 UX 확장입니다.
 - Context:
-  - `Date+Extension`의 `toYearMonthDayString()`는 저장/조회 키 역할로 광범위하게 사용됩니다.
-  - `toAdjustedYearMonthDayString()`/`adjustedDate()`는 04:00 정책 의미를 갖지만, `Date` 확장 메서드 형태라 호출부에서 시맨틱이 혼재되기 쉽습니다.
-  - 현재 `toYearMonthDayString()` 내부 `DateFormatter`에 타임존이 명시되지 않아, `Calendar.app`(Asia/Seoul 고정) 기반 계산과 키 생성 타임존이 어긋날 여지가 있습니다.
+  - 저장/조회 키 생성/파싱은 `ReadingDateKey` 타입으로 통일했습니다.
+  - `DayBoundaryProviding.adjustedDayKey(from:)`는 `ReadingDateKey`를 반환하도록 변경해 정책 키 경계를 타입화했습니다.
+  - 저장 호환성은 repository 레이어 1회 마이그레이션으로 보정합니다(`lastReadDate` anchor + safe shift).
+  - `toAdjustedYearMonthDayString()`/`adjustedDate()`는 여전히 `Date` 확장 API로 남아 있어, 장기적으로는 도메인 정책 경계로 더 수렴할 필요가 있습니다.
+  - 글로벌 사용자 UX를 위해서는 한국 고정 정책을 설정 가능 정책으로 확장해야 하지만, 이번 범위에서는 의도적으로 제외했습니다.
 - Risk:
-  - 저장 키 생성 기준이 실행 환경 타임존에 따라 달라져 데이터 조회/비교 불일치가 발생할 수 있습니다.
-  - 정책 반영 키와 일반 키가 같은 `String` 타입으로 노출되어 잘못된 경계에서 오용될 수 있습니다.
+  - 현재 런타임 키 불일치 리스크는 감소했지만, 저장 모델이 문자열 키를 직접 보유하므로 호출부에서 `.rawValue` 남용이 재발할 수 있습니다.
+  - 정책 반영 날짜 API(`toAdjustedYearMonthDayString`/`adjustedDate`)가 범용 확장에 남아 있어 경계 우회 가능성이 있습니다.
+  - 해외 사용자 환경에서는 한국 고정 기준으로 인해 day-boundary 체감 차이가 발생할 수 있습니다.
+  - 완료 플래그 충돌 리스크는 앱 스코프 키로 줄었지만, 여전히 1회 완료 모델이므로 이후 백업 복원/외부 import로 legacy 키가 재유입되면 자동 보정이 적용되지 않을 수 있습니다.
 - Target Layer:
-  - `Domain` 타입으로 키 시맨틱 고정 (예: `ReadingDayKey`, `ReadingDate` value object/래퍼)
-  - 키 생성 경로 단일화 (`ReadingDateProviding` 또는 정책 타입 경유)
+  - `Domain` value object(`ReadingDateKey`) 기반 키 시맨틱 유지/확장
+  - 저장 경계에서도 typed key 우선 경로를 보장하는 API 정리
 - Trigger Condition:
   - 날짜 키 관련 버그 발생, 저장 포맷/정책 변경, cross-timezone 요구사항 반영 시
 - Priority:
   - P2
 - Current Evidence:
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Domain/Entity/ReadingDateKey.swift`
   - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Resources/Extensions/Date+Extension.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Resources/Extensions/String+Extension.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Domain/Service/DayBoundaryProviding.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Data/RepositoryImpl/SwiftDataBookRepository.swift`
   - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Resources/Extensions/Calendar+Extension.swift`
   - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Domain/Calculator/ReadingScheduleCalculator.swift`
 - Suggested Follow-up:
-  1. 키 생성용 formatter 타임존을 `Calendar.app.timeZone`으로 명시
-  2. 정책 키/일반 키를 분리하는 래퍼 타입 도입 (`Date` 상속 대신 value object)
-  3. `toAdjustedYearMonthDayString`/`adjustedDate`의 호출 경계를 도메인 정책 계층으로 제한
+  1. 저장 모델(`[String: ReadingRecord]`) 호출부에 typed key adapter를 추가해 raw string 직접 접근을 축소
+  2. `toAdjustedYearMonthDayString`/`adjustedDate` 호출 경계를 `ReadingDateProviding`/`DayBoundaryProviding`로 제한
+  3. 글로벌 UX 확장 시 day-boundary 타임존 정책을 사용자/지역 기반으로 분리하고 전환 전략(마이그레이션 포함)을 별도 설계
+  4. legacy 데이터 재유입 가능성이 생기면 전역 1회 플래그를 버전드/조건부 마이그레이션으로 전환
