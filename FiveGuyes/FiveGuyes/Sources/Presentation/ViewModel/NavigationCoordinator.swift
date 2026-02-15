@@ -76,7 +76,12 @@ final class NavigationCoordinator {
                 )
             )
         case .completionCelebration(book: let book):
-            CompletionCelebrationView(userBook: book)
+            CompletionCelebrationView(
+                userBook: book,
+                viewModel: CompletionCelebrationViewModel(
+                    bookCompletionUseCase: appDependencies.bookCompletionUseCase
+                )
+            )
         case .completionReview(book: let book):
             CompletionReviewView(
                 userBook: book,

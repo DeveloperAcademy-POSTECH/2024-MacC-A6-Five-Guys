@@ -89,6 +89,69 @@ extension BookManagementUseCasesTests {
         #expect(todayProvider.callCount == 1)
     }
 
+    @Test("BookCompletionUseCase.completionCelebrationSummary는 todayProvider 기준으로 요약을 계산한다")
+    func testCompletionCelebrationSummary() {
+        let mockRepository = MockBookRepository()
+        let schedulerSpy = NotificationSchedulerSpy()
+        let today = makeDate("2025-01-20")
+        let useCase = makeBookCompletionUseCase(
+            repository: mockRepository,
+            notificationScheduler: schedulerSpy,
+            todayProvider: ReadingDateProviderStub(todayValue: today)
+        )
+
+        var testBook = createTestBook(totalPages: 300, isCompleted: true)
+        testBook.userSettings = FGUserSetting(
+            startPage: 1,
+            targetEndPage: 300,
+            startDate: makeDate("2025-01-01"),
+            targetEndDate: makeDate("2025-01-31"),
+            excludedReadingDays: []
+        )
+        testBook.readingProgress = FGReadingProgress(
+            dailyReadingRecords: [
+                makeDate("2025-01-01").toYearMonthDayString(): ReadingRecord(targetPages: 10, pagesRead: 10),
+                makeDate("2025-01-02").toYearMonthDayString(): ReadingRecord(targetPages: 10, pagesRead: 0),
+                makeDate("2025-01-03").toYearMonthDayString(): ReadingRecord(targetPages: 10, pagesRead: 20),
+            ],
+            lastReadDate: nil,
+            lastReadPage: 20
+        )
+
+        let summary = useCase.completionCelebrationSummary(for: testBook)
+
+        #expect(summary.startDate == makeDate("2025-01-01"))
+        #expect(summary.endDate == today)
+        #expect(summary.totalReadingDays == 2)
+        #expect(summary.pagesPerDay == 150)
+    }
+
+    @Test("BookCompletionUseCase.completionCelebrationSummary는 시작일이 오늘보다 늦으면 오늘로 보정한다")
+    func testCompletionCelebrationSummaryClampsFutureStartDate() {
+        let mockRepository = MockBookRepository()
+        let schedulerSpy = NotificationSchedulerSpy()
+        let today = makeDate("2025-01-20")
+        let useCase = makeBookCompletionUseCase(
+            repository: mockRepository,
+            notificationScheduler: schedulerSpy,
+            todayProvider: ReadingDateProviderStub(todayValue: today)
+        )
+
+        var testBook = createTestBook(totalPages: 300, isCompleted: true)
+        testBook.userSettings = FGUserSetting(
+            startPage: 1,
+            targetEndPage: 300,
+            startDate: makeDate("2025-01-25"),
+            targetEndDate: makeDate("2025-01-31"),
+            excludedReadingDays: []
+        )
+
+        let summary = useCase.completionCelebrationSummary(for: testBook)
+
+        #expect(summary.startDate == today)
+        #expect(summary.endDate == today)
+    }
+
     @Test("BookCompletionUseCase.updateCompletionReview로 완독 소감만 수정")
     func testUpdateCompletionReview() async throws {
         let mockRepository = MockBookRepository()

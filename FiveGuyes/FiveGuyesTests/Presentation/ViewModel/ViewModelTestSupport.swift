@@ -166,6 +166,10 @@ struct BookCompletionStubAdapter: BookCompletionUsing {
     func updateCompletionReview(id: UUID, review: String) async throws {
         try await service.updateCompletionReview(id: id, review: review)
     }
+
+    func completionCelebrationSummary(for book: FGUserBook) -> CompletionCelebrationSummary {
+        CompletionCelebrationSummary.make(for: book, endDate: service.today())
+    }
 }
 
 struct ReadingPlanStubAdapter: ReadingPlanUsing {

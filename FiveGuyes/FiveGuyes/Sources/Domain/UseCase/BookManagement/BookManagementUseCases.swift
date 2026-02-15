@@ -12,6 +12,43 @@ struct ReadingLibrarySnapshot {
     let completedBooks: [FGUserBook]
 }
 
+struct CompletionCelebrationSummary: Equatable {
+    let startDate: Date
+    let endDate: Date
+    let totalReadingDays: Int
+    let pagesPerDay: Int
+
+    static func make(
+        for book: FGUserBook,
+        endDate: Date,
+        pageMath: PageMathCalculator = PageMathCalculator()
+    ) -> CompletionCelebrationSummary {
+        let startDate = min(book.userSettings.startDate, endDate)
+
+        let totalReadingDays = max(
+            book.readingProgress.dailyReadingRecords.values.filter { $0.pagesRead > 0 }.count,
+            1
+        )
+
+        let totalReadingPages = (try? pageMath.pagesBetween(
+            from: book.userSettings.startPage,
+            to: book.userSettings.targetEndPage
+        )) ?? 0
+
+        let pagesPerDay = (try? pageMath.pagesPerDay(
+            totalPages: totalReadingPages,
+            totalDays: totalReadingDays
+        )) ?? totalReadingPages
+
+        return CompletionCelebrationSummary(
+            startDate: startDate,
+            endDate: endDate,
+            totalReadingDays: totalReadingDays,
+            pagesPerDay: pagesPerDay
+        )
+    }
+}
+
 protocol ReadingLibraryUsing {
     func fetchLibrarySnapshot() async throws -> ReadingLibrarySnapshot
     func deleteBook(id: UUID) async throws
@@ -27,6 +64,7 @@ protocol DailyReadingUsing {
 protocol BookCompletionUsing {
     func completeBook(id: UUID, review: String) async throws
     func updateCompletionReview(id: UUID, review: String) async throws
+    func completionCelebrationSummary(for book: FGUserBook) -> CompletionCelebrationSummary
 }
 
 protocol ReadingPlanUsing {
@@ -140,6 +178,10 @@ struct BookCompletionUseCase: BookCompletionUsing {
 
     func updateCompletionReview(id: UUID, review: String) async throws {
         try await updateCompletionReviewUseCase.execute(id: id, review: review)
+    }
+
+    func completionCelebrationSummary(for book: FGUserBook) -> CompletionCelebrationSummary {
+        CompletionCelebrationSummary.make(for: book, endDate: todayProvider.today())
     }
 }
 
