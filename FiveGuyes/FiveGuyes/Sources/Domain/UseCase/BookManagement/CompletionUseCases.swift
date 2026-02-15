@@ -1,5 +1,5 @@
 //
-//  BookManagementCompletionUseCases.swift
+//  CompletionUseCases.swift
 //  FiveGuyes
 //
 //  Created by zaehorang on 2026-02-16.
@@ -84,11 +84,11 @@ struct BookCompletionUseCase: BookCompletionUsing {
 }
 
 struct CompleteBookUseCase {
-    let repository: BookRepository
+    let repo: BookRepo
     let notificationScheduler: any ReadingNotificationScheduling
 
     func execute(id: UUID, completionDate: Date, review: String) async throws {
-        let currentBook = try await repository.fetchBook(by: id)
+        let currentBook = try await repo.fetchBook(by: id)
 
         let updatedStatus = FGCompletionStatus(
             isCompleted: true,
@@ -114,23 +114,23 @@ struct CompleteBookUseCase {
             )
         }
 
-        try await repository.updateCompletionStatus(bookId: id, status: updatedStatus)
-        try await repository.updateSettings(bookId: id, settings: updatedSettings)
+        try await repo.updateCompletionStatus(bookId: id, status: updatedStatus)
+        try await repo.updateSettings(bookId: id, settings: updatedSettings)
         await notificationScheduler.clearRequests()
     }
 }
 
 struct UpdateCompletionReviewUseCase {
-    let repository: BookRepository
+    let repo: BookRepo
 
     func execute(id: UUID, review: String) async throws {
-        let currentBook = try await repository.fetchBook(by: id)
+        let currentBook = try await repo.fetchBook(by: id)
 
         let updatedStatus = FGCompletionStatus(
             isCompleted: currentBook.completionStatus.isCompleted,
             reviewAfterCompletion: review
         )
 
-        try await repository.updateCompletionStatus(bookId: id, status: updatedStatus)
+        try await repo.updateCompletionStatus(bookId: id, status: updatedStatus)
     }
 }

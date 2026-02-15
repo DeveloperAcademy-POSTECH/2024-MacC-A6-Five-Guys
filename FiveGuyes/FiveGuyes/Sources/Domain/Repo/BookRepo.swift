@@ -1,5 +1,5 @@
 //
-//  BookRepository.swift
+//  BookRepo.swift
 //  FiveGuyes
 //
 //  Created by zaehorang on 1/8/25.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol BookRepository {
+protocol BookRepo {
     // MARK: - Basic CRUD Operations
     func fetchBooks() async throws -> [FGUserBook]
     func fetchBook(by id: UUID) async throws -> FGUserBook
@@ -27,8 +27,8 @@ protocol BookRepository {
     func updateCompletionStatus(bookId: UUID, status: FGCompletionStatus) async throws
 }
 
-// RepositoryError 정의
-enum RepositoryError: Error {
+// RepoError 정의
+enum RepoError: Error {
     case notFound
     case saveFailed
     case updateFailed

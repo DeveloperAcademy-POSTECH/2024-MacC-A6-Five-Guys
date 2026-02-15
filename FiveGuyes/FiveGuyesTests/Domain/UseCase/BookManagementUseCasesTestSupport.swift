@@ -56,19 +56,19 @@ struct BookManagementUseCasesTests {
     }
 
     func makeReadingLibraryUseCase(
-        repository: BookRepository,
+        repo: BookRepo,
         notificationScheduler: any ReadingNotificationScheduling,
         todayProvider: any ReadingDateProviding = ReadingDateProviderStub(todayValue: .distantPast)
     ) -> ReadingLibraryUseCase {
         ReadingLibraryUseCase(
-            fetchReadingBooksUseCase: FetchReadingBooksUseCase(repository: repository),
-            fetchCompletedBooksUseCase: FetchCompletedBooksUseCase(repository: repository),
+            fetchReadingBooksUseCase: FetchReadingBooksUseCase(repo: repo),
+            fetchCompletedBooksUseCase: FetchCompletedBooksUseCase(repo: repo),
             deleteBookUseCase: DeleteBookUseCase(
-                repository: repository,
+                repo: repo,
                 notificationScheduler: notificationScheduler
             ),
             rescheduleOnAppOpenUseCase: RescheduleOnAppOpenUseCase(
-                repository: repository,
+                repo: repo,
                 scheduleCalculator: ReadingScheduleCalculator()
             ),
             notificationScheduler: notificationScheduler,
@@ -77,13 +77,13 @@ struct BookManagementUseCasesTests {
     }
 
     func makeDailyReadingUseCase(
-        repository: BookRepository,
+        repo: BookRepo,
         notificationScheduler: any ReadingNotificationScheduling,
         todayProvider: any ReadingDateProviding = ReadingDateProviderStub(todayValue: .distantPast)
     ) -> DailyReadingUseCase {
         DailyReadingUseCase(
             recordReadingUseCase: RecordReadingUseCase(
-                repository: repository,
+                repo: repo,
                 notificationScheduler: notificationScheduler,
                 scheduleCalculator: ReadingScheduleCalculator()
             ),
@@ -92,28 +92,28 @@ struct BookManagementUseCasesTests {
     }
 
     func makeBookCompletionUseCase(
-        repository: BookRepository,
+        repo: BookRepo,
         notificationScheduler: any ReadingNotificationScheduling,
         todayProvider: any ReadingDateProviding = ReadingDateProviderStub(todayValue: .distantPast)
     ) -> BookCompletionUseCase {
         BookCompletionUseCase(
             completeBookUseCase: CompleteBookUseCase(
-                repository: repository,
+                repo: repo,
                 notificationScheduler: notificationScheduler
             ),
-            updateCompletionReviewUseCase: UpdateCompletionReviewUseCase(repository: repository),
+            updateCompletionReviewUseCase: UpdateCompletionReviewUseCase(repo: repo),
             todayProvider: todayProvider
         )
     }
 
     func makeReadingPlanUseCase(
-        repository: BookRepository,
+        repo: BookRepo,
         notificationScheduler: any ReadingNotificationScheduling,
         todayProvider: any ReadingDateProviding = ReadingDateProviderStub(todayValue: .distantPast)
     ) -> ReadingPlanUseCase {
         ReadingPlanUseCase(
             updateReadingPlanUseCase: UpdateReadingPlanUseCase(
-                repository: repository,
+                repo: repo,
                 notificationScheduler: notificationScheduler,
                 scheduleCalculator: ReadingScheduleCalculator()
             ),
@@ -122,12 +122,12 @@ struct BookManagementUseCasesTests {
     }
 
     func makeBookRegistrationUseCase(
-        repository: BookRepository,
+        repo: BookRepo,
         notificationScheduler: any ReadingNotificationScheduling
     ) -> BookRegistrationUseCase {
         BookRegistrationUseCase(
             registerBookUseCase: RegisterBookUseCase(
-                repository: repository,
+                repo: repo,
                 notificationScheduler: notificationScheduler,
                 scheduleCalculator: ReadingScheduleCalculator()
             )

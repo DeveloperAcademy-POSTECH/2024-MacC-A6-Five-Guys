@@ -1,5 +1,5 @@
 //
-//  SwiftDataBookRepositoryTests.swift
+//  SwiftDataBookRepoTests.swift
 //  FiveGuyesTests
 //
 //  Created by zaehorang on 2025-01-08.
@@ -10,19 +10,19 @@ import Foundation
 import SwiftData
 import Testing
 
-/// SwiftDataBookRepository에 대한 Swift Testing 기반 테스트
-@Suite("SwiftDataBookRepository 테스트")
+/// SwiftDataBookRepo에 대한 Swift Testing 기반 테스트
+@Suite("SwiftDataBookRepo 테스트")
 @MainActor
-struct SwiftDataBookRepositoryTests {
-    private let legacyMigrationCompletionKey = SwiftDataBookRepository.migrationCompletionVersionKey
+struct SwiftDataBookRepoTests {
+    private let legacyMigrationCompletionKey = SwiftDataBookRepo.migrationCompletionVersionKey
 
     // MARK: - Helper Methods
 
     /// 테스트용 In-Memory ModelContainer 생성
     private func createInMemoryContainer() throws -> ModelContainer {
         let schema = Schema([UserBookSchemaV2.UserBookV2.self])
-        let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
-        return try ModelContainer(for: schema, configurations: [configuration])
+        let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+        return try ModelContainer(for: schema, configurations: [config])
     }
 
     /// 테스트용 FGUserBook 생성 헬퍼
@@ -72,13 +72,13 @@ struct SwiftDataBookRepositoryTests {
     }
 
     private func createMigrationStorage() -> (userDefaults: UserDefaults, completionKey: String) {
-        let suiteName = "SwiftDataBookRepositoryTests.\(UUID().uuidString)"
+        let suiteName = "SwiftDataBookRepoTests.\(UUID().uuidString)"
         guard let userDefaults = UserDefaults(suiteName: suiteName) else {
             fatalError("Failed to create UserDefaults suite for migration tests")
         }
         userDefaults.removePersistentDomain(forName: suiteName)
 
-        let completionKey = "\(SwiftDataBookRepository.migrationCompletionVersionKey).\(UUID().uuidString)"
+        let completionKey = "\(SwiftDataBookRepo.migrationCompletionVersionKey).\(UUID().uuidString)"
         return (userDefaults: userDefaults, completionKey: completionKey)
     }
 
@@ -127,15 +127,15 @@ struct SwiftDataBookRepositoryTests {
     @Test("addBook 후 fetchBook으로 조회 성공")
     func testAddAndFetchBook() async throws {
         let container = try createInMemoryContainer()
-        let repository = SwiftDataBookRepository(modelContainer: container)
+        let repo = SwiftDataBookRepo(modelContainer: container)
 
         let testBook = createTestBook(title: "새로운 책", author: "새로운 작가")
 
         // 책 추가
-        try await repository.addBook(testBook)
+        try await repo.addBook(testBook)
 
         // 책 조회
-        let fetchedBook = try await repository.fetchBook(by: testBook.id)
+        let fetchedBook = try await repo.fetchBook(by: testBook.id)
 
         // 검증
         #expect(fetchedBook.id == testBook.id)
@@ -147,19 +147,19 @@ struct SwiftDataBookRepositoryTests {
     @Test("fetchBooks로 여러 책 조회")
     func testFetchBooks() async throws {
         let container = try createInMemoryContainer()
-        let repository = SwiftDataBookRepository(modelContainer: container)
+        let repo = SwiftDataBookRepo(modelContainer: container)
 
         // 3개의 책 추가
         let book1 = createTestBook(title: "책1", author: "작가1")
         let book2 = createTestBook(title: "책2", author: "작가2")
         let book3 = createTestBook(title: "책3", author: "작가3")
 
-        try await repository.addBook(book1)
-        try await repository.addBook(book2)
-        try await repository.addBook(book3)
+        try await repo.addBook(book1)
+        try await repo.addBook(book2)
+        try await repo.addBook(book3)
 
         // 모든 책 조회
-        let books = try await repository.fetchBooks()
+        let books = try await repo.fetchBooks()
 
         // 검증
         #expect(books.count == 3)
@@ -172,11 +172,11 @@ struct SwiftDataBookRepositoryTests {
     @Test("updateBook으로 책 정보 수정")
     func testUpdateBook() async throws {
         let container = try createInMemoryContainer()
-        let repository = SwiftDataBookRepository(modelContainer: container)
+        let repo = SwiftDataBookRepo(modelContainer: container)
 
         // 책 추가
         let originalBook = createTestBook(title: "원본 책")
-        try await repository.addBook(originalBook)
+        try await repo.addBook(originalBook)
 
         // 책 수정 (settings 변경)
         var updatedBook = originalBook
@@ -188,10 +188,10 @@ struct SwiftDataBookRepositoryTests {
             excludedReadingDays: [makeDate("2025-02-15")]
         )
 
-        try await repository.updateBook(updatedBook)
+        try await repo.updateBook(updatedBook)
 
         // 수정된 책 조회
-        let fetchedBook = try await repository.fetchBook(by: originalBook.id)
+        let fetchedBook = try await repo.fetchBook(by: originalBook.id)
 
         // 검증
         #expect(fetchedBook.userSettings.targetEndPage == 400)
@@ -204,18 +204,18 @@ struct SwiftDataBookRepositoryTests {
     @Test("deleteBook으로 책 삭제")
     func testDeleteBook() async throws {
         let container = try createInMemoryContainer()
-        let repository = SwiftDataBookRepository(modelContainer: container)
+        let repo = SwiftDataBookRepo(modelContainer: container)
 
         // 책 추가
         let testBook = createTestBook(title: "삭제될 책")
-        try await repository.addBook(testBook)
+        try await repo.addBook(testBook)
 
         // 책 삭제
-        try await repository.deleteBook(by: testBook.id)
+        try await repo.deleteBook(by: testBook.id)
 
         // 삭제 검증: fetchBook이 에러를 던져야 함
-        await #expect(throws: RepositoryError.self) {
-            _ = try await repository.fetchBook(by: testBook.id)
+        await #expect(throws: RepoError.self) {
+            _ = try await repo.fetchBook(by: testBook.id)
         }
     }
 
@@ -225,19 +225,19 @@ struct SwiftDataBookRepositoryTests {
     @Test("getReadingBooks로 읽는 중인 책만 조회")
     func testGetReadingBooks() async throws {
         let container = try createInMemoryContainer()
-        let repository = SwiftDataBookRepository(modelContainer: container)
+        let repo = SwiftDataBookRepo(modelContainer: container)
 
         // 읽는 중인 책 2개, 완료된 책 1개 추가
         let readingBook1 = createTestBook(title: "읽는 중1", isCompleted: false)
         let readingBook2 = createTestBook(title: "읽는 중2", isCompleted: false)
         let completedBook = createTestBook(title: "완료됨", isCompleted: true)
 
-        try await repository.addBook(readingBook1)
-        try await repository.addBook(readingBook2)
-        try await repository.addBook(completedBook)
+        try await repo.addBook(readingBook1)
+        try await repo.addBook(readingBook2)
+        try await repo.addBook(completedBook)
 
         // 읽는 중인 책만 조회
-        let readingBooks = try await repository.getReadingBooks()
+        let readingBooks = try await repo.getReadingBooks()
 
         // 검증
         #expect(readingBooks.count == 2)
@@ -250,19 +250,19 @@ struct SwiftDataBookRepositoryTests {
     @Test("getCompletedBooks로 완료된 책만 조회")
     func testGetCompletedBooks() async throws {
         let container = try createInMemoryContainer()
-        let repository = SwiftDataBookRepository(modelContainer: container)
+        let repo = SwiftDataBookRepo(modelContainer: container)
 
         // 읽는 중인 책 1개, 완료된 책 2개 추가
         let readingBook = createTestBook(title: "읽는 중", isCompleted: false)
         let completedBook1 = createTestBook(title: "완료1", isCompleted: true)
         let completedBook2 = createTestBook(title: "완료2", isCompleted: true)
 
-        try await repository.addBook(readingBook)
-        try await repository.addBook(completedBook1)
-        try await repository.addBook(completedBook2)
+        try await repo.addBook(readingBook)
+        try await repo.addBook(completedBook1)
+        try await repo.addBook(completedBook2)
 
         // 완료된 책만 조회
-        let completedBooks = try await repository.getCompletedBooks()
+        let completedBooks = try await repo.getCompletedBooks()
 
         // 검증
         #expect(completedBooks.count == 2)
@@ -277,11 +277,11 @@ struct SwiftDataBookRepositoryTests {
     @Test("updateReadingProgress로 진행 상황만 수정")
     func testUpdateReadingProgress() async throws {
         let container = try createInMemoryContainer()
-        let repository = SwiftDataBookRepository(modelContainer: container)
+        let repo = SwiftDataBookRepo(modelContainer: container)
 
         // 책 추가
         let testBook = createTestBook()
-        try await repository.addBook(testBook)
+        try await repo.addBook(testBook)
 
         // 진행 상황 수정
         let newProgress = FGReadingProgress(
@@ -290,10 +290,10 @@ struct SwiftDataBookRepositoryTests {
             lastReadPage: 10
         )
 
-        try await repository.updateReadingProgress(bookId: testBook.id, progress: newProgress)
+        try await repo.updateReadingProgress(bookId: testBook.id, progress: newProgress)
 
         // 수정 확인
-        let fetchedBook = try await repository.fetchBook(by: testBook.id)
+        let fetchedBook = try await repo.fetchBook(by: testBook.id)
         #expect(fetchedBook.readingProgress.lastReadPage == 10)
         #expect(fetchedBook.readingProgress.lastReadDate == makeDate("2025-01-10"))
         #expect(fetchedBook.readingProgress.dailyReadingRecords.count == 1)
@@ -303,11 +303,11 @@ struct SwiftDataBookRepositoryTests {
     @Test("updateSettings로 설정만 수정")
     func testUpdateSettings() async throws {
         let container = try createInMemoryContainer()
-        let repository = SwiftDataBookRepository(modelContainer: container)
+        let repo = SwiftDataBookRepo(modelContainer: container)
 
         // 책 추가
         let testBook = createTestBook()
-        try await repository.addBook(testBook)
+        try await repo.addBook(testBook)
 
         // 설정 수정
         let newSettings = FGUserSetting(
@@ -318,10 +318,10 @@ struct SwiftDataBookRepositoryTests {
             excludedReadingDays: []
         )
 
-        try await repository.updateSettings(bookId: testBook.id, settings: newSettings)
+        try await repo.updateSettings(bookId: testBook.id, settings: newSettings)
 
         // 수정 확인
-        let fetchedBook = try await repository.fetchBook(by: testBook.id)
+        let fetchedBook = try await repo.fetchBook(by: testBook.id)
         #expect(fetchedBook.userSettings.targetEndPage == 500)
         #expect(fetchedBook.userSettings.startDate == makeDate("2025-03-01"))
         #expect(fetchedBook.userSettings.targetEndDate == makeDate("2025-03-31"))
@@ -331,11 +331,11 @@ struct SwiftDataBookRepositoryTests {
     @Test("updateCompletionStatus로 완료 상태만 수정")
     func testUpdateCompletionStatus() async throws {
         let container = try createInMemoryContainer()
-        let repository = SwiftDataBookRepository(modelContainer: container)
+        let repo = SwiftDataBookRepo(modelContainer: container)
 
         // 책 추가 (읽는 중)
         let testBook = createTestBook(isCompleted: false)
-        try await repository.addBook(testBook)
+        try await repo.addBook(testBook)
 
         // 완료 상태로 변경
         let newStatus = FGCompletionStatus(
@@ -343,10 +343,10 @@ struct SwiftDataBookRepositoryTests {
             reviewAfterCompletion: "좋은 책이었습니다"
         )
 
-        try await repository.updateCompletionStatus(bookId: testBook.id, status: newStatus)
+        try await repo.updateCompletionStatus(bookId: testBook.id, status: newStatus)
 
         // 수정 확인
-        let fetchedBook = try await repository.fetchBook(by: testBook.id)
+        let fetchedBook = try await repo.fetchBook(by: testBook.id)
         #expect(fetchedBook.completionStatus.isCompleted == true)
         #expect(fetchedBook.completionStatus.reviewAfterCompletion == "좋은 책이었습니다")
     }
@@ -357,7 +357,7 @@ struct SwiftDataBookRepositoryTests {
     func testFetchMigratesLegacyReadingRecordKeys() async throws {
         let container = try createInMemoryContainer()
         let migrationStorage = createMigrationStorage()
-        let repository = SwiftDataBookRepository(
+        let repo = SwiftDataBookRepo(
             modelContainer: container,
             migrationUserDefaults: migrationStorage.userDefaults,
             migrationCompletionKey: migrationStorage.completionKey
@@ -373,7 +373,7 @@ struct SwiftDataBookRepositoryTests {
         container.mainContext.insert(legacyBook)
         try container.mainContext.save()
 
-        let migratedBook = try await repository.fetchBook(by: legacyBook.id)
+        let migratedBook = try await repo.fetchBook(by: legacyBook.id)
 
         #expect(migratedBook.readingProgress.dailyReadingRecords["2025-01-09"] == nil)
         #expect(migratedBook.readingProgress.dailyReadingRecords["2025-01-10"] != nil)
@@ -384,7 +384,7 @@ struct SwiftDataBookRepositoryTests {
     func testPrewarmMigratesBeforeFetchBoundary() async throws {
         let container = try createInMemoryContainer()
         let migrationStorage = createMigrationStorage()
-        let repository = SwiftDataBookRepository(
+        let repo = SwiftDataBookRepo(
             modelContainer: container,
             migrationUserDefaults: migrationStorage.userDefaults,
             migrationCompletionKey: migrationStorage.completionKey
@@ -401,7 +401,7 @@ struct SwiftDataBookRepositoryTests {
         container.mainContext.insert(legacyBook)
         try container.mainContext.save()
 
-        try repository.prewarmReadingRecordKeyMigrationIfNeeded()
+        try repo.prewarmReadingRecordKeyMigrationIfNeeded()
 
         var fetchDescriptor: FetchDescriptor<UserBookSchemaV2.UserBookV2> = .init(
             predicate: #Predicate { book in
@@ -415,7 +415,7 @@ struct SwiftDataBookRepositoryTests {
         #expect(storedBook?.readingProgress.readingRecords["2025-01-10"] != nil)
         #expect(migrationStorage.userDefaults.bool(forKey: migrationStorage.completionKey) == true)
 
-        let fetchedBook = try await repository.fetchBook(by: legacyBookID)
+        let fetchedBook = try await repo.fetchBook(by: legacyBookID)
         #expect(fetchedBook.readingProgress.dailyReadingRecords["2025-01-09"] == nil)
         #expect(fetchedBook.readingProgress.dailyReadingRecords["2025-01-10"] != nil)
     }
@@ -426,7 +426,7 @@ struct SwiftDataBookRepositoryTests {
         let migrationStorage = createMigrationStorage()
         migrationStorage.userDefaults.set(true, forKey: legacyMigrationCompletionKey)
 
-        let repository = SwiftDataBookRepository(
+        let repo = SwiftDataBookRepo(
             modelContainer: container,
             migrationUserDefaults: migrationStorage.userDefaults,
             migrationCompletionKey: migrationStorage.completionKey
@@ -442,7 +442,7 @@ struct SwiftDataBookRepositoryTests {
         container.mainContext.insert(legacyBook)
         try container.mainContext.save()
 
-        let fetchedBook = try await repository.fetchBook(by: legacyBook.id)
+        let fetchedBook = try await repo.fetchBook(by: legacyBook.id)
         #expect(fetchedBook.readingProgress.dailyReadingRecords["2025-01-09"] != nil)
         #expect(fetchedBook.readingProgress.dailyReadingRecords["2025-01-10"] == nil)
         #expect(migrationStorage.userDefaults.bool(forKey: migrationStorage.completionKey) == true)
@@ -452,7 +452,7 @@ struct SwiftDataBookRepositoryTests {
     func testMigrationRunsOnlyOnce() async throws {
         let container = try createInMemoryContainer()
         let migrationStorage = createMigrationStorage()
-        let repository = SwiftDataBookRepository(
+        let repo = SwiftDataBookRepo(
             modelContainer: container,
             migrationUserDefaults: migrationStorage.userDefaults,
             migrationCompletionKey: migrationStorage.completionKey
@@ -468,7 +468,7 @@ struct SwiftDataBookRepositoryTests {
         container.mainContext.insert(firstLegacyBook)
         try container.mainContext.save()
 
-        _ = try await repository.fetchBooks()
+        _ = try await repo.fetchBooks()
         #expect(migrationStorage.userDefaults.bool(forKey: migrationStorage.completionKey) == true)
 
         let secondLegacyBook = createTestBook().toUserBookV2()
@@ -481,7 +481,7 @@ struct SwiftDataBookRepositoryTests {
         container.mainContext.insert(secondLegacyBook)
         try container.mainContext.save()
 
-        let fetchedSecondBook = try await repository.fetchBook(by: secondLegacyBook.id)
+        let fetchedSecondBook = try await repo.fetchBook(by: secondLegacyBook.id)
 
         #expect(fetchedSecondBook.readingProgress.dailyReadingRecords["2025-01-09"] != nil)
         #expect(fetchedSecondBook.readingProgress.dailyReadingRecords["2025-01-10"] == nil)
@@ -491,7 +491,7 @@ struct SwiftDataBookRepositoryTests {
     func testMigrationDoesNotShiftWhenDiffExceedsGuardRange() async throws {
         let container = try createInMemoryContainer()
         let migrationStorage = createMigrationStorage()
-        let repository = SwiftDataBookRepository(
+        let repo = SwiftDataBookRepo(
             modelContainer: container,
             migrationUserDefaults: migrationStorage.userDefaults,
             migrationCompletionKey: migrationStorage.completionKey
@@ -507,7 +507,7 @@ struct SwiftDataBookRepositoryTests {
         container.mainContext.insert(legacyBook)
         try container.mainContext.save()
 
-        let fetchedBook = try await repository.fetchBook(by: legacyBook.id)
+        let fetchedBook = try await repo.fetchBook(by: legacyBook.id)
 
         #expect(fetchedBook.readingProgress.dailyReadingRecords["2025-01-07"] != nil)
         #expect(fetchedBook.readingProgress.dailyReadingRecords["2025-01-10"] == nil)
@@ -517,7 +517,7 @@ struct SwiftDataBookRepositoryTests {
     func testMigrationNormalizesInvalidReadingRecords() async throws {
         let container = try createInMemoryContainer()
         let migrationStorage = createMigrationStorage()
-        let repository = SwiftDataBookRepository(
+        let repo = SwiftDataBookRepo(
             modelContainer: container,
             migrationUserDefaults: migrationStorage.userDefaults,
             migrationCompletionKey: migrationStorage.completionKey
@@ -534,7 +534,7 @@ struct SwiftDataBookRepositoryTests {
         container.mainContext.insert(legacyBook)
         try container.mainContext.save()
 
-        let fetchedBook = try await repository.fetchBook(by: legacyBook.id)
+        let fetchedBook = try await repo.fetchBook(by: legacyBook.id)
         guard let sanitizedNegative = fetchedBook.readingProgress.dailyReadingRecords["2025-01-09"],
               let sanitizedTarget = fetchedBook.readingProgress.dailyReadingRecords["2025-01-10"] else {
             Issue.record("Expected normalized record")
@@ -551,7 +551,7 @@ struct SwiftDataBookRepositoryTests {
     func testMigrationMarksCompletedWhenNoMutation() async throws {
         let container = try createInMemoryContainer()
         let migrationStorage = createMigrationStorage()
-        let repository = SwiftDataBookRepository(
+        let repo = SwiftDataBookRepo(
             modelContainer: container,
             migrationUserDefaults: migrationStorage.userDefaults,
             migrationCompletionKey: migrationStorage.completionKey
@@ -567,7 +567,7 @@ struct SwiftDataBookRepositoryTests {
         container.mainContext.insert(alreadyNormalized)
         try container.mainContext.save()
 
-        let fetchedBook = try await repository.fetchBook(by: alreadyNormalized.id)
+        let fetchedBook = try await repo.fetchBook(by: alreadyNormalized.id)
         #expect(fetchedBook.readingProgress.dailyReadingRecords["2025-01-10"] != nil)
         #expect(migrationStorage.userDefaults.bool(forKey: migrationStorage.completionKey) == true)
     }
@@ -575,16 +575,16 @@ struct SwiftDataBookRepositoryTests {
     // MARK: - Error Tests
 
     /// 존재하지 않는 책 조회 시 에러
-    @Test("존재하지 않는 책 조회 시 RepositoryError.notFound 발생")
+    @Test("존재하지 않는 책 조회 시 RepoError.notFound 발생")
     func testFetchNonexistentBook() async throws {
         let container = try createInMemoryContainer()
-        let repository = SwiftDataBookRepository(modelContainer: container)
+        let repo = SwiftDataBookRepo(modelContainer: container)
 
         let nonexistentId = UUID()
 
         // 존재하지 않는 ID로 조회 시 에러 발생
-        await #expect(throws: RepositoryError.self) {
-            _ = try await repository.fetchBook(by: nonexistentId)
+        await #expect(throws: RepoError.self) {
+            _ = try await repo.fetchBook(by: nonexistentId)
         }
     }
 }

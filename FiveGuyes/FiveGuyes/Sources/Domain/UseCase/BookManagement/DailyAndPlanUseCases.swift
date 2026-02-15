@@ -1,5 +1,5 @@
 //
-//  BookManagementDailyAndPlanUseCases.swift
+//  DailyAndPlanUseCases.swift
 //  FiveGuyes
 //
 //  Created by zaehorang on 2026-02-16.
@@ -82,12 +82,12 @@ struct ReadingPlanUseCase: ReadingPlanUsing {
 }
 
 struct RecordReadingUseCase {
-    let repository: BookRepository
+    let repo: BookRepo
     let notificationScheduler: any ReadingNotificationScheduling
     let scheduleCalculator: ReadingScheduleCalculator
 
     func execute(bookId: UUID, pagesRead: Int, readDate: Date) async throws -> RecordReadingResult {
-        let currentBook = try await repository.fetchBook(by: bookId)
+        let currentBook = try await repo.fetchBook(by: bookId)
 
         if pagesRead > currentBook.userSettings.targetEndPage {
             return .exceedsTarget(currentTarget: currentBook.userSettings.targetEndPage)
@@ -124,7 +124,7 @@ struct RecordReadingUseCase {
             completionStatus: currentBook.completionStatus
         )
 
-        try await repository.updateBook(updatedBook)
+        try await repo.updateBook(updatedBook)
         await notificationScheduler.setupAllNotifications(updatedBook)
 
         if pagesRead >= currentBook.userSettings.targetEndPage {
@@ -164,13 +164,13 @@ struct RecordReadingUseCase {
             completionStatus: book.completionStatus
         )
 
-        try await repository.updateBook(updatedBook)
+        try await repo.updateBook(updatedBook)
         await notificationScheduler.setupAllNotifications(updatedBook)
     }
 }
 
 struct UpdateReadingPlanUseCase {
-    let repository: BookRepository
+    let repo: BookRepo
     let notificationScheduler: any ReadingNotificationScheduling
     let scheduleCalculator: ReadingScheduleCalculator
 
@@ -181,7 +181,7 @@ struct UpdateReadingPlanUseCase {
         excludedReadingDays: [Date],
         today: Date
     ) async throws {
-        let currentBook = try await repository.fetchBook(by: bookId)
+        let currentBook = try await repo.fetchBook(by: bookId)
 
         let newSettings = FGUserSetting(
             startPage: currentBook.userSettings.startPage,
@@ -205,7 +205,7 @@ struct UpdateReadingPlanUseCase {
             completionStatus: currentBook.completionStatus
         )
 
-        try await repository.updateBook(updatedBook)
+        try await repo.updateBook(updatedBook)
         await notificationScheduler.setupAllNotifications(updatedBook)
     }
 }

@@ -1,5 +1,5 @@
 //
-//  MockBookRepository.swift
+//  MockBookRepo.swift
 //  FiveGuyes
 //
 //  Created by zaehorang on 11/1/25.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-actor MockBookRepository: BookRepository {
+actor MockBookRepo: BookRepo {
     var books: [FGUserBook] = []
 
     func fetchBooks() async throws -> [FGUserBook] {
@@ -16,7 +16,7 @@ actor MockBookRepository: BookRepository {
 
     func fetchBook(by id: UUID) async throws -> FGUserBook {
         guard let book = books.first(where: { $0.id == id }) else {
-            throw RepositoryError.notFound
+            throw RepoError.notFound
         }
         return book
     }
@@ -27,7 +27,7 @@ actor MockBookRepository: BookRepository {
 
     func updateBook(_ book: FGUserBook) async throws {
         guard let index = books.firstIndex(where: { $0.id == book.id }) else {
-            throw RepositoryError.notFound
+            throw RepoError.notFound
         }
         books[index] = book
     }
@@ -46,7 +46,7 @@ actor MockBookRepository: BookRepository {
 
     func updateReadingProgress(bookId: UUID, progress: FGReadingProgress) async throws {
         guard let index = books.firstIndex(where: { $0.id == bookId }) else {
-            throw RepositoryError.notFound
+            throw RepoError.notFound
         }
         var updatedBook = books[index]
         updatedBook.readingProgress = progress
@@ -55,7 +55,7 @@ actor MockBookRepository: BookRepository {
 
     func updateSettings(bookId: UUID, settings: FGUserSetting) async throws {
         guard let index = books.firstIndex(where: { $0.id == bookId }) else {
-            throw RepositoryError.notFound
+            throw RepoError.notFound
         }
         var updatedBook = books[index]
         updatedBook.userSettings = settings
@@ -64,7 +64,7 @@ actor MockBookRepository: BookRepository {
 
     func updateMetaData(bookId: UUID, metaData: FGBookMetaData) async throws {
         guard let index = books.firstIndex(where: { $0.id == bookId }) else {
-            throw RepositoryError.notFound
+            throw RepoError.notFound
         }
         let oldBook = books[index]
         // bookMetaData는 let이므로 책 전체를 새로 생성
@@ -80,7 +80,7 @@ actor MockBookRepository: BookRepository {
 
     func updateCompletionStatus(bookId: UUID, status: FGCompletionStatus) async throws {
         guard let index = books.firstIndex(where: { $0.id == bookId }) else {
-            throw RepositoryError.notFound
+            throw RepoError.notFound
         }
         var updatedBook = books[index]
         updatedBook.completionStatus = status

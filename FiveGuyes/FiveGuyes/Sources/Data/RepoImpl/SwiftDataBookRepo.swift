@@ -1,5 +1,5 @@
 //
-//  SwiftDataBookRepository.swift
+//  SwiftDataBookRepo.swift
 //  FiveGuyes
 //
 //  Created by zaehorang on 1/8/25.
@@ -8,7 +8,7 @@
 import Foundation
 import SwiftData
 
-final class SwiftDataBookRepository: BookRepository {
+final class SwiftDataBookRepo: BookRepo {
     typealias SDUserBook = UserBookSchemaV2.UserBookV2
 
     // MARK: - Properties
@@ -50,7 +50,7 @@ final class SwiftDataBookRepository: BookRepository {
             let books = swiftDatabooks.map { $0.toFGUserBook() }
             return books
         } catch {
-            throw RepositoryError.fetchFailed
+            throw RepoError.fetchFailed
         }
     }
 
@@ -67,7 +67,7 @@ final class SwiftDataBookRepository: BookRepository {
         do {
             try modelContext.save()
         } catch {
-            throw RepositoryError.saveFailed
+            throw RepoError.saveFailed
         }
     }
 
@@ -81,7 +81,7 @@ final class SwiftDataBookRepository: BookRepository {
         do {
             try modelContext.save()
         } catch {
-            throw RepositoryError.updateFailed
+            throw RepoError.updateFailed
         }
     }
 
@@ -92,7 +92,7 @@ final class SwiftDataBookRepository: BookRepository {
             modelContext.delete(swiftDataBook)
             try modelContext.save()
         } catch {
-            throw RepositoryError.deleteFailed
+            throw RepoError.deleteFailed
         }
     }
 
@@ -110,7 +110,7 @@ final class SwiftDataBookRepository: BookRepository {
             let swiftDataBooks = try modelContext.fetch(fetchDescriptor)
             return swiftDataBooks.map { $0.toFGUserBook() }
         } catch {
-            throw RepositoryError.fetchFailed
+            throw RepoError.fetchFailed
         }
     }
 
@@ -126,7 +126,7 @@ final class SwiftDataBookRepository: BookRepository {
             let swiftDataBooks = try modelContext.fetch(fetchDescriptor)
             return swiftDataBooks.map { $0.toFGUserBook() }
         } catch {
-            throw RepositoryError.fetchFailed
+            throw RepoError.fetchFailed
         }
     }
 
@@ -140,7 +140,7 @@ final class SwiftDataBookRepository: BookRepository {
         do {
             try modelContext.save()
         } catch {
-            throw RepositoryError.updateFailed
+            throw RepoError.updateFailed
         }
     }
 
@@ -152,7 +152,7 @@ final class SwiftDataBookRepository: BookRepository {
         do {
             try modelContext.save()
         } catch {
-            throw RepositoryError.updateFailed
+            throw RepoError.updateFailed
         }
     }
 
@@ -164,7 +164,7 @@ final class SwiftDataBookRepository: BookRepository {
         do {
             try modelContext.save()
         } catch {
-            throw RepositoryError.updateFailed
+            throw RepoError.updateFailed
         }
     }
 
@@ -176,7 +176,7 @@ final class SwiftDataBookRepository: BookRepository {
         do {
             try modelContext.save()
         } catch {
-            throw RepositoryError.updateFailed
+            throw RepoError.updateFailed
         }
     }
 
@@ -218,7 +218,7 @@ final class SwiftDataBookRepository: BookRepository {
             markMigrationCompleted()
         } catch {
             // 마이그레이션 실패 시 완료 플래그를 올리지 않아 다음 fetch에서 재시도할 수 있게 합니다.
-            throw RepositoryError.fetchFailed
+            throw RepoError.fetchFailed
         }
     }
 
@@ -263,13 +263,13 @@ final class SwiftDataBookRepository: BookRepository {
         do {
             let books = try modelContext.fetch(fetchDescriptor)
             guard let book = books.first else {
-                throw RepositoryError.notFound
+                throw RepoError.notFound
             }
             return book
-        } catch is RepositoryError {
-            throw RepositoryError.notFound
+        } catch is RepoError {
+            throw RepoError.notFound
         } catch {
-            throw RepositoryError.fetchFailed
+            throw RepoError.fetchFailed
         }
     }
 }

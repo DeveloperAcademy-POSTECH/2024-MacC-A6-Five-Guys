@@ -12,17 +12,17 @@ import Testing
 extension BookManagementUseCasesTests {
     @Test("ReadingLibraryUseCase.fetchLibrarySnapshot로 읽는 중/완독 책 분리 조회")
     func testFetchLibrarySnapshot() async throws {
-        let mockRepository = MockBookRepository()
+        let mockRepo = MockBookRepo()
         let schedulerSpy = NotificationSchedulerSpy()
         let useCase = makeReadingLibraryUseCase(
-            repository: mockRepository,
+            repo: mockRepo,
             notificationScheduler: schedulerSpy
         )
 
         let readingBook1 = createTestBook(title: "읽는 중1", isCompleted: false)
         let readingBook2 = createTestBook(title: "읽는 중2", isCompleted: false)
         let completedBook = createTestBook(title: "완료됨", isCompleted: true)
-        await mockRepository.setBooks([readingBook1, readingBook2, completedBook])
+        await mockRepo.setBooks([readingBook1, readingBook2, completedBook])
 
         let snapshot = try await useCase.fetchLibrarySnapshot()
 
@@ -35,11 +35,11 @@ extension BookManagementUseCasesTests {
 
     @Test("FetchBookDetailUseCase로 특정 책 상세 조회")
     func testFetchBookDetail() async throws {
-        let mockRepository = MockBookRepository()
-        let useCase = FetchBookDetailUseCase(repository: mockRepository)
+        let mockRepo = MockBookRepo()
+        let useCase = FetchBookDetailUseCase(repo: mockRepo)
 
         let testBook = createTestBook(title: "테스트 책", author: "테스트 작가")
-        await mockRepository.setBooks([testBook])
+        await mockRepo.setBooks([testBook])
 
         let result = try await useCase.execute(id: testBook.id)
 
@@ -50,36 +50,36 @@ extension BookManagementUseCasesTests {
 
     @Test("FetchBookDetailUseCase로 존재하지 않는 책 조회 시 에러 발생")
     func testFetchBookDetailNotFound() async throws {
-        let mockRepository = MockBookRepository()
-        let useCase = FetchBookDetailUseCase(repository: mockRepository)
+        let mockRepo = MockBookRepo()
+        let useCase = FetchBookDetailUseCase(repo: mockRepo)
 
-        await #expect(throws: RepositoryError.self) {
+        await #expect(throws: RepoError.self) {
             _ = try await useCase.execute(id: UUID())
         }
     }
 
     @Test("책이 없을 때 ReadingLibraryUseCase.fetchLibrarySnapshot은 빈 결과를 반환")
     func testFetchEmptySnapshot() async throws {
-        let mockRepository = MockBookRepository()
+        let mockRepo = MockBookRepo()
         let schedulerSpy = NotificationSchedulerSpy()
         let useCase = makeReadingLibraryUseCase(
-            repository: mockRepository,
+            repo: mockRepo,
             notificationScheduler: schedulerSpy
         )
 
-        await mockRepository.setBooks([])
+        await mockRepo.setBooks([])
         let snapshot = try await useCase.fetchLibrarySnapshot()
 
         #expect(snapshot.readingBooks.isEmpty)
         #expect(snapshot.completedBooks.isEmpty)
     }
 
-    @Test("BookRegistrationUseCase.registerBook로 책 등록 시 Repository 저장 및 알림 설정")
+    @Test("BookRegistrationUseCase.registerBook로 책 등록 시 Repo 저장 및 알림 설정")
     func testRegisterBook() async throws {
-        let mockRepository = MockBookRepository()
+        let mockRepo = MockBookRepo()
         let schedulerSpy = NotificationSchedulerSpy()
         let useCase = makeBookRegistrationUseCase(
-            repository: mockRepository,
+            repo: mockRepo,
             notificationScheduler: schedulerSpy
         )
 
@@ -101,7 +101,7 @@ extension BookManagementUseCasesTests {
 
         let registeredBook = try await useCase.registerBook(input)
 
-        let booksInRepo = await mockRepository.books
+        let booksInRepo = await mockRepo.books
         let setupCount = await schedulerSpy.setupCount()
         let lastSetupBook = await schedulerSpy.lastSetupBook()
 
@@ -114,10 +114,10 @@ extension BookManagementUseCasesTests {
 
     @Test("BookRegistrationUseCase.registerBook로 책 등록 시 초기 스케줄이 계산됨")
     func testRegisterBookWithScheduleCalculation() async throws {
-        let mockRepository = MockBookRepository()
+        let mockRepo = MockBookRepo()
         let schedulerSpy = NotificationSchedulerSpy()
         let useCase = makeBookRegistrationUseCase(
-            repository: mockRepository,
+            repo: mockRepo,
             notificationScheduler: schedulerSpy
         )
 
@@ -146,24 +146,24 @@ extension BookManagementUseCasesTests {
         #expect(firstRecord!.targetPages > 0)
     }
 
-    @Test("ReadingLibraryUseCase.deleteBook으로 책 삭제 시 Repository에서 제거")
+    @Test("ReadingLibraryUseCase.deleteBook으로 책 삭제 시 Repo에서 제거")
     func testDeleteBook() async throws {
-        let mockRepository = MockBookRepository()
+        let mockRepo = MockBookRepo()
         let schedulerSpy = NotificationSchedulerSpy()
         let useCase = makeReadingLibraryUseCase(
-            repository: mockRepository,
+            repo: mockRepo,
             notificationScheduler: schedulerSpy
         )
 
         let testBook = createTestBook(title: "삭제할 책", isCompleted: false)
-        await mockRepository.setBooks([testBook])
+        await mockRepo.setBooks([testBook])
 
-        var booksInRepo = await mockRepository.books
+        var booksInRepo = await mockRepo.books
         #expect(booksInRepo.count == 1)
 
         try await useCase.deleteBook(id: testBook.id)
 
-        booksInRepo = await mockRepository.books
+        booksInRepo = await mockRepo.books
         let clearCount = await schedulerSpy.clearCount()
 
         #expect(booksInRepo.isEmpty)
@@ -172,16 +172,16 @@ extension BookManagementUseCasesTests {
 
     @Test("ReadingLibraryUseCase.deleteBook으로 존재하지 않는 책 삭제 시 에러 없이 처리")
     func testDeleteNonexistentBook() async throws {
-        let mockRepository = MockBookRepository()
+        let mockRepo = MockBookRepo()
         let schedulerSpy = NotificationSchedulerSpy()
         let useCase = makeReadingLibraryUseCase(
-            repository: mockRepository,
+            repo: mockRepo,
             notificationScheduler: schedulerSpy
         )
 
         try await useCase.deleteBook(id: UUID())
 
-        let booksInRepo = await mockRepository.books
+        let booksInRepo = await mockRepo.books
         let clearCount = await schedulerSpy.clearCount()
 
         #expect(booksInRepo.isEmpty)
@@ -190,11 +190,11 @@ extension BookManagementUseCasesTests {
 
     @Test("ReadingLibraryUseCase.today는 내부 todayProvider 값을 반환")
     func testReadingLibraryToday() {
-        let mockRepository = MockBookRepository()
+        let mockRepo = MockBookRepo()
         let schedulerSpy = NotificationSchedulerSpy()
         let todayProvider = ReadingDateProviderStub(todayValue: makeDate("2025-01-10"))
         let useCase = makeReadingLibraryUseCase(
-            repository: mockRepository,
+            repo: mockRepo,
             notificationScheduler: schedulerSpy,
             todayProvider: todayProvider
         )
@@ -204,17 +204,17 @@ extension BookManagementUseCasesTests {
 
     @Test("ReadingLibraryUseCase.rescheduleOnAppOpen은 내부 todayProvider를 통해 기준일을 해상한다")
     func testRescheduleOnAppOpenUsesTodayProvider() async throws {
-        let mockRepository = MockBookRepository()
+        let mockRepo = MockBookRepo()
         let schedulerSpy = NotificationSchedulerSpy()
         let todayProvider = ReadingDateProviderSpy(todayValue: makeDate("2025-01-10"))
         let useCase = makeReadingLibraryUseCase(
-            repository: mockRepository,
+            repo: mockRepo,
             notificationScheduler: schedulerSpy,
             todayProvider: todayProvider
         )
 
         let testBook = createTestBook(totalPages: 300, isCompleted: false)
-        await mockRepository.setBooks([testBook])
+        await mockRepo.setBooks([testBook])
 
         try await useCase.rescheduleOnAppOpen(bookId: testBook.id)
 

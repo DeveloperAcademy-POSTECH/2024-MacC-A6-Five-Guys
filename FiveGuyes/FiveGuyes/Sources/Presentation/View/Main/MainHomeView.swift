@@ -61,7 +61,7 @@ struct MainHomeView: View {
                 HStack {
                     Spacer()
                     notiButton {
-                        navigationCoordinator.push(.notificationSetting(book: readingBooks.first))
+                        navigationCoordinator.push(.notiSetting(book: readingBooks.first))
                     }
                 }
                 .padding(.bottom, 12)

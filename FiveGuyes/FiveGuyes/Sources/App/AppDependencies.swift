@@ -21,58 +21,58 @@ final class AppDependencies {
     let readingPlanUseCase: any ReadingPlanUsing
     let bookRegistrationUseCase: any BookRegistrationUsing
     let notificationService: any NotificationManaging
-    let notificationSettingsStore: any NotificationSettingsStoring
+    let notiSettingsStore: any NotificationSettingsStoring
     let bookSearchUseCase: any BookSearchUsing
 
     init(modelContainer: ModelContainer) {
         let migrationCompletionKey = Self.makeMigrationCompletionKey()
-        let repository = SwiftDataBookRepository(
+        let repo = SwiftDataBookRepo(
             modelContainer: modelContainer,
             migrationUserDefaults: .standard,
             migrationCompletionKey: migrationCompletionKey
         )
 
         do {
-            try repository.prewarmReadingRecordKeyMigrationIfNeeded()
+            try repo.prewarmReadingRecordKeyMigrationIfNeeded()
         } catch {
             // 앱 시작을 막지 않기 위해 prewarm 실패는 무시하고 fetch 경계 재시도에 맡깁니다.
         }
 
         let readingDateProvider = DefaultReadingDateProvider()
-        let notificationSettingsStore = UserDefaultsNotificationSettingsStore()
+        let notiSettingsStore = UserDefaultsNotificationSettingsStore()
         let notificationService = NotificationManager(
             todayProvider: readingDateProvider,
-            settingsStore: notificationSettingsStore
+            settingsStore: notiSettingsStore
         )
         let scheduleCalculator = ReadingScheduleCalculator()
 
-        let fetchReadingBooksUseCase = FetchReadingBooksUseCase(repository: repository)
-        let fetchCompletedBooksUseCase = FetchCompletedBooksUseCase(repository: repository)
+        let fetchReadingBooksUseCase = FetchReadingBooksUseCase(repo: repo)
+        let fetchCompletedBooksUseCase = FetchCompletedBooksUseCase(repo: repo)
         let deleteBookUseCase = DeleteBookUseCase(
-            repository: repository,
+            repo: repo,
             notificationScheduler: notificationService
         )
         let rescheduleOnAppOpenUseCase = RescheduleOnAppOpenUseCase(
-            repository: repository,
+            repo: repo,
             scheduleCalculator: scheduleCalculator
         )
         let registerBookUseCase = RegisterBookUseCase(
-            repository: repository,
+            repo: repo,
             notificationScheduler: notificationService,
             scheduleCalculator: scheduleCalculator
         )
         let recordReadingUseCase = RecordReadingUseCase(
-            repository: repository,
+            repo: repo,
             notificationScheduler: notificationService,
             scheduleCalculator: scheduleCalculator
         )
         let completeBookUseCase = CompleteBookUseCase(
-            repository: repository,
+            repo: repo,
             notificationScheduler: notificationService
         )
-        let updateCompletionReviewUseCase = UpdateCompletionReviewUseCase(repository: repository)
+        let updateCompletionReviewUseCase = UpdateCompletionReviewUseCase(repo: repo)
         let updateReadingPlanUseCase = UpdateReadingPlanUseCase(
-            repository: repository,
+            repo: repo,
             notificationScheduler: notificationService,
             scheduleCalculator: scheduleCalculator
         )
@@ -102,7 +102,7 @@ final class AppDependencies {
             registerBookUseCase: registerBookUseCase
         )
         self.notificationService = notificationService
-        self.notificationSettingsStore = notificationSettingsStore
+        self.notiSettingsStore = notiSettingsStore
         self.bookSearchUseCase = BookSearchUseCase(
             bookSearchProvider: AladinBookSearchProvider()
         )
@@ -110,6 +110,6 @@ final class AppDependencies {
 
     private static func makeMigrationCompletionKey() -> String {
         let bundleIdentifier = Bundle.main.bundleIdentifier ?? defaultBundleIdentifier
-        return "\(bundleIdentifier).\(migrationStoreScope).\(SwiftDataBookRepository.migrationCompletionVersionKey)"
+        return "\(bundleIdentifier).\(migrationStoreScope).\(SwiftDataBookRepo.migrationCompletionVersionKey)"
     }
 }

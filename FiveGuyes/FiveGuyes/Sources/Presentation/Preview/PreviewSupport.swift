@@ -18,13 +18,13 @@ enum PreviewSupport {
     static func makeDependencies() -> AppDependencies {
         // 이 설정은 데이터를 파일로 저장하지 않게 만듭니다.
         // 프리뷰를 닫으면 데이터가 사라져서 실데이터를 건드리지 않습니다.
-        let configuration = ModelConfiguration(isStoredInMemoryOnly: true)
+        let config = ModelConfiguration(isStoredInMemoryOnly: true)
         do {
             // 프리뷰 전용 저장 상자를 여기서 만듭니다.
             // 이후 서비스와 화면은 이 상자를 받아 같은 가짜 데이터를 함께 씁니다.
             let container = try ModelContainer(
                 for: UserBookSchemaV2.UserBookV2.self,
-                configurations: configuration
+                configurations: config
             )
             return AppDependencies(modelContainer: container)
         } catch {
@@ -133,7 +133,7 @@ final class PreviewBookManagementService: BookManagementService {
 
         // 해당 책을 못 찾으면 여기서 억지로 진행하지 않고 에러를 올립니다.
         // 위 단계가 이 에러를 받아 사용자에게 올바른 안내를 보여줍니다.
-        throw RepositoryError.notFound
+        throw RepoError.notFound
     }
 
     // 완독 소감만 바꿔서 다시 저장하는 함수입니다.
@@ -157,7 +157,7 @@ final class PreviewBookManagementService: BookManagementService {
 
         // 해당 책을 못 찾으면 여기서 억지로 진행하지 않고 에러를 올립니다.
         // 위 단계가 이 에러를 받아 사용자에게 올바른 안내를 보여줍니다.
-        throw RepositoryError.notFound
+        throw RepoError.notFound
     }
 
     // 사용자가 고른 새 기간/쉬는 날을 설정에 반영합니다.
@@ -173,7 +173,7 @@ final class PreviewBookManagementService: BookManagementService {
         guard let index = readingBooks.firstIndex(where: { $0.id == bookId }) else {
             // 해당 책을 못 찾으면 여기서 억지로 진행하지 않고 에러를 올립니다.
             // 위 단계가 이 에러를 받아 사용자에게 올바른 안내를 보여줍니다.
-            throw RepositoryError.notFound
+            throw RepoError.notFound
         }
 
         // 페이지 시작/끝 값은 유지하고 날짜만 바꾸려고 기존 설정을 잠깐 꺼내 둡니다.
@@ -213,7 +213,7 @@ final class PreviewBookManagementService: BookManagementService {
 
         // 해당 책을 못 찾으면 여기서 억지로 진행하지 않고 에러를 올립니다.
         // 위 단계가 이 에러를 받아 사용자에게 올바른 안내를 보여줍니다.
-        throw RepositoryError.notFound
+        throw RepoError.notFound
     }
 
     // 앱을 다시 열었을 때 계획을 다시 맞춰야 하는지 확인하는 함수입니다.
@@ -224,7 +224,7 @@ final class PreviewBookManagementService: BookManagementService {
         guard readingBooks.contains(where: { $0.id == bookId }) else {
             // 해당 책을 못 찾으면 여기서 억지로 진행하지 않고 에러를 올립니다.
             // 위 단계가 이 에러를 받아 사용자에게 올바른 안내를 보여줍니다.
-            throw RepositoryError.notFound
+            throw RepoError.notFound
         }
     }
 

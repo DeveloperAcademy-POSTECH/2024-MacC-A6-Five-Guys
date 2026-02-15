@@ -12,17 +12,17 @@ import Testing
 extension BookManagementUseCasesTests {
     @Test("DailyReadingUseCase.recordReading으로 일반 독서 기록")
     func testRecordReadingNormal() async throws {
-        let mockRepository = MockBookRepository()
+        let mockRepo = MockBookRepo()
         let schedulerSpy = NotificationSchedulerSpy()
         let today = makeDate("2025-01-02")
         let useCase = makeDailyReadingUseCase(
-            repository: mockRepository,
+            repo: mockRepo,
             notificationScheduler: schedulerSpy,
             todayProvider: ReadingDateProviderStub(todayValue: today)
         )
 
         let testBook = createTestBook(totalPages: 300)
-        await mockRepository.setBooks([testBook])
+        await mockRepo.setBooks([testBook])
 
         let result = try await useCase.recordReading(
             bookId: testBook.id,
@@ -42,17 +42,17 @@ extension BookManagementUseCasesTests {
 
     @Test("DailyReadingUseCase.recordReading으로 완독 처리")
     func testRecordReadingCompletion() async throws {
-        let mockRepository = MockBookRepository()
+        let mockRepo = MockBookRepo()
         let schedulerSpy = NotificationSchedulerSpy()
         let today = makeDate("2025-01-15")
         let useCase = makeDailyReadingUseCase(
-            repository: mockRepository,
+            repo: mockRepo,
             notificationScheduler: schedulerSpy,
             todayProvider: ReadingDateProviderStub(todayValue: today)
         )
 
         let testBook = createTestBook(totalPages: 300)
-        await mockRepository.setBooks([testBook])
+        await mockRepo.setBooks([testBook])
 
         let result = try await useCase.recordReading(
             bookId: testBook.id,
@@ -69,17 +69,17 @@ extension BookManagementUseCasesTests {
 
     @Test("DailyReadingUseCase.recordReading으로 마지막 날 목표 미달 시 날짜 자동 연장")
     func testRecordReadingDateExtension() async throws {
-        let mockRepository = MockBookRepository()
+        let mockRepo = MockBookRepo()
         let schedulerSpy = NotificationSchedulerSpy()
         let today = makeDate("2025-01-31")
         let useCase = makeDailyReadingUseCase(
-            repository: mockRepository,
+            repo: mockRepo,
             notificationScheduler: schedulerSpy,
             todayProvider: ReadingDateProviderStub(todayValue: today)
         )
 
         let testBook = createTestBook(totalPages: 300)
-        await mockRepository.setBooks([testBook])
+        await mockRepo.setBooks([testBook])
 
         let result = try await useCase.recordReading(
             bookId: testBook.id,
@@ -88,7 +88,7 @@ extension BookManagementUseCasesTests {
 
         switch result {
         case .dateExtended:
-            let updatedBook = try await mockRepository.fetchBook(by: testBook.id)
+            let updatedBook = try await mockRepo.fetchBook(by: testBook.id)
             #expect(updatedBook.userSettings.targetEndDate == makeDate("2025-02-01"))
             let setupCount = await schedulerSpy.setupCount()
             #expect(setupCount == 1)
@@ -99,17 +99,17 @@ extension BookManagementUseCasesTests {
 
     @Test("DailyReadingUseCase.recordReading으로 목표 페이지 초과 시 exceedsTarget 반환")
     func testRecordReadingExceedsTarget() async throws {
-        let mockRepository = MockBookRepository()
+        let mockRepo = MockBookRepo()
         let schedulerSpy = NotificationSchedulerSpy()
         let today = makeDate("2025-01-15")
         let useCase = makeDailyReadingUseCase(
-            repository: mockRepository,
+            repo: mockRepo,
             notificationScheduler: schedulerSpy,
             todayProvider: ReadingDateProviderStub(todayValue: today)
         )
 
         let testBook = createTestBook(totalPages: 300)
-        await mockRepository.setBooks([testBook])
+        await mockRepo.setBooks([testBook])
 
         let result = try await useCase.recordReading(
             bookId: testBook.id,
@@ -128,21 +128,21 @@ extension BookManagementUseCasesTests {
 
     @Test("DailyReadingUseCase는 내부 todayProvider 값을 읽어 recordReading 날짜로 사용")
     func testRecordReadingUsesTodayProvider() async throws {
-        let mockRepository = MockBookRepository()
+        let mockRepo = MockBookRepo()
         let schedulerSpy = NotificationSchedulerSpy()
         let todayProvider = ReadingDateProviderSpy(todayValue: makeDate("2025-01-07"))
         let useCase = makeDailyReadingUseCase(
-            repository: mockRepository,
+            repo: mockRepo,
             notificationScheduler: schedulerSpy,
             todayProvider: todayProvider
         )
 
         let testBook = createTestBook(totalPages: 300)
-        await mockRepository.setBooks([testBook])
+        await mockRepo.setBooks([testBook])
 
         _ = try await useCase.recordReading(bookId: testBook.id, pagesRead: 10)
 
-        let updatedBook = try await mockRepository.fetchBook(by: testBook.id)
+        let updatedBook = try await mockRepo.fetchBook(by: testBook.id)
         #expect(updatedBook.readingProgress.lastReadDate == makeDate("2025-01-07"))
         #expect(todayProvider.callCount == 1)
     }

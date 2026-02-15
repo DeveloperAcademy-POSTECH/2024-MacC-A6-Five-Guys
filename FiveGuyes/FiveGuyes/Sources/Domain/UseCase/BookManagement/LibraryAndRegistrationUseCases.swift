@@ -1,5 +1,5 @@
 //
-//  BookManagementLibraryAndRegistrationUseCases.swift
+//  LibraryAndRegistrationUseCases.swift
 //  FiveGuyes
 //
 //  Created by zaehorang on 2026-02-16.
@@ -89,35 +89,35 @@ struct BookRegistrationUseCase: BookRegistrationUsing {
 }
 
 struct FetchReadingBooksUseCase {
-    let repository: BookRepository
+    let repo: BookRepo
 
     func execute() async throws -> [FGUserBook] {
-        try await repository.getReadingBooks()
+        try await repo.getReadingBooks()
     }
 }
 
 struct FetchCompletedBooksUseCase {
-    let repository: BookRepository
+    let repo: BookRepo
 
     func execute() async throws -> [FGUserBook] {
-        try await repository.getCompletedBooks()
+        try await repo.getCompletedBooks()
     }
 }
 
 struct FetchBookDetailUseCase {
-    let repository: BookRepository
+    let repo: BookRepo
 
     func execute(id: UUID) async throws -> FGUserBook {
-        try await repository.fetchBook(by: id)
+        try await repo.fetchBook(by: id)
     }
 }
 
 struct RescheduleOnAppOpenUseCase {
-    let repository: BookRepository
+    let repo: BookRepo
     let scheduleCalculator: ReadingScheduleCalculator
 
     func execute(bookId: UUID, today: Date) async throws {
-        let currentBook = try await repository.fetchBook(by: bookId)
+        let currentBook = try await repo.fetchBook(by: bookId)
 
         let updatedProgress = try scheduleCalculator.rescheduleOnAppOpen(
             settings: currentBook.userSettings,
@@ -137,12 +137,12 @@ struct RescheduleOnAppOpenUseCase {
             completionStatus: currentBook.completionStatus
         )
 
-        try await repository.updateBook(updatedBook)
+        try await repo.updateBook(updatedBook)
     }
 }
 
 struct RegisterBookUseCase {
-    let repository: BookRepository
+    let repo: BookRepo
     let notificationScheduler: any ReadingNotificationScheduling
     let scheduleCalculator: ReadingScheduleCalculator
 
@@ -157,7 +157,7 @@ struct RegisterBookUseCase {
             completionStatus: FGCompletionStatus(isCompleted: false, reviewAfterCompletion: "")
         )
 
-        try await repository.addBook(bookWithSchedule)
+        try await repo.addBook(bookWithSchedule)
         await notificationScheduler.setupAllNotifications(bookWithSchedule)
 
         return bookWithSchedule
@@ -165,13 +165,13 @@ struct RegisterBookUseCase {
 }
 
 struct DeleteBookUseCase {
-    let repository: BookRepository
+    let repo: BookRepo
     let notificationScheduler: any ReadingNotificationScheduling
 
     func execute(id: UUID) async throws {
-        try await repository.deleteBook(by: id)
+        try await repo.deleteBook(by: id)
 
-        let remainingReadingBooks = try await repository.getReadingBooks()
+        let remainingReadingBooks = try await repo.getReadingBooks()
         if let nextReadingBook = remainingReadingBooks.first {
             await notificationScheduler.setupAllNotifications(nextReadingBook)
         } else {
