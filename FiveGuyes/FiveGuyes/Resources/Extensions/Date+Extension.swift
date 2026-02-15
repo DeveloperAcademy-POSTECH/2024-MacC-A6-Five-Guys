@@ -69,23 +69,26 @@ extension Date {
 
 // Date 확장으로 날짜 문자열 포맷 추가
 extension Date {
+    /// 기존 호출부 호환을 위해 Date 확장에 남겨둔 wrapper입니다.
+    /// 실제 키 생성 규칙은 `ReadingDateKey`가 단일 소스로 관리합니다.
+    var readingDateKey: ReadingDateKey {
+        ReadingDateKey(date: self, calendar: .app)
+    }
+
+    /// 기존 메서드 시그니처를 유지하면서 내부 구현만 `ReadingDateKey`로 통일합니다.
     func toYearMonthDayString() -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        return formatter.string(from: self)
+        readingDateKey.rawValue
     }
     
     /// 04:00 AM을 기준으로 날짜를 조정하여 "yyyy-MM-dd" 형식으로 반환
+    /// 정책 계산은 `DayBoundaryProviding`/`ReadingDateKey`로 위임하고, 호출부 호환을 위해 wrapper를 유지합니다.
     func toAdjustedYearMonthDayString(hourOffset: Int = -4) -> String {
         guard hourOffset == -4 else {
             let calendar = Calendar.app
             let adjustedDate = calendar.date(byAdding: .hour, value: hourOffset, to: self) ?? self
-            let formatter = DateFormatter()
-            formatter.dateFormat = "yyyy-MM-dd"
-            formatter.timeZone = calendar.timeZone
-            return formatter.string(from: adjustedDate)
+            return ReadingDateKey(date: adjustedDate, calendar: calendar).rawValue
         }
-        return DayBoundary.shared.adjustedDayKey(from: self)
+        return DayBoundary.shared.adjustedDayKey(from: self).rawValue
     }
     
     /// 기준 시각으로 조정된 날짜 반환

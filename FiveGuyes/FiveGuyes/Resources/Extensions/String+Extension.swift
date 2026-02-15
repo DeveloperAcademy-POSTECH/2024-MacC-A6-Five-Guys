@@ -54,14 +54,12 @@ extension String {
     
     // 년도 추출
     func extractYear() -> String {
-           let dateFormatter = DateFormatter()
-           dateFormatter.dateFormat = "yyyy-MM-dd"
-           if let date = dateFormatter.date(from: self) {
-               let calendar = Calendar.app
-               let year = calendar.component(.year, from: date)
-               return "\(year)"
+           guard let date = toReadingDateKey()?.toDate(calendar: .app) else {
+               return self
            }
-           return self
+
+           let year = Calendar.app.component(.year, from: date)
+           return "\(year)"
        }
     // (지은이) 제거
     func removingParenthesesContent() -> String {
@@ -71,12 +69,16 @@ extension String {
 }
 
 extension String {
+    /// 날짜 키 파싱은 `ReadingDateKey` 단일 경로를 사용합니다.
+    /// 포맷 안정성(`en_US_POSIX`)과 정책 시간대(`Calendar.app.timeZone`)를 함께 보장하기 위함입니다.
+    func toReadingDateKey() -> ReadingDateKey? {
+        ReadingDateKey(parsing: self, calendar: .app)
+    }
+
     /// 문자열을 `yyyy-MM-dd` 형식으로 `Date` 객체로 변환합니다.
+    /// 기존 호출부 호환을 위해 메서드 이름은 유지하고, 내부 구현만 `ReadingDateKey`를 재사용합니다.
     /// - Returns: 변환된 `Date` 객체 또는 변환이 실패한 경우 `nil`.
     func toDate() -> Date? {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd" // 날짜 포맷 지정
-
-        return dateFormatter.date(from: self) // 문자열을 Date로 변환
+        toReadingDateKey()?.toDate(calendar: .app)
     }
 }

@@ -134,11 +134,6 @@ extension ReadingScheduleCalculatorTests {
 
     @Test("rescheduleForSettingsChange - 시작일 미래로 변경")
     func rescheduleForSettingsChange_futureStartDate() throws {
-        let oldSettings = makeSettings(
-            startDate: makeDate("2025-01-10"),
-            targetEndDate: makeDate("2025-01-20")
-        )
-
         let progress = try makeProgressWithReadingHistory(
             startDate: makeDate("2025-01-10"),
             endDate: makeDate("2025-01-20"),
@@ -155,7 +150,6 @@ extension ReadingScheduleCalculatorTests {
         )
 
         let result = try calculator.rescheduleForSettingsChange(
-            oldSettings: oldSettings,
             newSettings: newSettings,
             progress: progress,
             today: makeDate("2025-01-15")
@@ -167,11 +161,6 @@ extension ReadingScheduleCalculatorTests {
 
     @Test("rescheduleForSettingsChange - 종료일 변경")
     func rescheduleForSettingsChange_endDateChanged() throws {
-        let oldSettings = makeSettings(
-            startDate: makeDate("2025-01-10"),
-            targetEndDate: makeDate("2025-01-20")
-        )
-
         let newSettings = makeSettings(
             startDate: makeDate("2025-01-10"),
             targetEndDate: makeDate("2025-01-25")
@@ -188,7 +177,6 @@ extension ReadingScheduleCalculatorTests {
         #expect(progress.dailyReadingRecords["2025-01-25"] == nil)
 
         let result = try calculator.rescheduleForSettingsChange(
-            oldSettings: oldSettings,
             newSettings: newSettings,
             progress: progress,
             today: makeDate("2025-01-12")

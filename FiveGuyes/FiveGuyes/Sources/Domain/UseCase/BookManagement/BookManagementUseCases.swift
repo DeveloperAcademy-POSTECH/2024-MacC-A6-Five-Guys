@@ -443,7 +443,6 @@ struct UpdateReadingPlanUseCase {
         )
 
         let updatedProgress = try scheduleCalculator.rescheduleForSettingsChange(
-            oldSettings: currentBook.userSettings,
             newSettings: newSettings,
             progress: currentBook.readingProgress,
             today: today

@@ -116,14 +116,14 @@ struct ReadingScheduleCalculator {
         pagesRead: Int,
         date: Date
     ) throws -> (progress: FGReadingProgress, updatedSettings: FGUserSetting?) {
-        let key = date.toYearMonthDayString()
+        let key = date.readingDateKey
         // 기존 기록을 바로 덮어쓰지 않고, 먼저 이 임시 변수에서 안전하게 수정합니다.
         // 중간에 계산이 실패해도 원본 상태를 잃지 않게 하려는 장치입니다.
         var newRecords = progress.dailyReadingRecords
 
         // 1. 오늘 날짜에 읽은 페이지 기록
-        let currentRecord = newRecords[key] ?? ReadingRecord(targetPages: 0, pagesRead: 0)
-        newRecords[key] = ReadingRecord(
+        let currentRecord = newRecords[key.rawValue] ?? ReadingRecord(targetPages: 0, pagesRead: 0)
+        newRecords[key.rawValue] = ReadingRecord(
             targetPages: currentRecord.targetPages,
             pagesRead: pagesRead
         )
@@ -132,9 +132,9 @@ struct ReadingScheduleCalculator {
         // 오늘이 쉬는 날 목록에 있으면, 그 목록을 갱신한 새 설정을 만듭니다.
         // 이 값을 따로 들고 있어야 이후 재계산에서 최신 규칙을 쓸 수 있습니다.
         var updatedSettings: FGUserSetting?
-        let excludedKey = settings.excludedReadingDays.first(where: { $0.toYearMonthDayString() == key })
+        let excludedKey = settings.excludedReadingDays.first(where: { $0.readingDateKey == key })
         if excludedKey != nil {
-            let newExcludedDays = settings.excludedReadingDays.filter { $0.toYearMonthDayString() != key }
+            let newExcludedDays = settings.excludedReadingDays.filter { $0.readingDateKey != key }
             updatedSettings = FGUserSetting(
                 startPage: settings.startPage,
                 targetEndPage: settings.targetEndPage,
@@ -164,7 +164,7 @@ struct ReadingScheduleCalculator {
         // 이 분기에서 그 재계산 흐름으로 이동합니다.
         if needsRecalculation {
             // 목표를 실제 읽은 페이지로 변경
-            newRecords[key] = ReadingRecord(targetPages: pagesRead, pagesRead: pagesRead)
+            newRecords[key.rawValue] = ReadingRecord(targetPages: pagesRead, pagesRead: pagesRead)
 
             // 다음날부터 재조정 (제외일이 변경되었다면 새 설정 사용)
             let adjustedSettings = updatedSettings ?? settings
@@ -257,21 +257,21 @@ struct ReadingScheduleCalculator {
         today: Date
     ) throws -> FGReadingProgress {
         // 1. 목표 종료일이 지났는지 확인
-        if today.toYearMonthDayString() > settings.targetEndDate.toYearMonthDayString() {
+        if today.readingDateKey > settings.targetEndDate.readingDateKey {
             // 목표 종료일이 이미 지났다면 일반 재계산을 하면 안 됩니다.
             // 이 경우를 따로 던져서, 위 단계에서 안내 문구를 정확히 보여주게 합니다.
             throw ScheduleCalculationError.targetDatePassed
         }
 
         // 2. 오늘 이미 읽은 기록이 있으면 재분배하지 않음
-        let todayKey = today.toYearMonthDayString()
-        if let todayRecord = progress.dailyReadingRecords[todayKey],
+        let todayKey = today.readingDateKey
+        if let todayRecord = progress.dailyReadingRecords[todayKey.rawValue],
            todayRecord.pagesRead > 0 {
             return progress  // 변경 없음
         }
 
         // 3. 시작일이 오늘 이후면 재분배하지 않음 (아직 시작 전)
-        if settings.startDate.toYearMonthDayString() >= today.toYearMonthDayString() {
+        if settings.startDate.readingDateKey >= today.readingDateKey {
             return progress  // 변경 없음
         }
 
@@ -312,7 +312,6 @@ struct ReadingScheduleCalculator {
     /// 스케줄을 재계산합니다.
     ///
     /// - Parameters:
-    ///   - oldSettings: 이전 설정
     ///   - newSettings: 새로운 설정
     ///   - progress: 현재 독서 진행 상황
     ///   - today: 오늘 날짜 (이미 보정 완료)
@@ -322,13 +321,12 @@ struct ReadingScheduleCalculator {
     // 사용자가 기간/제외일을 바꿨을 때 전체 계획을 다시 맞추는 함수입니다.
     // 옛 기록을 그대로 쓰면 새 규칙과 충돌하므로 먼저 정리 후 다시 계산합니다.
     func rescheduleForSettingsChange(
-        oldSettings: FGUserSetting,
         newSettings: FGUserSetting,
         progress: FGReadingProgress,
         today: Date
     ) throws -> FGReadingProgress {
         // 1. 시작일이 미래로 변경된 경우 → 전체 재계산
-        if newSettings.startDate.toYearMonthDayString() >= today.toYearMonthDayString() {
+        if newSettings.startDate.readingDateKey >= today.readingDateKey {
             return try createInitialSchedule(settings: newSettings)
         }
 
@@ -338,8 +336,8 @@ struct ReadingScheduleCalculator {
         let cleanedBase = cleanedProgress(progress: progress, settings: newSettings)
 
         // 3. 오늘 이미 읽은 기록이 있으면 다음날부터 재분배
-        let todayKey = today.toYearMonthDayString()
-        if let todayRecord = cleanedBase.dailyReadingRecords[todayKey],
+        let todayKey = today.readingDateKey
+        if let todayRecord = cleanedBase.dailyReadingRecords[todayKey.rawValue],
            todayRecord.pagesRead > 0 {
             return try adjustFutureTargets(
                 settings: newSettings,
@@ -433,20 +431,20 @@ struct ReadingScheduleCalculator {
         var records: [String: ReadingRecord] = [:]
         var cumulativePages = startPageExclusive
         var currentDate = startDate
-        let excludedKeys = Set(settings.excludedReadingDays.map { $0.toYearMonthDayString() })
+        let excludedKeys = Set(settings.excludedReadingDays.map(\.readingDateKey))
         var validDayIndex = 0
 
-        let endKey = settings.targetEndDate.toYearMonthDayString()
+        let endKey = settings.targetEndDate.readingDateKey
 
-        while currentDate.toYearMonthDayString() <= endKey,
+        while currentDate.readingDateKey <= endKey,
               validDayIndex < pagesPerValidDay.count {
-            let key = currentDate.toYearMonthDayString()
+            let key = currentDate.readingDateKey
 
             if !excludedKeys.contains(key) {
                 let pagesForDay = pagesPerValidDay[validDayIndex]
                 cumulativePages += pagesForDay
 
-                records[key] = ReadingRecord(
+                records[key.rawValue] = ReadingRecord(
                     targetPages: cumulativePages,
                     pagesRead: 0
                 )
@@ -475,11 +473,11 @@ struct ReadingScheduleCalculator {
         with segment: [String: ReadingRecord]
     ) -> FGReadingProgress {
         var mergedRecords = base.dailyReadingRecords
-        let replacingKey = replacingDate.toYearMonthDayString()
+        let replacingKey = replacingDate.readingDateKey
 
         // replacingDate 이후의 기존 기록 제거
         mergedRecords = mergedRecords.filter { key, _ in
-            key < replacingKey
+            ReadingDateKey.fromStoredKey(key) < replacingKey
         }
 
         // 새 segment 병합
@@ -511,13 +509,16 @@ struct ReadingScheduleCalculator {
         progress: FGReadingProgress,
         settings: FGUserSetting
     ) -> FGReadingProgress {
-        let startKey = settings.startDate.toYearMonthDayString()
-        let endKey = settings.targetEndDate.toYearMonthDayString()
-        let excludedKeys = Set(settings.excludedReadingDays.map { $0.toYearMonthDayString() })
+        let startKey = settings.startDate.readingDateKey
+        let endKey = settings.targetEndDate.readingDateKey
+        let excludedKeys = Set(settings.excludedReadingDays.map(\.readingDateKey))
 
         // 범위 내 + 제외일 아닌 기록만 유지
         let cleanedRecords = progress.dailyReadingRecords.filter { key, _ in
-            key >= startKey && key <= endKey && !excludedKeys.contains(key)
+            let readingDateKey = ReadingDateKey.fromStoredKey(key)
+            return readingDateKey >= startKey
+                && readingDateKey <= endKey
+                && !excludedKeys.contains(readingDateKey)
         }
 
         return FGReadingProgress(

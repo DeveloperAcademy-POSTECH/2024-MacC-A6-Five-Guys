@@ -107,11 +107,11 @@ struct FGReadingProgress: Hashable {
         return (0..<7).map { dayOffset in
              let date = calendar.date(byAdding: .day, value: dayOffset, to: startOfWeek)!
             // 내부 저장은 "yyyy-MM-dd" 문자열 키를 사용합니다.
-            return dailyReadingRecords[date.toYearMonthDayString()]
+            return dailyReadingRecords[date.readingDateKey.rawValue]
         }
     }
     
-    func getDailyReadingRecord(for date: Date) -> ReadingRecord? { dailyReadingRecords[date.toYearMonthDayString()] }
+    func getDailyReadingRecord(for date: Date) -> ReadingRecord? { dailyReadingRecords[date.readingDateKey.rawValue] }
 }
 
 struct FGCompletionStatus: Hashable {

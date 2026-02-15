@@ -106,7 +106,7 @@ struct TotalCalendarView: View {
                 return AnyView(EmptyView())
             }
             
-            let dateKey = date.toYearMonthDayString()
+            let dateKey = date.readingDateKey.rawValue
             
             return AnyView(calendarDayContent(date: date, dateKey: dateKey, currentReadingBook: currentReadingBook))
         }

@@ -39,7 +39,7 @@ struct DayBoundaryPolicyTests {
         let input = makeDate(year: 2026, month: 2, day: 14, hour: 3, minute: 59)
         let key = policy.adjustedDayKey(from: input)
 
-        #expect(key == "2026-02-13")
+        #expect(key.rawValue == "2026-02-13")
     }
 
     @Test("adjustedDayKey - 04시부터 당일 키")
@@ -47,7 +47,7 @@ struct DayBoundaryPolicyTests {
         let input = makeDate(year: 2026, month: 2, day: 14, hour: 4, minute: 0)
         let key = policy.adjustedDayKey(from: input)
 
-        #expect(key == "2026-02-14")
+        #expect(key.rawValue == "2026-02-14")
     }
 
     @Test("Date 확장 adjustedDate는 DayBoundary 정책과 동일하게 동작")
@@ -65,6 +65,6 @@ struct DayBoundaryPolicyTests {
         let viaExtension = input.toAdjustedYearMonthDayString()
         let viaPolicy = DayBoundary.shared.adjustedDayKey(from: input)
 
-        #expect(viaExtension == viaPolicy)
+        #expect(viaExtension == viaPolicy.rawValue)
     }
 }

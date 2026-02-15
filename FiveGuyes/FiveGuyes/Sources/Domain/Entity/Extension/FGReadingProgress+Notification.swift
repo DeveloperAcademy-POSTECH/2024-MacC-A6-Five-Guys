@@ -12,11 +12,15 @@ extension FGReadingProgress {
     /// 기준일(04:00 규칙으로 정규화된 날짜) 이후에서 아직 읽지 않은 첫 날짜를 찾습니다.
     func findNextReadingDay(today: Date) -> Date? {
         let lowerBoundDate = max(lastReadDate ?? today, today)
-        let lowerBoundKey = lowerBoundDate.toYearMonthDayString()
+        let lowerBoundKey = lowerBoundDate.readingDateKey
 
-        for dateString in dailyReadingRecords.keys.sorted() where dateString >= lowerBoundKey {
-            if dailyReadingRecords[dateString]?.pagesRead == 0 {
-                return dateString.toDate()
+        let sortedKeys = dailyReadingRecords.keys
+            .map { ReadingDateKey.fromStoredKey($0) }
+            .sorted()
+
+        for key in sortedKeys where key >= lowerBoundKey {
+            if dailyReadingRecords[key.rawValue]?.pagesRead == 0 {
+                return key.toDate()
             }
         }
         return nil
