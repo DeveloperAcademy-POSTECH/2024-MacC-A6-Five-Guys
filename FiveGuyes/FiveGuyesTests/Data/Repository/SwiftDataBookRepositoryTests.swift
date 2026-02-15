@@ -14,6 +14,7 @@ import Testing
 @Suite("SwiftDataBookRepository 테스트")
 @MainActor
 struct SwiftDataBookRepositoryTests {
+    private let legacyMigrationCompletionKey = SwiftDataBookRepository.migrationCompletionVersionKey
 
     // MARK: - Helper Methods
 
@@ -68,6 +69,17 @@ struct SwiftDataBookRepositoryTests {
             fatalError("Invalid date string: \(dateString)")
         }
         return date.onlyDate
+    }
+
+    private func createMigrationStorage() -> (userDefaults: UserDefaults, completionKey: String) {
+        let suiteName = "SwiftDataBookRepositoryTests.\(UUID().uuidString)"
+        guard let userDefaults = UserDefaults(suiteName: suiteName) else {
+            fatalError("Failed to create UserDefaults suite for migration tests")
+        }
+        userDefaults.removePersistentDomain(forName: suiteName)
+
+        let completionKey = "\(SwiftDataBookRepository.migrationCompletionVersionKey).\(UUID().uuidString)"
+        return (userDefaults: userDefaults, completionKey: completionKey)
     }
 
     // MARK: - Mapping Tests
@@ -337,6 +349,227 @@ struct SwiftDataBookRepositoryTests {
         let fetchedBook = try await repository.fetchBook(by: testBook.id)
         #expect(fetchedBook.completionStatus.isCompleted == true)
         #expect(fetchedBook.completionStatus.reviewAfterCompletion == "좋은 책이었습니다")
+    }
+
+    // MARK: - Migration Tests
+
+    @Test("fetch 시 legacy 읽기 키를 현재 정책 키로 1회 마이그레이션한다")
+    func testFetchMigratesLegacyReadingRecordKeys() async throws {
+        let container = try createInMemoryContainer()
+        let migrationStorage = createMigrationStorage()
+        let repository = SwiftDataBookRepository(
+            modelContainer: container,
+            migrationUserDefaults: migrationStorage.userDefaults,
+            migrationCompletionKey: migrationStorage.completionKey
+        )
+
+        let legacyBook = createTestBook().toUserBookV2()
+        legacyBook.readingProgress.readingRecords = [
+            "2025-01-09": ReadingRecord(targetPages: 10, pagesRead: 10)
+        ]
+        legacyBook.readingProgress.lastReadDate = makeDate("2025-01-10")
+        legacyBook.readingProgress.lastPagesRead = 10
+
+        container.mainContext.insert(legacyBook)
+        try container.mainContext.save()
+
+        let migratedBook = try await repository.fetchBook(by: legacyBook.id)
+
+        #expect(migratedBook.readingProgress.dailyReadingRecords["2025-01-09"] == nil)
+        #expect(migratedBook.readingProgress.dailyReadingRecords["2025-01-10"] != nil)
+        #expect(migrationStorage.userDefaults.bool(forKey: migrationStorage.completionKey) == true)
+    }
+
+    @Test("prewarm은 fetch 이전에 legacy 키 마이그레이션을 수행한다")
+    func testPrewarmMigratesBeforeFetchBoundary() async throws {
+        let container = try createInMemoryContainer()
+        let migrationStorage = createMigrationStorage()
+        let repository = SwiftDataBookRepository(
+            modelContainer: container,
+            migrationUserDefaults: migrationStorage.userDefaults,
+            migrationCompletionKey: migrationStorage.completionKey
+        )
+
+        let legacyBook = createTestBook().toUserBookV2()
+        legacyBook.readingProgress.readingRecords = [
+            "2025-01-09": ReadingRecord(targetPages: 10, pagesRead: 10)
+        ]
+        legacyBook.readingProgress.lastReadDate = makeDate("2025-01-10")
+        legacyBook.readingProgress.lastPagesRead = 10
+        let legacyBookID = legacyBook.id
+
+        container.mainContext.insert(legacyBook)
+        try container.mainContext.save()
+
+        try repository.prewarmReadingRecordKeyMigrationIfNeeded()
+
+        var fetchDescriptor: FetchDescriptor<UserBookSchemaV2.UserBookV2> = .init(
+            predicate: #Predicate { book in
+                book.id == legacyBookID
+            }
+        )
+        fetchDescriptor.fetchLimit = 1
+        let storedBook = try container.mainContext.fetch(fetchDescriptor).first
+
+        #expect(storedBook?.readingProgress.readingRecords["2025-01-09"] == nil)
+        #expect(storedBook?.readingProgress.readingRecords["2025-01-10"] != nil)
+        #expect(migrationStorage.userDefaults.bool(forKey: migrationStorage.completionKey) == true)
+
+        let fetchedBook = try await repository.fetchBook(by: legacyBookID)
+        #expect(fetchedBook.readingProgress.dailyReadingRecords["2025-01-09"] == nil)
+        #expect(fetchedBook.readingProgress.dailyReadingRecords["2025-01-10"] != nil)
+    }
+
+    @Test("legacy 완료 키가 true면 앱 스코프 키로 승격하고 마이그레이션을 건너뛴다")
+    func testLegacyCompletionKeyPromotesScopedKeyAndSkipsMigration() async throws {
+        let container = try createInMemoryContainer()
+        let migrationStorage = createMigrationStorage()
+        migrationStorage.userDefaults.set(true, forKey: legacyMigrationCompletionKey)
+
+        let repository = SwiftDataBookRepository(
+            modelContainer: container,
+            migrationUserDefaults: migrationStorage.userDefaults,
+            migrationCompletionKey: migrationStorage.completionKey
+        )
+
+        let legacyBook = createTestBook().toUserBookV2()
+        legacyBook.readingProgress.readingRecords = [
+            "2025-01-09": ReadingRecord(targetPages: 10, pagesRead: 10)
+        ]
+        legacyBook.readingProgress.lastReadDate = makeDate("2025-01-10")
+        legacyBook.readingProgress.lastPagesRead = 10
+
+        container.mainContext.insert(legacyBook)
+        try container.mainContext.save()
+
+        let fetchedBook = try await repository.fetchBook(by: legacyBook.id)
+        #expect(fetchedBook.readingProgress.dailyReadingRecords["2025-01-09"] != nil)
+        #expect(fetchedBook.readingProgress.dailyReadingRecords["2025-01-10"] == nil)
+        #expect(migrationStorage.userDefaults.bool(forKey: migrationStorage.completionKey) == true)
+    }
+
+    @Test("마이그레이션 완료 플래그가 있으면 추가 fetch에서 재실행하지 않는다")
+    func testMigrationRunsOnlyOnce() async throws {
+        let container = try createInMemoryContainer()
+        let migrationStorage = createMigrationStorage()
+        let repository = SwiftDataBookRepository(
+            modelContainer: container,
+            migrationUserDefaults: migrationStorage.userDefaults,
+            migrationCompletionKey: migrationStorage.completionKey
+        )
+
+        let firstLegacyBook = createTestBook().toUserBookV2()
+        firstLegacyBook.readingProgress.readingRecords = [
+            "2025-01-09": ReadingRecord(targetPages: 10, pagesRead: 10)
+        ]
+        firstLegacyBook.readingProgress.lastReadDate = makeDate("2025-01-10")
+        firstLegacyBook.readingProgress.lastPagesRead = 10
+
+        container.mainContext.insert(firstLegacyBook)
+        try container.mainContext.save()
+
+        _ = try await repository.fetchBooks()
+        #expect(migrationStorage.userDefaults.bool(forKey: migrationStorage.completionKey) == true)
+
+        let secondLegacyBook = createTestBook().toUserBookV2()
+        secondLegacyBook.readingProgress.readingRecords = [
+            "2025-01-09": ReadingRecord(targetPages: 20, pagesRead: 20)
+        ]
+        secondLegacyBook.readingProgress.lastReadDate = makeDate("2025-01-10")
+        secondLegacyBook.readingProgress.lastPagesRead = 20
+
+        container.mainContext.insert(secondLegacyBook)
+        try container.mainContext.save()
+
+        let fetchedSecondBook = try await repository.fetchBook(by: secondLegacyBook.id)
+
+        #expect(fetchedSecondBook.readingProgress.dailyReadingRecords["2025-01-09"] != nil)
+        #expect(fetchedSecondBook.readingProgress.dailyReadingRecords["2025-01-10"] == nil)
+    }
+
+    @Test("day shift 추론이 ±1 범위를 벗어나면 이동하지 않는다")
+    func testMigrationDoesNotShiftWhenDiffExceedsGuardRange() async throws {
+        let container = try createInMemoryContainer()
+        let migrationStorage = createMigrationStorage()
+        let repository = SwiftDataBookRepository(
+            modelContainer: container,
+            migrationUserDefaults: migrationStorage.userDefaults,
+            migrationCompletionKey: migrationStorage.completionKey
+        )
+
+        let legacyBook = createTestBook().toUserBookV2()
+        legacyBook.readingProgress.readingRecords = [
+            "2025-01-07": ReadingRecord(targetPages: 10, pagesRead: 10)
+        ]
+        legacyBook.readingProgress.lastReadDate = makeDate("2025-01-10")
+        legacyBook.readingProgress.lastPagesRead = 10
+
+        container.mainContext.insert(legacyBook)
+        try container.mainContext.save()
+
+        let fetchedBook = try await repository.fetchBook(by: legacyBook.id)
+
+        #expect(fetchedBook.readingProgress.dailyReadingRecords["2025-01-07"] != nil)
+        #expect(fetchedBook.readingProgress.dailyReadingRecords["2025-01-10"] == nil)
+    }
+
+    @Test("마이그레이션은 레코드를 정규화한다")
+    func testMigrationNormalizesInvalidReadingRecords() async throws {
+        let container = try createInMemoryContainer()
+        let migrationStorage = createMigrationStorage()
+        let repository = SwiftDataBookRepository(
+            modelContainer: container,
+            migrationUserDefaults: migrationStorage.userDefaults,
+            migrationCompletionKey: migrationStorage.completionKey
+        )
+
+        let legacyBook = createTestBook().toUserBookV2()
+        legacyBook.readingProgress.readingRecords = [
+            "2025-01-09": ReadingRecord(targetPages: 3, pagesRead: -4),
+            "2025-01-10": ReadingRecord(targetPages: 5, pagesRead: 10)
+        ]
+        legacyBook.readingProgress.lastReadDate = makeDate("2025-01-10")
+        legacyBook.readingProgress.lastPagesRead = 0
+
+        container.mainContext.insert(legacyBook)
+        try container.mainContext.save()
+
+        let fetchedBook = try await repository.fetchBook(by: legacyBook.id)
+        guard let sanitizedNegative = fetchedBook.readingProgress.dailyReadingRecords["2025-01-09"],
+              let sanitizedTarget = fetchedBook.readingProgress.dailyReadingRecords["2025-01-10"] else {
+            Issue.record("Expected normalized record")
+            return
+        }
+
+        #expect(sanitizedNegative.pagesRead == 0)
+        #expect(sanitizedNegative.targetPages == 3)
+        #expect(sanitizedTarget.pagesRead == 10)
+        #expect(sanitizedTarget.targetPages == 10)
+    }
+
+    @Test("마이그레이션 변경이 없어도 완료 플래그는 기록된다")
+    func testMigrationMarksCompletedWhenNoMutation() async throws {
+        let container = try createInMemoryContainer()
+        let migrationStorage = createMigrationStorage()
+        let repository = SwiftDataBookRepository(
+            modelContainer: container,
+            migrationUserDefaults: migrationStorage.userDefaults,
+            migrationCompletionKey: migrationStorage.completionKey
+        )
+
+        let alreadyNormalized = createTestBook().toUserBookV2()
+        alreadyNormalized.readingProgress.readingRecords = [
+            "2025-01-10": ReadingRecord(targetPages: 10, pagesRead: 10)
+        ]
+        alreadyNormalized.readingProgress.lastReadDate = makeDate("2025-01-10")
+        alreadyNormalized.readingProgress.lastPagesRead = 10
+
+        container.mainContext.insert(alreadyNormalized)
+        try container.mainContext.save()
+
+        let fetchedBook = try await repository.fetchBook(by: alreadyNormalized.id)
+        #expect(fetchedBook.readingProgress.dailyReadingRecords["2025-01-10"] != nil)
+        #expect(migrationStorage.userDefaults.bool(forKey: migrationStorage.completionKey) == true)
     }
 
     // MARK: - Error Tests

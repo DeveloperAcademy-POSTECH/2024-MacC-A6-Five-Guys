@@ -5,12 +5,16 @@
 //  Created by zaehorang on 2/12/26.
 //
 
+import Foundation
 import Observation
 import SwiftData
 
 @MainActor
 @Observable
 final class AppDependencies {
+    private static let defaultBundleIdentifier = "com.zaehorang.FiveGuyes"
+    private static let migrationStoreScope = "mainStore"
+
     let readingLibraryUseCase: any ReadingLibraryUsing
     let dailyReadingUseCase: any DailyReadingUsing
     let bookCompletionUseCase: any BookCompletionUsing
@@ -21,7 +25,19 @@ final class AppDependencies {
     private var cachedBookSearchStore: (any BookSearching)?
 
     init(modelContainer: ModelContainer) {
-        let repository = SwiftDataBookRepository(modelContainer: modelContainer)
+        let migrationCompletionKey = Self.makeMigrationCompletionKey()
+        let repository = SwiftDataBookRepository(
+            modelContainer: modelContainer,
+            migrationUserDefaults: .standard,
+            migrationCompletionKey: migrationCompletionKey
+        )
+
+        do {
+            try repository.prewarmReadingRecordKeyMigrationIfNeeded()
+        } catch {
+            // 앱 시작을 막지 않기 위해 prewarm 실패는 무시하고 fetch 경계 재시도에 맡깁니다.
+        }
+
         let readingDateProvider = DefaultReadingDateProvider()
         let notificationManager = NotificationManager(todayProvider: readingDateProvider)
         let scheduleCalculator = ReadingScheduleCalculator()
@@ -92,5 +108,10 @@ final class AppDependencies {
         let store = APIStore()
         self.cachedBookSearchStore = store
         return store
+    }
+
+    private static func makeMigrationCompletionKey() -> String {
+        let bundleIdentifier = Bundle.main.bundleIdentifier ?? defaultBundleIdentifier
+        return "\(bundleIdentifier).\(migrationStoreScope).\(SwiftDataBookRepository.migrationCompletionVersionKey)"
     }
 }
