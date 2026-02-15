@@ -1,5 +1,5 @@
 //
-//  NotiSettingView.swift
+//  NotificationSettingView.swift
 //  FiveGuyes
 //
 //  Created by zaehorang on 11/27/24.
@@ -7,13 +7,13 @@
 
 import SwiftUI
 
-struct NotiSettingView: View {
+struct NotificationSettingView: View {
     @Environment(\.scenePhase) private var scenePhase // 앱 상태 감지
 
-    @State private var viewModel: NotiSettingViewModel
+    @State private var viewModel: NotificationSettingViewModel
     let userBook: FGUserBook?
 
-    init(userBook: FGUserBook?, viewModel: NotiSettingViewModel) {
+    init(userBook: FGUserBook?, viewModel: NotificationSettingViewModel) {
         self.userBook = userBook
         self._viewModel = State(initialValue: viewModel)
     }
@@ -194,9 +194,9 @@ struct NotiSettingView: View {
 // 입력 없이도 이 분기 UI가 맞는지 빠르게 확인하려고 만든 예시입니다.
 #Preview("기본 상태") {
     NavigationStack {
-        NotiSettingView(
+        NotificationSettingView(
             userBook: PreviewSupport.sampleReadingBook,
-            viewModel: makeNotiSettingPreviewViewModel()
+            viewModel: makeNotificationSettingPreviewViewModel()
         )
     }
 }
@@ -205,9 +205,9 @@ struct NotiSettingView: View {
 // 입력 없이도 이 분기 UI가 맞는지 빠르게 확인하려고 만든 예시입니다.
 #Preview("시스템 알림 비활성화") {
     NavigationStack {
-        NotiSettingView(
+        NotificationSettingView(
             userBook: PreviewSupport.sampleReadingBook,
-            viewModel: makeNotiSettingPreviewViewModel(isSystemNotificationEnabled: false)
+            viewModel: makeNotificationSettingPreviewViewModel(isSystemNotificationEnabled: false)
         )
     }
 }
@@ -216,9 +216,9 @@ struct NotiSettingView: View {
 // 입력 없이도 이 분기 UI가 맞는지 빠르게 확인하려고 만든 예시입니다.
 #Preview("리마인드 시간 피커 열림") {
     NavigationStack {
-        NotiSettingView(
+        NotificationSettingView(
             userBook: PreviewSupport.sampleReadingBook,
-            viewModel: makeNotiSettingPreviewViewModel(
+            viewModel: makeNotificationSettingPreviewViewModel(
                 isNotificationDisabled: true,
                 isReminderTimePickerVisible: true
             )
@@ -231,11 +231,11 @@ struct NotiSettingView: View {
 @MainActor
 // 알림 화면 검증에 필요한 권한, 토글, 시간 값을 한 번에 만드는 헬퍼입니다.
 // 값이 흩어지면 같은 시나리오를 다시 만들기 어려워집니다.
-private func makeNotiSettingPreviewViewModel(
+private func makeNotificationSettingPreviewViewModel(
     isSystemNotificationEnabled: Bool = true,
     isNotificationDisabled: Bool = false,
     isReminderTimePickerVisible: Bool = false
-) -> NotiSettingViewModel {
+) -> NotificationSettingViewModel {
     let notificationService = PreviewNotificationManager()
     notificationService.isAuthorized = isSystemNotificationEnabled
 
@@ -245,7 +245,7 @@ private func makeNotiSettingPreviewViewModel(
         reminderMinute: 30
     )
 
-    let viewModel = NotiSettingViewModel(
+    let viewModel = NotificationSettingViewModel(
         notificationService: notificationService,
         settingsStore: settingsStore
     )

@@ -12,7 +12,7 @@ import SwiftUI
 // 문자열로 직접 쓰다가 오타 나는 문제를 막기 위한 구조입니다.
 enum Screens: Hashable {
     case mainHome
-    case notiSetting(book: FGUserBook?)
+    case notificationSetting(book: FGUserBook?)
     case bookSettingsManager
     case totalCalendar(books: [FGUserBook], today: Date)
     case dailyProgress(book: FGUserBook)
@@ -48,10 +48,10 @@ final class NavigationCoordinator {
                     readingLibraryUseCase: appDependencies.readingLibraryUseCase
                 )
             )
-        case .notiSetting(book: let book):
-            NotiSettingView(
+        case .notificationSetting(book: let book):
+            NotificationSettingView(
                 userBook: book,
-                viewModel: NotiSettingViewModel(
+                viewModel: NotificationSettingViewModel(
                     notificationService: appDependencies.notificationService,
                     settingsStore: appDependencies.notificationSettingsStore
                 )

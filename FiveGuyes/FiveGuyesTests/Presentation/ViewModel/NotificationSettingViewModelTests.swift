@@ -1,5 +1,5 @@
 //
-//  NotiSettingViewModelTests.swift
+//  NotificationSettingViewModelTests.swift
 //  FiveGuyesTests
 //
 //  Created by zaehorang on 2/14/26.
@@ -9,18 +9,18 @@
 import Foundation
 import Testing
 
-@Suite("NotiSettingViewModel 테스트")
+@Suite("NotificationSettingViewModel 테스트")
 @MainActor
-struct NotiSettingViewModelTests {
-    @Test("NotiSettingViewModel: 저장된 설정 로드")
-    func notiSetting_loadPersistedSettings() {
+struct NotificationSettingViewModelTests {
+    @Test("NotificationSettingViewModel: 저장된 설정 로드")
+    func notificationSetting_loadPersistedSettings() {
         let notificationService = NotificationManagerStub()
         let settingsStore = NotificationSettingsStoreStub(
             disabled: true,
             reminderHour: 8,
             reminderMinute: 30
         )
-        let viewModel = NotiSettingViewModel(
+        let viewModel = NotificationSettingViewModel(
             notificationService: notificationService,
             settingsStore: settingsStore,
             nowProvider: { makeDate("2025-01-01") }
@@ -34,15 +34,15 @@ struct NotiSettingViewModelTests {
         #expect(timeComponents.minute == 30)
     }
 
-    @Test("NotiSettingViewModel: 알림 비활성화 시 요청 삭제 호출")
-    func notiSetting_disable_clearsRequests() async {
+    @Test("NotificationSettingViewModel: 알림 비활성화 시 요청 삭제 호출")
+    func notificationSetting_disable_clearsRequests() async {
         let notificationService = NotificationManagerStub()
         let settingsStore = NotificationSettingsStoreStub(
             disabled: false,
             reminderHour: 9,
             reminderMinute: 0
         )
-        let viewModel = NotiSettingViewModel(
+        let viewModel = NotificationSettingViewModel(
             notificationService: notificationService,
             settingsStore: settingsStore
         )
@@ -62,15 +62,15 @@ struct NotiSettingViewModelTests {
         #expect(notificationService.setupAllNotificationsCallCount == 0)
     }
 
-    @Test("NotiSettingViewModel: 시간 변경 시 설정 저장 및 알림 업데이트")
-    func notiSetting_timeChange_updatesSettingsAndNotification() async {
+    @Test("NotificationSettingViewModel: 시간 변경 시 설정 저장 및 알림 업데이트")
+    func notificationSetting_timeChange_updatesSettingsAndNotification() async {
         let notificationService = NotificationManagerStub()
         let settingsStore = NotificationSettingsStoreStub(
             disabled: false,
             reminderHour: 7,
             reminderMinute: 0
         )
-        let viewModel = NotiSettingViewModel(
+        let viewModel = NotificationSettingViewModel(
             notificationService: notificationService,
             settingsStore: settingsStore,
             nowProvider: { makeDate("2025-01-01") }
@@ -98,8 +98,8 @@ struct NotiSettingViewModelTests {
         #expect(notificationService.updateNotificationCallCount == 1)
     }
 
-    @Test("NotiSettingViewModel: 빠른 연속 시간 변경 시 마지막 요청만 처리")
-    func notiSetting_timeChange_cancelsPreviousTask() async {
+    @Test("NotificationSettingViewModel: 빠른 연속 시간 변경 시 마지막 요청만 처리")
+    func notificationSetting_timeChange_cancelsPreviousTask() async {
         let notificationService = NotificationManagerStub()
         notificationService.updateNotificationDelayNanoseconds = 80_000_000
         notificationService.ignoreCancelledCalls = true
@@ -109,7 +109,7 @@ struct NotiSettingViewModelTests {
             reminderHour: 7,
             reminderMinute: 0
         )
-        let viewModel = NotiSettingViewModel(
+        let viewModel = NotificationSettingViewModel(
             notificationService: notificationService,
             settingsStore: settingsStore,
             nowProvider: { makeDate("2025-01-01") }

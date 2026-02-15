@@ -1,5 +1,5 @@
 //
-//  BookLowView.swift
+//  BookRowView.swift
 //  FiveGuyes
 //
 //  Created by Shim Hyeonhee on 11/4/24.

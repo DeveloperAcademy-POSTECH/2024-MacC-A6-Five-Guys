@@ -1,5 +1,5 @@
 //
-//  NotiSettingViewModel.swift
+//  NotificationSettingViewModel.swift
 //  FiveGuyes
 //
 //  Created by zaehorang on 2/13/26.
@@ -10,7 +10,7 @@ import Observation
 
 @MainActor
 @Observable
-final class NotiSettingViewModel {
+final class NotificationSettingViewModel {
     var selectedTime: Date = Date()
     var isNotificationDisabled = false
     var isReminderTimePickerVisible = false

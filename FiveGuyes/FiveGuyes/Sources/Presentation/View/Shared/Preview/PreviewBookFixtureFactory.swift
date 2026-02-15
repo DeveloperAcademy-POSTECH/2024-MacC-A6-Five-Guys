@@ -1,5 +1,5 @@
 //
-//  PreviewBookFixtures.swift
+//  PreviewBookFixtureFactory.swift
 //  FiveGuyes
 //
 //  Created by zaehorang on 2/13/26.
