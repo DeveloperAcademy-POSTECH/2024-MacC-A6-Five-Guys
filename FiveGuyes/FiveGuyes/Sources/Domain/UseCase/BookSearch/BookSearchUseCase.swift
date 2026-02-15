@@ -8,22 +8,22 @@
 import Foundation
 
 protocol BookSearchUsing {
-    func fetchBooks(query: String) async throws -> [Book]
+    func fetchBooks(query: String) async throws -> [BookSearchItem]
     func fetchBookTotalPages(isbn: String) async throws -> Int
 }
 
 struct BookSearchUseCase: BookSearchUsing {
-    private let bookSearchStore: any BookSearching
+    private let bookSearchProvider: any BookSearchProviding
 
-    init(bookSearchStore: any BookSearching) {
-        self.bookSearchStore = bookSearchStore
+    init(bookSearchProvider: any BookSearchProviding) {
+        self.bookSearchProvider = bookSearchProvider
     }
 
-    func fetchBooks(query: String) async throws -> [Book] {
-        try await bookSearchStore.fetchBooks(query: query)
+    func fetchBooks(query: String) async throws -> [BookSearchItem] {
+        try await bookSearchProvider.fetchBooks(query: query)
     }
 
     func fetchBookTotalPages(isbn: String) async throws -> Int {
-        try await bookSearchStore.fetchBookTotalPages(isbn: isbn)
+        try await bookSearchProvider.fetchBookTotalPages(isbn: isbn)
     }
 }

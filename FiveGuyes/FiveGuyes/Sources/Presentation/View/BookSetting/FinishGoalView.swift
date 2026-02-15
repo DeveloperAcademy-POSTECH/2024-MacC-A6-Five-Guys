@@ -183,7 +183,7 @@ struct FinishGoalView: View {
 
     @MainActor
     private func registerBook(
-        selectedBook: Book,
+        selectedBook: BookSearchItem,
         startPage: Int,
         targetEndPage: Int,
         startDate: Date,

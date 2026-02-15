@@ -12,19 +12,19 @@ import Foundation
 // 이 표시를 붙여, 다른 스레드가 끼어들어 상태가 꼬이는 일을 막습니다.
 @MainActor
 extension PreviewSupport {
-    static var sampleAPIBook: Book { makeAPIBook(title: "샘플 완독 도서") }
+    static var sampleBookSearchItem: BookSearchItem { makeBookSearchItem(title: "샘플 완독 도서") }
 
-    // 검색 결과에 쓸 Book 샘플을 한 줄로 만들기 위한 함수입니다.
+    // 검색 결과에 쓸 도서 샘플을 한 줄로 만들기 위한 함수입니다.
     // 여기로 모아두면 여러 프리뷰가 같은 형태를 재사용할 수 있습니다.
-    static func makeAPIBook(
+    static func makeBookSearchItem(
         title: String,
         author: String = "한입독서 팀",
         cover: String? = nil,
         publisher: String = "Five Guys Press",
         isbn13: String = "9781234567890",
         pubDate: String = "20250101"
-    ) -> Book {
-        Book(
+    ) -> BookSearchItem {
+        BookSearchItem(
             title: title,
             author: author,
             cover: cover,
@@ -34,10 +34,10 @@ extension PreviewSupport {
         )
     }
 
-    static var sampleSearchBooks: [Book] {
+    static var sampleSearchBooks: [BookSearchItem] {
         [
-            sampleAPIBook,
-            makeAPIBook(
+            sampleBookSearchItem,
+            makeBookSearchItem(
                 title: "두 번째 샘플 도서",
                 author: "홍길동",
                 publisher: "Sample House",
@@ -61,7 +61,7 @@ extension PreviewSupport {
         // 이 값이 없으면 하루 목표 계산 자체를 할 수 없습니다.
         let endDate = Calendar.app.date(byAdding: .day, value: 14, to: today)
 
-        model.setSelectedBook(sampleAPIBook)
+        model.setSelectedBook(sampleBookSearchItem)
         model.setPageRange(start: 1, end: 320)
         model.setReadingPeriod(startDate: startDate, endDate: endDate)
         model.setNonReadingDays([])
@@ -71,10 +71,12 @@ extension PreviewSupport {
     // 검색 결과 목록과 선택된 책을 직접 넣어 프리뷰 상태를 만듭니다.
     // 이 함수로 빈 결과/선택 완료 같은 분기 화면을 바로 재현합니다.
     static func makeBookSearchViewModel(
-        books: [Book],
-        selectedBook: Book? = nil
+        books: [BookSearchItem],
+        selectedBook: BookSearchItem? = nil
     ) -> BookSearchViewModel {
-        let useCase = BookSearchUseCase(bookSearchStore: PreviewBookSearchStore(books: books))
+        let useCase = BookSearchUseCase(
+            bookSearchProvider: PreviewBookSearchProvider(books: books)
+        )
         let viewModel = BookSearchViewModel(bookSearchUseCase: useCase)
         viewModel.books = books
         viewModel.selectedBook = selectedBook
@@ -88,20 +90,20 @@ extension PreviewSupport {
     }
 }
 
-struct PreviewBookSearchStore: BookSearching {
-    let books: [Book]
+struct PreviewBookSearchProvider: BookSearchProviding {
+    let books: [BookSearchItem]
     let totalPages: Int
 
     // 필요한 값을 밖에서 받아 시작할 수 있게 만든 생성자입니다.
     // 이렇게 해야 프리뷰/테스트에서 원하는 상황을 정확히 다시 만들 수 있습니다.
-    init(books: [Book], totalPages: Int = 320) {
+    init(books: [BookSearchItem], totalPages: Int = 320) {
         self.books = books
         self.totalPages = totalPages
     }
 
     // 실제 네트워크 대신 미리 준비한 목록을 바로 돌려줍니다.
     // 응답 대기 없이 검색 UI 전환을 빠르게 확인할 수 있습니다.
-    func fetchBooks(query: String) async throws -> [Book] {
+    func fetchBooks(query: String) async throws -> [BookSearchItem] {
         books
     }
 

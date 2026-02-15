@@ -9,14 +9,14 @@ import SwiftUI
 
 @Observable
 final class BookSettingInputModel {
-    private(set) var selectedBook: Book?
+    private(set) var selectedBook: BookSearchItem?
     private(set) var startPage = 1
     private(set) var targetEndPage = 1
     private(set) var startDate: Date?
     private(set) var endDate: Date?
     private(set) var nonReadingDays: [Date] = []
     
-    func setSelectedBook(_ book: Book) {
+    func setSelectedBook(_ book: BookSearchItem) {
         self.selectedBook = book
     }
     

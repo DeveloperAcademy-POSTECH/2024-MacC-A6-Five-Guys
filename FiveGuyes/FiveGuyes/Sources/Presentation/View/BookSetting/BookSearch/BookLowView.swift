@@ -9,7 +9,7 @@ import SwiftUI
 
 struct BookRowView: View {
     @ObservedObject var viewModel: BookSearchViewModel
-    let book: Book
+    let book: BookSearchItem
     
     var body: some View {
         VStack {
@@ -67,7 +67,7 @@ struct BookRowView: View {
 // 이 프리뷰는 "선택된 책" 화면을 바로 열어,
 // 입력 없이도 이 분기 UI가 맞는지 빠르게 확인하려고 만든 예시입니다.
 #Preview("선택된 책") {
-    let book = PreviewSupport.sampleAPIBook
+    let book = PreviewSupport.sampleBookSearchItem
     let viewModel: BookSearchViewModel = {
         let model = PreviewSupport.makeBookSearchViewModel()
         model.selectedBook = book
@@ -81,7 +81,7 @@ struct BookRowView: View {
 // 이 프리뷰는 "선택되지 않은 책" 화면을 바로 열어,
 // 입력 없이도 이 분기 UI가 맞는지 빠르게 확인하려고 만든 예시입니다.
 #Preview("선택되지 않은 책") {
-    let book = PreviewSupport.sampleAPIBook
+    let book = PreviewSupport.sampleBookSearchItem
     let viewModel = PreviewSupport.makeBookSearchViewModel(
         books: [book],
         selectedBook: nil

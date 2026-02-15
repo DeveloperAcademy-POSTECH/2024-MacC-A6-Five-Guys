@@ -39,8 +39,8 @@ func makeBook(id: UUID = UUID(), isCompleted: Bool = false) -> FGUserBook {
 }
 
 @MainActor
-func makeAPIBook(title: String) -> Book {
-    Book(
+func makeBookSearchItem(title: String) -> BookSearchItem {
+    BookSearchItem(
         title: title,
         author: "테스트 저자",
         cover: nil,
@@ -423,8 +423,8 @@ final class NotificationSettingsStoreStub: NotificationSettingsStoring {
     }
 }
 
-final class BookSearchStoreStub: BookSearching {
-    var fetchBooksResult: [Book] = []
+final class BookSearchProviderStub: BookSearchProviding {
+    var fetchBooksResult: [BookSearchItem] = []
     var fetchBookTotalPagesResult: Int = 0
 
     var fetchBooksError: Error?
@@ -433,7 +433,7 @@ final class BookSearchStoreStub: BookSearching {
     var fetchBooksQueries: [String] = []
     var fetchTotalPagesISBNs: [String] = []
 
-    func fetchBooks(query: String) async throws -> [Book] {
+    func fetchBooks(query: String) async throws -> [BookSearchItem] {
         fetchBooksQueries.append(query)
         if let fetchBooksError { throw fetchBooksError }
         return fetchBooksResult

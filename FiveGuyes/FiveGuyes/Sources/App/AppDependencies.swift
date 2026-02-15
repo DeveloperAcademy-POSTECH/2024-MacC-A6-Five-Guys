@@ -103,7 +103,9 @@ final class AppDependencies {
         )
         self.notificationService = notificationService
         self.notificationSettingsStore = notificationSettingsStore
-        self.bookSearchUseCase = BookSearchUseCase(bookSearchStore: APIStore())
+        self.bookSearchUseCase = BookSearchUseCase(
+            bookSearchProvider: AladinBookSearchProvider()
+        )
     }
 
     private static func makeMigrationCompletionKey() -> String {

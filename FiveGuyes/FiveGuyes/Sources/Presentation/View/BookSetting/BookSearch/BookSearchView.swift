@@ -88,7 +88,7 @@ struct BookSearchView: View {
     // 원하는 단계 화면을 바로 보려고 페이지 단계를 미리 앞으로 이동시킵니다.
     // 이 값을 맞추면 중간 단계를 매번 반복하지 않아도 됩니다.
     let pageModel = BookSettingPageModel()
-    let selectedBook = PreviewSupport.sampleSearchBooks.first ?? PreviewSupport.sampleAPIBook
+    let selectedBook = PreviewSupport.sampleSearchBooks.first ?? PreviewSupport.sampleBookSearchItem
     let viewModel = PreviewSupport.makeBookSearchViewModel(
         books: PreviewSupport.sampleSearchBooks,
         selectedBook: selectedBook

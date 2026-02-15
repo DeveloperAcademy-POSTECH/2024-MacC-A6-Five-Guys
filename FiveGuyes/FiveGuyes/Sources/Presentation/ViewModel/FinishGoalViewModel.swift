@@ -49,7 +49,7 @@ final class FinishGoalViewModel {
     }
 
     func registerBook(
-        selectedBook: Book,
+        selectedBook: BookSearchItem,
         startPage: Int,
         targetEndPage: Int,
         startDate: Date,

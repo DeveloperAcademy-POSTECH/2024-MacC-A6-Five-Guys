@@ -18,7 +18,7 @@ struct FinishGoalViewModelTests {
         let service = BookManagementServiceStub(book: book)
         let viewModel = FinishGoalViewModel(bookRegistrationUseCase: BookRegistrationStubAdapter(service: service))
 
-        let apiBook = Book(
+        let selectedBook = BookSearchItem(
             title: "테스트 도서",
             author: "작가",
             cover: nil,
@@ -28,7 +28,7 @@ struct FinishGoalViewModelTests {
         )
 
         let isRegistered = await viewModel.registerBook(
-            selectedBook: apiBook,
+            selectedBook: selectedBook,
             startPage: 1,
             targetEndPage: 300,
             startDate: makeDate("2025-01-01"),
@@ -47,7 +47,7 @@ struct FinishGoalViewModelTests {
         service.registerBookError = TestError.forced
         let viewModel = FinishGoalViewModel(bookRegistrationUseCase: BookRegistrationStubAdapter(service: service))
 
-        let apiBook = Book(
+        let selectedBook = BookSearchItem(
             title: "테스트 도서",
             author: "작가",
             cover: nil,
@@ -57,7 +57,7 @@ struct FinishGoalViewModelTests {
         )
 
         let isRegistered = await viewModel.registerBook(
-            selectedBook: apiBook,
+            selectedBook: selectedBook,
             startPage: 1,
             targetEndPage: 300,
             startDate: makeDate("2025-01-01"),
@@ -76,7 +76,7 @@ struct FinishGoalViewModelTests {
         service.registerBookDelayNanoseconds = 200_000_000
         let viewModel = FinishGoalViewModel(bookRegistrationUseCase: BookRegistrationStubAdapter(service: service))
 
-        let apiBook = Book(
+        let selectedBook = BookSearchItem(
             title: "테스트 도서",
             author: "작가",
             cover: nil,
@@ -87,7 +87,7 @@ struct FinishGoalViewModelTests {
 
         let firstTask = Task {
             await viewModel.registerBook(
-                selectedBook: apiBook,
+                selectedBook: selectedBook,
                 startPage: 1,
                 targetEndPage: 300,
                 startDate: makeDate("2025-01-01"),
@@ -97,7 +97,7 @@ struct FinishGoalViewModelTests {
         }
         #expect(await waitUntil { viewModel.isSubmitting })
         let second = await viewModel.registerBook(
-            selectedBook: apiBook,
+            selectedBook: selectedBook,
             startPage: 1,
             targetEndPage: 300,
             startDate: makeDate("2025-01-01"),

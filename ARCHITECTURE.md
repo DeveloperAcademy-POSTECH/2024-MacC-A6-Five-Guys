@@ -40,8 +40,7 @@ FiveGuyes는 사용자의 책/목표일/목표페이지를 입력받아, 매일 
 - `Presentation/`: SwiftUI View, UI 상태/네비게이션
 - `Domain/`: 엔티티, 서비스 인터페이스, 비즈니스 규칙
 - `Data/`: Repository 구현, SwiftData 스키마/매핑
-- `Platform/`: 알림/분석/시스템 설정 같은 OS 연동 구현
-- `Store/`: 외부 API 연동(도서 검색) + API 전용 모델
+- `Platform/`: 알림/분석/시스템 설정/외부 API 같은 OS·네트워크 연동 구현
 - `Util/`: 도메인 계산기가 조합해서 쓰는 순수 계산 유틸리티
 
 주요 컴포넌트:
@@ -73,14 +72,14 @@ FiveGuyes는 사용자의 책/목표일/목표페이지를 입력받아, 매일 
 
 ### Platform/External
 
-- 책임: 알림(`NotificationManager`), 시스템 설정 이동(`SystemSettingsManager`), 외부 API(`APIStore`)
+- 책임: 알림(`NotificationManager`), 시스템 설정 이동(`SystemSettingsManager`), 외부 API(`AladinBookSearchProvider`)
 - 경계 상태: iOS 시스템/네트워크 연동 경계
 
 ## 4) Architectural invariants
 
-**Architecture Invariant: Domain 데이터는 `FG*` 타입으로만 계층 경계를 넘는다**
+**Architecture Invariant: 도서 관리 핵심 도메인 데이터는 `FG*` 타입으로 계층 경계를 넘는다**
 - Rationale: 저장소 기술(SwiftData) 변경 시 UI/도메인 영향 최소화
-- Enforced by: `BookRepository`, `BookManagement` feature-level UseCase 시그니처
+- Enforced by: `BookRepository`, `BookManagement` feature-level UseCase 시그니처 (`BookSearch`는 전용 도메인 타입 `BookSearchItem` 사용)
 - Violation symptoms: View에서 SwiftData 모델 필드 직접 수정
 
 **Architecture Invariant: SwiftData fetch/save는 Data 계층에서만 수행한다**
@@ -124,7 +123,7 @@ Boundary C: DTO/모델 매핑 확장
 - 파일: `FGUserBook+toUserBookV2.swift`, `UserBookV2+toFGUserBook.swift`
 - 규칙: 모델 변환은 여기서만 수행
 
-Boundary D: 인프라 서비스 경계 (`ReadingNotificationScheduling`, `NotificationManaging`, `NotificationSettingsStoring`, `BookSearching`, `DayBoundaryProviding`)
+Boundary D: 인프라 서비스 경계 (`ReadingNotificationScheduling`, `NotificationManaging`, `NotificationSettingsStoring`, `BookSearchProviding`, `DayBoundaryProviding`)
 - 넘어오는 것: Domain 기반 상태(책 정보, 알림 시간 설정)
 - 금지되는 것: Presentation 계층에서 직접 시스템 권한/요청 생성, UseCase의 concrete 플랫폼 타입 직접 의존
 
@@ -135,14 +134,14 @@ Boundary E: 호환 파사드 경계 (`BookManagementService`)
 "only here" 규칙:
 - SwiftData IO는 `Data/RepositoryImpl`에서만 수행
 - SwiftData <-> Domain 매핑은 `Data/SwiftData/Extensions`, `Domain/Entity/Extension`에서만 수행
-- 외부 API 호출은 `Store/APIStore.swift`(또는 이후 동등 Gateway)에서만 수행
+- 외부 API 호출은 `Platform/BookSearch/AladinBookSearchProvider.swift`(또는 이후 동등 Gateway)에서만 수행
 
 ## 6) Cross-cutting concerns
 
 테스트 전략(경계 기준):
 - Pure 계산 테스트: `FiveGuyes/FiveGuyesTests/Domain/Calculator/DateMathCalculatorTests.swift`, `FiveGuyes/FiveGuyesTests/Domain/Calculator/PageMathCalculatorTests.swift`, `FiveGuyes/FiveGuyesTests/Domain/Calculator/ReadingScheduleCalculator*.swift`
 - UseCase/화면 경계 테스트: `FiveGuyes/FiveGuyesTests/Presentation/ViewModel/*.swift`
-- UseCase 실행 테스트: `FiveGuyes/FiveGuyesTests/Domain/UseCase/BookManagementUseCases*.swift` (Mock Repository + NotificationSchedulerSpy 사용)
+- UseCase 실행 테스트: `FiveGuyes/FiveGuyesTests/Domain/UseCase/BookManagementUseCases*.swift`, `FiveGuyes/FiveGuyesTests/Domain/UseCase/BookSearchUseCaseTests.swift`
 - 알림/다음 독서 계산 테스트: `FiveGuyes/FiveGuyesTests/Domain/Entity/FGReadingProgressNotificationTests.swift`
 - 저장소 테스트: `FiveGuyes/FiveGuyesTests/Data/Repository/SwiftDataBookRepositoryTests.swift` (In-memory SwiftData)
 

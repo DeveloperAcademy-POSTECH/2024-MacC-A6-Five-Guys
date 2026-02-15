@@ -9,8 +9,8 @@ import SwiftUI
 
 @MainActor
 final class BookSearchViewModel: ObservableObject {
-    @Published var books = [Book]()
-    @Published var selectedBook: Book?
+    @Published var books = [BookSearchItem]()
+    @Published var selectedBook: BookSearchItem?
     private let bookSearchUseCase: any BookSearchUsing
 
     init(bookSearchUseCase: any BookSearchUsing) {
@@ -35,7 +35,7 @@ final class BookSearchViewModel: ObservableObject {
         }
     }
 
-    func selectBook(_ book: Book) {
+    func selectBook(_ book: BookSearchItem) {
         selectedBook = book
     }
 }
