@@ -8,7 +8,7 @@
 import SwiftData
 
 @Model
-final class BookMetaData: BookMetaDataProtocol {
+final class BookMetaData {
     var title: String
     var author: String
     var coverURL: String?

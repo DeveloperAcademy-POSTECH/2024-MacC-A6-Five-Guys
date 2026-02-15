@@ -167,3 +167,28 @@ struct CompletedBooksView: View {
         }
     }
 }
+
+#if DEBUG
+#Preview("완독 도서 있음") {
+    NavigationStack {
+        CompletedBooksView(
+            completedBooks: [
+                PreviewSupport.sampleCompletedBook,
+                PreviewSupport.makeBook(title: "프리뷰 완독 도서 2", isCompleted: true)
+            ],
+            onDeleteBook: { _ in true }
+        )
+    }
+    .environment(PreviewSupport.makeCoordinator())
+}
+
+#Preview("완독 도서 없음") {
+    NavigationStack {
+        CompletedBooksView(
+            completedBooks: [],
+            onDeleteBook: { _ in true }
+        )
+    }
+    .environment(PreviewSupport.makeCoordinator())
+}
+#endif

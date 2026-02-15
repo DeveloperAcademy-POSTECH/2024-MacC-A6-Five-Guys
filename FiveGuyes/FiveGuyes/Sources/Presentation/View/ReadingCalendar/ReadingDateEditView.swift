@@ -48,22 +48,29 @@ struct ReadingDateEditView: View {
         }
     }
     
-    init(userBook: FGUserBook, viewModel: ReadingDateEditViewModel) {
+    init(
+        userBook: FGUserBook,
+        viewModel: ReadingDateEditViewModel,
+        calendarCellModel: CalendarCellModel? = nil
+    ) {
         self.adjustedToday = Date().adjustedDate()
         self.userBook = userBook
         _viewModel = State(initialValue: viewModel)
-        
+
+        if let calendarCellModel {
+            self._calendarCellModel = StateObject(wrappedValue: calendarCellModel)
+            return
+        }
+
         let userSettings = userBook.userSettings
-        
-        let calendarCellModel = CalendarCellModel(
+        let defaultCalendarCellModel = CalendarCellModel(
             adjustedToday: adjustedToday,
             startDate: userSettings.startDate,
             endDate: userSettings.targetEndDate,
             excludedDates: userSettings.excludedReadingDays,
-            isConfirmed: false)
-        
-        self._calendarCellModel = StateObject(wrappedValue: calendarCellModel)
-        
+            isConfirmed: false
+        )
+        self._calendarCellModel = StateObject(wrappedValue: defaultCalendarCellModel)
     }
     
     var body: some View {
@@ -183,3 +190,42 @@ struct ReadingDateEditView: View {
         }
     }
 }
+
+#if DEBUG
+#Preview("기간 재설정 단계") {
+    NavigationStack {
+        ReadingDateEditView(
+            userBook: PreviewSupport.sampleReadingBook,
+            viewModel: ReadingDateEditViewModel(
+                bookManagementService: PreviewBookManagementService()
+            )
+        )
+    }
+    .environment(PreviewSupport.makeCoordinator())
+}
+
+#Preview("쉬는 날 재설정 단계") {
+    let today = Date().adjustedDate()
+    let startDate = Calendar.app.date(byAdding: .day, value: 1, to: today) ?? today
+    let endDate = Calendar.app.date(byAdding: .day, value: 10, to: today) ?? today
+    let excludedDate = Calendar.app.date(byAdding: .day, value: 4, to: today) ?? today
+    let calendarCellModel = CalendarCellModel(
+        adjustedToday: today,
+        startDate: startDate,
+        endDate: endDate,
+        excludedDates: [excludedDate],
+        isConfirmed: true
+    )
+
+    NavigationStack {
+        ReadingDateEditView(
+            userBook: PreviewSupport.sampleReadingBook,
+            viewModel: ReadingDateEditViewModel(
+                bookManagementService: PreviewBookManagementService()
+            ),
+            calendarCellModel: calendarCellModel
+        )
+    }
+    .environment(PreviewSupport.makeCoordinator())
+}
+#endif

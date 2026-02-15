@@ -159,11 +159,39 @@ struct UnfinishReadingView: View {
     }
 }
 
-#Preview {
-    UnfinishReadingView(
-        userBook: .dummy,
-        viewModel: UnfinishReadingViewModel(
-            bookManagementService: DefaultBookManagementService(repository: MockBookRepository())
+#if DEBUG
+#Preview("기본 상태") {
+    NavigationStack {
+        UnfinishReadingView(
+            userBook: PreviewSupport.makeBook(
+                title: "목표 기간이 끝난 도서",
+                isCompleted: false,
+                lastReadPage: 184
+            ),
+            viewModel: UnfinishReadingViewModel(
+                bookManagementService: PreviewBookManagementService()
+            )
         )
-    )
+    }
+    .environment(PreviewSupport.makeCoordinator())
 }
+
+#Preview("표지 이미지 있는 상태") {
+    let bookWithCover = PreviewSupport.makeBook(
+        title: "표지 있는 미완독 도서",
+        isCompleted: false,
+        coverImageURL: "https://example.com/sample-cover.jpg",
+        lastReadPage: 210
+    )
+
+    NavigationStack {
+        UnfinishReadingView(
+            userBook: bookWithCover,
+            viewModel: UnfinishReadingViewModel(
+                bookManagementService: PreviewBookManagementService(readingBooks: [bookWithCover], completedBooks: [])
+            )
+        )
+    }
+    .environment(PreviewSupport.makeCoordinator())
+}
+#endif

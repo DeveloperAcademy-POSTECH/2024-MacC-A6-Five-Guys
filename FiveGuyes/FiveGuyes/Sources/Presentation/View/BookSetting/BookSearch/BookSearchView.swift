@@ -60,3 +60,32 @@ struct BookSearchView: View {
             }
     }
 }
+
+#if DEBUG
+#Preview("선택 전 상태") {
+    let inputModel = PreviewSupport.makeBookSettingInputModel()
+    let pageModel = BookSettingPageModel()
+
+    NavigationStack {
+        BookSearchView(viewModel: PreviewSupport.makeBookSearchViewModel())
+    }
+    .environment(inputModel)
+    .environment(pageModel)
+}
+
+#Preview("선택 완료 상태") {
+    let inputModel = PreviewSupport.makeBookSettingInputModel()
+    let pageModel = BookSettingPageModel()
+    let selectedBook = PreviewSupport.sampleSearchBooks.first ?? PreviewSupport.sampleAPIBook
+    let viewModel = PreviewSupport.makeBookSearchViewModel(
+        books: PreviewSupport.sampleSearchBooks,
+        selectedBook: selectedBook
+    )
+
+    NavigationStack {
+        BookSearchView(viewModel: viewModel)
+    }
+    .environment(inputModel)
+    .environment(pageModel)
+}
+#endif

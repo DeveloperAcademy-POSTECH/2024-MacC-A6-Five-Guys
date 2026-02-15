@@ -143,3 +143,29 @@ struct BookPageSettingView: View {
         isEndPageFieldFoucsed = false
     }
 }
+
+#if DEBUG
+#Preview("책 정보 있음") {
+    let inputModel = PreviewSupport.makeBookSettingInputModel()
+    let pageModel = BookSettingPageModel()
+
+    NavigationStack {
+        BookPageSettingView()
+    }
+    .environment(PreviewSupport.makeCoordinator())
+    .environment(inputModel)
+    .environment(pageModel)
+}
+
+#Preview("책 정보 없음") {
+    let inputModel = BookSettingInputModel()
+    let pageModel = BookSettingPageModel()
+
+    NavigationStack {
+        BookPageSettingView()
+    }
+    .environment(PreviewSupport.makeCoordinator())
+    .environment(inputModel)
+    .environment(pageModel)
+}
+#endif

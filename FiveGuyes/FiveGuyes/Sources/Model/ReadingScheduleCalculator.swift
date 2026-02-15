@@ -2,450 +2,462 @@
 //  ReadingScheduleCalculator.swift
 //  FiveGuyes
 //
-//  Created by zaehorang on 11/6/24.
+//  Created by zaehorang on 2025-10-24.
 //
 
 import Foundation
 
-enum ReadingScheduleError: Error {
+// MARK: - Error Types
+
+/// 스케줄 계산 중 발생할 수 있는 에러 타입
+enum ScheduleCalculationError: Error {
+    /// 목표 종료일이 이미 지난 경우
     case targetDatePassed
+    /// 잘못된 날짜 범위 (startDate > endDate)
+    case invalidDateRange
+    /// 잘못된 페이지 범위 (startPage > endPage 등)
+    case invalidPageRange
+    /// 하위 Calculator에서 발생한 에러를 래핑
+    case calculationFailed(underlying: Error)
 }
 
-/// 독서 스케줄을 계산하고 관리하는 구조체
+// MARK: - ReadingScheduleCalculator
+
+/// 독서 스케줄을 계산하는 Pure Function 기반 Calculator
 struct ReadingScheduleCalculator {
-    private let readingPagesCalculator: ReadingPagesCalculator = ReadingPagesCalculator()
-    private let readingDateCalculator: ReadingDateCalculator = ReadingDateCalculator()
-    
-    /// 첫날을 기준으로 읽어야하는 페이지를 할당하는 메서드 (초기 페이지 계산)
-    func calculateInitialDailyTargets<Settings: UserSettingsProtocol, Progress: ReadingProgressProtocol>(
-        for settings: Settings,
-        progress: Progress
+
+    // MARK: - Properties
+
+    private let dateMath: DateMathCalculator
+    private let pageMath: PageMathCalculator
+
+    // MARK: - Initialization
+
+    init(
+        dateMath: DateMathCalculator = DateMathCalculator(),
+        pageMath: PageMathCalculator = PageMathCalculator()
     ) {
-        let readingStartDate = settings.startDate
-        
-        let remainingReadingDays = getRemainingReadingDays(
-            startDate: readingStartDate,
-            targetEndDate: settings.targetEndDate,
-            nonReadingDays: settings.nonReadingDays
-        )
-        
-        let (pagesPerDay, remainderPages) = readingPagesCalculator.calculatePagesPerDayAndRemainder(
-            totalDays: remainingReadingDays,
-            startPage: settings.startPage,
-            endPage: settings.targetEndPage
-        )
-        
-        // 페이지 분배 계산
-        calculateReadingPages(
-            for: progress,
-            startingPage: progress.lastPagesRead,
-            pagesPerDay: pagesPerDay,
-            remainderPages: remainderPages,
-            startDate: readingStartDate,
-            targetEndDate: settings.targetEndDate,
-            nonReadingDays: settings.nonReadingDays
-        )
-        
-        // 목표 종료 페이지와 마지막 날 할당 페이지를 검증 및 수정
-        adjustLastDayTargetPage(
-            progress: progress,
-            targetEndDate: settings.targetEndDate,
-            targetEndPage: settings.targetEndPage
-        )
+        self.dateMath = dateMath
+        self.pageMath = pageMath
     }
-    
-    ///  읽은 페이지 입력 메서드 (오늘 날짜에만 값을 넣을 수 있음)
-    func updateReadingProgress<Settings: UserSettingsProtocol, Progress: ReadingProgressProtocol>(
-        for settings: Settings,
-        progress: Progress,
-        pagesRead: Int,
-        from today: Date
-    ) {
-        let adjustedDateKey = progress.getAdjustedReadingRecordsKey(today)
-        
-        // 시작날짜보다 오늘 날짜가 이전이면
-        if settings.startDate > today {
-            settings.changeStartDate(for: today)
-        }
-        
-        var record = progress.readingRecords[adjustedDateKey, default: ReadingRecord(targetPages: 0, pagesRead: 0)]
-        
-        // 비독서일에서 해당 날짜 제거
-        if let index = settings.nonReadingDays.firstIndex(where: {
-            progress.getReadingRecordsKey($0) == adjustedDateKey
-        }) {
-            settings.nonReadingDays.remove(at: index)
-        }
-        
-        // 페이지 읽기 업데이트
-        record.pagesRead = pagesRead
-        progress.readingRecords[adjustedDateKey] = record
-        
-        progress.lastPagesRead = pagesRead
-        progress.lastReadDate = today.adjustedDate()
-        
-        // 목표량과 실제 읽은 페이지 수가 다르면 이후 날짜 조정
-        if record.pagesRead != record.targetPages {
-            progress.readingRecords[adjustedDateKey]?.targetPages = record.pagesRead
-            adjustFutureTargets(for: settings, progress: progress, from: today)
-        }
-    }
-    
-    /// 하루 할당량보다 더 읽거나, 덜 읽으면 이후 날짜의 할당량을 다시 계산한다.
-    func adjustFutureTargets<Settings: UserSettingsProtocol, Progress: ReadingProgressProtocol>(
-        for settings: Settings,
-        progress: Progress,
-        from date: Date
-    ) {
-        // 다음날을 기준으로 새롭게 페이지를 분배하기 위해 date에 1일을 추가해서 계산합니다.
-        let startDate = date.adjustedDate().addDays(1)
-        
-        let remainingReadingDays = getRemainingReadingDays(
-            startDate: startDate,
-            targetEndDate: settings.targetEndDate,
-            nonReadingDays: settings.nonReadingDays)
-        
-        let (pagesPerDay, remainderPages) = readingPagesCalculator.calculatePagesPerDayAndRemainder(
-            totalDays: remainingReadingDays,
-            startPage: progress.lastPagesRead + 1, // 시작 페이지 == 이전까지 읽은 페이지 + 1
-            endPage: settings.targetEndPage
-        )
-        
-        // 페이지 분배 계산
-        calculateReadingPages(
-            for: progress,
-            startingPage: progress.lastPagesRead,
-            pagesPerDay: pagesPerDay,
-            remainderPages: remainderPages,
-            startDate: startDate,
-            targetEndDate: settings.targetEndDate,
-            nonReadingDays: settings.nonReadingDays
-        )
-        // 목표 종료 페이지와 마지막 날 할당 페이지를 검증 및 수정
-        adjustLastDayTargetPage(
-            progress: progress,
-            targetEndDate: settings.targetEndDate,
-            targetEndPage: settings.targetEndPage
-        )
-    }
-    
-    /// 지난 날의 할당량을 읽지 않고, 앱에 새롭게 접속할 때 페이지를 재할당해주는 메서드
-    func reassignPagesFromLastReadDate<Settings: UserSettingsProtocol, Progress: ReadingProgressProtocol>(
-        settings: Settings,
-        progress: Progress
-    ) throws {
-        let adjustedToday = Date().adjustedDate()
-        
-        // 완독 날짜가 지나면 에러 처리
-        if adjustedToday.onlyDate > settings.targetEndDate.onlyDate {
-            throw ReadingScheduleError.targetDatePassed
-        }
-        
-        // 이미 오늘 읽은 페이지가 기록되었으면 재분배를 수행하지 않음
-        if hasReadPagesAdjustedToday(progress: progress) {
-            print("페이지 재분배1 ❌❌❌ ")
-            return
-        }
-        
-        // 시작일이 ‘오늘’이거나 ‘미래’인 경우 재할당을 수행하지 않음 (불필요한 계산 방지)
-        if settings.startDate.toYearMonthDayString() >= adjustedToday.toYearMonthDayString() {
-            print("페이지 재분배2 ❌❌❌ ")
-            return
-        }
-        
-        let remainingReadingDays = getRemainingReadingDays(
-            startDate: adjustedToday,
-            targetEndDate: settings.targetEndDate,
-            nonReadingDays: settings.nonReadingDays
-        )
-        
-        // 남은 페이지와 일수를 기준으로 새롭게 할당량 계산 🐯🐯🐯🐯
-        let (pagesPerDay, remainderPages) =
-        readingPagesCalculator.calculatePagesPerDayAndRemainder(
-            totalDays: remainingReadingDays,
-            startPage: progress.lastPagesRead,
-            endPage: settings.targetEndPage
-        )
-        
-        // 페이지 분배 계산
-        calculateReadingPages(
-            for: progress,
-            startingPage: progress.lastPagesRead,
-            pagesPerDay: pagesPerDay,
-            remainderPages: remainderPages,
-            startDate: adjustedToday,
-            targetEndDate: settings.targetEndDate,
-            nonReadingDays: settings.nonReadingDays
-        )
-        
-        // 목표 종료 페이지와 마지막 날 할당 페이지를 검증 및 수정
-        adjustLastDayTargetPage(
-            progress: progress,
-            targetEndDate: settings.targetEndDate,
-            targetEndPage: settings.targetEndPage
-        )
-    }
-    
-    private func getRemainingReadingDays(startDate: Date, targetEndDate: Date, nonReadingDays: [Date]) -> Int {
+
+    // MARK: - Public Methods
+
+    /// 1. 초기 스케줄 생성
+    ///
+    /// 독서 시작 시 전체 기간에 대한 일일 목표 페이지를 계산합니다.
+    ///
+    /// - Parameters:
+    ///   - settings: 독서 설정 (시작/종료일, 페이지 범위 등)
+    /// - Returns: 일일 목표가 설정된 FGReadingProgress
+    /// - Throws:
+    ///   - `ScheduleCalculationError.invalidDateRange`: 날짜 범위 오류
+    ///   - `ScheduleCalculationError.invalidPageRange`: 페이지 범위 오류
+    ///   - `ScheduleCalculationError.calculationFailed`: 계산 실패
+    func createInitialSchedule(
+        settings: FGUserSetting
+    ) throws -> FGReadingProgress {
         do {
-            return try readingDateCalculator.calculateValidReadingDays(
-                startDate: startDate,
-                endDate: targetEndDate,
-                excludedDates: nonReadingDays
+            // 1. 시작일부터 종료일까지의 스케줄 생성
+            let records = try makeScheduleSegment(
+                settings: settings,
+                startDate: settings.startDate,
+                startPageExclusive: settings.startPage - 1  // 시작 페이지 이전
             )
-        } catch {
-            fatalError("getRemainingReadingDays: \(error)")
-        }
-    }
-    
-    /// 읽기 페이지를 계산하고 목표를 설정하는 메서드
-    /// - Parameters:
-    ///   - progress: 읽기 기록 데이터를 포함한 Progress 객체.
-    ///   - startingPage: 시작 페이지 (처음 읽는 경우 0).
-    ///   - pagesPerDay: 하루에 할당할 페이지 수.
-    ///   - remainderPages: 뒤에서 분배해야 할 남은 페이지 수.
-    ///   - startDate: 읽기를 시작할 날짜.
-    ///   - targetEndDate: 읽기를 종료할 목표 날짜.
-    ///   - nonReadingDays: 비독서일의 날짜 배열.
-    private func calculateReadingPages<Progress: ReadingProgressProtocol>(
-        for progress: Progress,
-        startingPage: Int,
-        pagesPerDay: Int,
-        remainderPages: Int,
-        startDate: Date,
-        targetEndDate: Date,
-        nonReadingDays: [Date]
-    ) {
-        // 앞에서부터 하루 할당량을 계산하고 기록 업데이트
-        assignPagesForEachDay(
-            for: progress,
-            startingPage: startingPage,
-            pagesPerDay: pagesPerDay,
-            startDate: startDate,
-            targetEndDate: targetEndDate,
-            nonReadingDays: nonReadingDays
-        )
-        
-        // 뒤에서부터 남은 페이지를 분배
-        distributeRemainderPagesBackward(
-            progress: progress,
-            remainderPages: remainderPages,
-            targetEndDate: targetEndDate
-        )
-    }
-    
-    /// 읽기 기록을 업데이트하는 메서드
-    /// - Parameters:
-    ///   - progress: 읽기 기록 데이터를 포함한 Progress 객체.
-    ///   - startingPage: 이전에 마지막으로 읽은 페이지. 처음 읽는 경우 0으로 설정해야 합니다.
-    ///   - pagesPerDay: 하루에 할당할 페이지 수.
-    ///   - startDate: 읽기를 시작할 날짜.
-    ///   - targetEndDate: 읽기를 종료할 목표 날짜.
-    ///   - nonReadingDays: 비독서일의 날짜 배열.
-    private func assignPagesForEachDay<Progress: ReadingProgressProtocol>(
-        for progress: Progress,
-        startingPage: Int,
-        pagesPerDay: Int,
-        startDate: Date,
-        targetEndDate: Date,
-        nonReadingDays: [Date]
-    ) {
-        var cumulativePages = startingPage
-        var targetDate = startDate
-        
-        // 비독서일을 키로 변환하여 비교용 배열 생성
-        let nonReadingDaysKey = nonReadingDays.map { progress.getReadingRecordsKey($0) }
-        
-        // 시작 날짜부터 목표 날짜까지 반복
-        while progress.getReadingRecordsKey(targetDate) <= progress.getReadingRecordsKey(targetEndDate) {
-            let dateKey = progress.getReadingRecordsKey(targetDate)
-            
-            // 비독서일이 아닌 경우에만 기록을 업데이트
-            if !nonReadingDaysKey.contains(dateKey) {
-                cumulativePages += pagesPerDay
-                progress.readingRecords[dateKey, default: ReadingRecord(targetPages: cumulativePages, pagesRead: 0)].targetPages = cumulativePages
-            }
-            
-            // 다음 날짜로 이동
-            targetDate = targetDate.addDays(1)
-        }
-    }
-    
-    /// 마지막 날부터 남은 페이지를 역순으로 분배하는 메서드
-    /// - Parameters:
-    ///   - progress: 읽기 기록 데이터를 포함한 Progress 객체.
-    ///   - remainderPages: 분배해야 할 남은 페이지 수.
-    ///   - targetEndDate: 읽기 일정의 마지막 날짜.
-    private func distributeRemainderPagesBackward<Progress: ReadingProgressProtocol>(
-        progress: Progress,
-        remainderPages: Int,
-        targetEndDate: Date
-    ) {
-        var remainingOffset = remainderPages
-        var currentTargetDate = targetEndDate
-        
-        // 마지막 날짜부터 시작하여 남은 페이지를 분배
-        while remainingOffset > 0 {
-            let dateKey = progress.getReadingRecordsKey(currentTargetDate)
-            
-            // 현재 날짜에 해당하는 기록이 없으면 이전 날짜로 이동
-            guard var record = progress.readingRecords[dateKey] else {
-                currentTargetDate = currentTargetDate.addingDays(-1)
-                continue
-            }
-            
-            // 현재 날짜의 목표 페이지에 남은 페이지를 추가
-            record.targetPages += remainingOffset
-            progress.readingRecords[dateKey] = record
-            
-            // 남은 페이지 수를 감소시키고 이전 날짜로 이동
-            remainingOffset -= 1
-            currentTargetDate = currentTargetDate.addingDays(-1)
-        }
-    }
-    
-    /// 오늘 할당량이 읽혔는지 확인하는 메서드
-    private func hasReadPagesAdjustedToday<Progress: ReadingProgressProtocol>(progress: Progress) -> Bool {
-        let today = Date()
-        let adjustedTodayKey = progress.getAdjustedReadingRecordsKey(today)
-        
-        // 해당 날짜에 기록이 없는 경우
-        guard let record = progress.readingRecords[adjustedTodayKey] else { return false }
-        
-        return record.pagesRead != 0
-    }
-}
 
-extension ReadingScheduleCalculator {
-    /// 기록된 날짜의 수를 계산하는 메서드
-    func calculateRecordedDays<Progress: ReadingProgressProtocol>(
-        progress: Progress
-    ) -> Int {
-        return progress.readingRecords.values.filter { $0.pagesRead > 0 }.count
-    }
-    
-    /// 마지막 날 할당 페이지를 목표 페이지로 재조정하는 메서드
-    /// - Parameters:
-    ///   - progress: 독서 진행 상황 객체
-    ///   - targetEndDate: 목표 종료 날짜
-    ///   - targetEndPage: 목표 종료 페이지
-    private func adjustLastDayTargetPage<Progress: ReadingProgressProtocol>(
-        progress: Progress,
-        targetEndDate: Date,
-        targetEndPage: Int
-    ) {
-        let endDateKey = progress.getReadingRecordsKey(targetEndDate)
-        if progress.readingRecords[endDateKey]?.targetPages != targetEndPage {
-            progress.readingRecords[endDateKey]?.targetPages = targetEndPage
+            // 2. 새로운 FGReadingProgress 반환
+            return FGReadingProgress(
+                dailyReadingRecords: records,
+                lastReadDate: nil,  // 아직 독서 시작 전
+                lastReadPage: settings.startPage - 1  // 시작 페이지 이전
+            )
+        } catch let error as DateMathCalculator.MathError {
+            throw ScheduleCalculationError.calculationFailed(underlying: error)
+        } catch let error as PageMathCalculator.MathError {
+            throw ScheduleCalculationError.calculationFailed(underlying: error)
         }
     }
-}
 
-// MARK: - 독서 날짜가 변경되면 업데이트
-extension ReadingScheduleCalculator {
-    /// 독서 일정이 변경된 경우 페이지를 재할당하는 메서드
-    func reassignPagesForUpdatedDates<Settings: UserSettingsProtocol, Progress: ReadingProgressProtocol>(
-        settings: Settings,
-        progress: Progress
-    ) {
-        let adjustedToday = Date().adjustedDate()
-        
-        if settings.startDate.toKoreanDateString() >= adjustedToday.toKoreanDateString() {
-            // 시작 날짜가 변경된 경우
-            progress.readingRecords = [:]
-            calculateInitialDailyTargets(for: settings, progress: progress)
-            return
+    /// 2. 오늘 읽기 반영
+    ///
+    /// 사용자가 오늘 읽은 페이지를 기록하고, 필요 시 미래 목표를 재조정합니다.
+    ///
+    /// **중요:**
+    /// - `date`는 이미 `adjustedForDailyBoundary()` 적용된 날짜여야 함
+    /// - Calculator 내부에서 날짜 보정하지 않음
+    ///
+    /// - Parameters:
+    ///   - settings: 독서 설정
+    ///   - progress: 현재 독서 진행 상황
+    ///   - pagesRead: 오늘 읽은 페이지 수
+    ///   - date: 기록 날짜 (이미 보정 완료)
+    /// - Returns: (progress: 업데이트된 FGReadingProgress, updatedSettings: 설정 변경 시 새 설정)
+    /// - Throws:
+    ///   - `ScheduleCalculationError.calculationFailed`: 재조정 실패
+    func applyTodayReading(
+        settings: FGUserSetting,
+        progress: FGReadingProgress,
+        pagesRead: Int,
+        date: Date
+    ) throws -> (progress: FGReadingProgress, updatedSettings: FGUserSetting?) {
+        let key = date.toYearMonthDayString()
+        var newRecords = progress.dailyReadingRecords
+
+        // 1. 오늘 날짜에 읽은 페이지 기록
+        let currentRecord = newRecords[key] ?? ReadingRecord(targetPages: 0, pagesRead: 0)
+        newRecords[key] = ReadingRecord(
+            targetPages: currentRecord.targetPages,
+            pagesRead: pagesRead
+        )
+
+        // 2. 제외일 처리: 해당 날짜가 제외일이었다면 목록에서 제거
+        var updatedSettings: FGUserSetting?
+        let excludedKey = settings.excludedReadingDays.first(where: { $0.toYearMonthDayString() == key })
+        if excludedKey != nil {
+            let newExcludedDays = settings.excludedReadingDays.filter { $0.toYearMonthDayString() != key }
+            updatedSettings = FGUserSetting(
+                startPage: settings.startPage,
+                targetEndPage: settings.targetEndPage,
+                startDate: settings.startDate,
+                targetEndDate: settings.targetEndDate,
+                excludedReadingDays: newExcludedDays
+            )
         }
-        
-        // 데이터 정리 로직 호출
-        cleanUpInvalidRecords(for: settings, progress: progress)
-        
-        // 이미 오늘 읽은 페이지가 기록되었으면 다음날부터 재분배
-        if hasReadPagesAdjustedToday(progress: progress) {
-            adjustFutureTargets(for: settings, progress: progress, from: Date())
-            return
+
+        // 3. 업데이트된 progress 생성
+        let updatedProgress = FGReadingProgress(
+            dailyReadingRecords: newRecords,
+            lastReadDate: date,
+            lastReadPage: pagesRead
+        )
+
+        // 4. 재조정이 필요한 경우 확인
+        // - 제외일이 변경된 경우: 유효 일수가 변경되므로 재조정 필요
+        // - 목표와 실제가 다른 경우: 남은 페이지가 변경되므로 재조정 필요
+        let needsRecalculation =
+            updatedSettings != nil ||  // 제외일 변경
+            (currentRecord.targetPages != 0 && pagesRead != currentRecord.targetPages)  // 목표 불일치
+
+        if needsRecalculation {
+            // 목표를 실제 읽은 페이지로 변경
+            newRecords[key] = ReadingRecord(targetPages: pagesRead, pagesRead: pagesRead)
+
+            // 다음날부터 재조정 (제외일이 변경되었다면 새 설정 사용)
+            let adjustedSettings = updatedSettings ?? settings
+
+            let recalculatedProgress = try adjustFutureTargets(
+                settings: adjustedSettings,
+                progress: FGReadingProgress(
+                    dailyReadingRecords: newRecords,
+                    lastReadDate: date,
+                    lastReadPage: pagesRead
+                ),
+                fromDate: date
+            )
+
+            return (progress: recalculatedProgress, updatedSettings: updatedSettings)
         }
-        
-        let remainingReadingDays = getRemainingReadingDays(
-            startDate: adjustedToday,
-            targetEndDate: settings.targetEndDate,
-            nonReadingDays: settings.nonReadingDays
-        )
-        
-        // 남은 페이지와 일수를 기준으로 새롭게 할당량 계산 🐯🐯🐯🐯
-        let (pagesPerDay, remainderPages) =
-        readingPagesCalculator.calculatePagesPerDayAndRemainder(
-            totalDays: remainingReadingDays,
-            startPage: progress.lastPagesRead,
-            endPage: settings.targetEndPage
-        )
-        
-        // 페이지 분배 계산
-        calculateReadingPages(
-            for: progress,
-            startingPage: progress.lastPagesRead,
-            pagesPerDay: pagesPerDay,
-            remainderPages: remainderPages,
-            startDate: adjustedToday,
-            targetEndDate: settings.targetEndDate,
-            nonReadingDays: settings.nonReadingDays
-        )
-        
-        // 목표 종료 페이지와 마지막 날 할당 페이지를 검증 및 수정
-        adjustLastDayTargetPage(
-            progress: progress,
-            targetEndDate: settings.targetEndDate,
-            targetEndPage: settings.targetEndPage
-        )
+
+        // 5. 재조정 불필요하면 그냥 반환
+        return (progress: updatedProgress, updatedSettings: updatedSettings)
     }
-    
-    /// 불필요한 읽기 기록 데이터를 제거하는 메서드
-    private func cleanUpInvalidRecords<Settings: UserSettingsProtocol, Progress: ReadingProgressProtocol>(
-        for settings: Settings,
-        progress: Progress
-    ) {
-        // 시작 날짜 이전 및 마지막 날짜 이후 데이터를 필터링
-        let filteredRecords = filteredProgressForDateRange(
-            progress: progress,
-            startDate: settings.startDate,
-            endDate: settings.targetEndDate
-        )
-        progress.readingRecords = filteredRecords
-        // 제외된 날짜 데이터를 필터링
-        let filteredExcludedDates = filteredProgressForExcludedDates(
-            progress: progress,
-            excludedDates: settings.nonReadingDays
-        )
-        progress.readingRecords = filteredExcludedDates
+
+    /// 3. 미래 목표 재조정
+    ///
+    /// - Parameters:
+    ///   - settings: 독서 설정
+    ///   - progress: 현재 독서 진행 상황
+    ///   - fromDate: 재조정 시작 날짜 (이 날 다음날부터 재계산)
+    /// - Returns: 미래 목표가 재조정된 FGReadingProgress
+    /// - Throws:
+    ///   - `ScheduleCalculationError.calculationFailed`: 재조정 실패
+    func adjustFutureTargets(
+        settings: FGUserSetting,
+        progress: FGReadingProgress,
+        fromDate: Date
+    ) throws -> FGReadingProgress {
+        do {
+            // 1. 다음날부터 재계산 시작
+            let nextDay = fromDate.addDays(1)
+
+            // 2. 다음날부터 종료일까지의 새 스케줄 생성
+            let newSegment = try makeScheduleSegment(
+                settings: settings,
+                startDate: nextDay,
+                startPageExclusive: progress.lastReadPage  // 현재까지 읽은 페이지
+            )
+
+            // 3. 기존 progress와 병합 (fromDate 이후만 교체)
+            let mergedProgress = mergeProgress(
+                base: progress,
+                replacingFrom: nextDay,
+                with: newSegment
+            )
+
+            return mergedProgress
+        } catch let error as DateMathCalculator.MathError {
+            throw ScheduleCalculationError.calculationFailed(underlying: error)
+        } catch let error as PageMathCalculator.MathError {
+            throw ScheduleCalculationError.calculationFailed(underlying: error)
+        }
     }
-    
-    /// 목표의 마지막 날짜 이후 및 시작 날짜 이전에 저장된 읽기 기록 데이터를 제거합니다.
-    /// - Returns: 지정된 범위를 벗어난 데이터를 제거한 읽기 기록.
-    private func filteredProgressForDateRange<Progress: ReadingProgressProtocol>(
-        progress: Progress,
+
+    /// 4. 앱 재접속 시 재분배
+    ///
+    /// 사용자가 며칠간 독서하지 않고 앱에 재접속했을 때,
+    /// 오늘부터 목표일까지 남은 페이지를 재분배합니다.
+    ///
+    /// - Parameters:
+    ///   - settings: 독서 설정
+    ///   - progress: 현재 독서 진행 상황
+    ///   - today: 오늘 날짜 (이미 보정 완료)
+    /// - Returns: 재분배된 FGReadingProgress
+    /// - Throws:
+    ///   - `ScheduleCalculationError.targetDatePassed`: 목표일 지남
+    ///   - `ScheduleCalculationError.calculationFailed`: 재분배 실패
+    func rescheduleOnAppOpen(
+        settings: FGUserSetting,
+        progress: FGReadingProgress,
+        today: Date
+    ) throws -> FGReadingProgress {
+        // 1. 목표 종료일이 지났는지 확인
+        if today.toYearMonthDayString() > settings.targetEndDate.toYearMonthDayString() {
+            throw ScheduleCalculationError.targetDatePassed
+        }
+
+        // 2. 오늘 이미 읽은 기록이 있으면 재분배하지 않음
+        let todayKey = today.toYearMonthDayString()
+        if let todayRecord = progress.dailyReadingRecords[todayKey],
+           todayRecord.pagesRead > 0 {
+            return progress  // 변경 없음
+        }
+
+        // 3. 시작일이 오늘 이후면 재분배하지 않음 (아직 시작 전)
+        if settings.startDate.toYearMonthDayString() >= today.toYearMonthDayString() {
+            return progress  // 변경 없음
+        }
+
+        do {
+            // 4. 오늘부터 종료일까지의 새 스케줄 생성
+            let newSegment = try makeScheduleSegment(
+                settings: settings,
+                startDate: today,
+                startPageExclusive: progress.lastReadPage  // 마지막까지 읽은 페이지
+            )
+
+            // 5. 기존 progress와 병합 (today 이후만 교체)
+            let mergedProgress = mergeProgress(
+                base: progress,
+                replacingFrom: today,
+                with: newSegment
+            )
+
+            return mergedProgress
+        } catch let error as DateMathCalculator.MathError {
+            throw ScheduleCalculationError.calculationFailed(underlying: error)
+        } catch let error as PageMathCalculator.MathError {
+            throw ScheduleCalculationError.calculationFailed(underlying: error)
+        }
+    }
+
+    /// 5. 설정 변경 시 재분배
+    ///
+    /// 사용자가 독서 설정(시작일, 종료일, 제외일)을 변경했을 때
+    /// 스케줄을 재계산합니다.
+    ///
+    /// - Parameters:
+    ///   - oldSettings: 이전 설정
+    ///   - newSettings: 새로운 설정
+    ///   - progress: 현재 독서 진행 상황
+    ///   - today: 오늘 날짜 (이미 보정 완료)
+    /// - Returns: 설정 변경이 반영된 FGReadingProgress
+    /// - Throws:
+    ///   - `ScheduleCalculationError.calculationFailed`: 재분배 실패
+    func rescheduleForSettingsChange(
+        oldSettings: FGUserSetting,
+        newSettings: FGUserSetting,
+        progress: FGReadingProgress,
+        today: Date
+    ) throws -> FGReadingProgress {
+        // 1. 시작일이 미래로 변경된 경우 → 전체 재계산
+        if newSettings.startDate.toYearMonthDayString() >= today.toYearMonthDayString() {
+            return try createInitialSchedule(settings: newSettings)
+        }
+
+        // 2. 기존 기록 정리 (변경된 범위/제외일에 따라)
+        let cleanedBase = cleanedProgress(progress: progress, settings: newSettings)
+
+        // 3. 오늘 이미 읽은 기록이 있으면 다음날부터 재분배
+        let todayKey = today.toYearMonthDayString()
+        if let todayRecord = cleanedBase.dailyReadingRecords[todayKey],
+           todayRecord.pagesRead > 0 {
+            return try adjustFutureTargets(
+                settings: newSettings,
+                progress: cleanedBase,
+                fromDate: today
+            )
+        }
+
+        // 4. 오늘부터 재분배
+        do {
+            let newSegment = try makeScheduleSegment(
+                settings: newSettings,
+                startDate: today,
+                startPageExclusive: cleanedBase.lastReadPage
+            )
+
+            // 5. 기존 progress와 병합
+            let mergedProgress = mergeProgress(
+                base: cleanedBase,
+                replacingFrom: today,
+                with: newSegment
+            )
+
+            return mergedProgress
+        } catch let error as DateMathCalculator.MathError {
+            throw ScheduleCalculationError.calculationFailed(underlying: error)
+        } catch let error as PageMathCalculator.MathError {
+            throw ScheduleCalculationError.calculationFailed(underlying: error)
+        }
+    }
+
+    // MARK: - Private Helper Methods
+
+    /// 특정 날짜부터 종료일까지의 일일 목표 스케줄 세그먼트를 생성합니다.
+    ///
+    /// - Parameters:
+    ///   - settings: 독서 설정
+    ///   - startDate: 스케줄 시작 날짜
+    ///   - startPageExclusive: 시작 페이지 (이전까지 읽은 페이지)
+    /// - Returns: 날짜 키와 ReadingRecord의 Dictionary
+    /// - Throws: 날짜/페이지 계산 에러
+    private func makeScheduleSegment(
+        settings: FGUserSetting,
         startDate: Date,
-        endDate: Date
-    ) -> [String: ReadingRecord] {
-        let adjustedStartDateKey = progress.getReadingRecordsKey(startDate)
-        let adjustedEndDateKey = progress.getReadingRecordsKey(endDate)
-        
-        // 시작 날짜 이전 또는 마지막 날짜 이후 데이터를 제거한 결과 반환
-        return progress.readingRecords.filter { record in
-            record.key >= adjustedStartDateKey && record.key <= adjustedEndDateKey
+        startPageExclusive: Int
+    ) throws -> [String: ReadingRecord] {
+        // 1. 유효 독서 일수 계산 (제외일 제외)
+        let validDays = try dateMath.validDays(
+            from: startDate,
+            to: settings.targetEndDate,
+            excluding: settings.excludedReadingDays
+        )
+
+        // 2. 읽어야 할 페이지 범위 계산
+        let startPage = startPageExclusive + 1  // 다음 페이지부터 시작
+        let endPage = settings.targetEndPage
+
+        // 3. 일일 페이지 수와 나머지 계산
+        let divisionResult = try pageMath.dividePages(
+            from: startPage,
+            to: endPage,
+            over: validDays
+        )
+
+        // 4. 유효 일자 수만큼 "일일 분배량 배열" 준비
+        //    - 앞쪽 (validDays - remainder)일 → daily
+        //    - 뒤쪽 remainder일 → daily + 1
+        var pagesPerValidDay: [Int] = []
+        pagesPerValidDay.reserveCapacity(validDays)
+
+        let extraStartIndex = validDays - divisionResult.remainder
+        for index in 0..<validDays {
+            let isExtraDay = index >= extraStartIndex
+            let pagesForDay = divisionResult.daily + (isExtraDay ? 1 : 0)
+            pagesPerValidDay.append(pagesForDay)
         }
+
+        // 5. 날짜를 순회하며 제외일이 아닌 날에만 pagesPerValidDay를 소비
+        var records: [String: ReadingRecord] = [:]
+        var cumulativePages = startPageExclusive
+        var currentDate = startDate
+        let excludedKeys = Set(settings.excludedReadingDays.map { $0.toYearMonthDayString() })
+        var validDayIndex = 0
+
+        let endKey = settings.targetEndDate.toYearMonthDayString()
+
+        while currentDate.toYearMonthDayString() <= endKey,
+              validDayIndex < pagesPerValidDay.count {
+            let key = currentDate.toYearMonthDayString()
+
+            if !excludedKeys.contains(key) {
+                let pagesForDay = pagesPerValidDay[validDayIndex]
+                cumulativePages += pagesForDay
+
+                records[key] = ReadingRecord(
+                    targetPages: cumulativePages,
+                    pagesRead: 0
+                )
+
+                validDayIndex += 1
+            }
+
+            currentDate = currentDate.addDays(1)
+        }
+
+        return records
     }
-    
-    /// 제외된 날짜를 기준으로 필터링된 읽기 기록 데이터를 반환합니다.
-    /// - Returns: 제외된 날짜를 제거한 읽기 기록.
-    private func filteredProgressForExcludedDates<Progress: ReadingProgressProtocol>(
-        progress: Progress,
-        excludedDates: [Date]
-    ) -> [String: ReadingRecord] {
-        let excludedDateKeys = excludedDates.map { progress.getReadingRecordsKey($0) }
-        
-        // 제외된 날짜를 제거한 결과 반환
-        return progress.readingRecords.filter { record in
-            !excludedDateKeys.contains(record.key)
+
+    /// 기존 progress에 새로운 스케줄 세그먼트를 병합합니다.
+    ///
+    /// - Parameters:
+    ///   - base: 기존 독서 진행 상황
+    ///   - replacingDate: 교체 시작 날짜
+    ///   - segment: 새로운 스케줄 세그먼트
+    /// - Returns: 병합된 FGReadingProgress
+    private func mergeProgress(
+        base: FGReadingProgress,
+        replacingFrom replacingDate: Date,
+        with segment: [String: ReadingRecord]
+    ) -> FGReadingProgress {
+        var mergedRecords = base.dailyReadingRecords
+        let replacingKey = replacingDate.toYearMonthDayString()
+
+        // replacingDate 이후의 기존 기록 제거
+        mergedRecords = mergedRecords.filter { key, _ in
+            key < replacingKey
         }
+
+        // 새 segment 병합
+        for (key, record) in segment {
+            mergedRecords[key] = record
+        }
+
+        return FGReadingProgress(
+            dailyReadingRecords: mergedRecords,
+            lastReadDate: base.lastReadDate,
+            lastReadPage: base.lastReadPage
+        )
+    }
+
+    /// 불필요한 독서 기록을 정리합니다.
+    ///
+    /// **정리 대상:**
+    /// - 시작일 이전 날짜의 기록
+    /// - 종료일 이후 날짜의 기록
+    /// - 제외일에 해당하는 기록
+    ///
+    /// - Parameters:
+    ///   - progress: 정리할 독서 진행 상황
+    ///   - settings: 독서 설정
+    /// - Returns: 정리된 FGReadingProgress
+    private func cleanedProgress(
+        progress: FGReadingProgress,
+        settings: FGUserSetting
+    ) -> FGReadingProgress {
+        let startKey = settings.startDate.toYearMonthDayString()
+        let endKey = settings.targetEndDate.toYearMonthDayString()
+        let excludedKeys = Set(settings.excludedReadingDays.map { $0.toYearMonthDayString() })
+
+        // 범위 내 + 제외일 아닌 기록만 유지
+        let cleanedRecords = progress.dailyReadingRecords.filter { key, _ in
+            key >= startKey && key <= endKey && !excludedKeys.contains(key)
+        }
+
+        return FGReadingProgress(
+            dailyReadingRecords: cleanedRecords,
+            lastReadDate: progress.lastReadDate,
+            lastReadPage: progress.lastReadPage
+        )
     }
 }

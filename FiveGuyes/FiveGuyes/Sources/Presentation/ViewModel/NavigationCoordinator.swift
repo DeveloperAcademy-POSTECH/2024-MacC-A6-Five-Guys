@@ -9,7 +9,6 @@ import SwiftUI
 
 // TODO: 추가되는 뷰 추가하기
 enum Screens: Hashable {
-    case empty
     case mainHome
     case notiSetting(book: FGUserBook?)
     case bookSettingsManager
@@ -35,9 +34,8 @@ final class NavigationCoordinator {
     
     @ViewBuilder
      func navigate(to screen: Screens) -> some View {
-         // TODO: 추가되는 뷰 추가하기
+        // TODO: 추가되는 뷰 추가하기
         switch screen {
-        case .empty: EmptyView()
         case .mainHome:
             MainHomeView(
                 viewModel: MainHomeViewModel(

@@ -9,9 +9,7 @@ import Foundation
 import SwiftData
 
 @Model
-final class ReadingProgress: ReadingProgressProtocol {
-    typealias Settings = UserSettingsProtocol
-    
+final class ReadingProgress {
     var readingRecords: [String: ReadingRecord]
     var lastReadDate: Date?
     var lastPagesRead: Int = 1
@@ -47,7 +45,7 @@ final class ReadingProgress: ReadingProgressProtocol {
     }
     
     // 모든 주 시작 날짜를 계산
-    func getAllWeekStartDates(for settings: Settings) -> [Date] {
+    func getAllWeekStartDates(for settings: UserSettings) -> [Date] {
         let firstDate = settings.startDate
         let lastDate = settings.targetEndDate
         
@@ -91,7 +89,7 @@ final class ReadingProgress: ReadingProgressProtocol {
         return nil
     }
     
-    func findNextReadingPagesPerDay(for settings: Settings) -> Int {
+    func findNextReadingPagesPerDay(for settings: UserSettings) -> Int {
         let readingPagesCalculator = ReadingPagesCalculator()
         let readingDateCalculator = ReadingDateCalculator()
         // TODO: !!!!!!!!!

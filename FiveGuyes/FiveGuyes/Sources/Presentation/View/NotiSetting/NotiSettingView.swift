@@ -188,3 +188,62 @@ struct NotiSettingView: View {
         }
     }
 }
+
+#if DEBUG
+#Preview("기본 상태") {
+    NavigationStack {
+        NotiSettingView(
+            userBook: PreviewSupport.sampleReadingBook,
+            viewModel: makeNotiSettingPreviewViewModel()
+        )
+    }
+}
+
+#Preview("시스템 알림 비활성화") {
+    NavigationStack {
+        NotiSettingView(
+            userBook: PreviewSupport.sampleReadingBook,
+            viewModel: makeNotiSettingPreviewViewModel(isSystemNotificationEnabled: false)
+        )
+    }
+}
+
+#Preview("리마인드 시간 피커 열림") {
+    NavigationStack {
+        NotiSettingView(
+            userBook: PreviewSupport.sampleReadingBook,
+            viewModel: makeNotiSettingPreviewViewModel(
+                isNotificationDisabled: true,
+                isReminderTimePickerVisible: true
+            )
+        )
+    }
+}
+
+@MainActor
+private func makeNotiSettingPreviewViewModel(
+    isSystemNotificationEnabled: Bool = true,
+    isNotificationDisabled: Bool = false,
+    isReminderTimePickerVisible: Bool = false
+) -> NotiSettingViewModel {
+    let notificationManager = PreviewNotificationManager()
+    notificationManager.isAuthorized = isSystemNotificationEnabled
+
+    let settingsStore = PreviewNotificationSettingsStore(
+        isDisabled: isNotificationDisabled,
+        reminderHour: 8,
+        reminderMinute: 30
+    )
+
+    let viewModel = NotiSettingViewModel(
+        notificationManager: notificationManager,
+        settingsStore: settingsStore
+    )
+    viewModel.isSystemNotificationEnabled = isSystemNotificationEnabled
+    viewModel.isNotificationDisabled = isNotificationDisabled
+    viewModel.isReminderTimePickerVisible = isReminderTimePickerVisible
+    viewModel.loadPersistedSettings()
+    viewModel.isReminderTimePickerVisible = isReminderTimePickerVisible
+    return viewModel
+}
+#endif

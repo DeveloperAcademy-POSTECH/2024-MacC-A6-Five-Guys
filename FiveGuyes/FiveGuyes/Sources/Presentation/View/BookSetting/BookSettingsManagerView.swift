@@ -22,6 +22,14 @@ struct BookSettingsManagerView: View {
     
     @State private var bookSettingInputModel = BookSettingInputModel()
     @State private var pageModel = BookSettingPageModel()
+
+    init(
+        bookSettingInputModel: BookSettingInputModel = BookSettingInputModel(),
+        pageModel: BookSettingPageModel = BookSettingPageModel()
+    ) {
+        _bookSettingInputModel = State(initialValue: bookSettingInputModel)
+        _pageModel = State(initialValue: pageModel)
+    }
     
     var body: some View {
         ZStack(alignment: .top) {
@@ -116,10 +124,54 @@ struct BookSettingsManagerView: View {
     }
 }
 
-#Preview {
-    let container = try! ModelContainer(for: UserBookSchemaV2.UserBookV2.self)
-    let dependencies = AppDependencies(modelContainer: container)
-    BookSettingsManagerView()
-        .environment(NavigationCoordinator(appDependencies: dependencies))
-        .environment(dependencies)
+#if DEBUG
+#Preview("도서 검색 단계") {
+    makeBookSettingsManagerPreview()
 }
+
+#Preview("페이지 설정 단계") {
+    makeBookSettingsManagerPreview(
+        pageAdvanceCount: 1,
+        inputModel: PreviewSupport.makeBookSettingInputModel()
+    )
+}
+
+#Preview("기간 선택 단계") {
+    makeBookSettingsManagerPreview(
+        pageAdvanceCount: 2,
+        inputModel: PreviewSupport.makeBookSettingInputModel()
+    )
+}
+
+#Preview("완독 목표 완료 단계") {
+    makeBookSettingsManagerPreview(
+        pageAdvanceCount: 4,
+        inputModel: PreviewSupport.makeBookSettingInputModel()
+    )
+}
+
+@MainActor
+private func makeBookSettingsManagerPreview(
+    pageAdvanceCount: Int = 0,
+    inputModel: BookSettingInputModel = BookSettingInputModel()
+) -> some View {
+    let dependencies = PreviewSupport.makeDependencies()
+    let coordinator = NavigationCoordinator(appDependencies: dependencies)
+    let pageModel = makeBookSettingsPreviewPageModel(advanceCount: pageAdvanceCount)
+
+    return BookSettingsManagerView(
+        bookSettingInputModel: inputModel,
+        pageModel: pageModel
+    )
+    .environment(coordinator)
+    .environment(dependencies)
+}
+
+private func makeBookSettingsPreviewPageModel(advanceCount: Int) -> BookSettingPageModel {
+    let model = BookSettingPageModel()
+    for _ in 0..<advanceCount {
+        model.nextPage()
+    }
+    return model
+}
+#endif

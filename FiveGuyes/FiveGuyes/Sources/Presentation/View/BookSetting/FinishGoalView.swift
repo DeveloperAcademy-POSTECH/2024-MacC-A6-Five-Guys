@@ -212,3 +212,33 @@ struct TextView: View {
             .fontStyle(.title1, weight: .semibold)
     }
 }
+
+#if DEBUG
+#Preview("완독 목표 요약") {
+    let inputModel = PreviewSupport.makeBookSettingInputModel()
+
+    NavigationStack {
+        FinishGoalView(
+            viewModel: FinishGoalViewModel(
+                bookManagementService: PreviewBookManagementService()
+            )
+        )
+    }
+    .environment(PreviewSupport.makeCoordinator())
+    .environment(inputModel)
+}
+
+#Preview("입력 누락 상태") {
+    let inputModel = BookSettingInputModel()
+
+    NavigationStack {
+        FinishGoalView(
+            viewModel: FinishGoalViewModel(
+                bookManagementService: PreviewBookManagementService()
+            )
+        )
+    }
+    .environment(PreviewSupport.makeCoordinator())
+    .environment(inputModel)
+}
+#endif

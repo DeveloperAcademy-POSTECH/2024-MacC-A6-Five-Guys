@@ -62,3 +62,28 @@ struct BookRowView: View {
             .padding(.vertical, 24)
     }
 }
+
+#if DEBUG
+#Preview("선택된 책") {
+    let book = PreviewSupport.sampleAPIBook
+    let viewModel: BookSearchViewModel = {
+        let model = PreviewSupport.makeBookSearchViewModel()
+        model.selectedBook = book
+        return model
+    }()
+
+    BookRowView(viewModel: viewModel, book: book)
+        .padding(.vertical, 24)
+}
+
+#Preview("선택되지 않은 책") {
+    let book = PreviewSupport.sampleAPIBook
+    let viewModel = PreviewSupport.makeBookSearchViewModel(
+        books: [book],
+        selectedBook: nil
+    )
+
+    BookRowView(viewModel: viewModel, book: book)
+        .padding(.vertical, 24)
+}
+#endif

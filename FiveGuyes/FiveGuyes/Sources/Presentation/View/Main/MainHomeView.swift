@@ -376,3 +376,32 @@ struct MainHomeView: View {
         await viewModel.setupNotificationsForCurrentBook()
     }
 }
+
+#if DEBUG
+#Preview("읽는 책 있음") {
+    MainHomeView(
+        viewModel: PreviewSupport.makeMainHomeViewModel()
+    )
+    .environment(PreviewSupport.makeCoordinator())
+}
+
+#Preview("읽는 책 없음 + 완독 있음") {
+    MainHomeView(
+        viewModel: PreviewSupport.makeMainHomeViewModel(
+            readingBooks: [],
+            completedBooks: [PreviewSupport.sampleCompletedBook]
+        )
+    )
+    .environment(PreviewSupport.makeCoordinator())
+}
+
+#Preview("읽는 책/완독 모두 없음") {
+    MainHomeView(
+        viewModel: PreviewSupport.makeMainHomeViewModel(
+            readingBooks: [],
+            completedBooks: []
+        )
+    )
+    .environment(PreviewSupport.makeCoordinator())
+}
+#endif
