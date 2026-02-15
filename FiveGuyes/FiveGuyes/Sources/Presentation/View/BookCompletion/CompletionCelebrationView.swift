@@ -9,33 +9,32 @@ import SwiftUI
 
 struct CompletionCelebrationView: View {
     @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
-    
+
     let userBook: FGUserBook
     let viewModel: CompletionCelebrationViewModel
-    
+
     private let celebrationTitleText = "완독 완료!"
     private let celebrationMessageText = "한 권을 전부 읽다니...\n대단한걸요?"
-    
-    // TODO: 컬러, 폰트 수정하기
+
     var body: some View {
         let summary = viewModel.summary(for: userBook)
         let bookMetadata = userBook.bookMetaData
-        
+
         VStack(spacing: 0) {
             Spacer()
             celebrationTitle
                 .padding(.bottom, 14)
-            
+
             celebrationMessage
                 .padding(.bottom, 80)
-            
+
             celebrationBookImage(bookMetadata)
                 .padding(.bottom, 28)
-            
+
             readingSummary(summary: summary)
-            
+
             Spacer()
-            
+
             reflectionButton
                 .padding(.bottom, 21)
         }
@@ -46,7 +45,7 @@ struct CompletionCelebrationView: View {
         }
         .customNavigationBackButton()
     }
-    
+
     private var celebrationTitle: some View {
         Text(celebrationTitleText)
             .fontStyle(.body, weight: .semibold)
@@ -58,21 +57,21 @@ struct CompletionCelebrationView: View {
                     .foregroundStyle(Color.Fills.white)
             }
     }
-    
+
     private var celebrationMessage: some View {
         Text(celebrationMessageText)
             .fontStyle(.title1, weight: .semibold)
             .foregroundStyle(Color.Labels.primaryBlack1)
             .multilineTextAlignment(.center)
     }
-    
+
     private func celebrationBookImage(_ bookMetadata: FGBookMetaData) -> some View {
         let overlayImage = Image("CompletedWandoki")
             .resizable()
             .scaledToFit()
             .frame(height: 89)
             .offset(y: -72)
-        
+
         return Group {
             if let coverURL = bookMetadata.coverImageURL, let url = URL(string: coverURL) {
                 AsyncImage(url: url) { image in
@@ -81,7 +80,6 @@ struct CompletionCelebrationView: View {
                     ProgressView()
                 }
             } else {
-                // TODO: 이미지 없을 때 대용 이미지 추가하기
                 Image("")
                     .resizable()
             }
@@ -92,11 +90,11 @@ struct CompletionCelebrationView: View {
             overlayImage
         }
     }
-    
+
     private func readingSummary(summary: CompletionCelebrationSummary) -> some View {
         let startDateText = summary.startDate.toKoreanDateString()
         let endDateText = summary.endDate.toKoreanDateString()
-        
+
         return Text("\(startDateText)부터 \(endDateText)까지\n꾸준히 \(summary.pagesPerDay)쪽씩 \(summary.totalReadingDays)일동안 읽었어요 🎉")
             .fontStyle(.caption1)
             .foregroundStyle(Color.Labels.primaryBlack1)
@@ -107,10 +105,9 @@ struct CompletionCelebrationView: View {
                     .foregroundStyle(Color.Fills.white)
             }
     }
-    
+
     private var reflectionButton: some View {
         Button {
-            // TODO: 🐯선택된 책 넣어주기
             navigationCoordinator.push(.completionReview(book: userBook))
         } label: {
             Text("완독 소감 작성하기")

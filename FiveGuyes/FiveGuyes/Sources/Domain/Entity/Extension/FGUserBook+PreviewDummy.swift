@@ -7,7 +7,6 @@
 
 import Foundation
 
-// FGUserBook+PreviewDummy.swift
 extension FGUserBook {
     static var dummy: FGUserBook {
         FGUserBook(

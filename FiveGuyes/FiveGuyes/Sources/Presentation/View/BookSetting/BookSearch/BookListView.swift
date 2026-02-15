@@ -7,13 +7,12 @@
 
 import SwiftUI
 
-// TODO: 검색 완료 시 키보드 내리기
 struct BookListView: View {
     @ObservedObject var bookSearchViewModel: BookSearchViewModel
     @State private var searchText: String = ""
-    
+
     private let placeholder: String = "어떤 책을 완독하고 싶나요?"
-    
+
     var body: some View {
         VStack(spacing: 40) {
             VStack(spacing: 0) {
@@ -28,9 +27,9 @@ struct BookListView: View {
                     }
                     .fontStyle(.body)
                     .foregroundStyle(Color.Labels.primaryBlack1)
-                    
+
                     Spacer()
-                    
+
                     Button {
                         requestSearchBooks()
                     } label: {
@@ -38,7 +37,7 @@ struct BookListView: View {
                             .foregroundStyle(Color.Labels.quaternaryBlack4)
                             .padding(.leading, 20)
                     }
-                    
+
                 }
                 .padding(.horizontal, 20)
                 .padding(.vertical, 13)
@@ -50,7 +49,7 @@ struct BookListView: View {
                 )
             }
             .padding(.horizontal, 20)
-            
+
             ScrollView {
                 ForEach(bookSearchViewModel.books) { book in
                     BookRowView(viewModel: bookSearchViewModel, book: book)
@@ -59,7 +58,7 @@ struct BookListView: View {
             .background(Color.Fills.white)
         }
     }
-    
+
     private func requestSearchBooks() {
         Task {
             await bookSearchViewModel.searchBooks(query: searchText)
@@ -68,16 +67,12 @@ struct BookListView: View {
 }
 
 #if DEBUG
-// 이 프리뷰는 "검색 결과 없음" 화면을 바로 열어,
-// 입력 없이도 이 분기 UI가 맞는지 빠르게 확인하려고 만든 예시입니다.
 #Preview("검색 결과 없음") {
     BookListView(
         bookSearchViewModel: PreviewSupport.makeBookSearchViewModel(books: [])
     )
 }
 
-// 이 프리뷰는 "검색 결과 있음" 화면을 바로 열어,
-// 입력 없이도 이 분기 UI가 맞는지 빠르게 확인하려고 만든 예시입니다.
 #Preview("검색 결과 있음") {
     BookListView(
         bookSearchViewModel: PreviewSupport.makeBookSearchViewModel(

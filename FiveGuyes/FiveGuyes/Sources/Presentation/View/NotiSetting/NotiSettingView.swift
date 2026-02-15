@@ -17,38 +17,36 @@ struct NotiSettingView: View {
         self.userBook = userBook
         self._viewModel = State(initialValue: viewModel)
     }
-    
-    // Toggle 바인딩 변수
+
     private var isNotificationToggleEnabled: Binding<Bool> {
         Binding(
             get: { !viewModel.isNotificationDisabled },
             set: { viewModel.isNotificationDisabled = !$0 }
         )
     }
-    
+
     var body: some View {
         ZStack {
             Color.Fills.white // 배경색 지정
                 .ignoresSafeArea()
-            
+
             VStack(alignment: .leading, spacing: .zero) {
                 if !viewModel.isSystemNotificationEnabled {
                     notificationDisabledView
                 }
-                
+
                 toggleSection
-                
+
                 dividerLine
                     .padding(.top, 12)
-                
-                // 하루 독서 미완료 알림
+
                 timePickerSection
                     .padding(.top, 16)
-                
+
                 if viewModel.isReminderTimePickerVisible {
                     timePicker
                 }
-                
+
                 Spacer()
             }
         }
@@ -76,7 +74,7 @@ struct NotiSettingView: View {
             }
         }
     }
-    
+
     // MARK: - View Property
     private func primaryTitle(_ title: String) -> some View {
         Text(title)
@@ -84,14 +82,14 @@ struct NotiSettingView: View {
             .foregroundStyle(Color.Labels.primaryBlack1)
             .multilineTextAlignment(.leading)
     }
-    
+
     private func secondaryTitle(_ title: String) -> some View {
         Text(title)
             .fontStyle(.body)
             .foregroundStyle(Color.Labels.secondaryBlack2)
             .multilineTextAlignment(.leading)
     }
-    
+
     private var notificationDisabledView: some View {
         Button(action: SystemSettingsManager.openSettings) {
             HStack {
@@ -100,9 +98,9 @@ struct NotiSettingView: View {
                     secondaryTitle("설정을 변경하고, 완독에 도움이 되는 알림을\n받아보세요")
                 }
                 .padding(.leading, 16)
-                
+
                 Spacer()
-                
+
                 Image(systemName: "chevron.forward")
                     .frame(width: 15, height: 22)
                     .scaledToFit()
@@ -117,25 +115,24 @@ struct NotiSettingView: View {
             .padding(.bottom, 32)
         }
     }
-    
+
     private var toggleSection: some View {
         VStack(alignment: .leading, spacing: .zero) {
             Toggle("알림 끄기", isOn: isNotificationToggleEnabled)
                 .toggleStyle(.switch)
                 .fontStyle(.title2, weight: .semibold)
                 .foregroundStyle(Color.Labels.primaryBlack1)
-            
+
             secondaryTitle("한입독서와 관련된 알림 수신이 중단돼요")
         }
     }
-    
+
     private var dividerLine: some View {
         Rectangle()
             .frame(height: 1)
             .foregroundStyle(Color.Separators.gray)
     }
-    
-    // 데이터 피커를 포함한 섹션
+
     private var timePickerSection: some View {
         VStack(alignment: .leading, spacing: .zero) {
             HStack {
@@ -146,7 +143,7 @@ struct NotiSettingView: View {
             secondaryTitle("지정된 시간에 오늘의 독서 목표를 알릴게요")
         }
     }
-    
+
     private var timerPickerButton: some View {
         Button {
             withAnimation(.easeIn) {
@@ -165,8 +162,7 @@ struct NotiSettingView: View {
                 .foregroundStyle(Color.Fills.lightGreen)
         }
     }
-    
-    // 실제로 데이터 피커가 보이는곳에 쓰이는 피커 컴포넌트
+
     private var timePicker: some View {
         @Bindable var bindableViewModel = viewModel
         return VStack {
@@ -190,8 +186,6 @@ struct NotiSettingView: View {
 }
 
 #if DEBUG
-// 이 프리뷰는 "기본 상태" 화면을 바로 열어,
-// 입력 없이도 이 분기 UI가 맞는지 빠르게 확인하려고 만든 예시입니다.
 #Preview("기본 상태") {
     NavigationStack {
         NotiSettingView(
@@ -201,8 +195,6 @@ struct NotiSettingView: View {
     }
 }
 
-// 이 프리뷰는 "시스템 알림 비활성화" 화면을 바로 열어,
-// 입력 없이도 이 분기 UI가 맞는지 빠르게 확인하려고 만든 예시입니다.
 #Preview("시스템 알림 비활성화") {
     NavigationStack {
         NotiSettingView(
@@ -212,8 +204,6 @@ struct NotiSettingView: View {
     }
 }
 
-// 이 프리뷰는 "리마인드 시간 피커 열림" 화면을 바로 열어,
-// 입력 없이도 이 분기 UI가 맞는지 빠르게 확인하려고 만든 예시입니다.
 #Preview("리마인드 시간 피커 열림") {
     NavigationStack {
         NotiSettingView(
@@ -226,11 +216,7 @@ struct NotiSettingView: View {
     }
 }
 
-// 화면 값은 메인 스레드에서만 바꿔야 안전합니다.
-// 이 표시를 붙여, 다른 스레드가 끼어들어 상태가 꼬이는 일을 막습니다.
 @MainActor
-// 알림 화면 검증에 필요한 권한, 토글, 시간 값을 한 번에 만드는 헬퍼입니다.
-// 값이 흩어지면 같은 시나리오를 다시 만들기 어려워집니다.
 private func makeNotiSettingPreviewViewModel(
     isSystemNotificationEnabled: Bool = true,
     isNotificationDisabled: Bool = false,

@@ -9,30 +9,30 @@ import SwiftUI
 
 struct DailyProgressView: View {
     @State private var viewModel: DailyProgressViewModel
-    
+
     @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
-    
+
     private let alertText = "전체쪽수를 초과해서 작성했어요!"
     private let alertMessage = "끝까지 읽은 게 맞나요?"
 
     @FocusState private var isTextTextFieldFocused: Bool
-    
+
     private let userBook: FGUserBook
 
     init(userBook: FGUserBook, viewModel: DailyProgressViewModel) {
         self.userBook = userBook
         _viewModel = State(initialValue: viewModel)
     }
-    
+
     var body: some View {
         @Bindable var bindableViewModel = viewModel
         let today = viewModel.today()
         let title = userBook.bookMetaData.title
         let targetEndPage = userBook.userSettings.targetEndPage
         let targetEndDate = userBook.userSettings.targetEndDate
-        
+
         let isTodayCompletionDate = Calendar.app.isDate(today, inSameDayAs: targetEndDate)
-        
+
         VStack(spacing: 0) {
             HStack {
                 Text(isTodayCompletionDate ? "오늘은 <\(title)>\(title.postPositionParticle()) 완독하는\n마지막 날이에요"
@@ -43,10 +43,10 @@ struct DailyProgressView: View {
             .padding(.top, 25)
             .padding(.bottom, 107)
             .padding(.horizontal, 20)
-            
+
             HStack {
                 Spacer()
-                
+
                 TextField("", value: $bindableViewModel.pagesToReadToday, format: .number)
                     .frame(width: 180, height: 68)
                     .background(Color.Fills.lightGreen)
@@ -56,16 +56,16 @@ struct DailyProgressView: View {
                     .fontStyle(.title1, weight: .semibold)
                     .tint(Color.Labels.primaryBlack1)
                     .focused($isTextTextFieldFocused)
-                
+
                 Text("쪽")
                     .padding(.top, 20)
                     .fontStyle(.title1, weight: .semibold)
                 Spacer()
             }
             .padding(.horizontal, 20)
-            
+
             Spacer()
-            
+
             if isTextTextFieldFocused {
                 Button {
                     if viewModel.requestSubmit(targetEndPage: targetEndPage) {
@@ -79,27 +79,24 @@ struct DailyProgressView: View {
                         .frame(height: 56)
                         .background(Color.Colors.green1)
                         .foregroundStyle(Color.Fills.white)
-                    
+
                 }
                 .ignoresSafeArea(.keyboard, edges: .bottom)
                 .disabled(viewModel.isSubmitting)
             }
-            
+
         }
         .alert(isPresented: $bindableViewModel.showTargetExceededAlert) {
-            // TODO: 커스텀스타일 적용 어려워서 임의로 스타일 지정함 확인필요
             Alert(
                 title: Text(alertText)
                     .alertFontStyle(.title3, weight: .semibold),
                 message: Text(alertMessage)
                     .alertFontStyle(.caption1),
                 primaryButton: .cancel(Text("다시 작성하기")) {
-                    // "다시 작성하기" 로직 (입력값 초기화)
                     viewModel.pagesToReadToday = 0
                     isTextTextFieldFocused = true
                 },
                 secondaryButton: .default(Text("확인")) {
-                    // "확인" 버튼 로직 (최종 타켓 페이지로 수정 및 완독 기록)
                     viewModel.applyMaximumTargetPages(targetEndPage)
                     Task {
                         await submitReading()
@@ -114,7 +111,6 @@ struct DailyProgressView: View {
             isTextTextFieldFocused = true
         }
         .onAppear {
-            // GA4 Tracking
             Tracking.Screen.dailyProgress.setTracking()
         }
     }
@@ -133,8 +129,6 @@ struct DailyProgressView: View {
 }
 
 #if DEBUG
-// 이 프리뷰는 "일반 진행 상태" 화면을 바로 열어,
-// 입력 없이도 이 분기 UI가 맞는지 빠르게 확인하려고 만든 예시입니다.
 #Preview("일반 진행 상태") {
     let service = PreviewBookManagementService()
 
@@ -149,8 +143,6 @@ struct DailyProgressView: View {
     .environment(PreviewSupport.makeCoordinator())
 }
 
-// 이 프리뷰는 "완독 마감일" 화면을 바로 열어,
-// 입력 없이도 이 분기 UI가 맞는지 빠르게 확인하려고 만든 예시입니다.
 #Preview("완독 마감일") {
     let dueTodayBook = PreviewSupport.makeBook(
         title: "오늘 완독 목표 도서",

@@ -10,16 +10,16 @@ import SwiftUI
 struct ReadingDateSettingView: View {
     @Environment(BookSettingInputModel.self) var bookSettingInputModel: BookSettingInputModel
     @Environment(BookSettingPageModel.self) var pageModel: BookSettingPageModel
-    
+
     @StateObject private var calendarCellModel: CalendarCellModel
-    
+
     @State var totalPages = 0
-    
+
     private var today: Date
     private let calendarCalculator = CalendarCalculator()
     private let dateMathCalculator = DateMathCalculator()
     private let pageMathCalculator = PageMathCalculator()
-    
+
     private var dayCount: Int {
         if let startDate = calendarCellModel.getStartDate(),
            let endDate = calendarCellModel.getEndDate() {
@@ -28,42 +28,40 @@ struct ReadingDateSettingView: View {
             return 1
         }
     }
-    
+
     private var pagesPerDay: Int {
         return (try? pageMathCalculator.pagesPerDay(totalPages: totalPages, totalDays: dayCount))
             ?? totalPages
     }
-    
+
     init(today: Date) {
-        // 오늘 날짜를 시작 날짜로 추가
         let calendarCellModel = CalendarCellModel(today: today, startDate: today)
-        
+
         self.today = today
-        
+
         self._calendarCellModel = StateObject(wrappedValue: calendarCellModel)
     }
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             descriptionText()
                 .padding(.top, 32)
                 .padding(.bottom, 26)
-            
+
             CalendarWeekdayHeader(calendarCalculator: calendarCalculator)
                 .padding(.bottom, 12)
-            
+
             DividerLine()
-            
+
             ReadingDatePickerView(today: today, calendarCalculator: calendarCalculator, calendarCellManager: calendarCellModel)
-            
+
             DividerLine()
-            
+
             nextButton()
         }
         .onAppear {
-            // GA4 Tracking
             Tracking.Screen.dateSelection.setTracking()
-            
+
             totalPages = (try? pageMathCalculator.pagesBetween(
                 from: bookSettingInputModel.startPage,
                 to: bookSettingInputModel.targetEndPage
@@ -84,7 +82,7 @@ struct ReadingDateSettingView: View {
             }
         }
     }
-    
+
     private func descriptionText() -> some View {
         Group {
             if !calendarCellModel.getConfirmed() {
@@ -97,7 +95,7 @@ struct ReadingDateSettingView: View {
         .foregroundStyle(Color.Labels.primaryBlack1)
         .padding(.horizontal, 20)
     }
-    
+
     private func nextButton() -> some View {
         Button(action: nextButtonAction) {
             RoundedRectangle(cornerRadius: 16)
@@ -115,29 +113,29 @@ struct ReadingDateSettingView: View {
         .padding(.horizontal, 16)
         .disabled(!calendarCellModel.isRangeComplete())
     }
-    
+
     private func goalSelectionText() -> some View {
         VStack(alignment: .leading, spacing: 0) {
             Text("목표기간을 선택해주세요")
-            
+
             HStack(spacing: 8) {
                 Text("매일")
-                
+
                 Text("\(pagesPerDay)")
                     .pageTextStyle()
-                
+
                 Text("쪽만 읽으면 돼요")
             }
         }
     }
-    
+
     private func restDaySelectionText() -> some View {
         HStack(alignment: .top) {
             Text("쉬는 날을 선택할 수 있어요!\n원하지 않는다면 넘어가도 좋아요")
             Spacer()
         }
     }
-    
+
     private func nextButtonAction() {
         if !calendarCellModel.getConfirmed() {
             confirmReadingPeriod()
@@ -146,19 +144,19 @@ struct ReadingDateSettingView: View {
         }
         pageModel.nextPage()
     }
-    
+
     private func confirmReadingPeriod() {
         withAnimation(.easeOut) {
             calendarCellModel.confirmDates()
         }
     }
-    
+
     private func resetNonReadingDays() {
         withAnimation(.easeOut) {
             calendarCellModel.resetConfirmedDates()
         }
     }
-    
+
     private func saveReadingData() {
         bookSettingInputModel.setReadingPeriod(
             startDate: calendarCellModel.getStartDate(),

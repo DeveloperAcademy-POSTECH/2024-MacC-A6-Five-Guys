@@ -27,7 +27,6 @@ protocol BookRepo {
     func updateCompletionStatus(bookId: UUID, status: FGCompletionStatus) async throws
 }
 
-// RepoError 정의
 enum RepoError: Error {
     case notFound
     case saveFailed

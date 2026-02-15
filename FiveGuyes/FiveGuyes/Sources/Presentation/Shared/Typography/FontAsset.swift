@@ -13,7 +13,7 @@ struct FontAsset {
 
     var style: FontStyle
     var weight: FontWeight
-    
+
     var fontName: String {
         switch weight {
         case .semibold:
@@ -22,11 +22,11 @@ struct FontAsset {
             return Self.fontPrefix + "Regular"
         }
     }
-    
+
     func toFont() -> Font {
         .custom(fontName, size: style.size)
     }
-    
+
     func actualFontSpacing() -> CGFloat {
         guard let uiFont = UIFont(name: fontName, size: style.size) else {
             fatalError("Font \(fontName) could not be loaded.")

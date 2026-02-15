@@ -38,7 +38,7 @@ extension View {
             y: 4
         )
     }
-    
+
     /// Clips the view into a shape resembling a book with rounded corners.
     func clipToBookShape(
         bottomTrailingRadius: CGFloat = 8,
@@ -50,7 +50,7 @@ extension View {
             )
         )
     }
-    
+
     /// 네비게이션 드래그 제스처를 비활성화합니다.
     func disableNavigationGesture() -> some View {
         self.gesture(DragGesture().onChanged { _ in })

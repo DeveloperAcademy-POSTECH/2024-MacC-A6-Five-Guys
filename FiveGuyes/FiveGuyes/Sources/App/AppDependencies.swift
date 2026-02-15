@@ -35,7 +35,6 @@ final class AppDependencies {
         do {
             try repo.prewarmReadingRecordKeyMigrationIfNeeded()
         } catch {
-            // 앱 시작을 막지 않기 위해 prewarm 실패는 무시하고 fetch 경계 재시도에 맡깁니다.
         }
 
         let readingDateProvider = DefaultReadingDateProvider()

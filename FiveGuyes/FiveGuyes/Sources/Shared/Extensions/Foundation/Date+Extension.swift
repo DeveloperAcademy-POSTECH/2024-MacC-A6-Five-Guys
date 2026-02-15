@@ -8,56 +8,41 @@
 import Foundation
 
 extension Date {
-    func startOfMonth() -> Date {
-        let calendar = Calendar.app
-        let components = calendar.dateComponents([.year, .month], from: self)
-        return calendar.date(from: components)!
-    }
-    
-    /// 지정된 일 수만큼 UTC 기준으로 날짜를 추가합니다.
-    /// - Parameter days: 추가할 일 수 (음수일 경우 감소)
-    /// - Returns: UTC 기준으로 일 수가 추가된 새로운 `Date`
-    func addDaysInUTC(_ days: Int) -> Date {
-        var utcCalendar = Calendar.app
-        utcCalendar.timeZone = TimeZone(secondsFromGMT: 0)! // UTC 시간대 설정
-        return utcCalendar.date(byAdding: .day, value: days, to: self) ?? self
-    }
-    
     /// 지정된 일 수만큼 날짜를 추가합니다.
     /// - Parameter days: 추가할 일 수 (음수일 경우 감소)
     /// - Returns: 일 수가 추가된 새로운 `Date`
     func addDays(_ days: Int) -> Date {
         return Calendar.app.date(byAdding: .day, value: days, to: self) ?? self
     }
-    
+
     /// `yyyy년 MM월 dd일` 형식으로 변환하여 문자열로 반환합니다.
     func toKoreanDateString() -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy년 MM월 dd일"
         return formatter.string(from: self)
     }
-    
+
     /// `yyyy년 M월` 형식으로 변환하여 문자열로 반환합니다.
     func calendarHeaderString() -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy년 M월"
         return formatter.string(from: self)
     }
-    
+
     /// `MM월 dd일` 형식으로 변환하여 문자열로 반환합니다.
     func toKoreanDateStringWithoutYear() -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "MM월 dd일"
         return formatter.string(from: self)
     }
-    
+
     /// `M월 d일 EEEE` 형식으로 변환하여 문자열로 반환합니다.
     func formattedCompletionDateString() -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "M월 d일 EEEE"
         return formatter.string(from: self)
     }
-    
+
     /// 년과 월을 문자로 반환합니다.
     func toYearMonthString() -> String {
         let formatter = Date.FormatStyle()
@@ -67,7 +52,6 @@ extension Date {
     }
 }
 
-// Date 확장으로 날짜 문자열 포맷 추가
 extension Date {
     /// 기존 호출부 호환을 위해 Date 확장에 남겨둔 wrapper입니다.
     /// 실제 키 생성 규칙은 `ReadingDateKey`가 단일 소스로 관리합니다.
@@ -79,7 +63,7 @@ extension Date {
     func toYearMonthDayString() -> String {
         readingDateKey.rawValue
     }
-    
+
     /// 04:00 AM을 기준으로 날짜를 조정하여 "yyyy-MM-dd" 형식으로 반환
     /// 정책 계산은 `DayBoundaryProviding`/`ReadingDateKey`로 위임하고, 호출부 호환을 위해 wrapper를 유지합니다.
     func toAdjustedYearMonthDayString(hourOffset: Int = -4) -> String {
@@ -90,7 +74,7 @@ extension Date {
         }
         return DayBoundary.shared.adjustedDayKey(from: self).rawValue
     }
-    
+
     /// 기준 시각으로 조정된 날짜 반환
     func adjustedDate(hourOffset: Int = -4) -> Date {
         guard hourOffset == -4 else {
@@ -115,12 +99,5 @@ extension Date {
     var onlyDate: Date {
         let component = Calendar.app.dateComponents([.year, .month, .day], from: self)
         return Calendar.app.date(from: component) ?? Date()
-    }
-    
-    /// 날짜에 지정된 일(day)을 추가하거나 감소합니다.
-    /// - Parameter days: 추가하거나 뺄 일수 (음수 값을 전달하면 감소)
-    /// - Returns: 지정된 일수를 더하거나 뺀 새로운 날짜
-    func addingDays(_ days: Int) -> Date {
-        return Calendar.app.date(byAdding: .day, value: days, to: self) ?? Date()
     }
 }

@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct MainHomeView: View {
-    // Derived UI State
     private enum HomeState {
         case reading(book: FGUserBook)
         case hasCompletedNoReading
@@ -110,7 +109,6 @@ struct MainHomeView: View {
                     .padding(.bottom, 22)
                     .padding(.horizontal, 20)
 
-                // Home Main Section
                 homeMainSection
                     .padding(.bottom, 12)
                     .shadow(color: .black.opacity(0.04), radius: 2, x: 0, y: 4)
@@ -333,7 +331,6 @@ struct MainHomeView: View {
         let deleted = await viewModel.deleteBook(id: bookToDelete.id)
         guard deleted else { return }
 
-        // 삭제 후 인덱스 업데이트
         if readingBooks.isEmpty {
             selectedBookIndex = nil
         } else if index >= readingBooks.count {
@@ -382,8 +379,6 @@ struct MainHomeView: View {
 }
 
 #if DEBUG
-// 이 프리뷰는 "읽는 책 있음" 화면을 바로 열어,
-// 입력 없이도 이 분기 UI가 맞는지 빠르게 확인하려고 만든 예시입니다.
 #Preview("읽는 책 있음") {
     MainHomeView(
         viewModel: PreviewSupport.makeMainHomeViewModel()
@@ -391,8 +386,6 @@ struct MainHomeView: View {
     .environment(PreviewSupport.makeCoordinator())
 }
 
-// 이 프리뷰는 "읽는 책 없음 + 완독 있음" 화면을 바로 열어,
-// 입력 없이도 이 분기 UI가 맞는지 빠르게 확인하려고 만든 예시입니다.
 #Preview("읽는 책 없음 + 완독 있음") {
     MainHomeView(
         viewModel: PreviewSupport.makeMainHomeViewModel(
@@ -403,8 +396,6 @@ struct MainHomeView: View {
     .environment(PreviewSupport.makeCoordinator())
 }
 
-// 이 프리뷰는 "읽는 책/완독 모두 없음" 화면을 바로 열어,
-// 입력 없이도 이 분기 UI가 맞는지 빠르게 확인하려고 만든 예시입니다.
 #Preview("읽는 책/완독 모두 없음") {
     MainHomeView(
         viewModel: PreviewSupport.makeMainHomeViewModel(

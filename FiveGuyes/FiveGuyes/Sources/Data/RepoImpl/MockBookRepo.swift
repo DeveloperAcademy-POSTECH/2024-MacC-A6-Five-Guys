@@ -67,7 +67,6 @@ actor MockBookRepo: BookRepo {
             throw RepoError.notFound
         }
         let oldBook = books[index]
-        // bookMetaData는 let이므로 책 전체를 새로 생성
         let updatedBook = FGUserBook(
             id: oldBook.id,
             bookMetaData: metaData,
@@ -87,7 +86,6 @@ actor MockBookRepo: BookRepo {
         books[index] = updatedBook
     }
 
-    // Mock 데이터 설정 헬퍼
     func setBooks(_ books: [FGUserBook]) {
         self.books = books
     }

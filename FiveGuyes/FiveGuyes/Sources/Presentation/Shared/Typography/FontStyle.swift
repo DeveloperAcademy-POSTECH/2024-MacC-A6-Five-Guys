@@ -10,7 +10,7 @@ import Foundation
 /// 텍스트 스타일 속성을 정의하는 열거형
 enum FontStyle {
     case title1, title2, title3, body, caption1, caption2
-    
+
     var size: CGFloat {
         switch self {
         case .title1: return 24

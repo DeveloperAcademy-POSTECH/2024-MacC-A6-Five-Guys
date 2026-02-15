@@ -52,8 +52,6 @@ enum PreviewBookFixtureFactory {
     }
 }
 
-// 화면 값은 메인 스레드에서만 바꿔야 안전합니다.
-// 이 표시를 붙여, 다른 스레드가 끼어들어 상태가 꼬이는 일을 막습니다.
 @MainActor
 extension PreviewSupport {
     static var sampleReadingBook: FGUserBook {
@@ -72,8 +70,6 @@ extension PreviewSupport {
         ]
     }
 
-    // 화면 분기를 확인할 때 쓸 샘플 책을 빠르게 만드는 함수입니다.
-    // 완독/미완독 상태를 쉽게 바꿔 다양한 화면을 검증합니다.
     static func makeBook(
         title: String,
         isCompleted: Bool,

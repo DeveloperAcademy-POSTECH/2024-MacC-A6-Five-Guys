@@ -12,72 +12,66 @@ import SwiftUI
 /// - 날짜 범위 선택, 시작/끝 날짜, 제외 날짜 등의 상태를 `CalendarCellModel`을 통해 관리.
 struct CalendarGridView: View {
     // MARK: - Properties
-    
+
     /// 현재 그리드가 표시할 월
     let month: Date
-    
+
     /// 캘린더의 행 간 간격
     private let weekSpacing: CGFloat = 21
-    
+
     /// 캘린더의 열 구성 (7열: 일~토)
     private let gridColumns: [GridItem] = Array(repeating: GridItem(.flexible(), spacing: 0), count: 7)
-    
+
     /// 캘린더 계산기를 통한 날짜 계산
     let calendarCalculator: CalendarCalculator
-    
+
     /// 캘린더 셀의 상태와 로직을 관리하는 모델
     @ObservedObject var calendarCellModel: CalendarCellModel
     @ObservedObject private var toastViewModel: ToastViewModel
-    
+
     init(month: Date, calendarCalculator: CalendarCalculator, calendarCellModel: CalendarCellModel, toastViewModel: ToastViewModel) {
         self.month = month
         self.calendarCalculator = calendarCalculator
         self.calendarCellModel = calendarCellModel
         self.toastViewModel = toastViewModel
     }
-    
+
     var body: some View {
         let daysInMonth = calendarCalculator.numberOfDays(in: month)
-        
-        // 첫 주의 시작 요일을 계산 (일요일을 기준으로 0부터 시작)
+
         let firstWeekday = calendarCalculator.firstWeekdayOfMonth(in: month) - 1
-        
-        // 전체 셀의 개수 (빈 칸 + 해당 월의 날짜)
+
         let totalCells = daysInMonth + firstWeekday
-        
+
         VStack(spacing: 16) {
-            // 월 표시
             Text(month.toYearMonthString())
                 .foregroundStyle(Color.Labels.primaryBlack1)
                 .fontStyle(.title3, weight: .semibold)
-            
+
             LazyVGrid(columns: gridColumns, spacing: weekSpacing) {
                 ForEach(0..<totalCells, id: \.self) { index in
                     if index < firstWeekday {
-                        // 첫 주의 빈 칸
                         emptyCell()
                     } else {
-                        // 해당 날짜 계산
                         let day = index - firstWeekday + 1
                         let date = calendarCalculator.dateForDay(index - firstWeekday, inMonth: month)
-                        
-                        // 날짜 셀 렌더링
+
                         calendarGridCell(day: day, date: date)
                     }
                 }
             }
         }
     }
-    
+
     // MARK: - Cell Views
-    
+
     /// 빈 셀을 렌더링 (첫 주의 빈 칸)
     private func emptyCell() -> some View {
         Rectangle()
             .fill(.clear)
             .frame(height: 44)
     }
-    
+
     /// 날짜 셀을 렌더링
     /// - Parameters:
     ///   - day: 날짜 숫자 (1~31)
@@ -92,7 +86,7 @@ struct CalendarGridView: View {
             handleCellTap(for: date)
         }
     }
-    
+
     /// 셀의 텍스트 (날짜) 렌더링
     /// - Parameters:
     ///   - day: 날짜 숫자 (1~31)
@@ -100,7 +94,7 @@ struct CalendarGridView: View {
     private func cellDayText(day: Int, date: Date) -> some View {
         let isPastDate = calendarCellModel.isPastDate(for: date)
         let isStartOrEndDate = calendarCellModel.isStartOrEndDate(for: date)
-        
+
         return Text("\(day)")
             .foregroundStyle(
                 isStartOrEndDate
@@ -112,12 +106,12 @@ struct CalendarGridView: View {
                        weight: isStartOrEndDate ? .semibold : .regular
             )
     }
-    
+
     /// 셀의 배경 렌더링
     /// - Parameter date: 해당 날짜
     private func cellBackground(for date: Date) -> some View {
         let isPastDate = calendarCellModel.isPastDate(for: date)
-        
+
         return HStack(spacing: 0) {
             if calendarCellModel.isStartOrEndDate(for: date) {
                 ZStack {
@@ -136,7 +130,6 @@ struct CalendarGridView: View {
                             }
                         }
                     }
-                    // 시작/끝 날짜 강조
                     Circle()
                         .fill(isPastDate ? Color.Separators.green : Color.Colors.green1)
                 }
@@ -149,7 +142,7 @@ struct CalendarGridView: View {
             }
         }
     }
-    
+
     // MARK: - Actions
 
     /// 셀 탭 이벤트 처리
@@ -162,8 +155,6 @@ struct CalendarGridView: View {
 }
 
 #if DEBUG
-// 이 프리뷰는 "기본 상태" 화면을 바로 열어,
-// 입력 없이도 이 분기 UI가 맞는지 빠르게 확인하려고 만든 예시입니다.
 #Preview("기본 상태") {
     let today = Date()
     CalendarGridView(
@@ -174,21 +165,11 @@ struct CalendarGridView: View {
     )
 }
 
-// 이 프리뷰는 "기간 선택 확정 상태" 화면을 바로 열어,
-// 입력 없이도 이 분기 UI가 맞는지 빠르게 확인하려고 만든 예시입니다.
 #Preview("기간 선택 확정 상태") {
-    // 계산 기준이 흔들리지 않게 오늘 날짜를 먼저 고정합니다.
-    // 기준이 매번 바뀌면 같은 프리뷰가 다르게 보여 디버깅이 어려워집니다.
     let today = DefaultReadingDateProvider().today()
     let calendar = Calendar.app
-    // 시작 날짜를 명확히 정해 둡니다.
-    // 그래야 이후 페이지 계산과 캘린더 표시가 같은 기준으로 움직입니다.
     let startDate = calendar.date(byAdding: .day, value: 1, to: today) ?? today
-    // 종료 날짜를 정해 목표 기간 길이를 확정합니다.
-    // 이 값이 없으면 하루 목표 계산 자체를 할 수 없습니다.
     let endDate = calendar.date(byAdding: .day, value: 7, to: today) ?? today
-    // 쉬는 날이 선택된 상황을 재현하려고 샘플 날짜를 하나 넣습니다.
-    // 이 값이 있어야 제외일 관련 캘린더 표시가 올바른지 확인할 수 있습니다.
     let excludedDate = calendar.date(byAdding: .day, value: 3, to: today) ?? today
 
     CalendarGridView(

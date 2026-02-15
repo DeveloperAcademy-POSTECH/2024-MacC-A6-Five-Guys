@@ -54,9 +54,7 @@ struct ReadingDateKey: Hashable, Comparable, Codable, Sendable {
     private static func makeFormatter(timeZone: TimeZone) -> DateFormatter {
         let formatter = DateFormatter()
         formatter.calendar = Calendar(identifier: .gregorian)
-        // 저장 키 포맷을 사용자 locale 변화와 분리하기 위한 고정 규칙입니다.
         formatter.locale = Locale(identifier: "en_US_POSIX")
-        // 도메인 날짜 기준(현재 Asia/Seoul)을 formatter에도 동일하게 적용합니다.
         formatter.timeZone = timeZone
         formatter.dateFormat = "yyyy-MM-dd"
         return formatter

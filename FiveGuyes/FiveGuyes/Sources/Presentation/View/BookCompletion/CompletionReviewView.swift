@@ -9,17 +9,15 @@ import SwiftUI
 
 struct CompletionReviewView: View {
     private let placeholder: String = "책 속 한 줄이 남긴 여운은 무엇인가요?"
-    
+
     @State private var viewModel: CompletionReviewViewModel
     @FocusState private var isFocusedTextEditor: Bool
     @ObservedObject private var keyboardObserver = KeyboardObserver()
-    
+
     @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
-    
-    // 업데이트 상황을 나타내는 불 변수
+
     var isUpdateMode: Bool = false
-        
-    // 외부에서 주입받을 수 있는 책 변수
+
     let userBook: FGUserBook
 
     init(
@@ -31,14 +29,14 @@ struct CompletionReviewView: View {
         self.userBook = userBook
         _viewModel = State(initialValue: viewModel)
     }
-    
+
     var body: some View {
         @Bindable var bindableViewModel = viewModel
         let title = userBook.bookMetaData.title
-        
+
         ZStack {
             Color.Fills.white.ignoresSafeArea()
-            
+
             VStack(spacing: 24) {
                 VStack(alignment: .leading, spacing: 24) {
                     VStack(alignment: .leading, spacing: 0) {
@@ -48,7 +46,7 @@ struct CompletionReviewView: View {
                     .fontStyle(.title1, weight: .semibold)
                     .foregroundStyle(Color.Labels.primaryBlack1)
                     .lineLimit(1)
-                    
+
                     TextEditor(text: $bindableViewModel.reflectionText)
                         .customStyleEditor(
                             placeholder: placeholder,
@@ -58,9 +56,9 @@ struct CompletionReviewView: View {
                         .focused($isFocusedTextEditor)
                 }
                 .padding(.horizontal, 20)
-                
+
                 Spacer()
-                
+
                 if keyboardObserver.keyboardIsVisible {
                     Button {
                         Task {
@@ -104,8 +102,6 @@ struct CompletionReviewView: View {
 }
 
 #if DEBUG
-// 이 프리뷰는 "완독 소감 작성" 화면을 바로 열어,
-// 입력 없이도 이 분기 UI가 맞는지 빠르게 확인하려고 만든 예시입니다.
 #Preview("완독 소감 작성") {
     let service = PreviewBookManagementService()
 
@@ -120,8 +116,6 @@ struct CompletionReviewView: View {
     .environment(PreviewSupport.makeCoordinator())
 }
 
-// 이 프리뷰는 "완독 소감 수정" 화면을 바로 열어,
-// 입력 없이도 이 분기 UI가 맞는지 빠르게 확인하려고 만든 예시입니다.
 #Preview("완독 소감 수정") {
     let reviewedBook = PreviewSupport.makeBook(
         title: "소감이 있는 도서",

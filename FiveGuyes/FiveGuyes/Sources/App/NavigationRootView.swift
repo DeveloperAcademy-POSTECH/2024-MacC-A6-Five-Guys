@@ -19,7 +19,7 @@ struct NavigationRootView: View {
 
     var body: some View {
         NavigationStack(path: $coordinator.paths) {
-            
+
             coordinator.navigate(to: .mainHome)
                 .navigationDestination(for: Screens.self) { screen in
                     coordinator.navigate(to: screen)

@@ -9,39 +9,38 @@ import SwiftUI
 
 struct CompletedBooksView: View {
     @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
-    
+
     @State private var selectedBookIndex: Int = 0
     @State var showCompletionAlert: Bool = false
-    
+
     var completedBooks: [FGUserBook]
     let onDeleteBook: @MainActor (UUID) async -> Bool
-    
+
     let completionAlertMessage = "정말로 내용을 삭제할까요?"
     let completionAlertText = "삭제 후에는 복원할 수 없어요"
-    
+
     var body: some View {
         let completedBooks = Array(completedBooks.reversed())
-        
+
         VStack(alignment: .leading, spacing: 16) {
             HStack {
                 Text("완독 리스트")
                     .fontStyle(.title1, weight: .semibold)
                     .foregroundStyle(Color.Labels.primaryBlack1)
-                
+
                 Spacer()
             }
             .padding(.horizontal, 20)
-            
+
             if !completedBooks.isEmpty {
                 let safeSelectedIndex = min(selectedBookIndex, completedBooks.count - 1)
 
                 VStack(alignment: .leading, spacing: 16) {
-                    // 가로 스크롤로 completedBooks 보여주기
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 20) {
                             ForEach(completedBooks.indices, id: \.self) { index in
                                 let book = completedBooks[index]
-                                
+
                                 VStack(alignment: .leading, spacing: 6) {
                                     if let coverURL = book.bookMetaData.coverImageURL, let url = URL(string: coverURL) {
                                         AsyncImage(url: url) { image in
@@ -60,7 +59,7 @@ struct CompletedBooksView: View {
                                             .frame(width: 115, height: 178)
                                             .clipToBookShape()
                                     }
-                                    
+
                                     VStack(alignment: .leading, spacing: 0) {
                                         Text(book.bookMetaData.title)
                                             .fontStyle(.caption1, weight: .semibold)
@@ -80,29 +79,28 @@ struct CompletedBooksView: View {
                         }
                         .padding(.horizontal, 20)
                     }
-                    
-                    // 선택된 책의 소감문 및 기타 정보 표시
+
                     let selectedBook = completedBooks[safeSelectedIndex]
-                    
+
                     VStack(alignment: .leading, spacing: 10) {
                         Text(selectedBook.completionStatus.reviewAfterCompletion)
                             .fontStyle(.body)
                             .foregroundStyle(Color.Labels.primaryBlack1)
                             .padding(.bottom, 10)
-                        
+
                         HStack {
                             Text("\(selectedBook.userSettings.targetEndDate.toKoreanDateStringWithoutYear()) 완독완료")
                             Spacer()
-                            
+
                             Menu {
                                 Button {
                                     navigationCoordinator.push(.completionReviewUpdate(book: completedBooks[safeSelectedIndex]))
                                 } label: {
                                     Label("내용 수정하기", systemImage: "pencil")
                                 }
-                                
+
                                 Divider()
-                                
+
                                 Button(role: .destructive) {
                                     showCompletionAlert = true
                                 } label: {
@@ -126,9 +124,9 @@ struct CompletedBooksView: View {
                         RoundedRectangle(cornerRadius: 16)
                             .foregroundStyle(Color.Fills.lightGreen)
                     }
-                    .padding(.horizontal, 20)    
+                    .padding(.horizontal, 20)
                 }
-                
+
             } else {
                 Rectangle()
                     .frame(width: 115, height: 178)
@@ -169,8 +167,6 @@ struct CompletedBooksView: View {
 }
 
 #if DEBUG
-// 이 프리뷰는 "완독 도서 있음" 화면을 바로 열어,
-// 입력 없이도 이 분기 UI가 맞는지 빠르게 확인하려고 만든 예시입니다.
 #Preview("완독 도서 있음") {
     NavigationStack {
         CompletedBooksView(
@@ -184,8 +180,6 @@ struct CompletedBooksView: View {
     .environment(PreviewSupport.makeCoordinator())
 }
 
-// 이 프리뷰는 "완독 도서 없음" 화면을 바로 열어,
-// 입력 없이도 이 분기 UI가 맞는지 빠르게 확인하려고 만든 예시입니다.
 #Preview("완독 도서 없음") {
     NavigationStack {
         CompletedBooksView(

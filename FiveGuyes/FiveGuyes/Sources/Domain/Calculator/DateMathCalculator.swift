@@ -9,13 +9,11 @@ import Foundation
 
 /// 날짜 및 일수 계산을 담당하는 Pure Function 수학 유틸리티
 struct DateMathCalculator {
-    // 날짜 계산 규칙을 따로 분리해 둔 유틸입니다.
-    // 규칙이 바뀌어도 이 파일만 고치면 되어 영향 범위가 작아집니다.
 
     // MARK: - Error Types
 
     enum MathError: Error {
-        case invalidDateOrder    // startDate > endDate인 경우
+        case invalidDateOrder
     }
 
     // MARK: - Public Methods
@@ -29,30 +27,19 @@ struct DateMathCalculator {
     /// - Throws:
     ///   - `MathError.invalidDateOrder`: startDate가 endDate보다 미래인 경우
     func daysBetween(from startDate: Date, to endDate: Date) throws -> Int {
-        // 날짜 정규화: 시간 정보를 제거하고 날짜만 비교
         let normalizedStart = startDate.onlyDate
         let normalizedEnd = endDate.onlyDate
 
-        // 날짜 순서 검증
         guard normalizedStart <= normalizedEnd else {
             throw MathError.invalidDateOrder
         }
 
-        // Calendar.app을 사용하여 날짜 차이 계산
         let gap = Calendar.app.getDaysBetween(from: normalizedStart, to: normalizedEnd)
 
-        // 양 끝 날짜 포함 (inclusive): gap이 0이면 같은 날 → 1일
         return gap + 1
     }
 
     /// 시작~종료 날짜 사이에서 제외일을 제외한 유효 일수를 계산합니다.
-    ///
-    /// **내부 동작:**
-    /// 1. daysBetween으로 전체 일수 계산
-    /// 2. excludedDates를 Set으로 변환하여 중복 제거
-    /// 3. 구간 [startDate.onlyDate, endDate.onlyDate] 안에 포함된 제외일만 필터링
-    /// 4. totalDays - excludedDaysCount 반환
-    ///
     /// - Parameters:
     ///   - startDate: 시작 날짜
     ///   - endDate: 종료 날짜
@@ -65,22 +52,17 @@ struct DateMathCalculator {
         to endDate: Date,
         excluding excludedDates: [Date]
     ) throws -> Int {
-        // 1. 전체 일수 계산
         let totalDays = try daysBetween(from: startDate, to: endDate)
 
-        // 2. 날짜 정규화
         let normalizedStart = startDate.onlyDate
         let normalizedEnd = endDate.onlyDate
 
-        // 3. 제외일 중복 제거 및 정규화
         let normalizedExcludedDates = Set(excludedDates.map { $0.onlyDate })
 
-        // 4. 구간 [startDate, endDate] 안에 포함된 제외일만 필터링
         let excludedDaysCount = normalizedExcludedDates.filter { excludedDate in
             excludedDate >= normalizedStart && excludedDate <= normalizedEnd
         }.count
 
-        // 5. 유효 일수 = 전체 일수 - 제외일 수
         return totalDays - excludedDaysCount
     }
 }

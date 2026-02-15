@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ToastView: View {
     @ObservedObject var viewModel: ToastViewModel
-    
+
     var body: some View {
         ZStack {
             VStack {
@@ -33,7 +33,7 @@ struct ToastView: View {
 
 struct ToastTestView: View {
     @StateObject private var toastViewModel = ToastViewModel()
-    
+
     var body: some View {
         ZStack {
             VStack(spacing: 20) {

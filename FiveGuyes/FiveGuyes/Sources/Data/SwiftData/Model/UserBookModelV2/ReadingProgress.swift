@@ -13,7 +13,7 @@ final class ReadingProgress {
     var readingRecords: [String: ReadingRecord]
     var lastReadDate: Date?
     var lastPagesRead: Int = 1
-    
+
     init(readingRecords: [String: ReadingRecord] = [:], lastReadDate: Date? = nil, lastPagesRead: Int = 1) {
         self.readingRecords = readingRecords
         self.lastReadDate = lastReadDate

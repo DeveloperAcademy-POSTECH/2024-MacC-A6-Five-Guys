@@ -10,7 +10,7 @@ import SwiftData
 
 enum UserBookSchemaV2: VersionedSchema {
     static var versionIdentifier = Schema.Version(2, 0, 0)
-        
+
     static var models: [any PersistentModel.Type] {
         [UserBookV2.self]
     }
@@ -20,7 +20,7 @@ extension UserBookSchemaV2 {
     @Model
     final class UserBookV2: Identifiable {
         @Attribute(.unique) var id: UUID
-        
+
         @Relationship(deleteRule: .cascade)
         var bookMetaData: BookMetaData
         @Relationship(deleteRule: .cascade)
@@ -29,7 +29,7 @@ extension UserBookSchemaV2 {
         var readingProgress: ReadingProgress
         @Relationship(deleteRule: .cascade)
         var completionStatus: CompletionStatus
-        
+
         // MARK: init
         init(
             id: UUID = UUID(),

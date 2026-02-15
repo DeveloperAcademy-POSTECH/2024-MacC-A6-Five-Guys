@@ -74,10 +74,8 @@ final class SwiftDataBookRepo: BookRepo {
     func updateBook(_ book: FGUserBook) async throws {
         let swiftDataBook = try await findSwiftDataBook(by: book.id)
 
-        // 기존 책 데이터를 DTO를 기준으로 업데이트
         updateSwiftDataModel(swiftDataBook, with: book)
 
-        // 저장
         do {
             try modelContext.save()
         } catch {
@@ -217,7 +215,6 @@ final class SwiftDataBookRepo: BookRepo {
 
             markMigrationCompleted()
         } catch {
-            // 마이그레이션 실패 시 완료 플래그를 올리지 않아 다음 fetch에서 재시도할 수 있게 합니다.
             throw RepoError.fetchFailed
         }
     }
@@ -227,7 +224,6 @@ final class SwiftDataBookRepo: BookRepo {
             return true
         }
 
-        // 하위 호환: 기존 단일 완료 키가 true라면 앱 스코프 키로 승격합니다.
         guard migrationCompletionKey != Self.migrationCompletionVersionKey else {
             return false
         }

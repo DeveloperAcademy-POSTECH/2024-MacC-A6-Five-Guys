@@ -12,46 +12,46 @@ struct UnfinishReadingView: View {
 
     @State private var viewModel: UnfinishReadingViewModel
     private let userBook: FGUserBook
-    
+
     // MARK: - init
-    
+
     init(userBook: FGUserBook, viewModel: UnfinishReadingViewModel) {
         self.userBook = userBook
         _viewModel = State(initialValue: viewModel)
     }
-    
+
     var body: some View {
         VStack(spacing: 0) {
             Spacer()
 
             unfinishTitle("목표 기간 종료!")
                 .padding(.bottom, 16)
-            
+
             unFinishDescription("총 \(userBook.readingProgress.lastReadPage) 쪽까지 읽었어요!\n지속적인 노력이 중요하죠")
                 .padding(.bottom, 90)
-                
+
             userBookImage(book: userBook)
                 .commonShadow()
                 .padding(.bottom, 28)
-            
+
             unfinishMessage("목표 기간을 연장해서\n남은 페이지를 완독할 수 있어요")
                 .padding(.bottom, 80)
-            
+
             HStack(spacing: 16) {
                 cancelButton {
                     Task {
                         await completeAndPopToRoot()
                     }
                 }
-                
+
                 readingDateEtidButton {
                     navigationCoordinator.push(.readingDateEdit(book: userBook))
                 }
             }
             .padding(.horizontal, 20)
-            
+
             Spacer()
-            
+
         }
         .background(Color.Fills.lightGreen.ignoresSafeArea())
         .disableNavigationGesture()
@@ -59,7 +59,7 @@ struct UnfinishReadingView: View {
             markBookAsCompletedInBackground()
         }
     }
-    
+
     private func unfinishTitle(_ text: String) -> some View {
         Text(text)
             .fontStyle(.body, weight: .semibold)
@@ -71,14 +71,14 @@ struct UnfinishReadingView: View {
                     .foregroundStyle(Color.Fills.white)
             }
     }
-    
+
     private func unFinishDescription(_ text: String) -> some View {
         Text(text)
             .fontStyle(.title1, weight: .semibold)
             .foregroundStyle(Color.Labels.primaryBlack1)
             .multilineTextAlignment(.center)
     }
-    
+
     private func userBookImage(book: FGUserBook) -> some View {
         Group {
             if let urlString = book.bookMetaData.coverImageURL {
@@ -98,7 +98,7 @@ struct UnfinishReadingView: View {
         .frame(height: 267)
         .clipToBookShape()
     }
-    
+
     private func unfinishMessage(_ text: String) -> some View {
         Text(text)
             .fontStyle(.caption1)
@@ -111,7 +111,7 @@ struct UnfinishReadingView: View {
                     .foregroundStyle(Color.Fills.white)
             }
     }
-    
+
     private func readingDateEtidButton(actions: @escaping () -> Void) -> some View {
         Button(action: actions) {
             Text("목표 기간 연장하기")
@@ -126,7 +126,7 @@ struct UnfinishReadingView: View {
         }
         .disabled(viewModel.isCompleting)
     }
-    
+
     private func cancelButton(actions: @escaping () -> Void) -> some View {
         Button(action: actions) {
             Text("닫기")
@@ -140,9 +140,9 @@ struct UnfinishReadingView: View {
         }
         .disabled(viewModel.isCompleting)
     }
-    
+
     // MARK: - Helper Methods
-    
+
     @MainActor
     private func completeAndPopToRoot() async {
         let isCompleted = await viewModel.completeBook(userBook)
@@ -160,8 +160,6 @@ struct UnfinishReadingView: View {
 }
 
 #if DEBUG
-// 이 프리뷰는 "기본 상태" 화면을 바로 열어,
-// 입력 없이도 이 분기 UI가 맞는지 빠르게 확인하려고 만든 예시입니다.
 #Preview("기본 상태") {
     let service = PreviewBookManagementService()
 
@@ -180,8 +178,6 @@ struct UnfinishReadingView: View {
     .environment(PreviewSupport.makeCoordinator())
 }
 
-// 이 프리뷰는 "표지 이미지 있는 상태" 화면을 바로 열어,
-// 입력 없이도 이 분기 UI가 맞는지 빠르게 확인하려고 만든 예시입니다.
 #Preview("표지 이미지 있는 상태") {
     let bookWithCover = PreviewSupport.makeBook(
         title: "표지 있는 미완독 도서",
