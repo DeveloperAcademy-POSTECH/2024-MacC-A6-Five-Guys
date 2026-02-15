@@ -28,13 +28,9 @@ final class NotificationManager {
     
     /// 노티를 요청하는 메서드
     func setupAllNotifications(_ readingBook: FGUserBook) async {
-        Task {
-            await self.clearRequests()
-            
-            await self.setupNotifications(notificationType: .morning(readingBook: readingBook))
-            
-            await self.setupNotifications(notificationType: .night(readingBook: readingBook))
-        }
+        await self.clearRequests()
+        await self.setupNotifications(notificationType: .morning(readingBook: readingBook))
+        await self.setupNotifications(notificationType: .night(readingBook: readingBook))
     }
     
     /// 노티를 요청하는 메서드

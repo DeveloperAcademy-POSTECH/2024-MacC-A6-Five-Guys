@@ -236,8 +236,8 @@ private func makeNotiSettingPreviewViewModel(
     isNotificationDisabled: Bool = false,
     isReminderTimePickerVisible: Bool = false
 ) -> NotiSettingViewModel {
-    let notificationManager = PreviewNotificationManager()
-    notificationManager.isAuthorized = isSystemNotificationEnabled
+    let notificationService = PreviewNotificationManager()
+    notificationService.isAuthorized = isSystemNotificationEnabled
 
     let settingsStore = PreviewNotificationSettingsStore(
         isDisabled: isNotificationDisabled,
@@ -246,7 +246,7 @@ private func makeNotiSettingPreviewViewModel(
     )
 
     let viewModel = NotiSettingViewModel(
-        notificationManager: notificationManager,
+        notificationService: notificationService,
         settingsStore: settingsStore
     )
     viewModel.isSystemNotificationEnabled = isSystemNotificationEnabled

@@ -276,6 +276,10 @@ struct PreviewReadingLibraryUseCaseAdapter: ReadingLibraryUsing {
         try await service.rescheduleOnAppOpen(bookId: bookId)
     }
 
+    func setupNotifications(for readingBook: FGUserBook) async {
+        // 프리뷰에서는 실제 알림 스케줄링을 수행하지 않습니다.
+    }
+
     func today() -> Date {
         service.today()
     }

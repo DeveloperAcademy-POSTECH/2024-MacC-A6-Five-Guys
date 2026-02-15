@@ -111,7 +111,7 @@ struct BookSettingsManagerView: View {
         case .bookSearch:
             BookSearchView(
                 viewModel: BookSearchViewModel(
-                    bookSearchStore: appDependencies.makeBookSearchStore()
+                    bookSearchUseCase: appDependencies.bookSearchUseCase
                 )
             )
         case .bookPageSetting:

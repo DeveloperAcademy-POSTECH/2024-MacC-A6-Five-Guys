@@ -20,9 +20,9 @@ final class AppDependencies {
     let bookCompletionUseCase: any BookCompletionUsing
     let readingPlanUseCase: any ReadingPlanUsing
     let bookRegistrationUseCase: any BookRegistrationUsing
-    let notificationManager: any NotificationManaging
+    let notificationService: any NotificationManaging
     let notificationSettingsStore: any NotificationSettingsStoring
-    private var cachedBookSearchStore: (any BookSearching)?
+    let bookSearchUseCase: any BookSearchUsing
 
     init(modelContainer: ModelContainer) {
         let migrationCompletionKey = Self.makeMigrationCompletionKey()
@@ -39,14 +39,14 @@ final class AppDependencies {
         }
 
         let readingDateProvider = DefaultReadingDateProvider()
-        let notificationManager = NotificationManager(todayProvider: readingDateProvider)
+        let notificationService = NotificationManager(todayProvider: readingDateProvider)
         let scheduleCalculator = ReadingScheduleCalculator()
 
         let fetchReadingBooksUseCase = FetchReadingBooksUseCase(repository: repository)
         let fetchCompletedBooksUseCase = FetchCompletedBooksUseCase(repository: repository)
         let deleteBookUseCase = DeleteBookUseCase(
             repository: repository,
-            notificationScheduler: notificationManager
+            notificationScheduler: notificationService
         )
         let rescheduleOnAppOpenUseCase = RescheduleOnAppOpenUseCase(
             repository: repository,
@@ -54,22 +54,22 @@ final class AppDependencies {
         )
         let registerBookUseCase = RegisterBookUseCase(
             repository: repository,
-            notificationScheduler: notificationManager,
+            notificationScheduler: notificationService,
             scheduleCalculator: scheduleCalculator
         )
         let recordReadingUseCase = RecordReadingUseCase(
             repository: repository,
-            notificationScheduler: notificationManager,
+            notificationScheduler: notificationService,
             scheduleCalculator: scheduleCalculator
         )
         let completeBookUseCase = CompleteBookUseCase(
             repository: repository,
-            notificationScheduler: notificationManager
+            notificationScheduler: notificationService
         )
         let updateCompletionReviewUseCase = UpdateCompletionReviewUseCase(repository: repository)
         let updateReadingPlanUseCase = UpdateReadingPlanUseCase(
             repository: repository,
-            notificationScheduler: notificationManager,
+            notificationScheduler: notificationService,
             scheduleCalculator: scheduleCalculator
         )
 
@@ -78,6 +78,7 @@ final class AppDependencies {
             fetchCompletedBooksUseCase: fetchCompletedBooksUseCase,
             deleteBookUseCase: deleteBookUseCase,
             rescheduleOnAppOpenUseCase: rescheduleOnAppOpenUseCase,
+            notificationScheduler: notificationService,
             todayProvider: readingDateProvider
         )
         self.dailyReadingUseCase = DailyReadingUseCase(
@@ -96,18 +97,9 @@ final class AppDependencies {
         self.bookRegistrationUseCase = BookRegistrationUseCase(
             registerBookUseCase: registerBookUseCase
         )
-        self.notificationManager = notificationManager
+        self.notificationService = notificationService
         self.notificationSettingsStore = UserDefaultsNotificationSettingsStore()
-    }
-
-    func makeBookSearchStore() -> any BookSearching {
-        if let cachedBookSearchStore {
-            return cachedBookSearchStore
-        }
-
-        let store = APIStore()
-        self.cachedBookSearchStore = store
-        return store
+        self.bookSearchUseCase = BookSearchUseCase(bookSearchStore: APIStore())
     }
 
     private static func makeMigrationCompletionKey() -> String {

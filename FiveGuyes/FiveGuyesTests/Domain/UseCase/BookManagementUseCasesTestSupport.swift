@@ -71,6 +71,7 @@ struct BookManagementUseCasesTests {
                 repository: repository,
                 scheduleCalculator: ReadingScheduleCalculator()
             ),
+            notificationScheduler: notificationScheduler,
             todayProvider: todayProvider
         )
     }

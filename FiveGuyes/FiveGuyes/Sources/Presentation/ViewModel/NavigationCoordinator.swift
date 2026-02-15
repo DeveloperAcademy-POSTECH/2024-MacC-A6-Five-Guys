@@ -45,15 +45,14 @@ final class NavigationCoordinator {
         case .mainHome:
             MainHomeView(
                 viewModel: MainHomeViewModel(
-                    readingLibraryUseCase: appDependencies.readingLibraryUseCase,
-                    notificationManager: appDependencies.notificationManager
+                    readingLibraryUseCase: appDependencies.readingLibraryUseCase
                 )
             )
         case .notiSetting(book: let book):
             NotiSettingView(
                 userBook: book,
                 viewModel: NotiSettingViewModel(
-                    notificationManager: appDependencies.notificationManager,
+                    notificationService: appDependencies.notificationService,
                     settingsStore: appDependencies.notificationSettingsStore
                 )
             )

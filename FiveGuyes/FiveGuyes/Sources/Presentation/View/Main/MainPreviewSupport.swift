@@ -22,8 +22,7 @@ extension PreviewSupport {
         )
 
         return MainHomeViewModel(
-            readingLibraryUseCase: PreviewReadingLibraryUseCaseAdapter(service: service),
-            notificationManager: PreviewNotificationManager()
+            readingLibraryUseCase: PreviewReadingLibraryUseCaseAdapter(service: service)
         )
     }
 

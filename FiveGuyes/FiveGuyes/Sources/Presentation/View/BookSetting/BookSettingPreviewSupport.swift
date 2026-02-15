@@ -74,7 +74,8 @@ extension PreviewSupport {
         books: [Book],
         selectedBook: Book? = nil
     ) -> BookSearchViewModel {
-        let viewModel = BookSearchViewModel(bookSearchStore: PreviewBookSearchStore(books: books))
+        let useCase = BookSearchUseCase(bookSearchStore: PreviewBookSearchStore(books: books))
+        let viewModel = BookSearchViewModel(bookSearchUseCase: useCase)
         viewModel.books = books
         viewModel.selectedBook = selectedBook
         return viewModel

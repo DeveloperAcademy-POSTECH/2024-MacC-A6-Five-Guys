@@ -15,14 +15,9 @@ final class MainHomeViewModel {
     private(set) var completedBooks: [FGUserBook] = []
 
     private let readingLibraryUseCase: any ReadingLibraryUsing
-    private let notificationManager: any NotificationManaging
 
-    init(
-        readingLibraryUseCase: any ReadingLibraryUsing,
-        notificationManager: any NotificationManaging
-    ) {
+    init(readingLibraryUseCase: any ReadingLibraryUsing) {
         self.readingLibraryUseCase = readingLibraryUseCase
-        self.notificationManager = notificationManager
     }
 
     func loadBooks() async {
@@ -74,6 +69,6 @@ final class MainHomeViewModel {
     func setupNotificationsForCurrentBook() async {
         guard let currentReadingBook = readingBooks.first else { return }
 
-        await notificationManager.setupAllNotifications(currentReadingBook)
+        await readingLibraryUseCase.setupNotifications(for: currentReadingBook)
     }
 }

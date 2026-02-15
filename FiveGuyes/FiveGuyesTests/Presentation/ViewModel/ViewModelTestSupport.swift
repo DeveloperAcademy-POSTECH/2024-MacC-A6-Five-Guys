@@ -124,6 +124,15 @@ enum TestError: Error {
 
 struct ReadingLibraryStubAdapter: ReadingLibraryUsing {
     let service: any BookManagementService
+    let notificationService: (any NotificationManaging)?
+
+    init(
+        service: any BookManagementService,
+        notificationService: (any NotificationManaging)? = nil
+    ) {
+        self.service = service
+        self.notificationService = notificationService
+    }
 
     func fetchLibrarySnapshot() async throws -> ReadingLibrarySnapshot {
         let readingBooks = try await service.fetchReadingBooks()
@@ -137,6 +146,10 @@ struct ReadingLibraryStubAdapter: ReadingLibraryUsing {
 
     func rescheduleOnAppOpen(bookId: UUID) async throws {
         try await service.rescheduleOnAppOpen(bookId: bookId)
+    }
+
+    func setupNotifications(for readingBook: FGUserBook) async {
+        await notificationService?.setupAllNotifications(readingBook)
     }
 
     func today() -> Date {

@@ -111,24 +111,15 @@
 
 ## TD-005: CompletionCelebrationView 날짜 계산/표현 로직 혼재
 
-- Status: Open
+- Status: Resolved (2026-02-15)
 - Context:
-  - `CompletionCelebrationView`가 도메인 today 경계를 사용하지 않고 `Date()`를 직접 사용해 완독 기간 텍스트를 구성합니다.
-  - 시작일/종료일 비교를 날짜 타입이 아닌 문자열 비교로 처리하고 있습니다.
-  - 완독 요약 계산 로직이 View 내부에 남아 있습니다.
-- Risk:
-  - 04:00 하루 경계 규칙과 화면 표시가 어긋날 수 있고, locale/포맷 변경 시 문자열 비교 오류 가능성이 있습니다.
-  - 날짜/요약 규칙이 화면 구현과 결합되어 규칙 변경 시 회귀 위험이 큽니다.
-- Target Layer:
-  - `Domain/UseCase` 또는 `Domain` 계산 경계에서 완독 요약용 데이터 모델 제공
-- Trigger Condition:
-  - 완독 요약 문구 규칙 변경, 날짜 경계 정책 변경, 완료 시나리오 UX 개편 시
-- Priority:
-  - P1
-- Execution Priority:
-  - Next target (현재 1순위)
+  - `CompletionCelebrationView`의 날짜/요약 계산 로직을 `BookCompletionUseCase` 경계로 이동했습니다.
+  - 완독 요약은 `CompletionCelebrationSummary` 모델을 통해 전달되며, today 기준은 `ReadingDateProviding`을 사용합니다.
 - Current Evidence:
   - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Presentation/View/BookCompletion/CompletionCelebrationView.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Presentation/ViewModel/CompletionCelebrationViewModel.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Domain/UseCase/BookManagement/BookManagementCompletionUseCases.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/docs/execplans/td-005-completion-celebration-summary-boundary-execplan.md`
 
 ## TD-006: ViewModel 조립 책임(Composition Root) 상향 필요
 
@@ -197,55 +188,102 @@
 
 ## TD-008: 알림 스케줄링 async 계약 불명확성
 
+- Status: Resolved (2026-02-16)
+- Context:
+  - `NotificationManager.setupAllNotifications`에서 내부 fire-and-forget `Task`를 제거했습니다.
+  - 호출 경계에서 `clearRequests -> morning -> night`가 직렬 `await`로 실제 완료됩니다.
+  - `NotificationManaging` 의존 변수명을 `notificationService`로 통일해 Service 용어 규칙을 맞췄습니다.
+- Current Evidence:
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Platform/Notification/NotificationManager.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Presentation/ViewModel/NotiSettingViewModel.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/App/AppDependencies.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyesTests/Presentation/ViewModel/NotiSettingViewModelTests.swift`
+
+## TD-009: UseCase-first 경계 드리프트(엄격 기준)
+
+- Status: Resolved (2026-02-16)
+- Context:
+  - `MainHomeViewModel`의 인프라 직접 의존을 제거하고 `ReadingLibraryUsing.setupNotifications(for:)` 경유로 이동했습니다.
+  - `BookSearchViewModel`의 `BookSearching` 직접 의존을 제거하고 `BookSearchUsing` 경계를 도입했습니다.
+  - `BookManagementUseCases` 단일 파일을 기능군 3파일로 분리해 UseCase 경계 탐색성과 유지보수성을 개선했습니다.
+- Current Evidence:
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Presentation/ViewModel/MainHomeViewModel.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Presentation/ViewModel/BookSearchViewModel.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Domain/UseCase/BookSearch/BookSearchUseCase.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Domain/UseCase/BookManagement/BookManagementLibraryAndRegistrationUseCases.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Domain/UseCase/BookManagement/BookManagementDailyAndPlanUseCases.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Domain/UseCase/BookManagement/BookManagementCompletionUseCases.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/App/AppDependencies.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/docs/decisions/adr-0002-usecase-first-boundary.md`
+
+## TD-010: 알림 일괄 등록 시 권한 체크 중복 호출
+
 - Status: Open
 - Context:
-  - `NotificationManager.setupAllNotifications`는 `async` 메서드이지만 내부에서 fire-and-forget `Task`를 생성합니다.
-  - 호출부 UseCase는 `await`로 순서를 맞춘다고 가정하나, 실제로는 내부 작업 완료 시점이 호출 경계와 분리됩니다.
+  - `NotificationManager.setupAllNotifications`는 내부에서 morning/night를 각각 호출하고, 각 호출에서 `canSendNotifications -> requestAuthorization`를 다시 수행합니다.
+  - 동일 흐름에서 권한/앱 설정 판단이 중복됩니다.
 - Risk:
-  - 호출 순서 보장과 테스트 결정성이 약해져 타이밍 의존 회귀를 만들 수 있습니다.
-  - 알림 초기화/재등록 시점이 기능 흐름(등록/기록/계획수정)과 어긋날 수 있습니다.
+  - 불필요한 권한 상태 조회가 누적되어 알림 등록 성능과 비동기 결정성이 흔들릴 수 있습니다.
+  - 추후 권한 처리 정책 변경 시 수정 지점이 분산될 수 있습니다.
 - Target Layer:
-  - `Platform/Notification` 경계에서 명시적 async 완료 계약 보장
-  - `Domain/UseCase`의 `await` 의미와 실제 부작용 완료 시점 일치
+  - `Platform/Notification`에서 일괄 등록 기준 단일 권한 체크 보장
 - Trigger Condition:
-  - 알림 관련 회귀, 타이밍 이슈, 비동기 결정성 테스트 강화 작업 착수 시
+  - 알림 등록/권한 처리 정책 변경, 비동기 성능 점검 시
 - Priority:
   - P2
 - Current Evidence:
   - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Platform/Notification/NotificationManager.swift`
-  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Domain/UseCase/BookManagement/BookManagementUseCases.swift`
 - Suggested Follow-up:
-  1. `setupAllNotifications` 내부 fire-and-forget `Task` 제거 또는 명시적 완료 동기화 구조로 전환
-  2. UseCase 테스트에서 알림 스케줄링 완료 시점을 검증할 수 있는 contract 테스트 추가
+  1. `setupAllNotifications` 진입 시 권한 체크 1회 수행 후 morning/night 스케줄링 실행
+  2. 권한 체크 실패 시 조기 반환 계약을 테스트로 명시
 
-## TD-009: UseCase-first 경계 드리프트(엄격 기준)
+## TD-011: ReadingLibraryUseCase 응집도 저하 (조회 + 홈 알림 트리거 혼합)
 
 - Status: Open
 - Context:
-  - ADR-0002 기준은 Presentation(ViewModel)에서 도메인 실행 단위를 UseCase로 직접 호출하는 구조를 고정합니다.
-  - 현재 `MainHomeViewModel`은 `NotificationManaging`을, `BookSearchViewModel`은 `BookSearching`을 직접 의존해 UseCase-first 경계가 일부 완화되어 있습니다.
+  - `ReadingLibraryUsing`에 홈 진입 알림 실행용 `setupNotifications(for:)`가 포함되어, 도서 조회/삭제 책임과 홈 라이프사이클 부작용 책임이 결합되어 있습니다.
 - Risk:
-  - ViewModel 경계 의미가 화면별로 달라져 DI 조립 기준이 분산될 수 있습니다.
-  - 인프라 의존이 Presentation으로 확산되면 ADR 용어/규칙(`UseCase` vs `Service`) 일관성이 약화됩니다.
+  - 홈 전용 사이드이펙트가 ReadingLibrary 경계로 계속 유입될 수 있습니다.
+  - 기능 경계 의미가 확장되며 UseCase 탐색/유지보수 비용이 커집니다.
 - Target Layer:
-  - `ViewModel -> UseCase` 단일 실행 경계 유지
-  - 인프라 연동은 UseCase 내부 조합 또는 UseCase 어댑터로 캡슐화
+  - 홈 라이프사이클 전용 UseCase 또는 오케스트레이션 경계 분리
 - Trigger Condition:
-  - 홈/검색 플로우 수정, DI 표준화, 아키텍처 정리 스프린트 착수 시
+  - 홈 진입 플로우 확장, 추가 사이드이펙트 도입 시
 - Priority:
   - P2
 - Current Evidence:
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Domain/UseCase/BookManagement/BookManagementLibraryAndRegistrationUseCases.swift`
   - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Presentation/ViewModel/MainHomeViewModel.swift`
-  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Presentation/ViewModel/BookSearchViewModel.swift`
-  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/docs/decisions/adr-0002-usecase-first-boundary.md`
 - Suggested Follow-up:
-  1. 홈 알림 등록 경로를 UseCase 경유로 이동해 `MainHomeViewModel`의 인프라 직접 의존 제거
-  2. 검색 기능도 UseCase/Facade 경계로 래핑해 Presentation의 `BookSearching` 직접 의존 제거
-  3. `NavigationCoordinator`/`AppDependencies` 조립 템플릿에 UseCase-first 규칙을 명시
+  1. 홈 진입 오케스트레이션 전용 `...Using` 경계 분리 검토
+  2. ReadingLibrary 경계는 조회/삭제/재스케줄 도메인 책임으로 다시 축소
+
+## TD-012: Preview/Test 어댑터 매핑 중복
+
+- Status: Open
+- Context:
+  - `BookManagementService -> ...Using` 매핑 어댑터가 Preview와 Test 지원 파일에 유사 로직으로 중복되어 있습니다.
+- Risk:
+  - 인터페이스 변경 시 양쪽 동시 수정 누락 가능성이 높아집니다.
+  - 테스트/프리뷰 행위 불일치가 숨은 회귀를 만들 수 있습니다.
+- Target Layer:
+  - Preview/Test 공통 어댑터 재사용 또는 단일 팩토리 경계
+- Trigger Condition:
+  - `...Using` 인터페이스 변경, 프리뷰/테스트 인프라 리팩토링 시
+- Priority:
+  - P3
+- Current Evidence:
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Presentation/Preview/PreviewSupport.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyesTests/Presentation/ViewModel/ViewModelTestSupport.swift`
+- Suggested Follow-up:
+  1. 공통 어댑터 타입 또는 빌더를 도입해 중복 제거
+  2. 인터페이스 변경 시 단일 수정 지점으로 정리
 
 ## Recommended Execution Order
 
-1. TD-005: CompletionCelebrationView 날짜/요약 경계화 (P1)
-2. TD-008: 알림 스케줄링 async 계약 정리 (P2)
-3. TD-009: UseCase-first 경계 일관화 (P2)
-4. 나머지 P2/P3 항목 순차 정리
+1. TD-008: 알림 스케줄링 async 계약 정리 (P2) - Resolved (2026-02-16)
+2. TD-009: UseCase-first 경계 일관화 (P2) - Resolved (2026-02-16)
+3. TD-010: 알림 일괄 등록 권한 체크 중복 제거 (P2)
+4. TD-011: ReadingLibraryUseCase 책임 재분리 (P2)
+5. TD-012: Preview/Test 어댑터 중복 제거 (P3)
+6. 나머지 Open P2/P3 항목 순차 정리

@@ -19,17 +19,19 @@ struct MainHomeViewModelTests {
         let service = BookManagementServiceStub(book: firstBook)
         service.fetchReadingBooksResult = [firstBook, secondBook]
         service.fetchCompletedBooksResult = []
-        let notificationManager = NotificationManagerStub()
+        let notificationService = NotificationManagerStub()
         let viewModel = MainHomeViewModel(
-            readingLibraryUseCase: ReadingLibraryStubAdapter(service: service),
-            notificationManager: notificationManager
+            readingLibraryUseCase: ReadingLibraryStubAdapter(
+                service: service,
+                notificationService: notificationService
+            )
         )
 
         await viewModel.loadBooks()
         await viewModel.setupNotificationsForCurrentBook()
 
-        #expect(notificationManager.setupAllNotificationsCallCount == 1)
-        #expect(notificationManager.setupAllNotificationsBookIDs == [firstBook.id])
+        #expect(notificationService.setupAllNotificationsCallCount == 1)
+        #expect(notificationService.setupAllNotificationsBookIDs == [firstBook.id])
     }
 
     @Test("MainHomeViewModel: 읽는 책이 없으면 알림 재설정 생략")
@@ -37,16 +39,18 @@ struct MainHomeViewModelTests {
         let service = BookManagementServiceStub()
         service.fetchReadingBooksResult = []
         service.fetchCompletedBooksResult = []
-        let notificationManager = NotificationManagerStub()
+        let notificationService = NotificationManagerStub()
         let viewModel = MainHomeViewModel(
-            readingLibraryUseCase: ReadingLibraryStubAdapter(service: service),
-            notificationManager: notificationManager
+            readingLibraryUseCase: ReadingLibraryStubAdapter(
+                service: service,
+                notificationService: notificationService
+            )
         )
 
         await viewModel.loadBooks()
         await viewModel.setupNotificationsForCurrentBook()
 
-        #expect(notificationManager.setupAllNotificationsCallCount == 0)
+        #expect(notificationService.setupAllNotificationsCallCount == 0)
     }
 
     @Test("MainHomeViewModel: 목표일 초과 책을 재스케줄 결과로 반환")
@@ -58,11 +62,7 @@ struct MainHomeViewModelTests {
         service.fetchReadingBooksResult = [overdueBook]
         service.fetchCompletedBooksResult = []
         service.rescheduleOnAppOpenError = ScheduleCalculationError.targetDatePassed
-        let notificationManager = NotificationManagerStub()
-        let viewModel = MainHomeViewModel(
-            readingLibraryUseCase: ReadingLibraryStubAdapter(service: service),
-            notificationManager: notificationManager
-        )
+        let viewModel = MainHomeViewModel(readingLibraryUseCase: ReadingLibraryStubAdapter(service: service))
 
         await viewModel.loadBooks()
         let overdueBooks = await viewModel.rescheduleOnAppOpen()
