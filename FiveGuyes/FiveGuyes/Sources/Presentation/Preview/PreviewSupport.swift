@@ -41,9 +41,7 @@ enum PreviewSupport {
     }
 }
 
-// 화면 값은 메인 스레드에서만 바꿔야 안전합니다.
-// 이 표시를 붙여, 다른 스레드가 끼어들어 상태가 꼬이는 일을 막습니다.
-@MainActor
+// Preview conformance는 nonisolated 프로토콜 계약과 맞추기 위해 @MainActor를 붙이지 않습니다.
 final class PreviewBookManagementService: BookManagementService {
     // 프리뷰에서 읽는 중 책 목록을 임시로 들고 있는 변수입니다.
     // 목록 값을 바꾸며 화면 분기가 맞는지 바로 확인할 수 있습니다.
@@ -69,8 +67,12 @@ final class PreviewBookManagementService: BookManagementService {
     // 필요한 값을 밖에서 받아 시작할 수 있게 만든 생성자입니다.
     // 이렇게 해야 프리뷰/테스트에서 원하는 상황을 정확히 다시 만들 수 있습니다.
     init(todayProvider: any ReadingDateProviding = DefaultReadingDateProvider()) {
-        self.readingBooks = [PreviewSupport.sampleReadingBook]
-        self.completedBooks = [PreviewSupport.sampleCompletedBook]
+        self.readingBooks = [
+            PreviewBookFixtureFactory.makeBook(title: "읽는 중인 샘플 도서", isCompleted: false)
+        ]
+        self.completedBooks = [
+            PreviewBookFixtureFactory.makeBook(title: "완독한 샘플 도서", isCompleted: true)
+        ]
         self.todayProvider = todayProvider
     }
 
@@ -256,7 +258,7 @@ final class PreviewNotificationManager: NotificationManaging {
     func updateNotification(notificationType: NotificationType) async {}
 }
 
-@MainActor
+// Preview conformance는 nonisolated 프로토콜 계약과 맞추기 위해 @MainActor를 붙이지 않습니다.
 struct PreviewReadingLibraryUseCaseAdapter: ReadingLibraryUsing {
     let service: any BookManagementService
 
@@ -279,7 +281,6 @@ struct PreviewReadingLibraryUseCaseAdapter: ReadingLibraryUsing {
     }
 }
 
-@MainActor
 struct PreviewDailyReadingUseCaseAdapter: DailyReadingUsing {
     let service: any BookManagementService
 
@@ -292,7 +293,6 @@ struct PreviewDailyReadingUseCaseAdapter: DailyReadingUsing {
     }
 }
 
-@MainActor
 struct PreviewBookCompletionUseCaseAdapter: BookCompletionUsing {
     let service: any BookManagementService
 
@@ -305,7 +305,6 @@ struct PreviewBookCompletionUseCaseAdapter: BookCompletionUsing {
     }
 }
 
-@MainActor
 struct PreviewReadingPlanUseCaseAdapter: ReadingPlanUsing {
     let service: any BookManagementService
 
@@ -328,7 +327,6 @@ struct PreviewReadingPlanUseCaseAdapter: ReadingPlanUsing {
     }
 }
 
-@MainActor
 struct PreviewBookRegistrationUseCaseAdapter: BookRegistrationUsing {
     let service: any BookManagementService
 
