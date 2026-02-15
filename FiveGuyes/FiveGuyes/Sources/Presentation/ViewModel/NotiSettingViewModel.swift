@@ -8,40 +8,6 @@
 import Foundation
 import Observation
 
-protocol NotificationManaging {
-    func requestAuthorization() async -> Bool
-    func clearRequests() async
-    func setupAllNotifications(_ readingBook: FGUserBook) async
-    func updateNotification(notificationType: NotificationType) async
-}
-
-extension NotificationManager: NotificationManaging {}
-
-protocol NotificationSettingsStoring {
-    func saveNotificationDisabled(_ isNotificationDisabled: Bool)
-    func fetchNotificationDisabled() -> Bool
-    func saveNotificationTime(hour: Int, minute: Int)
-    func fetchNotificationReminderTime() -> (hour: Int, minute: Int)
-}
-
-struct UserDefaultsNotificationSettingsStore: NotificationSettingsStoring {
-    func saveNotificationDisabled(_ isNotificationDisabled: Bool) {
-        UserDefaultsManager.saveNotificationDisabled(isNotificationDisabled)
-    }
-
-    func fetchNotificationDisabled() -> Bool {
-        UserDefaultsManager.fetchNotificationDisabled()
-    }
-
-    func saveNotificationTime(hour: Int, minute: Int) {
-        UserDefaultsManager.saveNotificationTime(hour: hour, minute: minute)
-    }
-
-    func fetchNotificationReminderTime() -> (hour: Int, minute: Int) {
-        UserDefaultsManager.fetchNotificationReminderTime()
-    }
-}
-
 @MainActor
 @Observable
 final class NotiSettingViewModel {

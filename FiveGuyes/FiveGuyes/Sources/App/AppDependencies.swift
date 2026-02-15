@@ -39,7 +39,11 @@ final class AppDependencies {
         }
 
         let readingDateProvider = DefaultReadingDateProvider()
-        let notificationService = NotificationManager(todayProvider: readingDateProvider)
+        let notificationSettingsStore = UserDefaultsNotificationSettingsStore()
+        let notificationService = NotificationManager(
+            todayProvider: readingDateProvider,
+            settingsStore: notificationSettingsStore
+        )
         let scheduleCalculator = ReadingScheduleCalculator()
 
         let fetchReadingBooksUseCase = FetchReadingBooksUseCase(repository: repository)
@@ -98,7 +102,7 @@ final class AppDependencies {
             registerBookUseCase: registerBookUseCase
         )
         self.notificationService = notificationService
-        self.notificationSettingsStore = UserDefaultsNotificationSettingsStore()
+        self.notificationSettingsStore = notificationSettingsStore
         self.bookSearchUseCase = BookSearchUseCase(bookSearchStore: APIStore())
     }
 

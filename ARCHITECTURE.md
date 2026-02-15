@@ -26,7 +26,10 @@ FiveGuyes는 사용자의 책/목표일/목표페이지를 입력받아, 매일 
 - 앱 진입점: `FiveGuyes/FiveGuyes/Sources/App/FiveGuyesApp.swift`
 - 루트 네비게이션: `FiveGuyes/FiveGuyes/Sources/App/NavigationRootView.swift`
 - 화면 라우팅 정의: `FiveGuyes/FiveGuyes/Sources/Presentation/ViewModel/NavigationCoordinator.swift`
-- 도메인 실행 단위(UseCase): `FiveGuyes/FiveGuyes/Sources/Domain/UseCase/BookManagement/BookManagementUseCases.swift`
+- 도메인 실행 단위(UseCase):
+  - `FiveGuyes/FiveGuyes/Sources/Domain/UseCase/BookManagement/BookManagementLibraryAndRegistrationUseCases.swift`
+  - `FiveGuyes/FiveGuyes/Sources/Domain/UseCase/BookManagement/BookManagementDailyAndPlanUseCases.swift`
+  - `FiveGuyes/FiveGuyes/Sources/Domain/UseCase/BookManagement/BookManagementCompletionUseCases.swift`
 - 하루 경계 단일 진입(Service Provider): `FiveGuyes/FiveGuyes/Sources/Domain/Service/ReadingDateProviding.swift`
 - 호환 계층(Preview/Test): `FiveGuyes/FiveGuyes/Sources/Domain/Service/BookManagementService.swift` (프로토콜 + 테스트/프리뷰 스텁)
 
@@ -77,7 +80,7 @@ FiveGuyes는 사용자의 책/목표일/목표페이지를 입력받아, 매일 
 
 **Architecture Invariant: Domain 데이터는 `FG*` 타입으로만 계층 경계를 넘는다**
 - Rationale: 저장소 기술(SwiftData) 변경 시 UI/도메인 영향 최소화
-- Enforced by: `BookRepository`, `BookManagementUseCases` 시그니처
+- Enforced by: `BookRepository`, `BookManagement` feature-level UseCase 시그니처
 - Violation symptoms: View에서 SwiftData 모델 필드 직접 수정
 
 **Architecture Invariant: SwiftData fetch/save는 Data 계층에서만 수행한다**
@@ -105,7 +108,7 @@ FiveGuyes는 사용자의 책/목표일/목표페이지를 입력받아, 매일 
 - Enforced by: `DayBoundaryProviding`, `DefaultDayBoundaryPolicy`, `Date+Extension` 위임 경로
 - Violation symptoms: 화면별 날짜 키 불일치, 기록 누락/중복
 
-2026-02-14 기준 운영 경로의 UseCase-first 경계 이행, `ReadingDateProviding` 도입, `DefaultBookManagementService` 제거를 반영했습니다. 남은 정리 항목은 `./docs/execplans/tech-debt-tracker.md`에서 추적합니다.
+2026-02-16 기준 운영 경로의 UseCase-first 경계 이행, `ReadingDateProviding` 도입, `DefaultBookManagementService` 제거, 알림 설정 경계(`NotificationManaging`/`NotificationSettingsStoring`)의 Domain/Data 재배치를 반영했습니다. 남은 정리 항목은 `./docs/execplans/tech-debt-tracker.md`에서 추적합니다.
 
 ## 5) Boundaries & API surfaces
 

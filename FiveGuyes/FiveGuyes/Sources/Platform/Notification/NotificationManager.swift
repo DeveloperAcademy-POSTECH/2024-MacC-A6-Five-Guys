@@ -10,19 +10,22 @@ import UserNotifications
 final class NotificationManager {
     private let notificationCenter: UNUserNotificationCenter
     private let todayProvider: any ReadingDateProviding
+    private let settingsStore: any NotificationSettingsStoring
 
     init(
         notificationCenter: UNUserNotificationCenter = .current(),
-        todayProvider: any ReadingDateProviding = DefaultReadingDateProvider()
+        todayProvider: any ReadingDateProviding = DefaultReadingDateProvider(),
+        settingsStore: any NotificationSettingsStoring = UserDefaultsNotificationSettingsStore()
     ) {
         self.notificationCenter = notificationCenter
         self.todayProvider = todayProvider
+        self.settingsStore = settingsStore
     }
     
     /// 모든 노티를 요청하는 메서드
     func canSendNotifications() async -> Bool {
         let isSystemAuthorized = await requestAuthorization()
-        let isAppEnabled = !UserDefaultsManager.fetchNotificationDisabled()
+        let isAppEnabled = !settingsStore.fetchNotificationDisabled()
         return isSystemAuthorized && isAppEnabled
     }
     
@@ -102,7 +105,7 @@ final class NotificationManager {
         let day = calendar.component(.day, from: date)
         let month = calendar.component(.month, from: date)
         let year = calendar.component(.year, from: date)
-        let (hour, minute) = notificationType.timeContent()
+        let (hour, minute) = notificationType.timeContent(settingsStore: settingsStore)
         print("💯노티 설정: \(date) \(hour): \(minute)")
         return DateComponents(year: year, month: month, day: day, hour: hour, minute: minute)
     }
@@ -120,4 +123,4 @@ final class NotificationManager {
     }
 }
 
-extension NotificationManager: ReadingNotificationScheduling {}
+extension NotificationManager: ReadingNotificationScheduling, NotificationManaging {}

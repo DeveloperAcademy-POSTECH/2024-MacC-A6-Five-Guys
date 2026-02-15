@@ -279,11 +279,25 @@
   1. 공통 어댑터 타입 또는 빌더를 도입해 중복 제거
   2. 인터페이스 변경 시 단일 수정 지점으로 정리
 
+## TD-013: Notification 경계 선언 위치 정렬
+
+- Status: Resolved (2026-02-16)
+- Context:
+  - `NotificationManaging`, `NotificationSettingsStoring` 선언을 `NotiSettingViewModel`에서 분리해 Domain Service 경계로 이동했습니다.
+  - `UserDefaultsNotificationSettingsStore` 구현을 Data(UserDefaults) 계층으로 이동해 Presentation이 인프라 구현을 소유하지 않도록 정렬했습니다.
+- Current Evidence:
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Domain/Service/NotificationManaging.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Domain/Service/NotificationSettingsStoring.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Data/UserDefaults/UserDefaultsNotificationSettingsStore.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Presentation/ViewModel/NotiSettingViewModel.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Platform/Notification/NotificationManager.swift`
+
 ## Recommended Execution Order
 
 1. TD-008: 알림 스케줄링 async 계약 정리 (P2) - Resolved (2026-02-16)
 2. TD-009: UseCase-first 경계 일관화 (P2) - Resolved (2026-02-16)
-3. TD-010: 알림 일괄 등록 권한 체크 중복 제거 (P2)
-4. TD-011: ReadingLibraryUseCase 책임 재분리 (P2)
-5. TD-012: Preview/Test 어댑터 중복 제거 (P3)
-6. 나머지 Open P2/P3 항목 순차 정리
+3. TD-013: Notification 경계 선언 위치 정렬 (P1) - Resolved (2026-02-16)
+4. TD-010: 알림 일괄 등록 권한 체크 중복 제거 (P2)
+5. TD-011: ReadingLibraryUseCase 책임 재분리 (P2)
+6. TD-012: Preview/Test 어댑터 중복 제거 (P3)
+7. 나머지 Open P2/P3 항목 순차 정리

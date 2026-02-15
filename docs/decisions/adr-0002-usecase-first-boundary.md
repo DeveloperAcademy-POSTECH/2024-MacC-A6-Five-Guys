@@ -96,3 +96,4 @@ Presentation 계층(ViewModel)은 도메인 실행 경계를 `BookManagementServ
 - 완료: `BookSearchViewModel`은 인프라 프로토콜(`BookSearching`) 대신 UseCase 경계(`BookSearchUsing`)를 주입받고, 인프라 연동은 `BookSearchUseCase` 내부로 캡슐화되었다.
 - 완료: 알림 관련 의존 변수명은 `notificationService`로 통일해 `Service` 용어 규칙을 코드 레벨에서 일치시켰다(타입명 `NotificationManager`는 유지).
 - 완료: `BookManagementUseCases.swift` 단일 파일을 기능군 3파일(`Library+Registration`, `Daily+Plan`, `Completion`)로 분리해 feature-level UseCase 경계를 유지하면서 파일 책임을 분명히 했다.
+- 완료: `NotificationManaging`/`NotificationSettingsStoring` 선언은 Presentation(`NotiSettingViewModel`)에서 분리되어 `Domain/Service`로 이동했고, `UserDefaultsNotificationSettingsStore` 구현은 `Data/UserDefaults`로 이동해 Presentation의 인프라 계약 소유를 제거했다.

@@ -48,10 +48,10 @@ enum NotificationType {
         }
     }
     
-    func timeContent() -> (hour: Int, minute: Int) {
+    func timeContent(settingsStore: any NotificationSettingsStoring) -> (hour: Int, minute: Int) {
         switch self {
         case .morning:
-            return UserDefaultsManager.fetchNotificationReminderTime()
+            return settingsStore.fetchNotificationReminderTime()
         case .night:
             return (24, 0)
         }
