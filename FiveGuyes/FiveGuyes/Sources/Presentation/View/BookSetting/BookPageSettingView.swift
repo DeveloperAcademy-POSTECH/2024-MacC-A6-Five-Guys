@@ -125,7 +125,7 @@ struct BookPageSettingView: View {
     }
 
     private func initializePageSettings() {
-        targetEndPage = bookSettingInputModel.startPage
+        startPage = bookSettingInputModel.startPage
         targetEndPage = bookSettingInputModel.targetEndPage
     }
 

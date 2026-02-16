@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct BookListView: View {
-    @ObservedObject var bookSearchViewModel: BookSearchViewModel
+    let bookSearchViewModel: BookSearchViewModel
     @State private var searchText: String = ""
 
     private let placeholder: String = "어떤 책을 완독하고 싶나요?"

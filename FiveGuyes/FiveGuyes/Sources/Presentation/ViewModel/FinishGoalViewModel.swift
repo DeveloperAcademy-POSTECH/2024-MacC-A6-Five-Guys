@@ -15,9 +15,14 @@ final class FinishGoalViewModel {
     private(set) var isSubmitting = false
 
     private let bookRegistrationUseCase: any BookRegistrationUsing
+    private let readingGoalMetricsUseCase: any ReadingGoalMetricsUsing
 
-    init(bookRegistrationUseCase: any BookRegistrationUsing) {
+    init(
+        bookRegistrationUseCase: any BookRegistrationUsing,
+        readingGoalMetricsUseCase: any ReadingGoalMetricsUsing
+    ) {
         self.bookRegistrationUseCase = bookRegistrationUseCase
+        self.readingGoalMetricsUseCase = readingGoalMetricsUseCase
     }
 
     func calculateRecommendedPagesPerDay(
@@ -27,25 +32,13 @@ final class FinishGoalViewModel {
         endDate: Date,
         excludedDays: [Date]
     ) {
-        let dateMath = DateMathCalculator()
-        let pageMath = PageMathCalculator()
-
-        do {
-            let totalDays = try dateMath.validDays(
-                from: startDate,
-                to: endDate,
-                excluding: excludedDays
-            )
-            let result = try pageMath.dividePages(
-                from: startPage,
-                to: targetEndPage,
-                over: totalDays
-            )
-
-            pagesPerDay = result.daily
-        } catch {
-            pagesPerDay = 0
-        }
+        pagesPerDay = readingGoalMetricsUseCase.recommendedPagesPerDay(
+            startPage: startPage,
+            targetEndPage: targetEndPage,
+            startDate: startDate,
+            endDate: endDate,
+            excludedDays: excludedDays
+        )
     }
 
     func registerBook(

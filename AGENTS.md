@@ -1,3 +1,8 @@
+# ExecPlans
+
+When writing complex features or significant refactors, use an ExecPlan from design to implementation.
+Follow `./PLANS.md`.
+
 # Architecture Docs
 
 When creating or updating architecture documentation, follow:

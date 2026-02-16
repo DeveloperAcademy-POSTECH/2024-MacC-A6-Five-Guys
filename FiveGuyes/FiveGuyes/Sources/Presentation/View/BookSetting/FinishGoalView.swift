@@ -215,7 +215,8 @@ struct TextView: View {
     NavigationStack {
         FinishGoalView(
             viewModel: FinishGoalViewModel(
-                bookRegistrationUseCase: previewUseCase
+                bookRegistrationUseCase: previewUseCase,
+                readingGoalMetricsUseCase: ReadingGoalMetricsUseCase()
             )
         )
     }
@@ -230,7 +231,8 @@ struct TextView: View {
     NavigationStack {
         FinishGoalView(
             viewModel: FinishGoalViewModel(
-                bookRegistrationUseCase: previewUseCase
+                bookRegistrationUseCase: previewUseCase,
+                readingGoalMetricsUseCase: ReadingGoalMetricsUseCase()
             )
         )
     }

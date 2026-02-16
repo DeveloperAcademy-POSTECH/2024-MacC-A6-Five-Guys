@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct BookRowView: View {
-    @ObservedObject var viewModel: BookSearchViewModel
+    let viewModel: BookSearchViewModel
     let book: BookSearchItem
 
     var body: some View {

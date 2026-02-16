@@ -11,10 +11,10 @@ struct BookSearchView: View {
     @Environment(BookSettingInputModel.self) var bookSettingInputModel: BookSettingInputModel
     @Environment(BookSettingPageModel.self) var pageModel: BookSettingPageModel
 
-    @StateObject private var bookSearchViewModel: BookSearchViewModel
+    @State private var bookSearchViewModel: BookSearchViewModel
 
     init(viewModel: BookSearchViewModel) {
-        _bookSearchViewModel = StateObject(wrappedValue: viewModel)
+        _bookSearchViewModel = State(initialValue: viewModel)
     }
 
     var body: some View {

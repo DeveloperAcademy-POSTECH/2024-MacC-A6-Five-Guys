@@ -16,7 +16,11 @@ struct FinishGoalViewModelTests {
     func finishGoal_registerBook_success() async {
         let book = makeBook()
         let bookRegistrationUseCase = BookRegistrationUseCaseStub(book: book)
-        let viewModel = FinishGoalViewModel(bookRegistrationUseCase: bookRegistrationUseCase)
+        let metricsUseCase = ReadingGoalMetricsUseCaseStub()
+        let viewModel = FinishGoalViewModel(
+            bookRegistrationUseCase: bookRegistrationUseCase,
+            readingGoalMetricsUseCase: metricsUseCase
+        )
 
         let selectedBook = BookSearchItem(
             title: "테스트 도서",
@@ -45,7 +49,11 @@ struct FinishGoalViewModelTests {
         let book = makeBook()
         let bookRegistrationUseCase = BookRegistrationUseCaseStub(book: book)
         bookRegistrationUseCase.registerBookError = TestError.forced
-        let viewModel = FinishGoalViewModel(bookRegistrationUseCase: bookRegistrationUseCase)
+        let metricsUseCase = ReadingGoalMetricsUseCaseStub()
+        let viewModel = FinishGoalViewModel(
+            bookRegistrationUseCase: bookRegistrationUseCase,
+            readingGoalMetricsUseCase: metricsUseCase
+        )
 
         let selectedBook = BookSearchItem(
             title: "테스트 도서",
@@ -74,7 +82,11 @@ struct FinishGoalViewModelTests {
         let book = makeBook()
         let bookRegistrationUseCase = BookRegistrationUseCaseStub(book: book)
         bookRegistrationUseCase.registerBookDelayNanoseconds = 200_000_000
-        let viewModel = FinishGoalViewModel(bookRegistrationUseCase: bookRegistrationUseCase)
+        let metricsUseCase = ReadingGoalMetricsUseCaseStub()
+        let viewModel = FinishGoalViewModel(
+            bookRegistrationUseCase: bookRegistrationUseCase,
+            readingGoalMetricsUseCase: metricsUseCase
+        )
 
         let selectedBook = BookSearchItem(
             title: "테스트 도서",
@@ -108,5 +120,27 @@ struct FinishGoalViewModelTests {
 
         #expect(!second)
         #expect(bookRegistrationUseCase.registerBookCallCount == 1)
+    }
+
+    @Test("FinishGoalViewModel: 하루 권장 페이지는 공통 계산 UseCase 결과를 사용")
+    func finishGoal_calculateRecommendedPages_usesMetricsUseCase() {
+        let book = makeBook()
+        let bookRegistrationUseCase = BookRegistrationUseCaseStub(book: book)
+        let metricsUseCase = ReadingGoalMetricsUseCaseStub()
+        metricsUseCase.recommendedPagesPerDayResult = 19
+        let viewModel = FinishGoalViewModel(
+            bookRegistrationUseCase: bookRegistrationUseCase,
+            readingGoalMetricsUseCase: metricsUseCase
+        )
+
+        viewModel.calculateRecommendedPagesPerDay(
+            startPage: 1,
+            targetEndPage: 300,
+            startDate: makeDate("2025-01-01"),
+            endDate: makeDate("2025-01-31"),
+            excludedDays: []
+        )
+
+        #expect(viewModel.pagesPerDay == 19)
     }
 }

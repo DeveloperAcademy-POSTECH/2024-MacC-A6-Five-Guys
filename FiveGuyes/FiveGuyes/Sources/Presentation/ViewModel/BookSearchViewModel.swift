@@ -5,12 +5,14 @@
 //  Created by Shim Hyeonhee on 11/4/24.
 //
 
-import SwiftUI
+import Foundation
+import Observation
 
 @MainActor
-final class BookSearchViewModel: ObservableObject {
-    @Published var books = [BookSearchItem]()
-    @Published var selectedBook: BookSearchItem?
+@Observable
+final class BookSearchViewModel {
+    var books = [BookSearchItem]()
+    var selectedBook: BookSearchItem?
     private let bookSearchUseCase: any BookSearchUsing
 
     init(bookSearchUseCase: any BookSearchUsing) {
