@@ -49,7 +49,12 @@ struct ReadingDatePickerView: View {
 
 #if DEBUG
 #Preview("기본 상태") {
-    ReadingDatePickerView(today: Date(), calendarCalculator: CalendarCalculator(), calendarCellManager: CalendarCellModel(today: Date()))
+    let today = DefaultReadingDateProvider().today()
+    ReadingDatePickerView(
+        today: today,
+        calendarCalculator: CalendarCalculator(),
+        calendarCellManager: CalendarCellModel(today: today)
+    )
 }
 
 #Preview("기간 확정 상태") {

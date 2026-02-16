@@ -60,10 +60,20 @@ final class NotificationManager {
         notificationCenter.removeAllPendingNotificationRequests()
     }
 
+    /// 리마인드(아침) 알림 요청을 삭제 후 재등록
+    func updateMorningNotification(for readingBook: FGUserBook) async {
+        await updateNotification(notificationType: .morning(readingBook: readingBook))
+    }
+
     /// 알림 요청을 삭제 후 재등록
-    func updateNotification(notificationType: NotificationType) async {
+    private func updateNotification(notificationType: NotificationType) async {
         let identifier = notificationType.identifier()
         notificationCenter.removePendingNotificationRequests(withIdentifiers: [identifier]) // 기존 알림 삭제
+
+        guard await canSendNotifications() else {
+            return
+        }
+
         await scheduleReminderNotification(notificationType: notificationType) // 새로운 알림 등록
     }
 

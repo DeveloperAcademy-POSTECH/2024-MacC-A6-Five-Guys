@@ -156,7 +156,7 @@ struct CalendarGridView: View {
 
 #if DEBUG
 #Preview("기본 상태") {
-    let today = Date()
+    let today = DefaultReadingDateProvider().today()
     CalendarGridView(
         month: today,
         calendarCalculator: CalendarCalculator(),

@@ -2,9 +2,25 @@
 
 이 문서는 아키텍처/도메인 경계 정리 과정에서 당장 전면 수정하지 못한 기술 부채를 추적하기 위한 기록입니다.
 
+## Review Sync (2026-02-16)
+
+- 본 문서는 2026-02-16 아키텍처 리뷰 결과 8건(P1 1건, P2 4건, P3 3건)을 반영해 갱신되었습니다.
+- 이번 리뷰에서 확인된 항목 매핑:
+  - Finding 1 -> TD-018
+  - Finding 2 -> TD-017
+  - Finding 3 -> TD-003
+  - Finding 4 -> TD-019
+  - Finding 5 -> TD-016
+  - Finding 6 -> TD-020
+  - Finding 7 -> TD-021
+  - Finding 8 -> TD-022
+
 ## TD-001: 하루 경계(04:00~03:59) 규칙의 전역 강제 부족
 
-- Status: Open (Production path aligned; preview/sample paths remain)
+- Status: Closed (2026-02-17)
+- Resolution:
+  - Preview/sample에서 `today` 주입에 사용하던 `Date()` 경로를 `DefaultReadingDateProvider().today()`로 통일했습니다.
+  - 대표 화면 프리뷰(`ReadingDateSettingView`, `ReadingDatePickerView`, `CalendarGridView`, `MultiBookProgressView`, `ReadingBookProgressCell`, `ReadingBooksCarousel`, `WeeklyProgressCalendar`)를 같은 기준으로 정렬했습니다.
 - Context:
   - `DayBoundaryProviding`/`ReadingDateProviding` 도입 이후 운영 핵심 실행 경계(Main/Daily/Completion/ReadingPlan)는 도메인 기준 today를 사용합니다.
   - 다만 일부 프리뷰/샘플 경로는 여전히 `Date()` 기반 today 주입을 사용합니다.
@@ -23,7 +39,11 @@
 
 ## TD-003: 프레젠테이션 레이어 계산 로직 잔존
 
-- Status: Open
+- Status: Closed (2026-02-16)
+- Resolution:
+  - `ReadingGoalMetricsUseCase`를 도입해 `DateMathCalculator`/`PageMathCalculator` 직접 생성 경로를 공통 UseCase로 수렴했습니다.
+  - `ReadingDateSettingView`, `ReadingDateEditView`, `FinishGoalViewModel`이 공통 계산 경계를 사용하도록 변경했습니다.
+  - `FinishGoalViewModelTests`에 계산 UseCase 위임 회귀 테스트를 추가했습니다.
 - Context:
   - 아래 화면/뷰모델에 도메인 규칙 성격의 계산 로직이 남아 있어 UseCase 경계와 계산 규칙이 분산됩니다.
 - Risk:
@@ -31,7 +51,9 @@
 - Target Layer:
   - `Domain/UseCase` 또는 `Domain/Calculator` 경유 단일 계산 경로
 - Priority:
-  - P3
+  - P2
+- Review Note (2026-02-16):
+  - View 직접 계산 경로가 3곳에서 동시에 확인되어 우선순위를 P3 -> P2로 상향합니다.
 
 ### 대상 1: ReadingDateSettingView
 
@@ -74,7 +96,10 @@
 
 ## TD-004: DayBoundary 직접 참조 잔존(Provider 경계 미통일)
 
-- Status: Open
+- Status: Closed (2026-02-17)
+- Resolution:
+  - `Date+Extension.toAdjustedYearMonthDayString`가 `DayBoundary.shared` 직접 호출 대신 `DefaultReadingDateProvider().dayKey(from:)` 경유로 정책 키를 해석하도록 정리했습니다.
+  - `ReadingDateProviding` 계약에 `adjustedDate(from:)`, `dayKey(from:)`를 추가해 provider 경계에서 날짜 정책 연산을 노출했습니다.
 - Context:
   - `ReadingDateProviding`으로 today 해상 경계를 정리했지만, 일부 경로는 아직 `DayBoundary.shared`를 직접 호출합니다.
 - Risk:
@@ -84,13 +109,17 @@
 - Priority:
   - P2
 - Current Evidence:
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Domain/Service/ReadingDateProviding.swift`
   - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Shared/Extensions/Foundation/Date+Extension.swift`
 - Suggested Follow-up:
-  1. `Date` extension의 `toAdjustedYearMonthDayString` 경유 정책을 provider 또는 domain policy로 단일화
+  1. `Date` extension 호출 경계를 단계적으로 축소해 도메인 경계에서 직접 provider를 호출하도록 수렴
 
 ## TD-006: ViewModel 조립 책임(Composition Root) 상향 필요
 
-- Status: Open
+- Status: Closed (2026-02-17)
+- Resolution:
+  - `BookSettingsManagerView`에서 `@Environment(AppDependencies.self)`와 하위 ViewModel 직접 생성을 제거했습니다.
+  - `NavigationCoordinator`에서 `BookSearchViewModel`, `FinishGoalViewModel`, `ReadingDateSettingViewModel`를 조립해 `BookSettingsManagerView` 생성자로 주입하도록 정리했습니다.
 - Context:
   - 아키텍처 원칙은 View에서 ViewModel을 직접 생성하지 않고, Navigation/Coordinator(Composition Root)에서 주입하는 방식입니다.
   - 현재 일부 화면/프리뷰 경로는 View 내부에서 ViewModel 및 의존성 생성이 남아 있습니다.
@@ -106,8 +135,8 @@
   - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Presentation/View/BookSetting/BookSettingsManagerView.swift`
   - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Presentation/ViewModel/NavigationCoordinator.swift`
 - Suggested Follow-up:
-  1. View 생성자에서 ViewModel 기본값/직접 생성 제거
-  2. Navigation 경로별 ViewModel/UseCase 주입 템플릿 표준화
+  1. 다른 feature 화면도 동일한 조립 템플릿으로 점진 이행
+  2. Coordinator 조립 규칙을 아키텍처 문서 예시 코드로 고정
 
 ## TD-007: 날짜 키 시맨틱/타입 분리 부족 + 키 포맷 타임존 명시 누락
 
@@ -176,7 +205,11 @@
 
 ## TD-011: ReadingLibraryUseCase 응집도 저하 (조회 + 홈 알림 트리거 혼합)
 
-- Status: Open
+- Status: Closed (2026-02-17)
+- Resolution:
+  - `ReadingLibraryUsing`에서 `setupNotifications(for:)`를 제거해 조회/삭제/재스케줄 책임만 유지하도록 API를 축소했습니다.
+  - 홈 진입 알림 오케스트레이션은 `HomeNotificationUsing`/`HomeNotificationUseCase`로 분리했습니다.
+  - `MainHomeViewModel`을 `ReadingLibraryUsing + HomeNotificationUsing` 2-UseCase 구성으로 전환했습니다.
 - Context:
   - `ReadingLibraryUsing`에 홈 진입 알림 실행용 `setupNotifications(for:)`가 포함되어, 도서 조회/삭제 책임과 홈 라이프사이클 부작용 책임이 결합되어 있습니다.
 - Risk:
@@ -189,11 +222,11 @@
 - Priority:
   - P2
 - Current Evidence:
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Domain/UseCase/Home/HomeNotificationUseCase.swift`
   - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Domain/UseCase/BookManagement/LibraryAndRegistrationUseCases.swift`
   - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Presentation/ViewModel/MainHomeViewModel.swift`
 - Suggested Follow-up:
-  1. 홈 진입 오케스트레이션 전용 `...Using` 경계 분리 검토
-  2. ReadingLibrary 경계는 조회/삭제/재스케줄 도메인 책임으로 다시 축소
+  1. 홈 전용 사이드이펙트가 추가될 때도 `HomeNotificationUsing` 경계로만 확장되도록 유지
 
 ## TD-015: 야간 알림 시간 상수 유효 범위 이탈
 
@@ -218,7 +251,11 @@
 
 ## TD-016: 도서 검색 URL 조합의 인코딩/응답 검증 부족
 
-- Status: Open
+- Status: Closed (2026-02-16)
+- Resolution:
+  - `AladinBookSearchProvider` 요청 생성을 `URLComponents + queryItems`로 전환했습니다.
+  - `HTTPURLResponse.statusCode` 검증과 `BookSearchNetworkError` 명시 오류 매핑을 추가했습니다.
+  - `AladinBookSearchProviderTests`를 추가해 특수문자 인코딩/비정상 상태코드 회귀를 고정했습니다.
 - Context:
   - `AladinBookSearchProvider`가 검색/상세조회 URL을 문자열 보간으로 직접 조합합니다.
   - `query`/`isbn`이 percent-encoding 없이 삽입되고, HTTP 상태 코드 검증 없이 디코딩을 시도합니다.
@@ -240,7 +277,10 @@
 
 ## TD-017: 페이지 설정 화면 복원 로직 결함
 
-- Status: Open
+- Status: Closed (2026-02-16)
+- Resolution:
+  - `BookPageSettingView.initializePageSettings()`에서 `startPage`/`targetEndPage` 복원 대입을 올바르게 수정했습니다.
+  - 회귀 검증은 등록 플로우 수동 검증 + 관련 ViewModel 테스트 스위트로 수행했습니다.
 - Context:
   - `BookPageSettingView.initializePageSettings()`에서 `startPage`를 복원하지 않고 `targetEndPage`에 두 번 대입하고 있습니다.
 - Risk:
@@ -258,15 +298,147 @@
   1. `initializePageSettings()`에서 `startPage`/`targetEndPage`를 각각 올바르게 복원
   2. 페이지 설정 화면 왕복(back-forward) 상태 복원 UI 테스트 또는 ViewModel 테스트 추가
 
+## TD-018: 알림 OFF 상태에서도 시간 변경이 알림 재예약을 유발
+
+- Status: Closed (2026-02-16)
+- Resolution:
+  - `NotiSettingViewModel.handleNotificationTimeChange`에 앱 내 알림 OFF 조기 반환을 적용했습니다.
+  - `NotificationManager` 재등록 경로에 권한/앱 설정 재검증을 추가했습니다.
+  - `NotiSettingViewModelTests`에 OFF 상태 시간 변경 회귀 테스트를 추가했습니다.
+- Context:
+  - `NotiSettingView`의 시간 변경(`selectedTime`)은 항상 `NotiSettingViewModel.handleNotificationTimeChange`로 연결됩니다.
+  - 해당 메서드는 앱 내 알림 비활성화 상태와 무관하게 `notificationService.updateNotification`을 호출합니다.
+  - `NotificationManager.updateNotification`은 `canSendNotifications` 검증 없이 스케줄 등록을 수행합니다.
+- Risk:
+  - 사용자가 앱 내 알림을 꺼도 시간 변경 또는 초기 값 동기화 시 알림이 다시 예약될 수 있습니다.
+  - 사용자 의도와 실제 알림 동작이 어긋나 신뢰도 저하로 이어질 수 있습니다.
+- Target Layer:
+  - `Presentation/ViewModel` + `Platform/Notification` 알림 재등록 경계
+- Trigger Condition:
+  - 알림 설정 화면 로직 변경, 알림 시간 정책 변경, 알림 이슈 재현 시 즉시 우선 대응
+- Priority:
+  - P1
+- Current Evidence:
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Presentation/ViewModel/NotiSettingViewModel.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Platform/Notification/NotificationManager.swift`
+- Suggested Follow-up:
+  1. `handleNotificationTimeChange`에서 앱 내 알림 비활성화 상태면 조기 반환
+  2. `NotificationManager.updateNotification`에서도 `canSendNotifications`를 재검증해 이중 방어
+  3. "앱 내 알림 OFF + 시간 변경" 회귀 테스트를 `NotiSettingViewModelTests`에 추가
+
+## TD-019: Domain 서비스 계약이 Platform 타입(NotificationType)에 의존
+
+- Status: Closed (2026-02-16)
+- Resolution:
+  - `NotificationManaging` 계약을 `updateMorningNotification(for:)`로 재정의해 Platform 타입 누수를 제거했습니다.
+  - Platform 상세(`NotificationType`)는 `NotificationManager` 내부 구현으로 축소했습니다.
+  - Preview/Test 스텁을 Domain 계약 기준으로 정리했습니다.
+- Context:
+  - `NotificationManaging` 계약이 `NotificationType`(Platform 위치 타입)을 파라미터로 노출합니다.
+  - 결과적으로 Domain 서비스 인터페이스가 Platform 구현 상세를 직접 참조합니다.
+- Risk:
+  - 계층 경계 방향이 느슨해져 모듈 분리 시 순환 의존 위험이 커집니다.
+  - 알림 정책 변경 시 Domain 계약과 Platform 구현이 동시에 흔들릴 수 있습니다.
+- Target Layer:
+  - `Domain/Service` 알림 계약 경계
+- Trigger Condition:
+  - 알림 계약 변경, 모듈 분리 착수, 알림 타입 확장 시
+- Priority:
+  - P2
+- Current Evidence:
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Domain/Service/NotificationManaging.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Platform/Notification/NotificationType.swift`
+- Suggested Follow-up:
+  1. Domain 전용 요청 모델(예: `NotificationUpdateRequest`) 또는 명시 메서드(`updateMorningNotification`)로 계약 재정의
+  2. Platform의 `NotificationType`은 내부 구현 상세로 축소
+  3. ViewModel 테스트 대역이 Domain 계약만 알도록 스텁 정리
+
+## TD-020: NotiSettingView가 시스템 설정 이동을 직접 호출
+
+- Status: Closed (2026-02-16)
+- Resolution:
+  - `SystemSettingsOpening` 경계를 추가하고 `NotiSettingViewModel`에 주입하도록 변경했습니다.
+  - `NotiSettingView`는 `viewModel.openSystemSettings()` 액션 전달만 수행하도록 정리했습니다.
+  - `NotiSettingViewModelTests`에 시스템 설정 이동 위임 테스트를 추가했습니다.
+- Context:
+  - `NotiSettingView`가 버튼 액션에서 `SystemSettingsManager.openSettings`를 직접 호출합니다.
+- Risk:
+  - Presentation 계층이 플랫폼 동작을 직접 소유해 경계 규칙이 약화됩니다.
+  - 시스템 설정 이동 로직의 테스트 대체 지점이 부족해집니다.
+- Target Layer:
+  - `Presentation -> UseCase/Service` 경유 호출 경계
+- Trigger Condition:
+  - 알림 설정 화면 리팩터링, 시스템 설정 진입 정책 확장 시
+- Priority:
+  - P3
+- Current Evidence:
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Presentation/View/NotiSetting/NotiSettingView.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Platform/System/SystemSettingsManager.swift`
+- Suggested Follow-up:
+  1. 시스템 설정 이동을 ViewModel 주입 서비스(`SystemSettingsOpening` 등)로 위임
+  2. View는 액션 전달만 수행하고 실제 호출은 서비스 구현에서 처리
+
+## TD-021: BookSearch만 ObservableObject 패턴으로 남아 상태관리 경로가 이원화됨
+
+- Status: Closed (2026-02-16)
+- Resolution:
+  - `BookSearchViewModel`을 `@Observable`로 전환하고 `ObservableObject/@Published` 경로를 제거했습니다.
+  - `BookSearchView`를 `@State` 소유 패턴으로 정렬하고 하위 뷰 `@ObservedObject` 사용을 제거했습니다.
+  - 기존 `BookSearchViewModelTests` 회귀를 통과해 동작 동일성을 확인했습니다.
+- Context:
+  - 대부분 ViewModel은 `@Observable` 기반인데, `BookSearchViewModel`만 `ObservableObject/@Published` + `@StateObject` 경로를 사용합니다.
+- Risk:
+  - 상태 업데이트/수명주기 규칙이 기능별로 달라 유지보수 비용과 온보딩 비용이 증가합니다.
+  - 향후 공통 상태 처리 규칙 추가 시 예외 경로가 늘어납니다.
+- Target Layer:
+  - `Presentation/ViewModel` 상태관리 패턴 표준화 경계
+- Trigger Condition:
+  - BookSearch 기능 확장, Observation 전환 작업 착수 시
+- Priority:
+  - P3
+- Current Evidence:
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Presentation/ViewModel/BookSearchViewModel.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Presentation/View/BookSetting/BookSearch/BookSearchView.swift`
+- Suggested Follow-up:
+  1. `BookSearchViewModel`을 `@Observable`로 정렬하거나, 예외 유지 시 명시적 ADR/가이드로 이유를 문서화
+  2. View 바인딩 방식(`@State`/`@Bindable`)을 다른 화면과 동일 패턴으로 정렬
+
+## TD-022: 계층 경계가 컴파일 단에서 강제되지 않음(단일 앱 타깃)
+
+- Status: Partial (2026-02-17, Stage 1 complete)
+- Resolution (Stage 1):
+  - `.swiftlint.yml`에 custom rule 3종을 추가해 경계 위반을 정적 검사로 차단했습니다.
+    1. `Presentation/ViewModel`의 `...Managing/...Providing/...Storing/...Opening` 직접 의존 금지
+    2. `Presentation/View`의 `any ...Using` 직접 의존 금지
+    3. `Presentation/View`의 `@Environment(AppDependencies.self)` 금지
+  - 검색 기반 Acceptance 검증에서 3개 패턴 모두 0건을 확인했습니다.
+- Context:
+  - 현재 프로젝트는 앱 타깃 하나에 Domain/Data/Platform/Presentation을 함께 컴파일합니다.
+  - 경계 위반이 발생해도 컴파일 단계에서 차단되지 않고 리뷰/규약 의존으로만 통제됩니다.
+- Risk:
+  - 동일한 경계 누수가 반복될 가능성이 높고, 구조 품질이 리뷰 역량에 과의존합니다.
+  - 장기적으로 모듈 변경 시 영향 범위가 넓어지고 회귀 비용이 증가합니다.
+- Target Layer:
+  - 빌드 타깃/모듈 경계(예: Domain/Data/Platform 분리) 설계
+- Trigger Condition:
+  - 중대 아키텍처 리팩터링, 모듈화 예산 확보, 빌드 시간/경계 이슈 반복 시
+- Priority:
+  - P3
+- Current Evidence:
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/.swiftlint.yml`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes.xcodeproj/project.pbxproj`
+- Suggested Follow-up:
+  1. 2단계로 Domain 모듈 분리 가능성 검증 스파이크(빌드/테스트 영향 포함)
+  2. 단계별 모듈화 로드맵(분리 순서, public API 경계, 마이그레이션 기준) 문서화
+
 ## Recommended Execution Order
 
 1. TD-015: 야간 알림 시간 상수 유효 범위 이탈 (P1)
 2. TD-010: 알림 일괄 등록 권한 체크 중복 제거 (P2)
-3. TD-011: ReadingLibraryUseCase 책임 재분리 (P2)
-4. TD-017: 페이지 설정 화면 복원 로직 결함 (P2)
-5. TD-016: 도서 검색 URL 조합의 인코딩/응답 검증 부족 (P2)
-6. TD-001: 하루 경계 규칙 프리뷰/샘플 경계 정리 (P2)
-7. TD-004: DayBoundary 직접 참조 제거 (P2)
-8. TD-007: 날짜 키 시맨틱/타입 경계 후속 정리 (P2, Partial)
-9. TD-006: ViewModel 조립 책임 상향 (P3)
-10. TD-003: 프레젠테이션 계산 로직 수렴 (P3)
+3. TD-007: 날짜 키 시맨틱/타입 경계 후속 정리 (P2, Partial)
+4. TD-022: 컴파일 단 경계 강제 2단계(모듈화 스파이크/분리 착수) (P3)
+
+완료(2026-02-16):
+- TD-018, TD-017, TD-019, TD-020, TD-016, TD-003, TD-021
+완료(2026-02-17):
+- TD-001, TD-011, TD-006, TD-004, TD-022(Stage 1)

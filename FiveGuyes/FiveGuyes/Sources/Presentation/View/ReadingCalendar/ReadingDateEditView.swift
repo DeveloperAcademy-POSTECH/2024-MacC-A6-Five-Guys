@@ -13,42 +13,40 @@ struct ReadingDateEditView: View {
     private let userBook: FGUserBook
 
     @State private var viewModel: ReadingDateEditViewModel
+    @State private var readingDateSettingViewModel: ReadingDateSettingViewModel
     @StateObject private var calendarCellModel: CalendarCellModel
 
     private var today: Date
     private let calendarCalculator = CalendarCalculator()
-    private let dateMathCalculator = DateMathCalculator()
-    private let pageMathCalculator = PageMathCalculator()
 
     private var dayCount: Int {
-        if let startDate = calendarCellModel.getStartDate(),
-           let endDate = calendarCellModel.getEndDate() {
-            return (try? dateMathCalculator.daysBetween(from: startDate, to: endDate)) ?? 1
-        } else {
-            return 1
-        }
+        readingDateSettingViewModel.dayCount(
+            startDate: calendarCellModel.getStartDate(),
+            endDate: calendarCellModel.getEndDate()
+        )
     }
 
     private var pagesPerDay: Int {
         let userSettings = userBook.userSettings
 
-        let totalPages = (try? pageMathCalculator.pagesBetween(
-            from: userSettings.startPage,
-            to: userSettings.targetEndPage
-        )) ?? 0
-
-        return (try? pageMathCalculator.pagesPerDay(totalPages: totalPages, totalDays: dayCount))
-            ?? totalPages
+        return readingDateSettingViewModel.pagesPerDay(
+            startPage: userSettings.startPage,
+            targetEndPage: userSettings.targetEndPage,
+            startDate: calendarCellModel.getStartDate(),
+            endDate: calendarCellModel.getEndDate()
+        )
     }
 
     init(
         userBook: FGUserBook,
         viewModel: ReadingDateEditViewModel,
+        readingDateSettingViewModel: ReadingDateSettingViewModel,
         calendarCellModel: CalendarCellModel? = nil
     ) {
         self.today = viewModel.today()
         self.userBook = userBook
         _viewModel = State(initialValue: viewModel)
+        _readingDateSettingViewModel = State(initialValue: readingDateSettingViewModel)
 
         if let calendarCellModel {
             self._calendarCellModel = StateObject(wrappedValue: calendarCellModel)
@@ -192,6 +190,9 @@ struct ReadingDateEditView: View {
             userBook: binding.userBook,
             viewModel: ReadingDateEditViewModel(
                 readingPlanUseCase: binding.useCase
+            ),
+            readingDateSettingViewModel: ReadingDateSettingViewModel(
+                readingGoalMetricsUseCase: ReadingGoalMetricsUseCase()
             )
         )
     }
@@ -217,6 +218,9 @@ struct ReadingDateEditView: View {
             userBook: binding.userBook,
             viewModel: ReadingDateEditViewModel(
                 readingPlanUseCase: binding.useCase
+            ),
+            readingDateSettingViewModel: ReadingDateSettingViewModel(
+                readingGoalMetricsUseCase: ReadingGoalMetricsUseCase()
             ),
             calendarCellModel: calendarCellModel
         )

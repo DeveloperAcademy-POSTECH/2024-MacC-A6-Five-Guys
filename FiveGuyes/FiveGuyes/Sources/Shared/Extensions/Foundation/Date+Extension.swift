@@ -72,7 +72,7 @@ extension Date {
             let adjustedDate = calendar.date(byAdding: .hour, value: hourOffset, to: self) ?? self
             return ReadingDateKey(date: adjustedDate, calendar: calendar).rawValue
         }
-        return DayBoundary.shared.adjustedDayKey(from: self).rawValue
+        return DefaultReadingDateProvider().dayKey(from: self).rawValue
     }
 
 }

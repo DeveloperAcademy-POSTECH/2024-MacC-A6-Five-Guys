@@ -11,34 +11,33 @@ struct ReadingDateSettingView: View {
     @Environment(BookSettingInputModel.self) var bookSettingInputModel: BookSettingInputModel
     @Environment(BookSettingPageModel.self) var pageModel: BookSettingPageModel
 
+    @State private var viewModel: ReadingDateSettingViewModel
     @StateObject private var calendarCellModel: CalendarCellModel
-
-    @State var totalPages = 0
 
     private var today: Date
     private let calendarCalculator = CalendarCalculator()
-    private let dateMathCalculator = DateMathCalculator()
-    private let pageMathCalculator = PageMathCalculator()
 
     private var dayCount: Int {
-        if let startDate = calendarCellModel.getStartDate(),
-           let endDate = calendarCellModel.getEndDate() {
-            return (try? dateMathCalculator.daysBetween(from: startDate, to: endDate)) ?? 1
-        } else {
-            return 1
-        }
+        viewModel.dayCount(
+            startDate: calendarCellModel.getStartDate(),
+            endDate: calendarCellModel.getEndDate()
+        )
     }
 
     private var pagesPerDay: Int {
-        return (try? pageMathCalculator.pagesPerDay(totalPages: totalPages, totalDays: dayCount))
-            ?? totalPages
+        viewModel.pagesPerDay(
+            startPage: bookSettingInputModel.startPage,
+            targetEndPage: bookSettingInputModel.targetEndPage,
+            startDate: calendarCellModel.getStartDate(),
+            endDate: calendarCellModel.getEndDate()
+        )
     }
 
-    init(today: Date) {
+    init(today: Date, viewModel: ReadingDateSettingViewModel) {
         let calendarCellModel = CalendarCellModel(today: today, startDate: today)
 
         self.today = today
-
+        _viewModel = State(initialValue: viewModel)
         self._calendarCellModel = StateObject(wrappedValue: calendarCellModel)
     }
 
@@ -62,12 +61,6 @@ struct ReadingDateSettingView: View {
         .onAppear {
             Tracking.Screen.dateSelection.setTracking()
 
-            totalPages = (try? pageMathCalculator.pagesBetween(
-                from: bookSettingInputModel.startPage,
-                to: bookSettingInputModel.targetEndPage
-            )) ?? 0
-        }
-        .onAppear {
             if pageModel.currentPage == BookSettingsPage.bookNoneReadingDaySetting.rawValue {
                 calendarCellModel.setStartDate(bookSettingInputModel.startDate)
                 calendarCellModel.setEndDate(bookSettingInputModel.endDate)
@@ -179,9 +172,16 @@ struct ReadingDateSettingView: View {
 private func makeReadingDateSettingPreview(pageAdvanceCount: Int) -> some View {
     let inputModel = PreviewSupport.makeBookSettingInputModel()
     let pageModel = makeReadingDateSettingPreviewPageModel(advanceCount: pageAdvanceCount)
-    let today = Date()
+    let dependencies = PreviewSupport.makeDependencies()
+    let today = DefaultReadingDateProvider().today()
+    let viewModel = ReadingDateSettingViewModel(
+        readingGoalMetricsUseCase: dependencies.readingGoalMetricsUseCase
+    )
 
-    return ReadingDateSettingView(today: today)
+    return ReadingDateSettingView(
+        today: today,
+        viewModel: viewModel
+    )
         .environment(inputModel)
         .environment(pageModel)
 }

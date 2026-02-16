@@ -37,21 +37,31 @@ final class NavigationCoordinator {
         case .mainHome:
             MainHomeView(
                 viewModel: MainHomeViewModel(
-                    readingLibraryUseCase: appDependencies.readingLibraryUseCase
+                    readingLibraryUseCase: appDependencies.readingLibraryUseCase,
+                    homeNotificationUseCase: appDependencies.homeNotificationUseCase
                 )
             )
         case .notiSetting(book: let book):
             NotiSettingView(
                 userBook: book,
                 viewModel: NotiSettingViewModel(
-                    notificationService: appDependencies.notificationService,
-                    settingsStore: appDependencies.notiSettingsStore
+                    notificationSettingUseCase: appDependencies.notificationSettingUseCase
                 )
             )
         case .bookSettingsManager:
             BookSettingsManagerView(
                 viewModel: BookSettingsManagerViewModel(
                     readingPlanUseCase: appDependencies.readingPlanUseCase
+                ),
+                bookSearchViewModel: BookSearchViewModel(
+                    bookSearchUseCase: appDependencies.bookSearchUseCase
+                ),
+                finishGoalViewModel: FinishGoalViewModel(
+                    bookRegistrationUseCase: appDependencies.bookRegistrationUseCase,
+                    readingGoalMetricsUseCase: appDependencies.readingGoalMetricsUseCase
+                ),
+                readingDateSettingViewModel: ReadingDateSettingViewModel(
+                    readingGoalMetricsUseCase: appDependencies.readingGoalMetricsUseCase
                 )
             )
         case .totalCalendar(books: let books, today: let today):
@@ -93,6 +103,9 @@ final class NavigationCoordinator {
                 userBook: book,
                 viewModel: ReadingDateEditViewModel(
                     readingPlanUseCase: appDependencies.readingPlanUseCase
+                ),
+                readingDateSettingViewModel: ReadingDateSettingViewModel(
+                    readingGoalMetricsUseCase: appDependencies.readingGoalMetricsUseCase
                 )
             )
         case .unfinishReading(book: let book):

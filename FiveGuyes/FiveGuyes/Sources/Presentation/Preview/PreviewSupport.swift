@@ -77,6 +77,7 @@ private final class PreviewBookStore {
 }
 
 final class PreviewBookUseCaseStub: ReadingLibraryUsing,
+    HomeNotificationUsing,
     DailyReadingUsing,
     BookCompletionUsing,
     ReadingPlanUsing,
@@ -221,7 +222,7 @@ final class PreviewNotificationManager: NotificationManaging {
 
     func setupAllNotifications(_ readingBook: FGUserBook) async {}
 
-    func updateNotification(notificationType: NotificationType) async {}
+    func updateMorningNotification(for readingBook: FGUserBook) async {}
 }
 
 final class PreviewNotificationSettingsStore: NotificationSettingsStoring {

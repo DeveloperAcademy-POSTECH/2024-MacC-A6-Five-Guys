@@ -278,5 +278,8 @@ struct WeeklyProgressCalendar: View {
 }
 
 #Preview {
-    WeeklyProgressCalendar(userBook: .dummy, today: Date())
+    WeeklyProgressCalendar(
+        userBook: .dummy,
+        today: DefaultReadingDateProvider().today()
+    )
 }

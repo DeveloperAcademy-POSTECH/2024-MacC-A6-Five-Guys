@@ -18,7 +18,8 @@ extension PreviewSupport {
         )
 
         return MainHomeViewModel(
-            readingLibraryUseCase: previewUseCase
+            readingLibraryUseCase: previewUseCase,
+            homeNotificationUseCase: previewUseCase
         )
     }
 

@@ -111,6 +111,9 @@ struct ReadingBookProgressCell: View {
 }
 
 #Preview {
-    ReadingBookProgressCell(book: .dummy, today: Date())
+    ReadingBookProgressCell(
+        book: .dummy,
+        today: DefaultReadingDateProvider().today()
+    )
         .background(.blue) // 프리뷰에서 흰색 카드가 보이도록 파란 배경 추가
 }

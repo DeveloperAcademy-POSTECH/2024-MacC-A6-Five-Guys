@@ -135,19 +135,21 @@ struct MultiBookProgressView: View {
 
 #if DEBUG
 #Preview("여러 권 진행 중") {
+    let today = DefaultReadingDateProvider().today()
     NavigationStack {
         MultiBookProgressView(
             currentReadingBooks: PreviewSupport.sampleBooksForCarousel,
-            today: Date()
+            today: today
         )
     }
 }
 
 #Preview("한 권 진행 중") {
+    let today = DefaultReadingDateProvider().today()
     NavigationStack {
         MultiBookProgressView(
             currentReadingBooks: [PreviewSupport.sampleReadingBook],
-            today: Date()
+            today: today
         )
     }
 }

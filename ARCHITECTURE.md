@@ -30,6 +30,8 @@ FiveGuyes는 사용자의 책/목표일/목표페이지를 입력받아, 매일 
   - `FiveGuyes/FiveGuyes/Sources/Domain/UseCase/BookManagement/LibraryAndRegistrationUseCases.swift`
   - `FiveGuyes/FiveGuyes/Sources/Domain/UseCase/BookManagement/DailyAndPlanUseCases.swift`
   - `FiveGuyes/FiveGuyes/Sources/Domain/UseCase/BookManagement/CompletionUseCases.swift`
+  - `FiveGuyes/FiveGuyes/Sources/Domain/UseCase/Notification/NotificationSettingUseCase.swift`
+  - `FiveGuyes/FiveGuyes/Sources/Domain/UseCase/Home/HomeNotificationUseCase.swift`
 - 하루 경계 단일 진입(Service Provider): `FiveGuyes/FiveGuyes/Sources/Domain/Service/ReadingDateProviding.swift`
 - Preview/Test 스텁 경계:
   - `FiveGuyes/FiveGuyes/Sources/Presentation/Preview/PreviewSupport.swift`
@@ -99,6 +101,16 @@ FiveGuyes는 사용자의 책/목표일/목표페이지를 입력받아, 매일 
 - Enforced by: `AppDependencies`의 UseCase 조립 + ViewModel 생성자 시그니처 (`...Using`)
 - Violation symptoms: ViewModel이 과도한 파사드 인터페이스 또는 저장소를 직접 참조
 
+**Architecture Invariant: View는 UseCase를 직접 참조하지 않고 ViewModel로만 상호작용한다**
+- Rationale: View 계층을 렌더링/입력 전달 역할로 제한해 조립 책임을 분산시키지 않는다
+- Enforced by: `NavigationCoordinator` 조립 + `BookSettingsManagerView` 생성자 주입 패턴 + `.swiftlint.yml` custom rule
+- Violation symptoms: `Presentation/View`에서 `any ...Using` 또는 `@Environment(AppDependencies.self)` 직접 사용
+
+**Architecture Invariant: ViewModel은 서비스 프로토콜(`...Managing/...Providing/...Storing/...Opening`)을 직접 의존하지 않는다**
+- Rationale: ViewModel 경계에서 UseCase-first 흐름을 강제해 도메인 실행 단위를 명확히 유지한다
+- Enforced by: `NotificationSettingUsing`, `HomeNotificationUsing` 같은 feature UseCase + `.swiftlint.yml` custom rule
+- Violation symptoms: `Presentation/ViewModel` 생성자에 서비스 프로토콜이 직접 주입됨
+
 **Architecture Invariant: 변환 로직은 매핑 확장 파일에서만 수행한다**
 - Rationale: 매핑 규칙의 단일 소스 유지
 - Enforced by: `FGUserBook+toUserBookV2.swift`, `UserBookV2+toFGUserBook.swift`
@@ -109,7 +121,7 @@ FiveGuyes는 사용자의 책/목표일/목표페이지를 입력받아, 매일 
 - Enforced by: `DayBoundaryProviding`, `DefaultDayBoundaryPolicy`, `Date+Extension` 위임 경로
 - Violation symptoms: 화면별 날짜 키 불일치, 기록 누락/중복
 
-2026-02-16 기준 운영/Preview/Test 경로의 UseCase-first 경계 이행, `ReadingDateProviding` 도입, `DefaultBookManagementService`/`BookManagementService` 제거, 알림 설정 경계(`NotificationManaging`/`NotificationSettingsStoring`)의 Domain/Data 재배치를 반영했습니다. 남은 정리 항목은 `./docs/execplans/tech-debt-tracker.md`에서 추적합니다.
+2026-02-17 기준 운영/Preview/Test 경로에 다음 정렬을 반영했습니다: `NotificationSettingUseCase` 도입으로 Noti 경계 UseCase-first 전환, `HomeNotificationUseCase`로 홈 알림 오케스트레이션 분리, `ReadingDateSettingViewModel` 도입으로 View direct UseCase 제거, `Date+Extension`의 provider 경유 통일, `.swiftlint.yml` 경계 가드룰(Stage 1). 남은 정리 항목은 `./docs/exec-plans/tech-debt-tracker.md`에서 추적합니다.
 
 ## 5) Boundaries & API surfaces
 
@@ -150,7 +162,8 @@ Boundary D: 인프라 서비스 경계 (`ReadingNotificationScheduling`, `Notifi
 
 ## 7) Related docs
 
-- 리팩터링 실행/결과 기록: `./docs/execplans/mvvm-architecture-refactoring-execplan.md`
-- ReadingRecord key migration 경량화 기록: `./docs/execplans/reading-record-key-migration-lightweight-refactor-execplan.md`
+- 리팩터링 실행/결과 기록: `./docs/exec-plans/completed/mvvm-architecture-refactoring-execplan.md`
+- Architecture debt wave 실행 계획: `./docs/exec-plans/architecture-debt-remediation-wave-plan.md`
+- Architecture debt 이슈별 계획: `./docs/exec-plans/architecture-debt-issue-plans.md`
 - Presentation 패턴 결정 기록(ADR): `./docs/decisions/adr-0001-presentation-architecture.md`
 - UseCase/Service 경계 결정 기록(ADR): `./docs/decisions/adr-0002-usecase-first-boundary.md`

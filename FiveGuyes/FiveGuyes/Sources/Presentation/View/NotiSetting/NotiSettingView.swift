@@ -91,7 +91,7 @@ struct NotiSettingView: View {
     }
 
     private var notificationDisabledView: some View {
-        Button(action: SystemSettingsManager.openSettings) {
+        Button(action: viewModel.openSystemSettings) {
             HStack {
                 VStack(alignment: .leading, spacing: .zero) {
                     primaryTitle("기기의 알림 설정이 꺼져 있어요!")
@@ -230,10 +230,14 @@ private func makeNotiSettingPreviewViewModel(
         reminderHour: 8,
         reminderMinute: 30
     )
+    let notificationSettingUseCase = NotificationSettingUseCase(
+        notificationService: notificationService,
+        systemSettingsOpener: SystemSettingsManager(),
+        settingsStore: settingsStore
+    )
 
     let viewModel = NotiSettingViewModel(
-        notificationService: notificationService,
-        settingsStore: settingsStore
+        notificationSettingUseCase: notificationSettingUseCase
     )
     viewModel.isSystemNotificationEnabled = isSystemNotificationEnabled
     viewModel.isNotificationDisabled = isNotificationDisabled

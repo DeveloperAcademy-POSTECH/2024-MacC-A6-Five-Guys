@@ -19,16 +19,21 @@ struct MainHomeViewModelTests {
         let notificationService = NotificationManagerStub()
         let readingLibraryUseCase = ReadingLibraryUseCaseStub(
             readingBooks: [firstBook, secondBook],
-            completedBooks: [],
+            completedBooks: []
+        )
+        let homeNotificationUseCase = HomeNotificationUseCaseStub(
             notificationService: notificationService
         )
         let viewModel = MainHomeViewModel(
-            readingLibraryUseCase: readingLibraryUseCase
+            readingLibraryUseCase: readingLibraryUseCase,
+            homeNotificationUseCase: homeNotificationUseCase
         )
 
         await viewModel.loadBooks()
         await viewModel.setupNotificationsForCurrentBook()
 
+        #expect(homeNotificationUseCase.setupNotificationsCallCount == 1)
+        #expect(homeNotificationUseCase.setupNotificationsBookIDs == [firstBook.id])
         #expect(notificationService.setupAllNotificationsCallCount == 1)
         #expect(notificationService.setupAllNotificationsBookIDs == [firstBook.id])
     }
@@ -38,16 +43,20 @@ struct MainHomeViewModelTests {
         let notificationService = NotificationManagerStub()
         let readingLibraryUseCase = ReadingLibraryUseCaseStub(
             readingBooks: [],
-            completedBooks: [],
+            completedBooks: []
+        )
+        let homeNotificationUseCase = HomeNotificationUseCaseStub(
             notificationService: notificationService
         )
         let viewModel = MainHomeViewModel(
-            readingLibraryUseCase: readingLibraryUseCase
+            readingLibraryUseCase: readingLibraryUseCase,
+            homeNotificationUseCase: homeNotificationUseCase
         )
 
         await viewModel.loadBooks()
         await viewModel.setupNotificationsForCurrentBook()
 
+        #expect(homeNotificationUseCase.setupNotificationsCallCount == 0)
         #expect(notificationService.setupAllNotificationsCallCount == 0)
     }
 
@@ -59,9 +68,13 @@ struct MainHomeViewModelTests {
             readingBooks: [overdueBook],
             completedBooks: []
         )
+        let homeNotificationUseCase = HomeNotificationUseCaseStub()
         readingLibraryUseCase.todayValue = today
         readingLibraryUseCase.rescheduleOnAppOpenError = ScheduleCalculationError.targetDatePassed
-        let viewModel = MainHomeViewModel(readingLibraryUseCase: readingLibraryUseCase)
+        let viewModel = MainHomeViewModel(
+            readingLibraryUseCase: readingLibraryUseCase,
+            homeNotificationUseCase: homeNotificationUseCase
+        )
 
         await viewModel.loadBooks()
         let overdueBooks = await viewModel.rescheduleOnAppOpen()

@@ -20,8 +20,10 @@ struct NotiSettingViewModelTests {
             reminderHour: 8,
             reminderMinute: 30
         )
-        let viewModel = NotiSettingViewModel(
+        let settingsOpener = SystemSettingsOpenerStub()
+        let viewModel = makeViewModel(
             notificationService: notificationService,
+            settingsOpener: settingsOpener,
             settingsStore: settingsStore,
             nowProvider: { makeDate("2025-01-01") }
         )
@@ -42,8 +44,10 @@ struct NotiSettingViewModelTests {
             reminderHour: 9,
             reminderMinute: 0
         )
-        let viewModel = NotiSettingViewModel(
+        let settingsOpener = SystemSettingsOpenerStub()
+        let viewModel = makeViewModel(
             notificationService: notificationService,
+            settingsOpener: settingsOpener,
             settingsStore: settingsStore
         )
 
@@ -70,8 +74,10 @@ struct NotiSettingViewModelTests {
             reminderHour: 7,
             reminderMinute: 0
         )
-        let viewModel = NotiSettingViewModel(
+        let settingsOpener = SystemSettingsOpenerStub()
+        let viewModel = makeViewModel(
             notificationService: notificationService,
+            settingsOpener: settingsOpener,
             settingsStore: settingsStore,
             nowProvider: { makeDate("2025-01-01") }
         )
@@ -89,19 +95,57 @@ struct NotiSettingViewModelTests {
             await waitUntil {
                 settingsStore.savedReminderHour == 21 &&
                     settingsStore.savedReminderMinute == 15 &&
-                    notificationService.updateNotificationCallCount == 1
+                    notificationService.updateMorningNotificationCallCount == 1
             }
         )
 
         #expect(settingsStore.savedReminderHour == 21)
         #expect(settingsStore.savedReminderMinute == 15)
-        #expect(notificationService.updateNotificationCallCount == 1)
+        #expect(notificationService.updateMorningNotificationCallCount == 1)
+    }
+
+    @Test("NotiSettingViewModel: 알림 비활성화 상태에서는 시간 변경 시 알림을 재등록하지 않음")
+    func notiSetting_timeChange_whenDisabled_doesNotUpdateNotification() async {
+        let notificationService = NotificationManagerStub()
+        let settingsStore = NotificationSettingsStoreStub(
+            disabled: true,
+            reminderHour: 7,
+            reminderMinute: 0
+        )
+        let settingsOpener = SystemSettingsOpenerStub()
+        let viewModel = makeViewModel(
+            notificationService: notificationService,
+            settingsOpener: settingsOpener,
+            settingsStore: settingsStore,
+            nowProvider: { makeDate("2025-01-01") }
+        )
+
+        let baseDate = makeDate("2025-01-01")
+        viewModel.isNotificationDisabled = true
+        viewModel.selectedTime = Calendar.app.date(
+            bySettingHour: 10,
+            minute: 40,
+            second: 0,
+            of: baseDate
+        ) ?? baseDate
+
+        viewModel.handleNotificationTimeChange(userBook: makeBook())
+
+        #expect(
+            await waitUntil {
+                settingsStore.savedReminderHour == 10 &&
+                    settingsStore.savedReminderMinute == 40
+            }
+        )
+        #expect(settingsStore.savedReminderHour == 10)
+        #expect(settingsStore.savedReminderMinute == 40)
+        #expect(notificationService.updateMorningNotificationCallCount == 0)
     }
 
     @Test("NotiSettingViewModel: 빠른 연속 시간 변경 시 마지막 요청만 처리")
     func notiSetting_timeChange_cancelsPreviousTask() async {
         let notificationService = NotificationManagerStub()
-        notificationService.updateNotificationDelayNanoseconds = 80_000_000
+        notificationService.updateMorningNotificationDelayNanoseconds = 80_000_000
         notificationService.ignoreCancelledCalls = true
 
         let settingsStore = NotificationSettingsStoreStub(
@@ -109,8 +153,10 @@ struct NotiSettingViewModelTests {
             reminderHour: 7,
             reminderMinute: 0
         )
-        let viewModel = NotiSettingViewModel(
+        let settingsOpener = SystemSettingsOpenerStub()
+        let viewModel = makeViewModel(
             notificationService: notificationService,
+            settingsOpener: settingsOpener,
             settingsStore: settingsStore,
             nowProvider: { makeDate("2025-01-01") }
         )
@@ -126,12 +172,50 @@ struct NotiSettingViewModelTests {
 
         #expect(
             await waitUntil(timeoutNanoseconds: 1_000_000_000) {
-                notificationService.updateNotificationCallCount == 1
+                notificationService.updateMorningNotificationCallCount == 1
             }
         )
 
         #expect(settingsStore.savedReminderHour == 9)
         #expect(settingsStore.savedReminderMinute == 20)
-        #expect(notificationService.updateNotificationCallCount == 1)
+        #expect(notificationService.updateMorningNotificationCallCount == 1)
+    }
+
+    @Test("NotiSettingViewModel: 시스템 설정 이동 요청 위임")
+    func notiSetting_openSystemSettings_delegatesToService() {
+        let notificationService = NotificationManagerStub()
+        let settingsStore = NotificationSettingsStoreStub(
+            disabled: false,
+            reminderHour: 7,
+            reminderMinute: 0
+        )
+        let settingsOpener = SystemSettingsOpenerStub()
+        let viewModel = makeViewModel(
+            notificationService: notificationService,
+            settingsOpener: settingsOpener,
+            settingsStore: settingsStore
+        )
+
+        viewModel.openSystemSettings()
+
+        #expect(settingsOpener.openSettingsCallCount == 1)
+    }
+
+    private func makeViewModel(
+        notificationService: NotificationManagerStub,
+        settingsOpener: SystemSettingsOpenerStub,
+        settingsStore: NotificationSettingsStoreStub,
+        nowProvider: @escaping () -> Date = Date.init
+    ) -> NotiSettingViewModel {
+        let useCase = NotificationSettingUseCase(
+            notificationService: notificationService,
+            systemSettingsOpener: settingsOpener,
+            settingsStore: settingsStore
+        )
+
+        return NotiSettingViewModel(
+            notificationSettingUseCase: useCase,
+            nowProvider: nowProvider
+        )
     }
 }

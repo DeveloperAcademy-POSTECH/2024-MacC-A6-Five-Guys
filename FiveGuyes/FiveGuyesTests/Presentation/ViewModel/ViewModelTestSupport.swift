@@ -129,7 +129,6 @@ final class ReadingLibraryUseCaseStub: ReadingLibraryUsing {
     var deleteBookError: Error?
     var rescheduleOnAppOpenError: Error?
     var todayValue: Date = .distantPast
-    var notificationService: (any NotificationManaging)?
 
     var fetchLibrarySnapshotCallCount = 0
     var deleteBookCallCount = 0
@@ -137,12 +136,10 @@ final class ReadingLibraryUseCaseStub: ReadingLibraryUsing {
 
     init(
         readingBooks: [FGUserBook] = [.dummy],
-        completedBooks: [FGUserBook] = [],
-        notificationService: (any NotificationManaging)? = nil
+        completedBooks: [FGUserBook] = []
     ) {
         self.fetchReadingBooksResult = readingBooks
         self.fetchCompletedBooksResult = completedBooks
-        self.notificationService = notificationService
     }
 
     func fetchLibrarySnapshot() async throws -> ReadingLibrarySnapshot {
@@ -166,12 +163,24 @@ final class ReadingLibraryUseCaseStub: ReadingLibraryUsing {
         if let rescheduleOnAppOpenError { throw rescheduleOnAppOpenError }
     }
 
-    func setupNotifications(for readingBook: FGUserBook) async {
-        await notificationService?.setupAllNotifications(readingBook)
-    }
-
     func today() -> Date {
         todayValue
+    }
+}
+
+final class HomeNotificationUseCaseStub: HomeNotificationUsing {
+    var notificationService: (any NotificationManaging)?
+    var setupNotificationsCallCount = 0
+    var setupNotificationsBookIDs: [UUID] = []
+
+    init(notificationService: (any NotificationManaging)? = nil) {
+        self.notificationService = notificationService
+    }
+
+    func setupNotifications(for readingBook: FGUserBook) async {
+        setupNotificationsCallCount += 1
+        setupNotificationsBookIDs.append(readingBook.id)
+        await notificationService?.setupAllNotifications(readingBook)
     }
 }
 
@@ -292,14 +301,49 @@ final class BookRegistrationUseCaseStub: BookRegistrationUsing {
     }
 }
 
+final class ReadingGoalMetricsUseCaseStub: ReadingGoalMetricsUsing {
+    var dayCountResult = 1
+    var totalPagesResult = 0
+    var pagesPerDayResult = 0
+    var recommendedPagesPerDayResult = 0
+    var dayCountInputs: [(startDate: Date, endDate: Date)] = []
+    var totalPagesInputs: [(startPage: Int, targetEndPage: Int)] = []
+    var pagesPerDayInputs: [(totalPages: Int, totalDays: Int)] = []
+
+    func dayCount(startDate: Date, endDate: Date) -> Int {
+        dayCountInputs.append((startDate, endDate))
+        return dayCountResult
+    }
+
+    func totalPages(startPage: Int, targetEndPage: Int) -> Int {
+        totalPagesInputs.append((startPage, targetEndPage))
+        return totalPagesResult
+    }
+
+    func pagesPerDay(totalPages: Int, totalDays: Int) -> Int {
+        pagesPerDayInputs.append((totalPages, totalDays))
+        return pagesPerDayResult
+    }
+
+    func recommendedPagesPerDay(
+        startPage: Int,
+        targetEndPage: Int,
+        startDate: Date,
+        endDate: Date,
+        excludedDays: [Date]
+    ) -> Int {
+        recommendedPagesPerDayResult
+    }
+}
+
 final class NotificationManagerStub: NotificationManaging {
     var isAuthorized = true
     var requestAuthorizationCallCount = 0
     var clearRequestsCallCount = 0
     var setupAllNotificationsCallCount = 0
     var setupAllNotificationsBookIDs: [UUID] = []
-    var updateNotificationCallCount = 0
-    var updateNotificationDelayNanoseconds: UInt64 = 0
+    var updateMorningNotificationCallCount = 0
+    var updateMorningNotificationDelayNanoseconds: UInt64 = 0
     var ignoreCancelledCalls = false
 
     func requestAuthorization() async -> Bool {
@@ -316,14 +360,22 @@ final class NotificationManagerStub: NotificationManaging {
         setupAllNotificationsBookIDs.append(readingBook.id)
     }
 
-    func updateNotification(notificationType: NotificationType) async {
-        if updateNotificationDelayNanoseconds > 0 {
-            try? await Task.sleep(nanoseconds: updateNotificationDelayNanoseconds)
+    func updateMorningNotification(for readingBook: FGUserBook) async {
+        if updateMorningNotificationDelayNanoseconds > 0 {
+            try? await Task.sleep(nanoseconds: updateMorningNotificationDelayNanoseconds)
         }
         if ignoreCancelledCalls && Task.isCancelled {
             return
         }
-        updateNotificationCallCount += 1
+        updateMorningNotificationCallCount += 1
+    }
+}
+
+final class SystemSettingsOpenerStub: SystemSettingsOpening {
+    var openSettingsCallCount = 0
+
+    func openSettings() {
+        openSettingsCallCount += 1
     }
 }
 

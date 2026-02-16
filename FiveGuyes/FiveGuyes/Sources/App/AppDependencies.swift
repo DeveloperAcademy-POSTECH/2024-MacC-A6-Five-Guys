@@ -16,12 +16,16 @@ final class AppDependencies {
     private static let migrationStoreScope = "mainStore"
 
     let readingLibraryUseCase: any ReadingLibraryUsing
+    let homeNotificationUseCase: any HomeNotificationUsing
     let dailyReadingUseCase: any DailyReadingUsing
     let bookCompletionUseCase: any BookCompletionUsing
     let readingPlanUseCase: any ReadingPlanUsing
+    let readingGoalMetricsUseCase: any ReadingGoalMetricsUsing
     let bookRegistrationUseCase: any BookRegistrationUsing
+    let notificationSettingUseCase: any NotificationSettingUsing
     let notificationService: any NotificationManaging
     let notiSettingsStore: any NotificationSettingsStoring
+    let systemSettingsOpener: any SystemSettingsOpening
     let bookSearchUseCase: any BookSearchUsing
 
     init(modelContainer: ModelContainer) {
@@ -39,11 +43,21 @@ final class AppDependencies {
 
         let readingDateProvider = DefaultReadingDateProvider()
         let notiSettingsStore = UserDefaultsNotificationSettingsStore()
+        let systemSettingsOpener = SystemSettingsManager()
         let notificationService = NotificationManager(
             todayProvider: readingDateProvider,
             settingsStore: notiSettingsStore
         )
+        let notificationSettingUseCase = NotificationSettingUseCase(
+            notificationService: notificationService,
+            systemSettingsOpener: systemSettingsOpener,
+            settingsStore: notiSettingsStore
+        )
+        let homeNotificationUseCase = HomeNotificationUseCase(
+            notificationScheduler: notificationService
+        )
         let scheduleCalculator = ReadingScheduleCalculator()
+        let readingGoalMetricsUseCase = ReadingGoalMetricsUseCase()
 
         let fetchReadingBooksUseCase = FetchReadingBooksUseCase(repo: repo)
         let fetchCompletedBooksUseCase = FetchCompletedBooksUseCase(repo: repo)
@@ -81,9 +95,9 @@ final class AppDependencies {
             fetchCompletedBooksUseCase: fetchCompletedBooksUseCase,
             deleteBookUseCase: deleteBookUseCase,
             rescheduleOnAppOpenUseCase: rescheduleOnAppOpenUseCase,
-            notificationScheduler: notificationService,
             todayProvider: readingDateProvider
         )
+        self.homeNotificationUseCase = homeNotificationUseCase
         self.dailyReadingUseCase = DailyReadingUseCase(
             recordReadingUseCase: recordReadingUseCase,
             todayProvider: readingDateProvider
@@ -97,11 +111,14 @@ final class AppDependencies {
             updateReadingPlanUseCase: updateReadingPlanUseCase,
             todayProvider: readingDateProvider
         )
+        self.readingGoalMetricsUseCase = readingGoalMetricsUseCase
         self.bookRegistrationUseCase = BookRegistrationUseCase(
             registerBookUseCase: registerBookUseCase
         )
+        self.notificationSettingUseCase = notificationSettingUseCase
         self.notificationService = notificationService
         self.notiSettingsStore = notiSettingsStore
+        self.systemSettingsOpener = systemSettingsOpener
         self.bookSearchUseCase = BookSearchUseCase(
             bookSearchProvider: AladinBookSearchProvider()
         )

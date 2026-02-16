@@ -9,5 +9,5 @@ protocol NotificationManaging {
     func requestAuthorization() async -> Bool
     func clearRequests() async
     func setupAllNotifications(_ readingBook: FGUserBook) async
-    func updateNotification(notificationType: NotificationType) async
+    func updateMorningNotification(for readingBook: FGUserBook) async
 }

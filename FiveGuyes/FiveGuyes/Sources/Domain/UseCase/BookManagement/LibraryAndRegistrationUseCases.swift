@@ -16,7 +16,6 @@ protocol ReadingLibraryUsing {
     func fetchLibrarySnapshot() async throws -> ReadingLibrarySnapshot
     func deleteBook(id: UUID) async throws
     func rescheduleOnAppOpen(bookId: UUID) async throws
-    func setupNotifications(for readingBook: FGUserBook) async
     func today() -> Date
 }
 
@@ -29,7 +28,6 @@ struct ReadingLibraryUseCase: ReadingLibraryUsing {
     private let fetchCompletedBooksUseCase: FetchCompletedBooksUseCase
     private let deleteBookUseCase: DeleteBookUseCase
     private let rescheduleOnAppOpenUseCase: RescheduleOnAppOpenUseCase
-    private let notificationScheduler: any ReadingNotificationScheduling
     private let todayProvider: any ReadingDateProviding
 
     init(
@@ -37,14 +35,12 @@ struct ReadingLibraryUseCase: ReadingLibraryUsing {
         fetchCompletedBooksUseCase: FetchCompletedBooksUseCase,
         deleteBookUseCase: DeleteBookUseCase,
         rescheduleOnAppOpenUseCase: RescheduleOnAppOpenUseCase,
-        notificationScheduler: any ReadingNotificationScheduling,
         todayProvider: any ReadingDateProviding
     ) {
         self.fetchReadingBooksUseCase = fetchReadingBooksUseCase
         self.fetchCompletedBooksUseCase = fetchCompletedBooksUseCase
         self.deleteBookUseCase = deleteBookUseCase
         self.rescheduleOnAppOpenUseCase = rescheduleOnAppOpenUseCase
-        self.notificationScheduler = notificationScheduler
         self.todayProvider = todayProvider
     }
 
@@ -65,10 +61,6 @@ struct ReadingLibraryUseCase: ReadingLibraryUsing {
     func rescheduleOnAppOpen(bookId: UUID) async throws {
         let today = todayProvider.today()
         try await rescheduleOnAppOpenUseCase.execute(bookId: bookId, today: today)
-    }
-
-    func setupNotifications(for readingBook: FGUserBook) async {
-        await notificationScheduler.setupAllNotifications(readingBook)
     }
 
     func today() -> Date {
