@@ -161,17 +161,18 @@ struct UnfinishReadingView: View {
 
 #if DEBUG
 #Preview("기본 상태") {
-    let service = PreviewBookManagementService()
+    let overdueBook = PreviewSupport.makeBook(
+        title: "목표 기간이 끝난 도서",
+        isCompleted: false,
+        lastReadPage: 184
+    )
+    let binding = PreviewSupport.bindReadingBook(overdueBook)
 
     NavigationStack {
         UnfinishReadingView(
-            userBook: PreviewSupport.makeBook(
-                title: "목표 기간이 끝난 도서",
-                isCompleted: false,
-                lastReadPage: 184
-            ),
+            userBook: binding.userBook,
             viewModel: UnfinishReadingViewModel(
-                bookCompletionUseCase: PreviewBookCompletionUseCaseAdapter(service: service)
+                bookCompletionUseCase: binding.useCase
             )
         )
     }
@@ -185,13 +186,13 @@ struct UnfinishReadingView: View {
         coverImageURL: "https://example.com/sample-cover.jpg",
         lastReadPage: 210
     )
-    let service = PreviewBookManagementService(readingBooks: [bookWithCover], completedBooks: [])
+    let binding = PreviewSupport.bindReadingBook(bookWithCover)
 
     NavigationStack {
         UnfinishReadingView(
-            userBook: bookWithCover,
+            userBook: binding.userBook,
             viewModel: UnfinishReadingViewModel(
-                bookCompletionUseCase: PreviewBookCompletionUseCaseAdapter(service: service)
+                bookCompletionUseCase: binding.useCase
             )
         )
     }

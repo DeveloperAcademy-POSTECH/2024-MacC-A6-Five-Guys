@@ -130,13 +130,13 @@ struct DailyProgressView: View {
 
 #if DEBUG
 #Preview("일반 진행 상태") {
-    let service = PreviewBookManagementService()
+    let binding = PreviewSupport.bindReadingBook(PreviewSupport.sampleReadingBook)
 
     NavigationStack {
         DailyProgressView(
-            userBook: PreviewSupport.sampleReadingBook,
+            userBook: binding.userBook,
             viewModel: DailyProgressViewModel(
-                dailyReadingUseCase: PreviewDailyReadingUseCaseAdapter(service: service)
+                dailyReadingUseCase: binding.useCase
             )
         )
     }
@@ -150,13 +150,13 @@ struct DailyProgressView: View {
         targetEndDateOffset: 0,
         lastReadPage: 300
     )
-    let service = PreviewBookManagementService(readingBooks: [dueTodayBook], completedBooks: [])
+    let binding = PreviewSupport.bindReadingBook(dueTodayBook)
 
     NavigationStack {
         DailyProgressView(
-            userBook: dueTodayBook,
+            userBook: binding.userBook,
             viewModel: DailyProgressViewModel(
-                dailyReadingUseCase: PreviewDailyReadingUseCaseAdapter(service: service)
+                dailyReadingUseCase: binding.useCase
             )
         )
     }

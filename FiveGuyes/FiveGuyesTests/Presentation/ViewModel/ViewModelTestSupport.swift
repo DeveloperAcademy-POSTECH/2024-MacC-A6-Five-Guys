@@ -122,30 +122,48 @@ enum TestError: Error {
     case forced
 }
 
-struct ReadingLibraryStubAdapter: ReadingLibraryUsing {
-    let service: any BookManagementService
-    let notificationService: (any NotificationManaging)?
+final class ReadingLibraryUseCaseStub: ReadingLibraryUsing {
+    var fetchReadingBooksResult: [FGUserBook]
+    var fetchCompletedBooksResult: [FGUserBook]
+    var fetchLibrarySnapshotError: Error?
+    var deleteBookError: Error?
+    var rescheduleOnAppOpenError: Error?
+    var todayValue: Date = .distantPast
+    var notificationService: (any NotificationManaging)?
+
+    var fetchLibrarySnapshotCallCount = 0
+    var deleteBookCallCount = 0
+    var rescheduleOnAppOpenCallCount = 0
 
     init(
-        service: any BookManagementService,
+        readingBooks: [FGUserBook] = [.dummy],
+        completedBooks: [FGUserBook] = [],
         notificationService: (any NotificationManaging)? = nil
     ) {
-        self.service = service
+        self.fetchReadingBooksResult = readingBooks
+        self.fetchCompletedBooksResult = completedBooks
         self.notificationService = notificationService
     }
 
     func fetchLibrarySnapshot() async throws -> ReadingLibrarySnapshot {
-        let readingBooks = try await service.fetchReadingBooks()
-        let completedBooks = try await service.fetchCompletedBooks()
-        return ReadingLibrarySnapshot(readingBooks: readingBooks, completedBooks: completedBooks)
+        fetchLibrarySnapshotCallCount += 1
+        if let fetchLibrarySnapshotError { throw fetchLibrarySnapshotError }
+        return ReadingLibrarySnapshot(
+            readingBooks: fetchReadingBooksResult,
+            completedBooks: fetchCompletedBooksResult
+        )
     }
 
     func deleteBook(id: UUID) async throws {
-        try await service.deleteBook(id: id)
+        deleteBookCallCount += 1
+        if let deleteBookError { throw deleteBookError }
+        fetchReadingBooksResult.removeAll { $0.id == id }
+        fetchCompletedBooksResult.removeAll { $0.id == id }
     }
 
     func rescheduleOnAppOpen(bookId: UUID) async throws {
-        try await service.rescheduleOnAppOpen(bookId: bookId)
+        rescheduleOnAppOpenCallCount += 1
+        if let rescheduleOnAppOpenError { throw rescheduleOnAppOpenError }
     }
 
     func setupNotifications(for readingBook: FGUserBook) async {
@@ -153,123 +171,22 @@ struct ReadingLibraryStubAdapter: ReadingLibraryUsing {
     }
 
     func today() -> Date {
-        service.today()
+        todayValue
     }
 }
 
-struct DailyReadingStubAdapter: DailyReadingUsing {
-    let service: any BookManagementService
-
-    func recordReading(bookId: UUID, pagesRead: Int) async throws -> RecordReadingResult {
-        try await service.recordReading(bookId: bookId, pagesRead: pagesRead)
-    }
-
-    func today() -> Date {
-        service.today()
-    }
-}
-
-struct BookCompletionStubAdapter: BookCompletionUsing {
-    let service: any BookManagementService
-
-    func completeBook(id: UUID, review: String) async throws {
-        try await service.completeBook(id: id, review: review)
-    }
-
-    func updateCompletionReview(id: UUID, review: String) async throws {
-        try await service.updateCompletionReview(id: id, review: review)
-    }
-
-    func completionCelebrationSummary(for book: FGUserBook) -> CompletionCelebrationSummary {
-        CompletionCelebrationSummary.make(for: book, endDate: service.today())
-    }
-}
-
-struct ReadingPlanStubAdapter: ReadingPlanUsing {
-    let service: any BookManagementService
-
-    func updateReadingPlan(
-        bookId: UUID,
-        startDate: Date,
-        targetEndDate: Date,
-        excludedReadingDays: [Date]
-    ) async throws {
-        try await service.updateReadingPlan(
-            bookId: bookId,
-            startDate: startDate,
-            targetEndDate: targetEndDate,
-            excludedReadingDays: excludedReadingDays
-        )
-    }
-
-    func today() -> Date {
-        service.today()
-    }
-}
-
-struct BookRegistrationStubAdapter: BookRegistrationUsing {
-    let service: any BookManagementService
-
-    func registerBook(_ input: RegisterBookInput) async throws -> FGUserBook {
-        try await service.registerBook(input)
-    }
-}
-
-final class BookManagementServiceStub: BookManagementService {
-    var registerBookResult: FGUserBook
+final class DailyReadingUseCaseStub: DailyReadingUsing {
     var recordReadingResult: RecordReadingResult
-    var fetchReadingBooksResult: [FGUserBook]
-    var fetchCompletedBooksResult: [FGUserBook]
-    var fetchBookDetailResult: FGUserBook
-
-    var registerBookError: Error?
     var recordReadingError: Error?
-    var deleteBookError: Error?
-    var completeBookError: Error?
-    var updateCompletionReviewError: Error?
-    var updateReadingPlanError: Error?
-    var fetchReadingBooksError: Error?
-    var fetchCompletedBooksError: Error?
-    var fetchBookDetailError: Error?
-    var rescheduleOnAppOpenError: Error?
-
-    var registerBookDelayNanoseconds: UInt64 = 0
     var recordReadingDelayNanoseconds: UInt64 = 0
-    var completeBookDelayNanoseconds: UInt64 = 0
-    var updateCompletionReviewDelayNanoseconds: UInt64 = 0
-    var updateReadingPlanDelayNanoseconds: UInt64 = 0
     var recordReadingGate: AsyncGate?
-    var completeBookGate: AsyncGate?
     var onRecordReadingStart: (() async -> Void)?
-    var onCompleteBookStart: (() async -> Void)?
     var todayValue: Date = .distantPast
 
-    var registerBookCallCount = 0
     var recordReadingCallCount = 0
-    var deleteBookCallCount = 0
-    var completeBookCallCount = 0
-    var updateCompletionReviewCallCount = 0
-    var updateReadingPlanCallCount = 0
-    var fetchReadingBooksCallCount = 0
-    var fetchCompletedBooksCallCount = 0
-    var fetchBookDetailCallCount = 0
-    var rescheduleOnAppOpenCallCount = 0
 
     init(book: FGUserBook = .dummy) {
-        self.registerBookResult = book
         self.recordReadingResult = .recorded(updatedBook: book)
-        self.fetchReadingBooksResult = [book]
-        self.fetchCompletedBooksResult = []
-        self.fetchBookDetailResult = book
-    }
-
-    func registerBook(_ input: RegisterBookInput) async throws -> FGUserBook {
-        registerBookCallCount += 1
-        if registerBookDelayNanoseconds > 0 {
-            try? await Task.sleep(nanoseconds: registerBookDelayNanoseconds)
-        }
-        if let registerBookError { throw registerBookError }
-        return registerBookResult
     }
 
     func recordReading(bookId: UUID, pagesRead: Int) async throws -> RecordReadingResult {
@@ -287,10 +204,22 @@ final class BookManagementServiceStub: BookManagementService {
         return recordReadingResult
     }
 
-    func deleteBook(id: UUID) async throws {
-        deleteBookCallCount += 1
-        if let deleteBookError { throw deleteBookError }
+    func today() -> Date {
+        todayValue
     }
+}
+
+final class BookCompletionUseCaseStub: BookCompletionUsing {
+    var completeBookError: Error?
+    var updateCompletionReviewError: Error?
+    var completeBookDelayNanoseconds: UInt64 = 0
+    var updateCompletionReviewDelayNanoseconds: UInt64 = 0
+    var completeBookGate: AsyncGate?
+    var onCompleteBookStart: (() async -> Void)?
+    var todayValue: Date = .distantPast
+
+    var completeBookCallCount = 0
+    var updateCompletionReviewCallCount = 0
 
     func completeBook(id: UUID, review: String) async throws {
         completeBookCallCount += 1
@@ -314,6 +243,17 @@ final class BookManagementServiceStub: BookManagementService {
         if let updateCompletionReviewError { throw updateCompletionReviewError }
     }
 
+    func completionCelebrationSummary(for book: FGUserBook) -> CompletionCelebrationSummary {
+        CompletionCelebrationSummary.make(for: book, endDate: todayValue)
+    }
+}
+
+final class ReadingPlanUseCaseStub: ReadingPlanUsing {
+    var updateReadingPlanError: Error?
+    var updateReadingPlanDelayNanoseconds: UInt64 = 0
+    var updateReadingPlanCallCount = 0
+    var todayValue: Date = .distantPast
+
     func updateReadingPlan(
         bookId: UUID,
         startDate: Date,
@@ -327,31 +267,28 @@ final class BookManagementServiceStub: BookManagementService {
         if let updateReadingPlanError { throw updateReadingPlanError }
     }
 
-    func fetchReadingBooks() async throws -> [FGUserBook] {
-        fetchReadingBooksCallCount += 1
-        if let fetchReadingBooksError { throw fetchReadingBooksError }
-        return fetchReadingBooksResult
-    }
-
-    func fetchCompletedBooks() async throws -> [FGUserBook] {
-        fetchCompletedBooksCallCount += 1
-        if let fetchCompletedBooksError { throw fetchCompletedBooksError }
-        return fetchCompletedBooksResult
-    }
-
-    func fetchBookDetail(id: UUID) async throws -> FGUserBook {
-        fetchBookDetailCallCount += 1
-        if let fetchBookDetailError { throw fetchBookDetailError }
-        return fetchBookDetailResult
-    }
-
-    func rescheduleOnAppOpen(bookId: UUID) async throws {
-        rescheduleOnAppOpenCallCount += 1
-        if let rescheduleOnAppOpenError { throw rescheduleOnAppOpenError }
-    }
-
     func today() -> Date {
         todayValue
+    }
+}
+
+final class BookRegistrationUseCaseStub: BookRegistrationUsing {
+    var registerBookResult: FGUserBook
+    var registerBookError: Error?
+    var registerBookDelayNanoseconds: UInt64 = 0
+    var registerBookCallCount = 0
+
+    init(book: FGUserBook = .dummy) {
+        self.registerBookResult = book
+    }
+
+    func registerBook(_ input: RegisterBookInput) async throws -> FGUserBook {
+        registerBookCallCount += 1
+        if registerBookDelayNanoseconds > 0 {
+            try? await Task.sleep(nanoseconds: registerBookDelayNanoseconds)
+        }
+        if let registerBookError { throw registerBookError }
+        return registerBookResult
     }
 }
 

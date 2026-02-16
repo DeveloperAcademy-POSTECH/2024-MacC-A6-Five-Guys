@@ -260,24 +260,13 @@
 
 ## TD-012: Preview/Test 어댑터 매핑 중복
 
-- Status: Open
+- Status: Resolved (2026-02-16)
 - Context:
-  - `BookManagementService -> ...Using` 매핑 어댑터가 Preview와 Test 지원 파일에 유사 로직으로 중복되어 있습니다.
-- Risk:
-  - 인터페이스 변경 시 양쪽 동시 수정 누락 가능성이 높아집니다.
-  - 테스트/프리뷰 행위 불일치가 숨은 회귀를 만들 수 있습니다.
-- Target Layer:
-  - Preview/Test 공통 어댑터 재사용 또는 단일 팩토리 경계
-- Trigger Condition:
-  - `...Using` 인터페이스 변경, 프리뷰/테스트 인프라 리팩토링 시
-- Priority:
-  - P3
+  - Preview/Test의 `BookManagementService -> ...Using` 매핑 어댑터를 제거하고, `...Using` 직접 스텁으로 경계를 단일화했습니다.
 - Current Evidence:
   - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Presentation/Preview/PreviewSupport.swift`
   - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyesTests/Presentation/ViewModel/ViewModelTestSupport.swift`
-- Suggested Follow-up:
-  1. 공통 어댑터 타입 또는 빌더를 도입해 중복 제거
-  2. 인터페이스 변경 시 단일 수정 지점으로 정리
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Domain/Service` (`BookManagementService.swift` 삭제)
 
 ## TD-013: Notification 경계 선언 위치 정렬
 
@@ -299,5 +288,4 @@
 3. TD-013: Notification 경계 선언 위치 정렬 (P1) - Resolved (2026-02-16)
 4. TD-010: 알림 일괄 등록 권한 체크 중복 제거 (P2)
 5. TD-011: ReadingLibraryUseCase 책임 재분리 (P2)
-6. TD-012: Preview/Test 어댑터 중복 제거 (P3)
-7. 나머지 Open P2/P3 항목 순차 정리
+6. 나머지 Open P2/P3 항목 순차 정리

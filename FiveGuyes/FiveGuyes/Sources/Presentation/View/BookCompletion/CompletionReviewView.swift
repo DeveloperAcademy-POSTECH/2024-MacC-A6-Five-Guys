@@ -103,13 +103,13 @@ struct CompletionReviewView: View {
 
 #if DEBUG
 #Preview("완독 소감 작성") {
-    let service = PreviewBookManagementService()
+    let binding = PreviewSupport.bindCompletedBook(PreviewSupport.sampleCompletedBook)
 
     NavigationStack {
         CompletionReviewView(
-            userBook: PreviewSupport.sampleCompletedBook,
+            userBook: binding.userBook,
             viewModel: CompletionReviewViewModel(
-                bookCompletionUseCase: PreviewBookCompletionUseCaseAdapter(service: service)
+                bookCompletionUseCase: binding.useCase
             )
         )
     }
@@ -122,17 +122,14 @@ struct CompletionReviewView: View {
         isCompleted: true,
         reviewAfterCompletion: "이미 남겨둔 완독 소감입니다."
     )
-    let service = PreviewBookManagementService(
-        readingBooks: [],
-        completedBooks: [reviewedBook]
-    )
+    let binding = PreviewSupport.bindCompletedBook(reviewedBook)
 
     NavigationStack {
         CompletionReviewView(
             isUpdateMode: true,
-            userBook: reviewedBook,
+            userBook: binding.userBook,
             viewModel: CompletionReviewViewModel(
-                bookCompletionUseCase: PreviewBookCompletionUseCaseAdapter(service: service)
+                bookCompletionUseCase: binding.useCase
             )
         )
     }

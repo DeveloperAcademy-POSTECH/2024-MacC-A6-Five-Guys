@@ -15,8 +15,8 @@ struct FinishGoalViewModelTests {
     @Test("FinishGoalViewModel: registerBook 성공 시 true 반환")
     func finishGoal_registerBook_success() async {
         let book = makeBook()
-        let service = BookManagementServiceStub(book: book)
-        let viewModel = FinishGoalViewModel(bookRegistrationUseCase: BookRegistrationStubAdapter(service: service))
+        let bookRegistrationUseCase = BookRegistrationUseCaseStub(book: book)
+        let viewModel = FinishGoalViewModel(bookRegistrationUseCase: bookRegistrationUseCase)
 
         let selectedBook = BookSearchItem(
             title: "테스트 도서",
@@ -37,15 +37,15 @@ struct FinishGoalViewModelTests {
         )
 
         #expect(isRegistered)
-        #expect(service.registerBookCallCount == 1)
+        #expect(bookRegistrationUseCase.registerBookCallCount == 1)
     }
 
     @Test("FinishGoalViewModel: 등록 실패 시 false 반환")
     func finishGoal_registerBook_failure() async {
         let book = makeBook()
-        let service = BookManagementServiceStub(book: book)
-        service.registerBookError = TestError.forced
-        let viewModel = FinishGoalViewModel(bookRegistrationUseCase: BookRegistrationStubAdapter(service: service))
+        let bookRegistrationUseCase = BookRegistrationUseCaseStub(book: book)
+        bookRegistrationUseCase.registerBookError = TestError.forced
+        let viewModel = FinishGoalViewModel(bookRegistrationUseCase: bookRegistrationUseCase)
 
         let selectedBook = BookSearchItem(
             title: "테스트 도서",
@@ -66,15 +66,15 @@ struct FinishGoalViewModelTests {
         )
 
         #expect(!isRegistered)
-        #expect(service.registerBookCallCount == 1)
+        #expect(bookRegistrationUseCase.registerBookCallCount == 1)
     }
 
     @Test("FinishGoalViewModel: 중복 등록 시 두 번째 요청 무시")
     func finishGoal_registerBook_duplicateSubmit_ignored() async {
         let book = makeBook()
-        let service = BookManagementServiceStub(book: book)
-        service.registerBookDelayNanoseconds = 200_000_000
-        let viewModel = FinishGoalViewModel(bookRegistrationUseCase: BookRegistrationStubAdapter(service: service))
+        let bookRegistrationUseCase = BookRegistrationUseCaseStub(book: book)
+        bookRegistrationUseCase.registerBookDelayNanoseconds = 200_000_000
+        let viewModel = FinishGoalViewModel(bookRegistrationUseCase: bookRegistrationUseCase)
 
         let selectedBook = BookSearchItem(
             title: "테스트 도서",
@@ -107,6 +107,6 @@ struct FinishGoalViewModelTests {
         _ = await firstTask.value
 
         #expect(!second)
-        #expect(service.registerBookCallCount == 1)
+        #expect(bookRegistrationUseCase.registerBookCallCount == 1)
     }
 }

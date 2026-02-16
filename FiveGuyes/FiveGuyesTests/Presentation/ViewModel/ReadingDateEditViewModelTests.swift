@@ -15,11 +15,11 @@ struct ReadingDateEditViewModelTests {
     @Test("ReadingDateEditViewModel: updateReadingPlan 성공 시 true 반환")
     func readingDateEdit_success() async {
         let book = makeBook()
-        let service = BookManagementServiceStub(book: book)
+        let readingPlanUseCase = ReadingPlanUseCaseStub()
         let today = makeDate("2025-01-02")
-        service.todayValue = today
+        readingPlanUseCase.todayValue = today
         let viewModel = ReadingDateEditViewModel(
-            readingPlanUseCase: ReadingPlanStubAdapter(service: service)
+            readingPlanUseCase: readingPlanUseCase
         )
 
         let isUpdated = await viewModel.submitReadingPlanUpdate(
@@ -30,17 +30,17 @@ struct ReadingDateEditViewModelTests {
         )
 
         #expect(isUpdated)
-        #expect(service.updateReadingPlanCallCount == 1)
+        #expect(readingPlanUseCase.updateReadingPlanCallCount == 1)
         #expect(viewModel.today() == today)
     }
 
     @Test("ReadingDateEditViewModel: 실패 시 false 반환")
     func readingDateEdit_failure() async {
         let book = makeBook()
-        let service = BookManagementServiceStub(book: book)
-        service.updateReadingPlanError = TestError.forced
+        let readingPlanUseCase = ReadingPlanUseCaseStub()
+        readingPlanUseCase.updateReadingPlanError = TestError.forced
         let viewModel = ReadingDateEditViewModel(
-            readingPlanUseCase: ReadingPlanStubAdapter(service: service)
+            readingPlanUseCase: readingPlanUseCase
         )
 
         let isUpdated = await viewModel.submitReadingPlanUpdate(
@@ -51,17 +51,17 @@ struct ReadingDateEditViewModelTests {
         )
 
         #expect(!isUpdated)
-        #expect(service.updateReadingPlanCallCount == 1)
+        #expect(readingPlanUseCase.updateReadingPlanCallCount == 1)
     }
 
     @Test("ReadingDateEditViewModel: 중복 제출 시 두 번째 요청 무시")
     func readingDateEdit_duplicateSubmit_ignored() async {
         let book = makeBook()
-        let service = BookManagementServiceStub(book: book)
-        service.updateReadingPlanDelayNanoseconds = 200_000_000
+        let readingPlanUseCase = ReadingPlanUseCaseStub()
+        readingPlanUseCase.updateReadingPlanDelayNanoseconds = 200_000_000
 
         let viewModel = ReadingDateEditViewModel(
-            readingPlanUseCase: ReadingPlanStubAdapter(service: service)
+            readingPlanUseCase: readingPlanUseCase
         )
 
         let firstTask = Task {
@@ -82,6 +82,6 @@ struct ReadingDateEditViewModelTests {
         _ = await firstTask.value
 
         #expect(!second)
-        #expect(service.updateReadingPlanCallCount == 1)
+        #expect(readingPlanUseCase.updateReadingPlanCallCount == 1)
     }
 }

@@ -12,13 +12,13 @@ extension PreviewSupport {
         readingBooks: [FGUserBook],
         completedBooks: [FGUserBook]
     ) -> MainHomeViewModel {
-        let service = PreviewBookManagementService(
+        let previewUseCase = PreviewBookUseCaseStub(
             readingBooks: readingBooks,
             completedBooks: completedBooks
         )
 
         return MainHomeViewModel(
-            readingLibraryUseCase: PreviewReadingLibraryUseCaseAdapter(service: service)
+            readingLibraryUseCase: previewUseCase
         )
     }
 

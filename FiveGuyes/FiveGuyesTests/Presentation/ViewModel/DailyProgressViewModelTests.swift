@@ -14,9 +14,9 @@ import Testing
 struct DailyProgressViewModelTests {
     @Test("DailyProgressViewModel: 목표 초과 입력 시 제출 차단")
     func dailyProgress_overTarget_preventsSubmit() {
-        let service = BookManagementServiceStub()
+        let dailyReadingUseCase = DailyReadingUseCaseStub()
         let viewModel = DailyProgressViewModel(
-            dailyReadingUseCase: DailyReadingStubAdapter(service: service)
+            dailyReadingUseCase: dailyReadingUseCase
         )
         viewModel.pagesToReadToday = 101
 
@@ -29,13 +29,13 @@ struct DailyProgressViewModelTests {
     @Test("DailyProgressViewModel: 완독 결과일 때 완독 화면 이동 결과 반환")
     func dailyProgress_completedOutcome() async {
         let book = makeBook()
-        let service = BookManagementServiceStub(book: book)
+        let dailyReadingUseCase = DailyReadingUseCaseStub(book: book)
         let today = makeDate("2025-01-03")
-        service.todayValue = today
-        service.recordReadingResult = .completed(updatedBook: book)
+        dailyReadingUseCase.todayValue = today
+        dailyReadingUseCase.recordReadingResult = .completed(updatedBook: book)
 
         let viewModel = DailyProgressViewModel(
-            dailyReadingUseCase: DailyReadingStubAdapter(service: service)
+            dailyReadingUseCase: dailyReadingUseCase
         )
         viewModel.pagesToReadToday = 300
 
@@ -47,7 +47,7 @@ struct DailyProgressViewModelTests {
         default:
             Issue.record("Expected .completionCelebration, got \(outcome)")
         }
-        #expect(service.recordReadingCallCount == 1)
+        #expect(dailyReadingUseCase.recordReadingCallCount == 1)
         #expect(viewModel.today() == today)
         #expect(!viewModel.isSubmitting)
     }
@@ -55,18 +55,18 @@ struct DailyProgressViewModelTests {
     @Test("DailyProgressViewModel: 실패 시 none 반환 및 submitting 해제")
     func dailyProgress_failure_returnsNone() async {
         let book = makeBook()
-        let service = BookManagementServiceStub(book: book)
-        service.recordReadingError = TestError.forced
+        let dailyReadingUseCase = DailyReadingUseCaseStub(book: book)
+        dailyReadingUseCase.recordReadingError = TestError.forced
 
         let viewModel = DailyProgressViewModel(
-            dailyReadingUseCase: DailyReadingStubAdapter(service: service)
+            dailyReadingUseCase: dailyReadingUseCase
         )
         viewModel.pagesToReadToday = 120
 
         let outcome = await viewModel.submit(bookId: book.id)
 
         if case .none = outcome {
-            #expect(service.recordReadingCallCount == 1)
+            #expect(dailyReadingUseCase.recordReadingCallCount == 1)
             #expect(!viewModel.isSubmitting)
         } else {
             Issue.record("Expected .none on failure")
@@ -76,17 +76,17 @@ struct DailyProgressViewModelTests {
     @Test("DailyProgressViewModel: 중복 제출 시 두 번째 요청 무시")
     func dailyProgress_duplicateSubmit_ignored() async {
         let book = makeBook()
-        let service = BookManagementServiceStub(book: book)
-        service.recordReadingResult = .recorded(updatedBook: book)
+        let dailyReadingUseCase = DailyReadingUseCaseStub(book: book)
+        dailyReadingUseCase.recordReadingResult = .recorded(updatedBook: book)
         let startedSignal = AsyncSignal()
         let gate = AsyncGate()
-        service.recordReadingGate = gate
-        service.onRecordReadingStart = {
+        dailyReadingUseCase.recordReadingGate = gate
+        dailyReadingUseCase.onRecordReadingStart = {
             await startedSignal.signal()
         }
 
         let viewModel = DailyProgressViewModel(
-            dailyReadingUseCase: DailyReadingStubAdapter(service: service)
+            dailyReadingUseCase: dailyReadingUseCase
         )
         viewModel.pagesToReadToday = 10
 
@@ -99,7 +99,7 @@ struct DailyProgressViewModelTests {
         _ = await firstTask.value
 
         if case .none = second {
-            #expect(service.recordReadingCallCount == 1)
+            #expect(dailyReadingUseCase.recordReadingCallCount == 1)
         } else {
             Issue.record("Expected second submit to return .none while submitting")
         }

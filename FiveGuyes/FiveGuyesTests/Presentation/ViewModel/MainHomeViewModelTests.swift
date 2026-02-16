@@ -16,15 +16,14 @@ struct MainHomeViewModelTests {
     func mainHome_setupNotificationsForCurrentBook() async {
         let firstBook = makeBook()
         let secondBook = makeBook()
-        let service = BookManagementServiceStub(book: firstBook)
-        service.fetchReadingBooksResult = [firstBook, secondBook]
-        service.fetchCompletedBooksResult = []
         let notificationService = NotificationManagerStub()
+        let readingLibraryUseCase = ReadingLibraryUseCaseStub(
+            readingBooks: [firstBook, secondBook],
+            completedBooks: [],
+            notificationService: notificationService
+        )
         let viewModel = MainHomeViewModel(
-            readingLibraryUseCase: ReadingLibraryStubAdapter(
-                service: service,
-                notificationService: notificationService
-            )
+            readingLibraryUseCase: readingLibraryUseCase
         )
 
         await viewModel.loadBooks()
@@ -36,15 +35,14 @@ struct MainHomeViewModelTests {
 
     @Test("MainHomeViewModel: 읽는 책이 없으면 알림 재설정 생략")
     func mainHome_setupNotificationsWithoutReadingBook() async {
-        let service = BookManagementServiceStub()
-        service.fetchReadingBooksResult = []
-        service.fetchCompletedBooksResult = []
         let notificationService = NotificationManagerStub()
+        let readingLibraryUseCase = ReadingLibraryUseCaseStub(
+            readingBooks: [],
+            completedBooks: [],
+            notificationService: notificationService
+        )
         let viewModel = MainHomeViewModel(
-            readingLibraryUseCase: ReadingLibraryStubAdapter(
-                service: service,
-                notificationService: notificationService
-            )
+            readingLibraryUseCase: readingLibraryUseCase
         )
 
         await viewModel.loadBooks()
@@ -56,20 +54,21 @@ struct MainHomeViewModelTests {
     @Test("MainHomeViewModel: 목표일 초과 책을 재스케줄 결과로 반환")
     func mainHome_reschedule_returnsOverdueBooks() async {
         let overdueBook = makeBook()
-        let service = BookManagementServiceStub(book: overdueBook)
         let today = makeDate("2025-01-15")
-        service.todayValue = today
-        service.fetchReadingBooksResult = [overdueBook]
-        service.fetchCompletedBooksResult = []
-        service.rescheduleOnAppOpenError = ScheduleCalculationError.targetDatePassed
-        let viewModel = MainHomeViewModel(readingLibraryUseCase: ReadingLibraryStubAdapter(service: service))
+        let readingLibraryUseCase = ReadingLibraryUseCaseStub(
+            readingBooks: [overdueBook],
+            completedBooks: []
+        )
+        readingLibraryUseCase.todayValue = today
+        readingLibraryUseCase.rescheduleOnAppOpenError = ScheduleCalculationError.targetDatePassed
+        let viewModel = MainHomeViewModel(readingLibraryUseCase: readingLibraryUseCase)
 
         await viewModel.loadBooks()
         let overdueBooks = await viewModel.rescheduleOnAppOpen()
 
         #expect(overdueBooks.count == 1)
         #expect(overdueBooks.first?.id == overdueBook.id)
-        #expect(service.rescheduleOnAppOpenCallCount == 1)
+        #expect(readingLibraryUseCase.rescheduleOnAppOpenCallCount == 1)
         #expect(viewModel.today() == today)
     }
 }

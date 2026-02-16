@@ -185,13 +185,13 @@ struct ReadingDateEditView: View {
 
 #if DEBUG
 #Preview("기간 재설정 단계") {
-    let service = PreviewBookManagementService()
+    let binding = PreviewSupport.bindReadingBook(PreviewSupport.sampleReadingBook)
 
     NavigationStack {
         ReadingDateEditView(
-            userBook: PreviewSupport.sampleReadingBook,
+            userBook: binding.userBook,
             viewModel: ReadingDateEditViewModel(
-                readingPlanUseCase: PreviewReadingPlanUseCaseAdapter(service: service)
+                readingPlanUseCase: binding.useCase
             )
         )
     }
@@ -210,13 +210,13 @@ struct ReadingDateEditView: View {
         excludedDates: [excludedDate],
         isConfirmed: true
     )
-    let service = PreviewBookManagementService()
+    let binding = PreviewSupport.bindReadingBook(PreviewSupport.sampleReadingBook)
 
     NavigationStack {
         ReadingDateEditView(
-            userBook: PreviewSupport.sampleReadingBook,
+            userBook: binding.userBook,
             viewModel: ReadingDateEditViewModel(
-                readingPlanUseCase: PreviewReadingPlanUseCaseAdapter(service: service)
+                readingPlanUseCase: binding.useCase
             ),
             calendarCellModel: calendarCellModel
         )

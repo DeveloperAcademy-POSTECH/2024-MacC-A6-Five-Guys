@@ -63,7 +63,7 @@ Presentation 계층(ViewModel)은 도메인 실행 경계를 `BookManagementServ
 - ViewModel은 UseCase 인터페이스만 호출한다.
 - UseCase는 Domain 모델만 입출력으로 사용한다.
 - UseCase가 필요한 외부 기능은 `...Managing`, `...Scheduling`, `...Providing` 같은 Service 인터페이스를 통해 주입받는다.
-- `BookManagementService`는 운영 경로에서는 사용하지 않고, Preview/Test 호환 어댑터로만 유지한다.
+- `BookManagementService` 같은 호환 파사드는 운영/Preview/Test 신규 경로에서 사용하지 않는다.
 
 ## Consequences
 
@@ -81,15 +81,16 @@ Presentation 계층(ViewModel)은 도메인 실행 경계를 `BookManagementServ
 1. UseCase 인터페이스를 명시하고 AppDependencies에서 조립한다.
 2. ViewModel을 화면별로 `BookManagementService` -> 필요한 UseCase로 교체한다.
 3. 테스트를 화면 단위로 전환한다.
-4. 모든 화면 전환이 완료되면 `BookManagementService`를 삭제하거나 완전한 하위 호환 계층으로 격리한다.
+4. 모든 화면 전환이 완료되면 `BookManagementService` 호환 계층을 제거한다.
 
 ## Implementation status (2026-02-16)
 
 - 완료: `AppDependencies`가 feature-composed UseCase(`ReadingLibraryUsing`, `DailyReadingUsing`, `BookCompletionUsing`, `ReadingPlanUsing`, `BookRegistrationUsing`)를 조립한다.
 - 완료: 대상 ViewModel(`MainHome`, `DailyProgress`, `CompletionReview`, `ReadingDateEdit`, `UnfinishReading`, `FinishGoal`)이 UseCase 인터페이스를 직접 주입받는다.
 - 완료: UseCase의 알림 의존은 concrete `NotificationManager` 대신 `ReadingNotificationScheduling` 프로토콜로 분리되었다.
-- 완료: 운영 `App`/`Presentation/ViewModel` 경로의 `BookManagementService` 의존은 제거되었고, Preview/Test 어댑터 프로토콜로만 유지된다.
+- 완료: 운영 `App`/`Presentation/ViewModel` 경로의 `BookManagementService` 의존은 제거되었고, Preview/Test도 `...Using` 직접 스텁으로 전환되어 호환 프로토콜 계층이 삭제되었다.
 - 완료: 런타임 미사용 중복 계층이던 `DefaultBookManagementService` 구현체를 제거했다.
+- 완료: `BookManagementService` 프로토콜과 Preview/Test 어댑터(`PreviewBookManagementService`, `BookManagementServiceStub`)를 제거해 전체 코드 경계를 UseCase 인터페이스로 단일화했다.
 - 완료: action-level `...Using` 프로토콜은 제거하고, Presentation 경계에는 feature-level UseCase 프로토콜만 유지해 과분리를 완화했다.
 - 완료: 테스트 기준도 UseCase 중심으로 전환해 `BookManagementUseCasesTests`가 등록/기록/완독/계획변경 핵심 시나리오를 검증한다.
 - 완료: `MainHomeViewModel`은 인프라(`NotificationManaging`) 직접 의존 없이 `ReadingLibraryUsing.setupNotifications(for:)`를 통해 알림 트리거를 실행한다.

@@ -27,11 +27,13 @@ FiveGuyes는 사용자의 책/목표일/목표페이지를 입력받아, 매일 
 - 루트 네비게이션: `FiveGuyes/FiveGuyes/Sources/App/NavigationRootView.swift`
 - 화면 라우팅 정의: `FiveGuyes/FiveGuyes/Sources/Presentation/ViewModel/NavigationCoordinator.swift`
 - 도메인 실행 단위(UseCase):
-  - `FiveGuyes/FiveGuyes/Sources/Domain/UseCase/BookManagement/BookManagementLibraryAndRegistrationUseCases.swift`
-  - `FiveGuyes/FiveGuyes/Sources/Domain/UseCase/BookManagement/BookManagementDailyAndPlanUseCases.swift`
-  - `FiveGuyes/FiveGuyes/Sources/Domain/UseCase/BookManagement/BookManagementCompletionUseCases.swift`
+  - `FiveGuyes/FiveGuyes/Sources/Domain/UseCase/BookManagement/LibraryAndRegistrationUseCases.swift`
+  - `FiveGuyes/FiveGuyes/Sources/Domain/UseCase/BookManagement/DailyAndPlanUseCases.swift`
+  - `FiveGuyes/FiveGuyes/Sources/Domain/UseCase/BookManagement/CompletionUseCases.swift`
 - 하루 경계 단일 진입(Service Provider): `FiveGuyes/FiveGuyes/Sources/Domain/Service/ReadingDateProviding.swift`
-- 호환 계층(Preview/Test): `FiveGuyes/FiveGuyes/Sources/Domain/Service/BookManagementService.swift` (프로토콜 + 테스트/프리뷰 스텁)
+- Preview/Test 스텁 경계:
+  - `FiveGuyes/FiveGuyes/Sources/Presentation/Preview/PreviewSupport.swift`
+  - `FiveGuyes/FiveGuyesTests/Presentation/ViewModel/ViewModelTestSupport.swift`
 
 ## 3) Code map
 
@@ -60,7 +62,7 @@ FiveGuyes는 사용자의 책/목표일/목표페이지를 입력받아, 매일 
 - 의존: Repository/알림/시간 정책 같은 추상화
 - 금지 의존: SwiftUI, SwiftData, View 타입
 - 경계 상태: 앱의 핵심 규칙 계층
-- 구현 메모: 운영 경계는 `ViewModel -> UseCase` 직접 의존으로 고정되었고, `BookManagementService`는 Preview/Test 호환 프로토콜로만 유지(기본 구현체 제거)
+- 구현 메모: 운영/Preview/Test 경계 모두 `ViewModel -> UseCase` 인터페이스를 기준으로 정렬되었고, 런타임 미사용 중복 계층(`DefaultBookManagementService`, `BookManagementService`)은 제거되었다.
 
 ### Data
 
@@ -107,7 +109,7 @@ FiveGuyes는 사용자의 책/목표일/목표페이지를 입력받아, 매일 
 - Enforced by: `DayBoundaryProviding`, `DefaultDayBoundaryPolicy`, `Date+Extension` 위임 경로
 - Violation symptoms: 화면별 날짜 키 불일치, 기록 누락/중복
 
-2026-02-16 기준 운영 경로의 UseCase-first 경계 이행, `ReadingDateProviding` 도입, `DefaultBookManagementService` 제거, 알림 설정 경계(`NotificationManaging`/`NotificationSettingsStoring`)의 Domain/Data 재배치를 반영했습니다. 남은 정리 항목은 `./docs/execplans/tech-debt-tracker.md`에서 추적합니다.
+2026-02-16 기준 운영/Preview/Test 경로의 UseCase-first 경계 이행, `ReadingDateProviding` 도입, `DefaultBookManagementService`/`BookManagementService` 제거, 알림 설정 경계(`NotificationManaging`/`NotificationSettingsStoring`)의 Domain/Data 재배치를 반영했습니다. 남은 정리 항목은 `./docs/execplans/tech-debt-tracker.md`에서 추적합니다.
 
 ## 5) Boundaries & API surfaces
 
@@ -126,10 +128,6 @@ Boundary C: DTO/모델 매핑 확장
 Boundary D: 인프라 서비스 경계 (`ReadingNotificationScheduling`, `NotificationManaging`, `NotificationSettingsStoring`, `BookSearchProviding`, `DayBoundaryProviding`)
 - 넘어오는 것: Domain 기반 상태(책 정보, 알림 시간 설정)
 - 금지되는 것: Presentation 계층에서 직접 시스템 권한/요청 생성, UseCase의 concrete 플랫폼 타입 직접 의존
-
-Boundary E: 호환 파사드 경계 (`BookManagementService`)
-- 사용처: Preview/Test 어댑터 및 스텁
-- 금지되는 것: 운영 ViewModel/App 조립 경로에서 신규 의존 추가
 
 "only here" 규칙:
 - SwiftData IO는 `Data/RepositoryImpl`에서만 수행

@@ -210,12 +210,12 @@ struct TextView: View {
 #if DEBUG
 #Preview("완독 목표 요약") {
     let inputModel = PreviewSupport.makeBookSettingInputModel()
-    let service = PreviewBookManagementService()
+    let previewUseCase = PreviewBookUseCaseStub()
 
     NavigationStack {
         FinishGoalView(
             viewModel: FinishGoalViewModel(
-                bookRegistrationUseCase: PreviewBookRegistrationUseCaseAdapter(service: service)
+                bookRegistrationUseCase: previewUseCase
             )
         )
     }
@@ -225,12 +225,12 @@ struct TextView: View {
 
 #Preview("입력 누락 상태") {
     let inputModel = BookSettingInputModel()
-    let service = PreviewBookManagementService()
+    let previewUseCase = PreviewBookUseCaseStub()
 
     NavigationStack {
         FinishGoalView(
             viewModel: FinishGoalViewModel(
-                bookRegistrationUseCase: PreviewBookRegistrationUseCaseAdapter(service: service)
+                bookRegistrationUseCase: previewUseCase
             )
         )
     }
