@@ -8,40 +8,6 @@
 import Foundation
 import Observation
 
-protocol NotificationManaging {
-    func requestAuthorization() async -> Bool
-    func clearRequests() async
-    func setupAllNotifications(_ readingBook: FGUserBook) async
-    func updateNotification(notificationType: NotificationType) async
-}
-
-extension NotificationManager: NotificationManaging {}
-
-protocol NotificationSettingsStoring {
-    func saveNotificationDisabled(_ isNotificationDisabled: Bool)
-    func fetchNotificationDisabled() -> Bool
-    func saveNotificationTime(hour: Int, minute: Int)
-    func fetchNotificationReminderTime() -> (hour: Int, minute: Int)
-}
-
-struct UserDefaultsNotificationSettingsStore: NotificationSettingsStoring {
-    func saveNotificationDisabled(_ isNotificationDisabled: Bool) {
-        UserDefaultsManager.saveNotificationDisabled(isNotificationDisabled)
-    }
-
-    func fetchNotificationDisabled() -> Bool {
-        UserDefaultsManager.fetchNotificationDisabled()
-    }
-
-    func saveNotificationTime(hour: Int, minute: Int) {
-        UserDefaultsManager.saveNotificationTime(hour: hour, minute: minute)
-    }
-
-    func fetchNotificationReminderTime() -> (hour: Int, minute: Int) {
-        UserDefaultsManager.fetchNotificationReminderTime()
-    }
-}
-
 @MainActor
 @Observable
 final class NotiSettingViewModel {
@@ -53,16 +19,16 @@ final class NotiSettingViewModel {
     private var notificationStatusTask: Task<Void, Never>?
     private var notificationTimeTask: Task<Void, Never>?
 
-    private let notificationManager: any NotificationManaging
+    private let notificationService: any NotificationManaging
     private let settingsStore: any NotificationSettingsStoring
     private let nowProvider: () -> Date
 
     init(
-        notificationManager: any NotificationManaging,
+        notificationService: any NotificationManaging,
         settingsStore: any NotificationSettingsStoring,
         nowProvider: @escaping () -> Date = Date.init
     ) {
-        self.notificationManager = notificationManager
+        self.notificationService = notificationService
         self.settingsStore = settingsStore
         self.nowProvider = nowProvider
     }
@@ -91,7 +57,7 @@ final class NotiSettingViewModel {
     }
 
     func refreshSystemNotificationAuthorization() async {
-        isSystemNotificationEnabled = await notificationManager.requestAuthorization()
+        isSystemNotificationEnabled = await notificationService.requestAuthorization()
     }
 
     func handleNotificationStatusChange(userBook: FGUserBook?) {
@@ -104,9 +70,9 @@ final class NotiSettingViewModel {
             guard !Task.isCancelled else { return }
 
             if isDisabled {
-                await notificationManager.clearRequests()
+                await notificationService.clearRequests()
             } else {
-                await notificationManager.setupAllNotifications(userBook)
+                await notificationService.setupAllNotifications(userBook)
             }
         }
     }
@@ -120,7 +86,7 @@ final class NotiSettingViewModel {
             guard let userBook else { return }
             guard !Task.isCancelled else { return }
 
-            await notificationManager.updateNotification(
+            await notificationService.updateNotification(
                 notificationType: .morning(readingBook: userBook)
             )
         }

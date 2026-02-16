@@ -7,12 +7,11 @@
 
 import SwiftUI
 
-// TODO: 추가되는 뷰 추가하기
 enum Screens: Hashable {
     case mainHome
     case notiSetting(book: FGUserBook?)
     case bookSettingsManager
-    case totalCalendar(books: [FGUserBook])
+    case totalCalendar(books: [FGUserBook], today: Date)
     case dailyProgress(book: FGUserBook)
     case completionCelebration(book: FGUserBook)
     case completionReview(book: FGUserBook)
@@ -31,44 +30,54 @@ final class NavigationCoordinator {
     init(appDependencies: AppDependencies) {
         self.appDependencies = appDependencies
     }
-    
+
     @ViewBuilder
      func navigate(to screen: Screens) -> some View {
-        // TODO: 추가되는 뷰 추가하기
         switch screen {
         case .mainHome:
             MainHomeView(
                 viewModel: MainHomeViewModel(
-                    bookManagementService: appDependencies.bookManagementService,
-                    notificationManager: appDependencies.notificationManager
+                    readingLibraryUseCase: appDependencies.readingLibraryUseCase
                 )
             )
         case .notiSetting(book: let book):
             NotiSettingView(
                 userBook: book,
                 viewModel: NotiSettingViewModel(
-                    notificationManager: appDependencies.notificationManager,
-                    settingsStore: appDependencies.notificationSettingsStore
+                    notificationService: appDependencies.notificationService,
+                    settingsStore: appDependencies.notiSettingsStore
                 )
             )
         case .bookSettingsManager:
-            BookSettingsManagerView()
-        case .totalCalendar(books: let books):
-            MultiBookProgressView(currentReadingBooks: books)
+            BookSettingsManagerView(
+                viewModel: BookSettingsManagerViewModel(
+                    readingPlanUseCase: appDependencies.readingPlanUseCase
+                )
+            )
+        case .totalCalendar(books: let books, today: let today):
+            MultiBookProgressView(
+                currentReadingBooks: books,
+                today: today
+            )
         case .dailyProgress(book: let book):
             DailyProgressView(
                 userBook: book,
                 viewModel: DailyProgressViewModel(
-                    bookManagementService: appDependencies.bookManagementService
+                    dailyReadingUseCase: appDependencies.dailyReadingUseCase
                 )
             )
         case .completionCelebration(book: let book):
-            CompletionCelebrationView(userBook: book)
+            CompletionCelebrationView(
+                userBook: book,
+                viewModel: CompletionCelebrationViewModel(
+                    bookCompletionUseCase: appDependencies.bookCompletionUseCase
+                )
+            )
         case .completionReview(book: let book):
             CompletionReviewView(
                 userBook: book,
                 viewModel: CompletionReviewViewModel(
-                    bookManagementService: appDependencies.bookManagementService
+                    bookCompletionUseCase: appDependencies.bookCompletionUseCase
                 )
             )
         case .completionReviewUpdate(book: let book):
@@ -76,45 +85,42 @@ final class NavigationCoordinator {
                 isUpdateMode: true,
                 userBook: book,
                 viewModel: CompletionReviewViewModel(
-                    bookManagementService: appDependencies.bookManagementService
+                    bookCompletionUseCase: appDependencies.bookCompletionUseCase
                 )
             )
         case .readingDateEdit(book: let book):
             ReadingDateEditView(
                 userBook: book,
                 viewModel: ReadingDateEditViewModel(
-                    bookManagementService: appDependencies.bookManagementService
+                    readingPlanUseCase: appDependencies.readingPlanUseCase
                 )
             )
         case .unfinishReading(book: let book):
             UnfinishReadingView(
                 userBook: book,
                 viewModel: UnfinishReadingViewModel(
-                    bookManagementService: appDependencies.bookManagementService
+                    bookCompletionUseCase: appDependencies.bookCompletionUseCase
                 )
             )
         }
     }
 
-    // add screen
     func push(_ screen: Screens) {
         paths.append(screen)
     }
 
-    // remove last screen
     func pop() {
         paths.removeLast()
     }
 
-    // go to root screen
     func popToRoot() {
         paths.removeLast(paths.count)
     }
-    
+
     func reloadView() {
         viewReloadTrigger = UUID()
     }
-    
+
     func getViewReloadTrigger() -> UUID {
         viewReloadTrigger
     }

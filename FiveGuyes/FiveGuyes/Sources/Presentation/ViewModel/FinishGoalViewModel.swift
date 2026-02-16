@@ -14,10 +14,10 @@ final class FinishGoalViewModel {
     var pagesPerDay = 0
     private(set) var isSubmitting = false
 
-    private let bookManagementService: any BookManagementService
+    private let bookRegistrationUseCase: any BookRegistrationUsing
 
-    init(bookManagementService: any BookManagementService) {
-        self.bookManagementService = bookManagementService
+    init(bookRegistrationUseCase: any BookRegistrationUsing) {
+        self.bookRegistrationUseCase = bookRegistrationUseCase
     }
 
     func calculateRecommendedPagesPerDay(
@@ -27,26 +27,29 @@ final class FinishGoalViewModel {
         endDate: Date,
         excludedDays: [Date]
     ) {
-        let totalDays = try? ReadingDateCalculator().calculateValidReadingDays(
-            startDate: startDate,
-            endDate: endDate,
-            excludedDates: excludedDays
-        )
+        let dateMath = DateMathCalculator()
+        let pageMath = PageMathCalculator()
 
-        guard let totalDays, totalDays > 0 else {
+        do {
+            let totalDays = try dateMath.validDays(
+                from: startDate,
+                to: endDate,
+                excluding: excludedDays
+            )
+            let result = try pageMath.dividePages(
+                from: startPage,
+                to: targetEndPage,
+                over: totalDays
+            )
+
+            pagesPerDay = result.daily
+        } catch {
             pagesPerDay = 0
-            return
         }
-
-        pagesPerDay = ReadingPagesCalculator().calculatePagesPerDayAndRemainder(
-            totalDays: totalDays,
-            startPage: startPage,
-            endPage: targetEndPage
-        ).pagesPerDay
     }
 
     func registerBook(
-        selectedBook: Book,
+        selectedBook: BookSearchItem,
         startPage: Int,
         targetEndPage: Int,
         startDate: Date,
@@ -75,7 +78,7 @@ final class FinishGoalViewModel {
         )
 
         do {
-            _ = try await bookManagementService.registerBook(input)
+            _ = try await bookRegistrationUseCase.registerBook(input)
             return true
         } catch {
             print("책 등록 중 오류 발생: \(error.localizedDescription)")

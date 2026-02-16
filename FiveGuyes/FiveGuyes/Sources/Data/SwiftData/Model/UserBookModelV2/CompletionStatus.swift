@@ -10,17 +10,12 @@ import SwiftData
 final class CompletionStatus {
     var isCompleted: Bool
     var completionReview: String
-    
+
     init(isCompleted: Bool = false, completionReview: String = "") {
         self.isCompleted = isCompleted
         self.completionReview = completionReview
     }
-    
-    func markAsCompleted(review: String) {
-        self.isCompleted = true
-        self.completionReview = review
-    }
-    
+
     func updateCompletionReview(review: String) {
         self.completionReview = review
     }

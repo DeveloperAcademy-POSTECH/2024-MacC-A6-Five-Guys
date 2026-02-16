@@ -14,11 +14,12 @@
 현재 프로젝트는 View 내부에 SwiftData 접근, 비즈니스 로직, UI 로직이 혼재되어 있다.
 동시에 아래 기반은 이미 구현되어 있다.
 
-- Domain 서비스 경계: `BookManagementService`, `DefaultBookManagementService`
+- Domain 실행 경계(당시): `BookManagementService`, `DefaultBookManagementService`
 - Data 저장 경계: `BookRepository`, `SwiftDataBookRepository`
-- 계산 로직 V2 + 테스트: `ReadingScheduleCalculatorV2`, `DateMathCalculator`, `PageMathCalculator`
+- 계산 로직 + 테스트: `ReadingScheduleCalculator`, `DateMathCalculator`, `PageMathCalculator`
 
 따라서 핵심 과제는 새 패턴을 "처음부터 도입"하는 것이 아니라, 기존 코드를 **안전하게 경계화**하는 것이다.
+현재 운영 경계 용어/호출 규칙(`ViewModel -> UseCase`)은 `ADR-0002`에서 확정되었다.
 
 ## Options considered
 
@@ -26,7 +27,7 @@
 
 - 장점:
   - 현재 View 중심 구조에서 점진 이행 비용이 가장 낮다.
-  - 기존 Domain Service 경계를 즉시 활용할 수 있다.
+  - 당시 존재하던 Domain Service 경계를 즉시 활용할 수 있다.
   - 화면별 테스트(ViewModel 단위)를 빠르게 추가할 수 있다.
 - 단점:
   - 화면 간 상태/이펙트가 커지면 ViewModel 비대화 위험이 있다.
@@ -61,7 +62,7 @@ MVVM 채택 시 아래 규칙을 반드시 지킨다.
 
 - View는 SwiftData를 직접 다루지 않는다.
 - View는 계산기/Repository를 직접 호출하지 않는다.
-- ViewModel만 Service 인터페이스를 호출한다.
+- ViewModel은 도메인 실행 경계 인터페이스만 호출한다. (Phase 1 당시 Service, 현재 운영 기준 UseCase)
 - 화면 상태는 ViewModel의 단일 state에서 파생한다.
 - 라우팅 payload는 SwiftData 모델 대신 `id` 또는 Domain DTO를 사용한다.
 

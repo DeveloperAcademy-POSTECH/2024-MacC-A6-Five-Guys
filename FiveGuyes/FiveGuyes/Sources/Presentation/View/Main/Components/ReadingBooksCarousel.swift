@@ -10,9 +10,9 @@ import SwiftUI
 struct ReadingBooksCarousel: View {
     let readingBooks: [FGUserBook]
     let today: Date
-    
+
     @Binding var activeID: UUID?
-    
+
     var body: some View {
         ScrollView(.horizontal) {
             HStack(spacing: 8) {

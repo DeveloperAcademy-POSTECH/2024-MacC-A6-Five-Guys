@@ -17,38 +17,36 @@ struct NotiSettingView: View {
         self.userBook = userBook
         self._viewModel = State(initialValue: viewModel)
     }
-    
-    // Toggle 바인딩 변수
+
     private var isNotificationToggleEnabled: Binding<Bool> {
         Binding(
             get: { !viewModel.isNotificationDisabled },
             set: { viewModel.isNotificationDisabled = !$0 }
         )
     }
-    
+
     var body: some View {
         ZStack {
             Color.Fills.white // 배경색 지정
                 .ignoresSafeArea()
-            
+
             VStack(alignment: .leading, spacing: .zero) {
                 if !viewModel.isSystemNotificationEnabled {
                     notificationDisabledView
                 }
-                
+
                 toggleSection
-                
+
                 dividerLine
                     .padding(.top, 12)
-                
-                // 하루 독서 미완료 알림
+
                 timePickerSection
                     .padding(.top, 16)
-                
+
                 if viewModel.isReminderTimePickerVisible {
                     timePicker
                 }
-                
+
                 Spacer()
             }
         }
@@ -76,7 +74,7 @@ struct NotiSettingView: View {
             }
         }
     }
-    
+
     // MARK: - View Property
     private func primaryTitle(_ title: String) -> some View {
         Text(title)
@@ -84,14 +82,14 @@ struct NotiSettingView: View {
             .foregroundStyle(Color.Labels.primaryBlack1)
             .multilineTextAlignment(.leading)
     }
-    
+
     private func secondaryTitle(_ title: String) -> some View {
         Text(title)
             .fontStyle(.body)
             .foregroundStyle(Color.Labels.secondaryBlack2)
             .multilineTextAlignment(.leading)
     }
-    
+
     private var notificationDisabledView: some View {
         Button(action: SystemSettingsManager.openSettings) {
             HStack {
@@ -100,9 +98,9 @@ struct NotiSettingView: View {
                     secondaryTitle("설정을 변경하고, 완독에 도움이 되는 알림을\n받아보세요")
                 }
                 .padding(.leading, 16)
-                
+
                 Spacer()
-                
+
                 Image(systemName: "chevron.forward")
                     .frame(width: 15, height: 22)
                     .scaledToFit()
@@ -117,25 +115,24 @@ struct NotiSettingView: View {
             .padding(.bottom, 32)
         }
     }
-    
+
     private var toggleSection: some View {
         VStack(alignment: .leading, spacing: .zero) {
             Toggle("알림 끄기", isOn: isNotificationToggleEnabled)
                 .toggleStyle(.switch)
                 .fontStyle(.title2, weight: .semibold)
                 .foregroundStyle(Color.Labels.primaryBlack1)
-            
+
             secondaryTitle("한입독서와 관련된 알림 수신이 중단돼요")
         }
     }
-    
+
     private var dividerLine: some View {
         Rectangle()
             .frame(height: 1)
             .foregroundStyle(Color.Separators.gray)
     }
-    
-    // 데이터 피커를 포함한 섹션
+
     private var timePickerSection: some View {
         VStack(alignment: .leading, spacing: .zero) {
             HStack {
@@ -146,7 +143,7 @@ struct NotiSettingView: View {
             secondaryTitle("지정된 시간에 오늘의 독서 목표를 알릴게요")
         }
     }
-    
+
     private var timerPickerButton: some View {
         Button {
             withAnimation(.easeIn) {
@@ -165,8 +162,7 @@ struct NotiSettingView: View {
                 .foregroundStyle(Color.Fills.lightGreen)
         }
     }
-    
-    // 실제로 데이터 피커가 보이는곳에 쓰이는 피커 컴포넌트
+
     private var timePicker: some View {
         @Bindable var bindableViewModel = viewModel
         return VStack {
@@ -226,8 +222,8 @@ private func makeNotiSettingPreviewViewModel(
     isNotificationDisabled: Bool = false,
     isReminderTimePickerVisible: Bool = false
 ) -> NotiSettingViewModel {
-    let notificationManager = PreviewNotificationManager()
-    notificationManager.isAuthorized = isSystemNotificationEnabled
+    let notificationService = PreviewNotificationManager()
+    notificationService.isAuthorized = isSystemNotificationEnabled
 
     let settingsStore = PreviewNotificationSettingsStore(
         isDisabled: isNotificationDisabled,
@@ -236,7 +232,7 @@ private func makeNotiSettingPreviewViewModel(
     )
 
     let viewModel = NotiSettingViewModel(
-        notificationManager: notificationManager,
+        notificationService: notificationService,
         settingsStore: settingsStore
     )
     viewModel.isSystemNotificationEnabled = isSystemNotificationEnabled

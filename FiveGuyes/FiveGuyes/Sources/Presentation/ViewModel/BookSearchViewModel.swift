@@ -9,18 +9,17 @@ import SwiftUI
 
 @MainActor
 final class BookSearchViewModel: ObservableObject {
-    
-    @Published var books = [Book]()
-    @Published var selectedBook: Book?
-    private let bookSearchStore: any BookSearching
+    @Published var books = [BookSearchItem]()
+    @Published var selectedBook: BookSearchItem?
+    private let bookSearchUseCase: any BookSearchUsing
 
-    init(bookSearchStore: any BookSearching) {
-        self.bookSearchStore = bookSearchStore
+    init(bookSearchUseCase: any BookSearchUsing) {
+        self.bookSearchUseCase = bookSearchUseCase
     }
 
     func searchBooks(query: String) async {
         do {
-            let books = try await bookSearchStore.fetchBooks(query: query)
+            let books = try await bookSearchUseCase.fetchBooks(query: query)
             self.books = books
         } catch {
             print("Failed to fetch books: \(error)")
@@ -29,14 +28,14 @@ final class BookSearchViewModel: ObservableObject {
 
     func fetchBookTotalPages(isbn: String) async -> String {
         do {
-            return try await String(bookSearchStore.fetchBookTotalPages(isbn: isbn))
+            return try await String(bookSearchUseCase.fetchBookTotalPages(isbn: isbn))
         } catch {
             print("Failed to fetch book details: \(error)")
             return "0"
         }
     }
-    
-    func selectBook(_ book: Book) {
-            selectedBook = book
-        }
+
+    func selectBook(_ book: BookSearchItem) {
+        selectedBook = book
+    }
 }

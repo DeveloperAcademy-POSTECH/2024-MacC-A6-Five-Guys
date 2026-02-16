@@ -7,19 +7,18 @@
 
 import SwiftUI
 
-// TODO: 검색 결과 없을 때 화면 추가하기
 struct BookSearchView: View {
     @Environment(BookSettingInputModel.self) var bookSettingInputModel: BookSettingInputModel
     @Environment(BookSettingPageModel.self) var pageModel: BookSettingPageModel
-    
+
     @StateObject private var bookSearchViewModel: BookSearchViewModel
 
     init(viewModel: BookSearchViewModel) {
         _bookSearchViewModel = StateObject(wrappedValue: viewModel)
     }
-    
+
     var body: some View {
-        
+
         BookListView(bookSearchViewModel: bookSearchViewModel)
             .background(Color.Fills.white)
             .padding(.top, 24)
@@ -27,24 +26,24 @@ struct BookSearchView: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         guard let selectedBook = bookSearchViewModel.selectedBook else { return }
-                        
+
                         Task {
                             let totalPages =  await bookSearchViewModel
                                 .fetchBookTotalPages(
                                     isbn: selectedBook.isbn13
                                 )
-                            
+
                             bookSettingInputModel
                                 .setPageRange(
                                     end: Int(totalPages) ?? 0
                                 )
-                            
+
                             bookSettingInputModel
                                 .setSelectedBook(selectedBook)
-                            
+
                             pageModel.nextPage()
                         }
-                        
+
                     } label: {
                         Text("완료")
                             .foregroundStyle(bookSearchViewModel.selectedBook != nil ?
@@ -55,7 +54,6 @@ struct BookSearchView: View {
                 }
             }
             .onAppear {
-                // GA4 Tracking
                 Tracking.Screen.bookSearch.setTracking()
             }
     }
@@ -76,7 +74,7 @@ struct BookSearchView: View {
 #Preview("선택 완료 상태") {
     let inputModel = PreviewSupport.makeBookSettingInputModel()
     let pageModel = BookSettingPageModel()
-    let selectedBook = PreviewSupport.sampleSearchBooks.first ?? PreviewSupport.sampleAPIBook
+    let selectedBook = PreviewSupport.sampleSearchBooks.first ?? PreviewSupport.sampleBookSearchItem
     let viewModel = PreviewSupport.makeBookSearchViewModel(
         books: PreviewSupport.sampleSearchBooks,
         selectedBook: selectedBook

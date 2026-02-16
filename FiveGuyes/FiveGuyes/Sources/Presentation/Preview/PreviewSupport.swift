@@ -12,11 +12,11 @@ import SwiftData
 @MainActor
 enum PreviewSupport {
     static func makeDependencies() -> AppDependencies {
-        let configuration = ModelConfiguration(isStoredInMemoryOnly: true)
+        let config = ModelConfiguration(isStoredInMemoryOnly: true)
         do {
             let container = try ModelContainer(
                 for: UserBookSchemaV2.UserBookV2.self,
-                configurations: configuration
+                configurations: config
             )
             return AppDependencies(modelContainer: container)
         } catch {
@@ -27,22 +27,93 @@ enum PreviewSupport {
     static func makeCoordinator() -> NavigationCoordinator {
         NavigationCoordinator(appDependencies: makeDependencies())
     }
+
+    static func bindReadingBook(_ book: FGUserBook) -> PreviewBookUseCaseBinding {
+        PreviewBookUseCaseBinding(
+            userBook: book,
+            useCase: PreviewBookUseCaseStub(
+                readingBooks: [book],
+                completedBooks: []
+            )
+        )
+    }
+
+    static func bindCompletedBook(_ book: FGUserBook) -> PreviewBookUseCaseBinding {
+        PreviewBookUseCaseBinding(
+            userBook: book,
+            useCase: PreviewBookUseCaseStub(
+                readingBooks: [],
+                completedBooks: [book]
+            )
+        )
+    }
 }
 
-@MainActor
-final class PreviewBookManagementService: BookManagementService {
-    private var readingBooks: [FGUserBook]
-    private var completedBooks: [FGUserBook]
-    var previewRecordReadingResult: RecordReadingResult?
+struct PreviewBookUseCaseBinding {
+    let userBook: FGUserBook
+    let useCase: PreviewBookUseCaseStub
+}
+
+private final class PreviewBookStore {
+    var readingBooks: [FGUserBook]
+    var completedBooks: [FGUserBook]
 
     init(readingBooks: [FGUserBook], completedBooks: [FGUserBook]) {
         self.readingBooks = readingBooks
         self.completedBooks = completedBooks
     }
 
-    init() {
-        self.readingBooks = [PreviewSupport.sampleReadingBook]
-        self.completedBooks = [PreviewSupport.sampleCompletedBook]
+    func fetchBookDetail(id: UUID) throws -> FGUserBook {
+        if let readingBook = readingBooks.first(where: { $0.id == id }) {
+            return readingBook
+        }
+
+        if let completedBook = completedBooks.first(where: { $0.id == id }) {
+            return completedBook
+        }
+
+        throw RepoError.notFound
+    }
+}
+
+final class PreviewBookUseCaseStub: ReadingLibraryUsing,
+    DailyReadingUsing,
+    BookCompletionUsing,
+    ReadingPlanUsing,
+    BookRegistrationUsing {
+    private let store: PreviewBookStore
+    private let todayProvider: any ReadingDateProviding
+    var previewRecordReadingResult: RecordReadingResult?
+
+    // ID 기반 프리뷰에서는 bindReadingBook/bindCompletedBook 헬퍼를 사용해
+    // 화면 book.id와 stub 저장소 데이터를 같은 인스턴스로 맞춘다.
+    init(
+        readingBooks: [FGUserBook] = [PreviewBookFixtureFactory.makeBook(title: "읽는 중인 샘플 도서", isCompleted: false)],
+        completedBooks: [FGUserBook] = [PreviewBookFixtureFactory.makeBook(title: "완독한 샘플 도서", isCompleted: true)],
+        previewRecordReadingResult: RecordReadingResult? = nil,
+        todayProvider: any ReadingDateProviding = DefaultReadingDateProvider()
+    ) {
+        self.store = PreviewBookStore(readingBooks: readingBooks, completedBooks: completedBooks)
+        self.previewRecordReadingResult = previewRecordReadingResult
+        self.todayProvider = todayProvider
+    }
+
+    func fetchLibrarySnapshot() async throws -> ReadingLibrarySnapshot {
+        ReadingLibrarySnapshot(readingBooks: store.readingBooks, completedBooks: store.completedBooks)
+    }
+
+    func deleteBook(id: UUID) async throws {
+        store.readingBooks.removeAll { $0.id == id }
+        store.completedBooks.removeAll { $0.id == id }
+    }
+
+    func rescheduleOnAppOpen(bookId: UUID) async throws {
+        guard store.readingBooks.contains(where: { $0.id == bookId }) else {
+            throw RepoError.notFound
+        }
+    }
+
+    func setupNotifications(for readingBook: FGUserBook) async {
     }
 
     func registerBook(_ input: RegisterBookInput) async throws -> FGUserBook {
@@ -57,75 +128,70 @@ final class PreviewBookManagementService: BookManagementService {
             ),
             completionStatus: FGCompletionStatus(isCompleted: false, reviewAfterCompletion: "")
         )
-        readingBooks.append(newBook)
+        store.readingBooks.append(newBook)
         return newBook
     }
 
-    func recordReading(bookId: UUID, pagesRead: Int, readDate: Date) async throws -> RecordReadingResult {
+    func recordReading(bookId: UUID, pagesRead: Int) async throws -> RecordReadingResult {
         if let previewRecordReadingResult {
             return previewRecordReadingResult
         }
-        let book = try await fetchBookDetail(id: bookId)
+
+        let book = try store.fetchBookDetail(id: bookId)
         return .recorded(updatedBook: book)
     }
 
-    func deleteBook(id: UUID) async throws {
-        readingBooks.removeAll { $0.id == id }
-        completedBooks.removeAll { $0.id == id }
-    }
-
-    func completeBook(id: UUID, completionDate: Date, review: String) async throws {
-        if let readingIndex = readingBooks.firstIndex(where: { $0.id == id }) {
-            var book = readingBooks.remove(at: readingIndex)
+    func completeBook(id: UUID, review: String) async throws {
+        if let readingIndex = store.readingBooks.firstIndex(where: { $0.id == id }) {
+            var book = store.readingBooks.remove(at: readingIndex)
             book.completionStatus = FGCompletionStatus(isCompleted: true, reviewAfterCompletion: review)
-            completedBooks.append(book)
+            store.completedBooks.append(book)
             return
         }
 
-        if let completedIndex = completedBooks.firstIndex(where: { $0.id == id }) {
-            completedBooks[completedIndex].completionStatus = FGCompletionStatus(
+        if let completedIndex = store.completedBooks.firstIndex(where: { $0.id == id }) {
+            store.completedBooks[completedIndex].completionStatus = FGCompletionStatus(
                 isCompleted: true,
                 reviewAfterCompletion: review
             )
             return
         }
 
-        throw RepositoryError.notFound
+        throw RepoError.notFound
     }
 
     func updateCompletionReview(id: UUID, review: String) async throws {
-        if let readingIndex = readingBooks.firstIndex(where: { $0.id == id }) {
-            readingBooks[readingIndex].completionStatus = FGCompletionStatus(
-                isCompleted: readingBooks[readingIndex].completionStatus.isCompleted,
+        if let readingIndex = store.readingBooks.firstIndex(where: { $0.id == id }) {
+            store.readingBooks[readingIndex].completionStatus = FGCompletionStatus(
+                isCompleted: store.readingBooks[readingIndex].completionStatus.isCompleted,
                 reviewAfterCompletion: review
             )
             return
         }
 
-        if let completedIndex = completedBooks.firstIndex(where: { $0.id == id }) {
-            completedBooks[completedIndex].completionStatus = FGCompletionStatus(
-                isCompleted: completedBooks[completedIndex].completionStatus.isCompleted,
+        if let completedIndex = store.completedBooks.firstIndex(where: { $0.id == id }) {
+            store.completedBooks[completedIndex].completionStatus = FGCompletionStatus(
+                isCompleted: store.completedBooks[completedIndex].completionStatus.isCompleted,
                 reviewAfterCompletion: review
             )
             return
         }
 
-        throw RepositoryError.notFound
+        throw RepoError.notFound
     }
 
     func updateReadingPlan(
         bookId: UUID,
         startDate: Date,
         targetEndDate: Date,
-        excludedReadingDays: [Date],
-        today: Date
+        excludedReadingDays: [Date]
     ) async throws {
-        guard let index = readingBooks.firstIndex(where: { $0.id == bookId }) else {
-            throw RepositoryError.notFound
+        guard let index = store.readingBooks.firstIndex(where: { $0.id == bookId }) else {
+            throw RepoError.notFound
         }
 
-        let currentSettings = readingBooks[index].userSettings
-        readingBooks[index].userSettings = FGUserSetting(
+        let currentSettings = store.readingBooks[index].userSettings
+        store.readingBooks[index].userSettings = FGUserSetting(
             startPage: currentSettings.startPage,
             targetEndPage: currentSettings.targetEndPage,
             startDate: startDate,
@@ -134,30 +200,12 @@ final class PreviewBookManagementService: BookManagementService {
         )
     }
 
-    func fetchReadingBooks() async throws -> [FGUserBook] {
-        readingBooks
+    func completionCelebrationSummary(for book: FGUserBook) -> CompletionCelebrationSummary {
+        CompletionCelebrationSummary.make(for: book, endDate: todayProvider.today())
     }
 
-    func fetchCompletedBooks() async throws -> [FGUserBook] {
-        completedBooks
-    }
-
-    func fetchBookDetail(id: UUID) async throws -> FGUserBook {
-        if let readingBook = readingBooks.first(where: { $0.id == id }) {
-            return readingBook
-        }
-
-        if let completedBook = completedBooks.first(where: { $0.id == id }) {
-            return completedBook
-        }
-
-        throw RepositoryError.notFound
-    }
-
-    func rescheduleOnAppOpen(bookId: UUID, today: Date) async throws {
-        guard readingBooks.contains(where: { $0.id == bookId }) else {
-            throw RepositoryError.notFound
-        }
+    func today() -> Date {
+        todayProvider.today()
     }
 }
 

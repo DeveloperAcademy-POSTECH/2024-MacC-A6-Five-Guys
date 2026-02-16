@@ -5,31 +5,110 @@
 //  Created by zaehorang on 2/12/26.
 //
 
+import Foundation
 import Observation
 import SwiftData
 
 @MainActor
 @Observable
 final class AppDependencies {
-    let bookManagementService: any BookManagementService
-    let notificationManager: any NotificationManaging
-    let notificationSettingsStore: any NotificationSettingsStoring
-    private var cachedBookSearchStore: (any BookSearching)?
+    private static let defaultBundleIdentifier = "com.zaehorang.FiveGuyes"
+    private static let migrationStoreScope = "mainStore"
+
+    let readingLibraryUseCase: any ReadingLibraryUsing
+    let dailyReadingUseCase: any DailyReadingUsing
+    let bookCompletionUseCase: any BookCompletionUsing
+    let readingPlanUseCase: any ReadingPlanUsing
+    let bookRegistrationUseCase: any BookRegistrationUsing
+    let notificationService: any NotificationManaging
+    let notiSettingsStore: any NotificationSettingsStoring
+    let bookSearchUseCase: any BookSearchUsing
 
     init(modelContainer: ModelContainer) {
-        let repository = SwiftDataBookRepository(modelContainer: modelContainer)
-        self.bookManagementService = DefaultBookManagementService(repository: repository)
-        self.notificationManager = NotificationManager()
-        self.notificationSettingsStore = UserDefaultsNotificationSettingsStore()
-    }
+        let migrationCompletionKey = Self.makeMigrationCompletionKey()
+        let repo = SwiftDataBookRepo(
+            modelContainer: modelContainer,
+            migrationUserDefaults: .standard,
+            migrationCompletionKey: migrationCompletionKey
+        )
 
-    func makeBookSearchStore() -> any BookSearching {
-        if let cachedBookSearchStore {
-            return cachedBookSearchStore
+        do {
+            try repo.prewarmReadingRecordKeyMigrationIfNeeded()
+        } catch {
         }
 
-        let store = APIStore()
-        self.cachedBookSearchStore = store
-        return store
+        let readingDateProvider = DefaultReadingDateProvider()
+        let notiSettingsStore = UserDefaultsNotificationSettingsStore()
+        let notificationService = NotificationManager(
+            todayProvider: readingDateProvider,
+            settingsStore: notiSettingsStore
+        )
+        let scheduleCalculator = ReadingScheduleCalculator()
+
+        let fetchReadingBooksUseCase = FetchReadingBooksUseCase(repo: repo)
+        let fetchCompletedBooksUseCase = FetchCompletedBooksUseCase(repo: repo)
+        let deleteBookUseCase = DeleteBookUseCase(
+            repo: repo,
+            notificationScheduler: notificationService
+        )
+        let rescheduleOnAppOpenUseCase = RescheduleOnAppOpenUseCase(
+            repo: repo,
+            scheduleCalculator: scheduleCalculator
+        )
+        let registerBookUseCase = RegisterBookUseCase(
+            repo: repo,
+            notificationScheduler: notificationService,
+            scheduleCalculator: scheduleCalculator
+        )
+        let recordReadingUseCase = RecordReadingUseCase(
+            repo: repo,
+            notificationScheduler: notificationService,
+            scheduleCalculator: scheduleCalculator
+        )
+        let completeBookUseCase = CompleteBookUseCase(
+            repo: repo,
+            notificationScheduler: notificationService
+        )
+        let updateCompletionReviewUseCase = UpdateCompletionReviewUseCase(repo: repo)
+        let updateReadingPlanUseCase = UpdateReadingPlanUseCase(
+            repo: repo,
+            notificationScheduler: notificationService,
+            scheduleCalculator: scheduleCalculator
+        )
+
+        self.readingLibraryUseCase = ReadingLibraryUseCase(
+            fetchReadingBooksUseCase: fetchReadingBooksUseCase,
+            fetchCompletedBooksUseCase: fetchCompletedBooksUseCase,
+            deleteBookUseCase: deleteBookUseCase,
+            rescheduleOnAppOpenUseCase: rescheduleOnAppOpenUseCase,
+            notificationScheduler: notificationService,
+            todayProvider: readingDateProvider
+        )
+        self.dailyReadingUseCase = DailyReadingUseCase(
+            recordReadingUseCase: recordReadingUseCase,
+            todayProvider: readingDateProvider
+        )
+        self.bookCompletionUseCase = BookCompletionUseCase(
+            completeBookUseCase: completeBookUseCase,
+            updateCompletionReviewUseCase: updateCompletionReviewUseCase,
+            todayProvider: readingDateProvider
+        )
+        self.readingPlanUseCase = ReadingPlanUseCase(
+            updateReadingPlanUseCase: updateReadingPlanUseCase,
+            todayProvider: readingDateProvider
+        )
+        self.bookRegistrationUseCase = BookRegistrationUseCase(
+            registerBookUseCase: registerBookUseCase
+        )
+        self.notificationService = notificationService
+        self.notiSettingsStore = notiSettingsStore
+        self.bookSearchUseCase = BookSearchUseCase(
+            bookSearchProvider: AladinBookSearchProvider()
+        )
+    }
+
+    private static func makeMigrationCompletionKey() -> String {
+        let bundleIdentifier = Bundle.main.bundleIdentifier ?? defaultBundleIdentifier
+        return "\(bundleIdentifier).\(migrationStoreScope).\(SwiftDataBookRepo.migrationCompletionVersionKey)"
     }
 }

@@ -13,18 +13,21 @@ import Observation
 final class ReadingDateEditViewModel {
     private(set) var isSubmitting = false
 
-    private let bookManagementService: any BookManagementService
+    private let readingPlanUseCase: any ReadingPlanUsing
 
-    init(bookManagementService: any BookManagementService) {
-        self.bookManagementService = bookManagementService
+    init(readingPlanUseCase: any ReadingPlanUsing) {
+        self.readingPlanUseCase = readingPlanUseCase
+    }
+
+    func today() -> Date {
+        readingPlanUseCase.today()
     }
 
     func submitReadingPlanUpdate(
         bookId: UUID,
         startDate: Date,
         endDate: Date,
-        excludedReadingDays: [Date],
-        today: Date
+        excludedReadingDays: [Date]
     ) async -> Bool {
         guard !isSubmitting else { return false }
 
@@ -32,12 +35,11 @@ final class ReadingDateEditViewModel {
         defer { isSubmitting = false }
 
         do {
-            try await bookManagementService.updateReadingPlan(
+            try await readingPlanUseCase.updateReadingPlan(
                 bookId: bookId,
                 startDate: startDate,
                 targetEndDate: endDate,
-                excludedReadingDays: excludedReadingDays,
-                today: today
+                excludedReadingDays: excludedReadingDays
             )
             return true
         } catch {

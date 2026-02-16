@@ -7,13 +7,12 @@
 
 import SwiftUI
 
-// TODO: 검색 완료 시 키보드 내리기
 struct BookListView: View {
     @ObservedObject var bookSearchViewModel: BookSearchViewModel
     @State private var searchText: String = ""
-    
+
     private let placeholder: String = "어떤 책을 완독하고 싶나요?"
-    
+
     var body: some View {
         VStack(spacing: 40) {
             VStack(spacing: 0) {
@@ -28,9 +27,9 @@ struct BookListView: View {
                     }
                     .fontStyle(.body)
                     .foregroundStyle(Color.Labels.primaryBlack1)
-                    
+
                     Spacer()
-                    
+
                     Button {
                         requestSearchBooks()
                     } label: {
@@ -38,7 +37,7 @@ struct BookListView: View {
                             .foregroundStyle(Color.Labels.quaternaryBlack4)
                             .padding(.leading, 20)
                     }
-                    
+
                 }
                 .padding(.horizontal, 20)
                 .padding(.vertical, 13)
@@ -50,7 +49,7 @@ struct BookListView: View {
                 )
             }
             .padding(.horizontal, 20)
-            
+
             ScrollView {
                 ForEach(bookSearchViewModel.books) { book in
                     BookRowView(viewModel: bookSearchViewModel, book: book)
@@ -59,7 +58,7 @@ struct BookListView: View {
             .background(Color.Fills.white)
         }
     }
-    
+
     private func requestSearchBooks() {
         Task {
             await bookSearchViewModel.searchBooks(query: searchText)

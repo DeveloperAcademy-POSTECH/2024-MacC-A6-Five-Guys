@@ -10,17 +10,17 @@ import Foundation
 
 @MainActor
 extension PreviewSupport {
-    static var sampleAPIBook: Book { makeAPIBook(title: "샘플 완독 도서") }
+    static var sampleBookSearchItem: BookSearchItem { makeBookSearchItem(title: "샘플 완독 도서") }
 
-    static func makeAPIBook(
+    static func makeBookSearchItem(
         title: String,
         author: String = "한입독서 팀",
         cover: String? = nil,
         publisher: String = "Five Guys Press",
         isbn13: String = "9781234567890",
         pubDate: String = "20250101"
-    ) -> Book {
-        Book(
+    ) -> BookSearchItem {
+        BookSearchItem(
             title: title,
             author: author,
             cover: cover,
@@ -30,10 +30,10 @@ extension PreviewSupport {
         )
     }
 
-    static var sampleSearchBooks: [Book] {
+    static var sampleSearchBooks: [BookSearchItem] {
         [
-            sampleAPIBook,
-            makeAPIBook(
+            sampleBookSearchItem,
+            makeBookSearchItem(
                 title: "두 번째 샘플 도서",
                 author: "홍길동",
                 publisher: "Sample House",
@@ -45,11 +45,11 @@ extension PreviewSupport {
 
     static func makeBookSettingInputModel() -> BookSettingInputModel {
         let model = BookSettingInputModel()
-        let today = Date().adjustedDate()
+        let today = DefaultReadingDateProvider().today()
         let startDate = Calendar.app.date(byAdding: .day, value: -1, to: today)
         let endDate = Calendar.app.date(byAdding: .day, value: 14, to: today)
 
-        model.setSelectedBook(sampleAPIBook)
+        model.setSelectedBook(sampleBookSearchItem)
         model.setPageRange(start: 1, end: 320)
         model.setReadingPeriod(startDate: startDate, endDate: endDate)
         model.setNonReadingDays([])
@@ -57,10 +57,13 @@ extension PreviewSupport {
     }
 
     static func makeBookSearchViewModel(
-        books: [Book],
-        selectedBook: Book? = nil
+        books: [BookSearchItem],
+        selectedBook: BookSearchItem? = nil
     ) -> BookSearchViewModel {
-        let viewModel = BookSearchViewModel(bookSearchStore: PreviewBookSearchStore(books: books))
+        let useCase = BookSearchUseCase(
+            bookSearchProvider: PreviewBookSearchProvider(books: books)
+        )
+        let viewModel = BookSearchViewModel(bookSearchUseCase: useCase)
         viewModel.books = books
         viewModel.selectedBook = selectedBook
         return viewModel
@@ -71,16 +74,16 @@ extension PreviewSupport {
     }
 }
 
-struct PreviewBookSearchStore: BookSearching {
-    let books: [Book]
+struct PreviewBookSearchProvider: BookSearchProviding {
+    let books: [BookSearchItem]
     let totalPages: Int
 
-    init(books: [Book], totalPages: Int = 320) {
+    init(books: [BookSearchItem], totalPages: Int = 320) {
         self.books = books
         self.totalPages = totalPages
     }
 
-    func fetchBooks(query: String) async throws -> [Book] {
+    func fetchBooks(query: String) async throws -> [BookSearchItem] {
         books
     }
 
