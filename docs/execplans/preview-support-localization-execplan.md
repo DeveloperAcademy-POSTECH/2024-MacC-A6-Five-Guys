@@ -2,8 +2,6 @@
 
 This ExecPlan is a living document. The sections `Progress`, `Surprises & Discoveries`, `Decision Log`, and `Outcomes & Retrospective` must be kept up to date as work proceeds.
 
-`PLANS.md` exists at repository root. This plan must be maintained in accordance with `PLANS.md`.
-
 ## Purpose / Big Picture
 
 After this change, developers can find preview sample data and preview ViewModel builders in the feature folder that owns each screen, instead of searching one large central preview file. User-visible behavior does not change: each SwiftUI `#Preview` should still render with the same mock data and dependencies.

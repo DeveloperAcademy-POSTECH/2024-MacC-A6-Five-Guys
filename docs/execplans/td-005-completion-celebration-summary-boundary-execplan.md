@@ -2,8 +2,6 @@
 
 This ExecPlan is a living document. The sections `Progress`, `Surprises & Discoveries`, `Decision Log`, and `Outcomes & Retrospective` must be kept up to date as work proceeds.
 
-`PLANS.md` exists at repository root. This plan is maintained in accordance with `PLANS.md`.
-
 ## Purpose / Big Picture
 
 After this change, `CompletionCelebrationView` no longer computes completion-period date/page/day summary inside the SwiftUI view. The summary is now produced through `BookCompletionUseCase` using the domain today policy (`ReadingDateProviding`).

@@ -2,8 +2,6 @@
 
 This ExecPlan is a living document. The sections `Progress`, `Surprises & Discoveries`, `Decision Log`, and `Outcomes & Retrospective` must be kept up to date as work proceeds.
 
-`PLANS.md` exists at repository root. This plan is maintained in accordance with `PLANS.md`.
-
 ## Purpose / Big Picture
 
 After this change, date keys used for reading records will be generated with an explicit app timezone (`Calendar.app.timeZone`) and passed through a domain value type instead of raw `String` in key comparison logic. This prevents environment-dependent key mismatches and reduces accidental mixing of "date value" and "reading record key" semantics.

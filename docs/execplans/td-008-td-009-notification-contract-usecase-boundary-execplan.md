@@ -2,8 +2,6 @@
 
 This ExecPlan is a living document. The sections `Progress`, `Surprises & Discoveries`, `Decision Log`, and `Outcomes & Retrospective` must be kept up to date as work proceeds.
 
-`PLANS.md` exists at repository root. This plan is maintained in accordance with `PLANS.md`.
-
 ## Purpose / Big Picture
 
 After this change, notification scheduling awaits real completion (`clear -> morning -> night`) instead of launching detached work, and Presentation regains a strict `ViewModel -> UseCase` boundary for home notification trigger and book search flow. The same user-visible behavior is preserved, but async determinism, dependency semantics, and maintenance clarity are improved.

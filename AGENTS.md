@@ -1,12 +1,6 @@
-# ExecPlans
-
-When writing complex features or significant refactors, use an ExecPlan from design to implementation.
-Follow `./PLANS.md`.
-
 # Architecture Docs
 
 When creating or updating architecture documentation, follow:
-- `./docs/references/architecture-doc.md`
 - `./docs/decisions/`
 
 # Git Conventions
@@ -23,18 +17,7 @@ When performing PR review, you must:
 - Avoid top-level-only findings; use top-level comment only for summary/fallback with reason.
 - If another agent is actively working on the same PR/branch, refresh and re-check latest `HEAD` before submitting review comments.
 
-# File Header Convention
-
-For source file header rules, follow:
-- `./docs/conventions/file-header-convention.md`
-
 # Preview/Simulator Troubleshooting
 
 If SwiftUI Preview is broken, or simulator build/run has runtime-state errors, check and apply:
 - `./docs/setup/swiftui-preview-troubleshooting.md`
-
-# Change Scope Guard (Mandatory)
-
-- Code changes must be limited strictly to the user-requested scope.
-- Do not modify unrelated files, logic, UI, naming, formatting, or refactors unless explicitly requested.
-- If an out-of-scope change is necessary to complete the requested fix safely, ask the user first and proceed only after approval.

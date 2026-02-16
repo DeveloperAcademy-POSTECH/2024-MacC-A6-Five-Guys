@@ -281,11 +281,99 @@
   - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Presentation/ViewModel/NotificationSettingViewModel.swift`
   - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Platform/Notification/NotificationManager.swift`
 
+## TD-014: CalendarCalculator 강제 언래핑 제거
+
+- Status: Open
+- Context:
+  - `CalendarCalculator`에서 `Calendar.date(from:)`, `Calendar.date(byAdding:)` 결과를 강제 언래핑(`!`)으로 사용하고 있습니다.
+  - 일반적인 입력에서는 동작하더라도 캘린더/시간대 경계 상황에서 nil이 반환되면 즉시 크래시가 발생할 수 있습니다.
+- Risk:
+  - 월 시작일/월 이동 계산 경로에서 런타임 크래시 가능성이 남아 있습니다.
+  - 실패 경로를 표현하지 못해 호출부에서 안전한 fallback 정책을 적용하기 어렵습니다.
+- Target Layer:
+  - `Presentation/Shared/Calendar` 계산 유틸의 nil-safe 계약(guard 기반 fallback 또는 실패 전파)
+- Trigger Condition:
+  - 캘린더 계산 로직 변경, 날짜/타임존 정책 변경, 캘린더 UI 회귀 수정 시
+- Priority:
+  - P3
+- Current Evidence:
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Presentation/Shared/Calendar/CalendarCalculator.swift`
+- Suggested Follow-up:
+  1. `!` 제거 후 `guard let` 기반 반환 정책을 명시하고 호출부에서 안전한 기본값을 사용
+  2. `CalendarCalculator` 단위 테스트에 nil 대응 시나리오(월 경계/이상 입력)를 추가
+
+## TD-015: 야간 알림 시간 상수 유효 범위 이탈
+
+- Status: Open
+- Context:
+  - `NotificationType.timeContent`의 `.night`가 `(24, 0)`을 반환합니다.
+  - `DateComponents.hour` 유효 범위(0...23)를 벗어나며, 트리거가 다음날 00:00으로 밀리거나 무효 처리될 수 있습니다.
+- Risk:
+  - 의도한 "야간 알림" 시점 보장이 깨질 수 있습니다.
+  - 기기/OS 버전에 따라 스케줄 해석이 달라져 재현성 없는 알림 누락이 발생할 수 있습니다.
+- Target Layer:
+  - `Platform/Notification`의 알림 시각 정책 상수
+- Trigger Condition:
+  - 알림 시간 정책 변경, 야간 알림 회귀, 알림 스케줄 재구성 시
+- Priority:
+  - P1
+- Current Evidence:
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Platform/Notification/NotificationType.swift`
+- Suggested Follow-up:
+  1. `.night` 시각을 유효 범위 값(예: `23:00`)으로 교체하고 정책 의도를 주석/상수명으로 명시
+  2. `FGReadingProgressNotificationTests` 또는 `NotificationType` 테스트에 night 시간 유효성 검증 케이스 추가
+
+## TD-016: 도서 검색 URL 조합의 인코딩/응답 검증 부족
+
+- Status: Open
+- Context:
+  - `AladinBookSearchProvider`가 검색/상세조회 URL을 문자열 보간으로 직접 조합합니다.
+  - `query`/`isbn`이 percent-encoding 없이 삽입되고, HTTP 상태 코드 검증 없이 디코딩을 시도합니다.
+- Risk:
+  - 공백/`&`/`+` 포함 입력에서 파라미터 오염으로 검색 실패 또는 오동작 가능성이 있습니다.
+  - 비정상 응답(4xx/5xx/HTML 오류 페이지)에서도 디코딩 실패로 원인 파악이 어려워집니다.
+- Target Layer:
+  - `Platform/BookSearch` URL 생성/네트워크 응답 검증 경계
+- Trigger Condition:
+  - 검색 품질 이슈, API 파라미터 추가, 네트워크 에러 처리 개선 시
+- Priority:
+  - P2
+- Current Evidence:
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Platform/BookSearch/AladinBookSearchProvider.swift`
+- Suggested Follow-up:
+  1. `URLComponents` + `queryItems`로 URL 생성 로직 전환
+  2. `HTTPURLResponse.statusCode` 검증 후 명시적 오류 매핑
+  3. Provider 레벨 통합 테스트에 URL 인코딩/상태코드 처리 케이스 추가
+
+## TD-017: 페이지 설정 화면 복원 로직 결함
+
+- Status: Open
+- Context:
+  - `BookPageSettingView.initializePageSettings()`에서 `startPage`를 복원하지 않고 `targetEndPage`에 두 번 대입하고 있습니다.
+- Risk:
+  - 사용자가 다음 단계로 이동 후 뒤로 돌아올 때 시작 페이지가 초기값(1)로 유실되어 UX 일관성이 깨집니다.
+  - 입력 복원 신뢰도가 떨어져 등록 플로우 이탈 가능성이 커집니다.
+- Target Layer:
+  - `Presentation/View/BookSetting` 입력 상태 복원 경계
+- Trigger Condition:
+  - 도서 등록 플로우 수정, back-navigation 상태 유지 정책 변경 시
+- Priority:
+  - P2
+- Current Evidence:
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Presentation/View/BookSetting/BookPageSettingView.swift`
+- Suggested Follow-up:
+  1. `initializePageSettings()`에서 `startPage`/`targetEndPage`를 각각 올바르게 복원
+  2. 페이지 설정 화면 왕복(back-forward) 상태 복원 UI 테스트 또는 ViewModel 테스트 추가
+
 ## Recommended Execution Order
 
-1. TD-008: 알림 스케줄링 async 계약 정리 (P2) - Resolved (2026-02-16)
-2. TD-009: UseCase-first 경계 일관화 (P2) - Resolved (2026-02-16)
-3. TD-013: Notification 경계 선언 위치 정렬 (P1) - Resolved (2026-02-16)
-4. TD-010: 알림 일괄 등록 권한 체크 중복 제거 (P2)
-5. TD-011: ReadingLibraryUseCase 책임 재분리 (P2)
-6. 나머지 Open P2/P3 항목 순차 정리
+1. TD-015: 야간 알림 시간 상수 유효 범위 이탈 (P1)
+2. TD-010: 알림 일괄 등록 권한 체크 중복 제거 (P2)
+3. TD-011: ReadingLibraryUseCase 책임 재분리 (P2)
+4. TD-016: 도서 검색 URL 조합의 인코딩/응답 검증 부족 (P2)
+5. TD-017: 페이지 설정 화면 복원 로직 결함 (P2)
+6. TD-014: CalendarCalculator 강제 언래핑 제거 (P3)
+7. TD-008: 알림 스케줄링 async 계약 정리 (P2) - Resolved (2026-02-16)
+8. TD-009: UseCase-first 경계 일관화 (P2) - Resolved (2026-02-16)
+9. TD-013: Notification 경계 선언 위치 정렬 (P1) - Resolved (2026-02-16)
+10. 나머지 Open P2/P3 항목 순차 정리

@@ -2,8 +2,6 @@
 
 This ExecPlan is a living document. The sections `Progress`, `Surprises & Discoveries`, `Decision Log`, and `Outcomes & Retrospective` must be kept up to date as work proceeds.
 
-`PLANS.md` exists at repository root. This plan must be maintained in accordance with `PLANS.md`.
-
 ## Purpose / Big Picture
 
 After this change, contributors will be able to add or modify reading features without editing SwiftData persistence logic inside SwiftUI views. User-visible behavior remains the same (book registration, daily reading record, completion flow, date edits), but the execution path becomes: View -> ViewModel -> UseCase -> Repository/Infrastructure Service. This enables isolated tests for business rules and reduces regressions when changing one screen.

@@ -2,8 +2,6 @@
 
 This ExecPlan is a living document. The sections `Progress`, `Surprises & Discoveries`, `Decision Log`, and `Outcomes & Retrospective` must be kept up to date as work proceeds.
 
-`PLANS.md` exists at repository root. This plan is maintained in accordance with `PLANS.md`.
-
 ## Purpose / Big Picture
 
 After this change, all reading-flow boundaries (runtime, Preview, and ViewModel tests) use the same `...Using` UseCase interfaces. The compatibility facade `BookManagementService` and its adapter layers are removed. Contributors can now change UseCase interfaces in one boundary model without maintaining parallel service adapters.

@@ -2,8 +2,6 @@
 
 This ExecPlan is a living document. The sections `Progress`, `Surprises & Discoveries`, `Decision Log`, and `Outcomes & Retrospective` must be kept up to date as work proceeds.
 
-`PLANS.md` exists at repository root. This plan is maintained in accordance with `PLANS.md`.
-
 ## Purpose / Big Picture
 
 이 작업의 목적은 "기능을 바꾸지 않고 구조를 단순화"하는 것입니다. 사용자에게 보이는 동작은 기존과 동일하게 유지하면서, 마이그레이션 관련 책임을 repository 내부로 국소화해 코드 이해/삭제를 쉽게 만듭니다.

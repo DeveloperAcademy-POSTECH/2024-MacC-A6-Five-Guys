@@ -2,8 +2,6 @@
 
 This ExecPlan is a living document. The sections `Progress`, `Surprises & Discoveries`, `Decision Log`, and `Outcomes & Retrospective` must be kept up to date as work proceeds.
 
-This document follows `./PLANS.md` from the repository root. Any implementation must keep this file updated as decisions and progress change.
-
 ## Purpose / Big Picture
 
 FiveGuyes already follows a layer-first architecture (`App/Presentation/Domain/Data/Platform`), but the current source tree still has inconsistent naming (`Noti` vs `Notification`), empty folders, and file/object mismatches (`BookLowView.swift` containing `BookRowView`). These inconsistencies slow down onboarding and increase review friction because contributors cannot reliably infer intent from paths and names.
