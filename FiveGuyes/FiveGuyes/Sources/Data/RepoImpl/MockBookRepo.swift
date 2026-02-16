@@ -62,21 +62,6 @@ actor MockBookRepo: BookRepo {
         books[index] = updatedBook
     }
 
-    func updateMetaData(bookId: UUID, metaData: FGBookMetaData) async throws {
-        guard let index = books.firstIndex(where: { $0.id == bookId }) else {
-            throw RepoError.notFound
-        }
-        let oldBook = books[index]
-        let updatedBook = FGUserBook(
-            id: oldBook.id,
-            bookMetaData: metaData,
-            userSettings: oldBook.userSettings,
-            readingProgress: oldBook.readingProgress,
-            completionStatus: oldBook.completionStatus
-        )
-        books[index] = updatedBook
-    }
-
     func updateCompletionStatus(bookId: UUID, status: FGCompletionStatus) async throws {
         guard let index = books.firstIndex(where: { $0.id == bookId }) else {
             throw RepoError.notFound

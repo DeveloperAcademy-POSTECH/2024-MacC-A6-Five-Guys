@@ -68,7 +68,7 @@ struct TotalCalendarView: View {
     }
 
     private var dayLabels: some View {
-        LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7),) {
+        LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7)) {
             ForEach(["일", "월", "화", "수", "목", "금", "토"], id: \.self) { day in
                 Text(day)
                     .fontStyle(.caption2, weight: .semibold)

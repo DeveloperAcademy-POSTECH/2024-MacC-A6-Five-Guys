@@ -100,7 +100,9 @@ struct FGReadingProgress: Hashable {
         let startOfWeek = calendar.dateInterval(of: .weekOfMonth, for: today)?.start ?? today
 
         return (0..<7).map { dayOffset in
-             let date = calendar.date(byAdding: .day, value: dayOffset, to: startOfWeek)!
+            guard let date = calendar.date(byAdding: .day, value: dayOffset, to: startOfWeek) else {
+                return nil
+            }
             return dailyReadingRecords[date.readingDateKey.rawValue]
         }
     }

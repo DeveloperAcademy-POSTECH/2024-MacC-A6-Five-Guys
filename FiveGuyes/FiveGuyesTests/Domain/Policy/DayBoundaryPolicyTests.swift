@@ -50,13 +50,13 @@ struct DayBoundaryPolicyTests {
         #expect(key.rawValue == "2026-02-14")
     }
 
-    @Test("Date 확장 adjustedDate는 DayBoundary 정책과 동일하게 동작")
-    func dateExtension_adjustedDate_matchesPolicy() {
+    @Test("DayBoundary adjustedDate는 04시 이전 시간을 전날로 조정한다")
+    func adjustedDate_beforeBoundary_isPreviousDayTime() {
         let input = makeDate(year: 2026, month: 2, day: 14, hour: 2, minute: 30)
-        let viaExtension = input.adjustedDate()
-        let viaPolicy = DayBoundary.shared.adjustedDate(from: input)
+        let adjusted = DayBoundary.shared.adjustedDate(from: input)
+        let expected = makeDate(year: 2026, month: 2, day: 13, hour: 22, minute: 30)
 
-        #expect(viaExtension == viaPolicy)
+        #expect(adjusted == expected)
     }
 
     @Test("Date 확장 adjusted key는 DayBoundary 정책과 동일하게 동작")

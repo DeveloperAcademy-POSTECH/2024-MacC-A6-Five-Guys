@@ -23,7 +23,7 @@ extension ReadingScheduleCalculatorTests {
             startDate: makeDate("2025-01-10"),
             endDate: makeDate("2025-01-14"),
             readDates: [
-                makeDate("2025-01-10"): 30,
+                makeDate("2025-01-10"): 30
             ]
         )
 
@@ -52,7 +52,7 @@ extension ReadingScheduleCalculatorTests {
             startDate: makeDate("2025-01-10"),
             endDate: makeDate("2025-01-19"),
             readDates: [
-                makeDate("2025-01-10"): 10,
+                makeDate("2025-01-10"): 10
             ]
         )
 
@@ -107,7 +107,7 @@ extension ReadingScheduleCalculatorTests {
             endDate: makeDate("2025-01-15"),
             readDates: [
                 makeDate("2025-01-10"): 16,
-                makeDate("2025-01-12"): 50,
+                makeDate("2025-01-12"): 50
             ]
         )
 
@@ -138,7 +138,7 @@ extension ReadingScheduleCalculatorTests {
             startDate: makeDate("2025-01-10"),
             endDate: makeDate("2025-01-20"),
             readDates: [
-                makeDate("2025-01-10"): 10,
+                makeDate("2025-01-10"): 10
             ]
         )
 
@@ -170,7 +170,7 @@ extension ReadingScheduleCalculatorTests {
             startDate: makeDate("2025-01-10"),
             endDate: makeDate("2025-01-20"),
             readDates: [
-                makeDate("2025-01-10"): 30,
+                makeDate("2025-01-10"): 30
             ]
         )
 

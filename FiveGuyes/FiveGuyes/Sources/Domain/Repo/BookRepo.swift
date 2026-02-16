@@ -23,7 +23,6 @@ protocol BookRepo {
     // MARK: - Partial Update Operations
     func updateReadingProgress(bookId: UUID, progress: FGReadingProgress) async throws
     func updateSettings(bookId: UUID, settings: FGUserSetting) async throws
-    func updateMetaData(bookId: UUID, metaData: FGBookMetaData) async throws
     func updateCompletionStatus(bookId: UUID, status: FGCompletionStatus) async throws
 }
 

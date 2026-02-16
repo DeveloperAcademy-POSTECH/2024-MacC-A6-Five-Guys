@@ -15,7 +15,7 @@ struct CalendarCalculator {
     /// - Returns: 해당 월의 첫 번째 날짜.
     func startDateOfMonth(_ month: Date) -> Date {
         let components = calendar.dateComponents([.year, .month], from: month)
-        return calendar.date(from: components)!
+        return calendar.date(from: components) ?? month
     }
 
     /// 주어진 월에서 특정 일을 계산하여 반환합니다.
@@ -24,7 +24,8 @@ struct CalendarCalculator {
     ///   - month: 기준이 되는 월.
     /// - Returns: 계산된 날짜.
     func dateForDay(_ day: Int, inMonth month: Date) -> Date {
-        return calendar.date(byAdding: .day, value: day, to: startDateOfMonth(month))!
+        let monthStart = startDateOfMonth(month)
+        return calendar.date(byAdding: .day, value: day, to: monthStart) ?? monthStart
     }
 
     /// 주어진 월에 포함된 날짜의 수를 반환합니다.
@@ -40,7 +41,7 @@ struct CalendarCalculator {
     /// - Returns: 해당 월 첫 번째 날짜의 요일 순서.
     func firstWeekdayOfMonth(in date: Date) -> Int {
         let components = calendar.dateComponents([.year, .month], from: date)
-        let firstDayOfMonth = calendar.date(from: components)!
+        let firstDayOfMonth = calendar.date(from: components) ?? date
 
         return calendar.component(.weekday, from: firstDayOfMonth)
     }
@@ -51,7 +52,7 @@ struct CalendarCalculator {
     ///   - currentMonth: 기준이 되는 날짜.
     /// - Returns: 계산된 새로운 날짜.
     func addMonths(to currentMonth: Date, by monthOffset: Int) -> Date {
-        return calendar.date(byAdding: .month, value: monthOffset, to: currentMonth)!
+        return calendar.date(byAdding: .month, value: monthOffset, to: currentMonth) ?? currentMonth
     }
 
     func getWeekdayHeaders() -> [String] {

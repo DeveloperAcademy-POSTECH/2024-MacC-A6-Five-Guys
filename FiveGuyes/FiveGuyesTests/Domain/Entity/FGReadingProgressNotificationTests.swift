@@ -16,7 +16,7 @@ struct FGReadingProgressNotificationTests {
         let progress = FGReadingProgress(
             dailyReadingRecords: [
                 "2025-01-01": ReadingRecord(targetPages: 20, pagesRead: 0),
-                "2025-01-03": ReadingRecord(targetPages: 40, pagesRead: 0),
+                "2025-01-03": ReadingRecord(targetPages: 40, pagesRead: 0)
             ],
             lastReadDate: nil,
             lastReadPage: 0
@@ -32,7 +32,7 @@ struct FGReadingProgressNotificationTests {
         let settings = makeSettings(targetEndPage: 200, targetEndDate: makeDate("2025-01-10"))
         let progress = FGReadingProgress(
             dailyReadingRecords: [
-                "2025-01-05": ReadingRecord(targetPages: 150, pagesRead: 150),
+                "2025-01-05": ReadingRecord(targetPages: 150, pagesRead: 150)
             ],
             lastReadDate: makeDate("2025-01-05"),
             lastReadPage: 151
@@ -52,7 +52,7 @@ struct FGReadingProgressNotificationTests {
         let progress = FGReadingProgress(
             dailyReadingRecords: [
                 "2025-01-01": ReadingRecord(targetPages: 120, pagesRead: 120),
-                "2025-01-02": ReadingRecord(targetPages: 140, pagesRead: 140),
+                "2025-01-02": ReadingRecord(targetPages: 140, pagesRead: 140)
             ],
             lastReadDate: makeDate("2025-01-02"),
             lastReadPage: 80
@@ -88,7 +88,7 @@ struct FGReadingProgressNotificationTests {
         let settings = makeSettings(targetEndPage: 300, targetEndDate: makeDate("2025-01-10"))
         let progress = FGReadingProgress(
             dailyReadingRecords: [
-                "2025-01-02": ReadingRecord(targetPages: 300, pagesRead: 350),
+                "2025-01-02": ReadingRecord(targetPages: 300, pagesRead: 350)
             ],
             lastReadDate: makeDate("2025-01-02"),
             lastReadPage: 120
@@ -108,7 +108,7 @@ struct FGReadingProgressNotificationTests {
         let progress = FGReadingProgress(
             dailyReadingRecords: [
                 "2025-01-03": ReadingRecord(targetPages: 120, pagesRead: 120),
-                "2025-01-04": ReadingRecord(targetPages: 140, pagesRead: 0),
+                "2025-01-04": ReadingRecord(targetPages: 140, pagesRead: 0)
             ],
             lastReadDate: makeDate("2025-01-03"),
             lastReadPage: 120
@@ -134,7 +134,7 @@ struct FGReadingProgressNotificationTests {
         let expectedTitles: Set<String> = [
             "오늘 목표는 22쪽이에요!",
             "독서로 오늘 하루를 시작해 볼까요?",
-            "22쪽으로 오늘을 시작해요!",
+            "22쪽으로 오늘을 시작해요!"
         ]
 
         #expect(expectedTitles.contains(title))

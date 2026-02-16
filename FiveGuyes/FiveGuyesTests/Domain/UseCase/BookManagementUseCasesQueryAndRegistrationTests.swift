@@ -143,7 +143,7 @@ extension BookManagementUseCasesTests {
         let firstDateKey = makeDate("2025-01-01").toYearMonthDayString()
         let firstRecord = registeredBook.readingProgress.dailyReadingRecords[firstDateKey]
         #expect(firstRecord != nil)
-        #expect(firstRecord!.targetPages > 0)
+        #expect((firstRecord?.targetPages ?? 0) > 0)
     }
 
     @Test("ReadingLibraryUseCase.deleteBook으로 책 삭제 시 Repo에서 제거")

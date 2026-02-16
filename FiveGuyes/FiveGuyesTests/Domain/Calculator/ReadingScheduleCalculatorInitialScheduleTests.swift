@@ -54,7 +54,7 @@ extension ReadingScheduleCalculatorTests {
             targetEndDate: makeDate("2025-01-19"),
             excludedReadingDays: [
                 makeDate("2025-01-12"),
-                makeDate("2025-01-15"),
+                makeDate("2025-01-15")
             ]
         )
 

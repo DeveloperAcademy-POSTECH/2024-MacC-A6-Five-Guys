@@ -112,7 +112,7 @@ extension BookManagementUseCasesTests {
             dailyReadingRecords: [
                 makeDate("2025-01-01").toYearMonthDayString(): ReadingRecord(targetPages: 10, pagesRead: 10),
                 makeDate("2025-01-02").toYearMonthDayString(): ReadingRecord(targetPages: 10, pagesRead: 0),
-                makeDate("2025-01-03").toYearMonthDayString(): ReadingRecord(targetPages: 10, pagesRead: 20),
+                makeDate("2025-01-03").toYearMonthDayString(): ReadingRecord(targetPages: 10, pagesRead: 20)
             ],
             lastReadDate: nil,
             lastReadPage: 20
@@ -191,7 +191,7 @@ extension BookManagementUseCasesTests {
         testBook.readingProgress = FGReadingProgress(
             dailyReadingRecords: [
                 makeDate("2025-01-01").toYearMonthDayString(): ReadingRecord(targetPages: 10, pagesRead: 10),
-                makeDate("2025-01-02").toYearMonthDayString(): ReadingRecord(targetPages: 20, pagesRead: 20),
+                makeDate("2025-01-02").toYearMonthDayString(): ReadingRecord(targetPages: 20, pagesRead: 20)
             ],
             lastReadDate: makeDate("2025-01-02"),
             lastReadPage: 20

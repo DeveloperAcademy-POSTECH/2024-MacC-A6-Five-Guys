@@ -34,7 +34,6 @@ extension String {
 
             guard let unicodeValue = UnicodeScalar(String(lastCharacter))?.value else { return "는" }
 
-
             if unicodeValue < 0xAC00 || unicodeValue > 0xD7A3 {
                 let lastLowercased = lastCharacter.lowercased()
                 let koreanConsonantAlphabets = ["l", "m", "n", "r"]

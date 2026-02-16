@@ -75,14 +75,6 @@ extension Date {
         return DayBoundary.shared.adjustedDayKey(from: self).rawValue
     }
 
-    /// 기준 시각으로 조정된 날짜 반환
-    func adjustedDate(hourOffset: Int = -4) -> Date {
-        guard hourOffset == -4 else {
-            let calendar = Calendar.app
-            return calendar.date(byAdding: .hour, value: hourOffset, to: self) ?? self
-        }
-        return DayBoundary.shared.adjustedDate(from: self)
-    }
 }
 
 extension Date {
@@ -93,7 +85,6 @@ extension Date {
     }
 }
 
-// MARK: - 수정중 ❗️❗️❗️❗️❗️
 extension Date {
     /// 시간 부분을 버리기
     var onlyDate: Date {

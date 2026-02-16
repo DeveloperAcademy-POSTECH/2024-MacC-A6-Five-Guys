@@ -93,7 +93,7 @@ extension ReadingScheduleCalculatorTests {
             startDate: makeDate("2025-01-10"),
             targetEndDate: makeDate("2025-01-14"),
             excludedReadingDays: [
-                makeDate("2025-01-11"),
+                makeDate("2025-01-11")
             ]
         )
 
@@ -107,7 +107,7 @@ extension ReadingScheduleCalculatorTests {
         )
 
         #expect(result.updatedSettings != nil)
-        #expect(result.updatedSettings?.excludedReadingDays.count == 0)
+        #expect(result.updatedSettings?.excludedReadingDays.isEmpty == true)
         #expect(result.progress.dailyReadingRecords["2025-01-11"]?.pagesRead == 30)
         #expect(result.progress.dailyReadingRecords["2025-01-11"]?.targetPages == 30)
         #expect(result.progress.dailyReadingRecords.count == 5)

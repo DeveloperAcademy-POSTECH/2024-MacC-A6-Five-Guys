@@ -154,18 +154,6 @@ final class SwiftDataBookRepo: BookRepo {
         }
     }
 
-    func updateMetaData(bookId: UUID, metaData: FGBookMetaData) async throws {
-        let swiftDataBook = try await findSwiftDataBook(by: bookId)
-
-        swiftDataBook.bookMetaData = metaData.toBookMetaData()
-
-        do {
-            try modelContext.save()
-        } catch {
-            throw RepoError.updateFailed
-        }
-    }
-
     func updateCompletionStatus(bookId: UUID, status: FGCompletionStatus) async throws {
         let swiftDataBook = try await findSwiftDataBook(by: bookId)
 

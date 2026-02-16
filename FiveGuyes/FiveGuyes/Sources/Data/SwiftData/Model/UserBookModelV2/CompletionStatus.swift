@@ -15,8 +15,4 @@ final class CompletionStatus {
         self.isCompleted = isCompleted
         self.completionReview = completionReview
     }
-
-    func updateCompletionReview(review: String) {
-        self.completionReview = review
-    }
 }

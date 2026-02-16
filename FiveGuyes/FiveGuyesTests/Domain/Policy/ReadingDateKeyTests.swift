@@ -14,7 +14,11 @@ struct ReadingDateKeyTests {
     @Test("ReadingDateKey는 Calendar.app 타임존 기준으로 키를 생성한다")
     func createsKeyUsingAppTimeZone() {
         var utcCalendar = Calendar(identifier: .gregorian)
-        utcCalendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        guard let utcTimeZone = TimeZone(secondsFromGMT: 0) else {
+            Issue.record("Invalid UTC time zone fixture")
+            return
+        }
+        utcCalendar.timeZone = utcTimeZone
 
         var components = DateComponents()
         components.year = 2026
