@@ -124,8 +124,11 @@ struct RecordReadingUseCase {
             completionStatus: currentBook.completionStatus
         )
 
-        try await repo.updateBook(updatedBook)
-        await notificationScheduler.setupAllNotifications(updatedBook)
+        try await persistUpdatedBookAndRefreshNotifications(
+            updatedBook,
+            repo: repo,
+            notificationScheduler: notificationScheduler
+        )
 
         if pagesRead >= currentBook.userSettings.targetEndPage {
             return .completed(updatedBook: updatedBook)
@@ -164,8 +167,11 @@ struct RecordReadingUseCase {
             completionStatus: book.completionStatus
         )
 
-        try await repo.updateBook(updatedBook)
-        await notificationScheduler.setupAllNotifications(updatedBook)
+        try await persistUpdatedBookAndRefreshNotifications(
+            updatedBook,
+            repo: repo,
+            notificationScheduler: notificationScheduler
+        )
     }
 }
 
@@ -205,7 +211,19 @@ struct UpdateReadingPlanUseCase {
             completionStatus: currentBook.completionStatus
         )
 
-        try await repo.updateBook(updatedBook)
-        await notificationScheduler.setupAllNotifications(updatedBook)
+        try await persistUpdatedBookAndRefreshNotifications(
+            updatedBook,
+            repo: repo,
+            notificationScheduler: notificationScheduler
+        )
     }
+}
+
+private func persistUpdatedBookAndRefreshNotifications(
+    _ updatedBook: FGUserBook,
+    repo: BookRepo,
+    notificationScheduler: any ReadingNotificationScheduling
+) async throws {
+    try await repo.updateBook(updatedBook)
+    await notificationScheduler.setupAllNotifications(updatedBook)
 }

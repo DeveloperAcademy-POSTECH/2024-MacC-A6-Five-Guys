@@ -95,24 +95,14 @@ struct CompleteBookUseCase {
             reviewAfterCompletion: review
         )
 
-        let updatedSettings: FGUserSetting
-        if currentBook.userSettings.startDate > completionDate {
-            updatedSettings = FGUserSetting(
-                startPage: currentBook.userSettings.startPage,
-                targetEndPage: currentBook.userSettings.targetEndPage,
-                startDate: completionDate,
-                targetEndDate: completionDate,
-                excludedReadingDays: currentBook.userSettings.excludedReadingDays
-            )
-        } else {
-            updatedSettings = FGUserSetting(
-                startPage: currentBook.userSettings.startPage,
-                targetEndPage: currentBook.userSettings.targetEndPage,
-                startDate: currentBook.userSettings.startDate,
-                targetEndDate: completionDate,
-                excludedReadingDays: currentBook.userSettings.excludedReadingDays
-            )
-        }
+        let adjustedStartDate = min(currentBook.userSettings.startDate, completionDate)
+        let updatedSettings = FGUserSetting(
+            startPage: currentBook.userSettings.startPage,
+            targetEndPage: currentBook.userSettings.targetEndPage,
+            startDate: adjustedStartDate,
+            targetEndDate: completionDate,
+            excludedReadingDays: currentBook.userSettings.excludedReadingDays
+        )
 
         try await repo.updateCompletionStatus(bookId: id, status: updatedStatus)
         try await repo.updateSettings(bookId: id, settings: updatedSettings)
