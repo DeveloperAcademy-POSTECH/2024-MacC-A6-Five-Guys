@@ -39,6 +39,31 @@ extension BookManagementUseCasesTests {
         #expect(clearCount == 1)
     }
 
+    @Test("BookCompletionUseCase.completeBook은 빈 소감이어도 완료 처리와 알림 해제를 수행한다")
+    func testCompleteBookWithEmptyReviewClearsNotifications() async throws {
+        let mockRepo = MockBookRepo()
+        let schedulerSpy = NotificationSchedulerSpy()
+        let completionDate = makeDate("2025-01-20")
+        let useCase = makeBookCompletionUseCase(
+            repo: mockRepo,
+            notificationScheduler: schedulerSpy,
+            todayProvider: ReadingDateProviderStub(todayValue: completionDate)
+        )
+
+        let testBook = createTestBook(totalPages: 300, isCompleted: false)
+        await mockRepo.setBooks([testBook])
+
+        try await useCase.completeBook(id: testBook.id, review: "")
+
+        let updatedBook = try await mockRepo.fetchBook(by: testBook.id)
+        let clearCount = await schedulerSpy.clearCount()
+
+        #expect(updatedBook.completionStatus.isCompleted == true)
+        #expect(updatedBook.completionStatus.reviewAfterCompletion.isEmpty)
+        #expect(updatedBook.userSettings.targetEndDate == completionDate)
+        #expect(clearCount == 1)
+    }
+
     @Test("BookCompletionUseCase.completeBook으로 시작일이 완독일보다 미래인 경우 처리")
     func testCompleteBookFutureStartDate() async throws {
         let mockRepo = MockBookRepo()
@@ -124,6 +149,41 @@ extension BookManagementUseCasesTests {
         #expect(summary.endDate == today)
         #expect(summary.totalReadingDays == 2)
         #expect(summary.pagesPerDay == 150)
+    }
+
+    @Test("BookCompletionUseCase.completionCelebrationSummary는 04시 이전 입력을 전날 기준으로 보정한다")
+    func testCompletionCelebrationSummaryAdjustsBeforeBoundary() {
+        let mockRepo = MockBookRepo()
+        let schedulerSpy = NotificationSchedulerSpy()
+        let rawNow = makeDateTime(
+            year: 2025,
+            month: 1,
+            day: 20,
+            hour: 2,
+            minute: 30
+        )
+        let boundaryAwareProvider = DefaultReadingDateProvider(
+            dayBoundaryPolicy: FixedNowDayBoundaryPolicy(now: rawNow)
+        )
+        let useCase = makeBookCompletionUseCase(
+            repo: mockRepo,
+            notificationScheduler: schedulerSpy,
+            todayProvider: boundaryAwareProvider
+        )
+
+        var testBook = createTestBook(totalPages: 300, isCompleted: true)
+        testBook.userSettings = FGUserSetting(
+            startPage: 1,
+            targetEndPage: 300,
+            startDate: makeDate("2025-01-01"),
+            targetEndDate: makeDate("2025-01-31"),
+            excludedReadingDays: []
+        )
+
+        let summary = useCase.completionCelebrationSummary(for: testBook)
+
+        #expect(summary.startDate.toYearMonthDayString() == "2025-01-01")
+        #expect(summary.endDate.toYearMonthDayString() == "2025-01-19")
     }
 
     @Test("BookCompletionUseCase.completionCelebrationSummary는 시작일이 오늘보다 늦으면 오늘로 보정한다")
@@ -241,5 +301,48 @@ extension BookManagementUseCasesTests {
         )
 
         #expect(todayProvider.callCount == 1)
+    }
+
+    private func makeDateTime(
+        year: Int,
+        month: Int,
+        day: Int,
+        hour: Int,
+        minute: Int
+    ) -> Date {
+        var components = DateComponents()
+        components.year = year
+        components.month = month
+        components.day = day
+        components.hour = hour
+        components.minute = minute
+        components.timeZone = Calendar.app.timeZone
+
+        guard let date = Calendar.app.date(from: components) else {
+            fatalError("Invalid date components")
+        }
+        return date
+    }
+}
+
+private struct FixedNowDayBoundaryPolicy: DayBoundaryProviding {
+    private let now: Date
+    private let policy: DefaultDayBoundaryPolicy
+
+    init(now: Date, policy: DefaultDayBoundaryPolicy = DefaultDayBoundaryPolicy()) {
+        self.now = now
+        self.policy = policy
+    }
+
+    func adjustedNow() -> Date {
+        policy.adjustedDate(from: now)
+    }
+
+    func adjustedDate(from date: Date) -> Date {
+        policy.adjustedDate(from: date)
+    }
+
+    func adjustedDayKey(from date: Date) -> ReadingDateKey {
+        policy.adjustedDayKey(from: date)
     }
 }

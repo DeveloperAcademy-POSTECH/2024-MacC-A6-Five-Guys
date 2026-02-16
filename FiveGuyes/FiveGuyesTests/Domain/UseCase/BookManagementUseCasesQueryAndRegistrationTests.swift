@@ -188,6 +188,33 @@ extension BookManagementUseCasesTests {
         #expect(clearCount == 1)
     }
 
+    @Test("ReadingLibraryUseCase.deleteBook으로 삭제 후 남은 읽는 책이 있으면 해당 책 알림을 재설정")
+    func testDeleteBookWithRemainingReadingBookResetsNotification() async throws {
+        let mockRepo = MockBookRepo()
+        let schedulerSpy = NotificationSchedulerSpy()
+        let useCase = makeReadingLibraryUseCase(
+            repo: mockRepo,
+            notificationScheduler: schedulerSpy
+        )
+
+        let firstBook = createTestBook(title: "첫 번째 책", isCompleted: false)
+        let secondBook = createTestBook(title: "두 번째 책", isCompleted: false)
+        await mockRepo.setBooks([firstBook, secondBook])
+
+        try await useCase.deleteBook(id: firstBook.id)
+
+        let booksInRepo = await mockRepo.books
+        let setupCount = await schedulerSpy.setupCount()
+        let lastSetupBook = await schedulerSpy.lastSetupBook()
+        let clearCount = await schedulerSpy.clearCount()
+
+        #expect(booksInRepo.count == 1)
+        #expect(booksInRepo.first?.id == secondBook.id)
+        #expect(setupCount == 1)
+        #expect(lastSetupBook?.id == secondBook.id)
+        #expect(clearCount == 0)
+    }
+
     @Test("ReadingLibraryUseCase.today는 내부 todayProvider 값을 반환")
     func testReadingLibraryToday() {
         let mockRepo = MockBookRepo()
