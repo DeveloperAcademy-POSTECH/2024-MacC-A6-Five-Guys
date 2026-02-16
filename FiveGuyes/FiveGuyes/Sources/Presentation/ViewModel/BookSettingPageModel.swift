@@ -9,19 +9,21 @@ import SwiftUI
 
 @Observable
 final class BookSettingPageModel {
+    private let minimumPage = 1
+    private let maximumPage = 5
     private(set) var currentPage = 1
 
     /// 다음 페이지로 이동
     func nextPage() {
         withAnimation(.easeOut) {
-            currentPage += 1
+            currentPage = min(maximumPage, currentPage + 1)
         }
     }
 
     /// 이전 페이지로 이동
     func previousPage() {
         withAnimation(.easeOut) {
-            currentPage = max(1, currentPage - 1)
+            currentPage = max(minimumPage, currentPage - 1)
         }
     }
 }

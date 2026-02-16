@@ -11,8 +11,14 @@ import Observation
 @MainActor
 @Observable
 final class BookSearchViewModel {
+    struct CompletionSelection: Equatable {
+        let selectedBook: BookSearchItem
+        let totalPages: Int
+    }
+
     var books = [BookSearchItem]()
     var selectedBook: BookSearchItem?
+    private(set) var isCompletingSelection = false
     private let bookSearchUseCase: any BookSearchUsing
 
     init(bookSearchUseCase: any BookSearchUsing) {
@@ -39,5 +45,20 @@ final class BookSearchViewModel {
 
     func selectBook(_ book: BookSearchItem) {
         selectedBook = book
+    }
+
+    func completeSelection() async -> CompletionSelection? {
+        guard !isCompletingSelection, let selectedBook else { return nil }
+
+        isCompletingSelection = true
+        defer { isCompletingSelection = false }
+
+        let totalPagesString = await fetchBookTotalPages(isbn: selectedBook.isbn13)
+        let totalPages = Int(totalPagesString) ?? 0
+
+        return CompletionSelection(
+            selectedBook: selectedBook,
+            totalPages: totalPages
+        )
     }
 }

@@ -418,6 +418,9 @@ final class BookSearchProviderStub: BookSearchProviding {
 
     var fetchBooksError: Error?
     var fetchBookTotalPagesError: Error?
+    var fetchBookTotalPagesDelayNanoseconds: UInt64 = 0
+    var fetchBookTotalPagesGate: AsyncGate?
+    var onFetchBookTotalPagesStart: (() async -> Void)?
 
     var fetchBooksQueries: [String] = []
     var fetchTotalPagesISBNs: [String] = []
@@ -430,6 +433,15 @@ final class BookSearchProviderStub: BookSearchProviding {
 
     func fetchBookTotalPages(isbn: String) async throws -> Int {
         fetchTotalPagesISBNs.append(isbn)
+        if let onFetchBookTotalPagesStart {
+            await onFetchBookTotalPagesStart()
+        }
+        if let fetchBookTotalPagesGate {
+            await fetchBookTotalPagesGate.wait()
+        }
+        if fetchBookTotalPagesDelayNanoseconds > 0 {
+            try? await Task.sleep(nanoseconds: fetchBookTotalPagesDelayNanoseconds)
+        }
         if let fetchBookTotalPagesError { throw fetchBookTotalPagesError }
         return fetchBookTotalPagesResult
     }

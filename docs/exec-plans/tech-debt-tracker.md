@@ -15,6 +15,20 @@
   - Finding 7 -> TD-021
   - Finding 8 -> TD-022
 
+## Review Sync (2026-02-17, Presentation)
+
+- 본 문서는 2026-02-17 Presentation 집중 리뷰 결과 2건(P2 2건)을 반영해 갱신되었습니다.
+- 이번 리뷰에서 확인된 항목 매핑:
+  - Finding 1 -> TD-024
+  - Finding 2 -> TD-023
+
+## Review Sync (2026-02-17, Presentation SwiftUI Follow-up)
+
+- 본 문서는 2026-02-17 SwiftUI 관점 후속 리뷰 결과 2건(P2 2건)을 반영해 갱신되었습니다.
+- 이번 리뷰에서 확인된 항목 매핑:
+  - Finding 1 -> TD-025
+  - Finding 2 -> TD-026
+
 ## TD-001: 하루 경계(04:00~03:59) 규칙의 전역 강제 부족
 
 - Status: Closed (2026-02-17)
@@ -431,14 +445,116 @@
   1. 2단계로 Domain 모듈 분리 가능성 검증 스파이크(빌드/테스트 영향 포함)
   2. 단계별 모듈화 로드맵(분리 순서, public API 경계, 마이그레이션 기준) 문서화
 
+## TD-023: 검색 완료 중복 탭 시 등록 마법사 단계 건너뛰기
+
+- Status: Closed (2026-02-17)
+- Resolution:
+  - `BookSearchViewModel`에 `isCompletingSelection`, `completeSelection()`을 도입해 in-flight 중복 완료 요청을 ViewModel 경계에서 차단했습니다.
+  - `BookSearchView` 완료 버튼 경로를 `completeSelection()` 단일 성공 경로로 정리하고, 요청 중 버튼 비활성/비활성 스타일을 반영했습니다.
+  - `BookSearchViewModelTests`에 완료 성공/선택 없음/중복 요청 무시 케이스를 추가하고, `BookSearchProviderStub`에 지연/게이트 훅을 확장해 경쟁 조건 회귀를 고정했습니다.
+- Context:
+  - `BookSearchView`의 상단 "완료" 버튼은 탭마다 새로운 `Task`를 생성하고, 완료 시점마다 `pageModel.nextPage()`를 호출합니다.
+  - in-flight 요청 여부를 제어하는 상태(`isSubmitting`)가 없어 네트워크 지연 구간에서 연속 탭이 누적될 수 있습니다.
+- Risk:
+  - `currentPage`가 1 -> 2 -> 3 이상으로 연속 증가해 페이지 입력 단계를 건너뛰거나 의도하지 않은 단계로 진입할 수 있습니다.
+  - 등록 플로우의 값 전이 순서가 깨져 사용자 입력 복원/검증 UX 일관성이 저하됩니다.
+- Target Layer:
+  - `Presentation/View/BookSetting` 등록 마법사 액션 전이 경계
+- Trigger Condition:
+  - 검색 API 지연, 중복 탭 제보, 등록 플로우 단계 이탈 이슈 발생 시 즉시 우선 대응
+- Priority:
+  - P2
+- Current Evidence:
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Presentation/View/BookSetting/BookSearch/BookSearchView.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Presentation/ViewModel/BookSettingPageModel.swift`
+- Suggested Follow-up:
+  1. `BookSearchViewModel` 또는 View 계층에 요청 중 상태를 도입해 완료 버튼 중복 탭을 차단
+  2. `pageModel.nextPage()`를 단일 성공 경로에서 1회만 실행하도록 보장
+  3. 지연 응답 조건에서 중복 탭 회귀 시나리오(단위/통합/UI 중 최소 1개) 추가
+
+## TD-024: BookSettingPageModel 단계 상한 미보장으로 빈 화면 경로 유입 가능
+
+- Status: Closed (2026-02-17)
+- Resolution:
+  - `BookSettingPageModel`에 `minimumPage = 1`, `maximumPage = 5` 상수를 도입하고 `nextPage()/previousPage()`를 clamp 기반으로 변경했습니다.
+  - `BookSettingPageModelTests`를 추가해 초기값/하한/상한 회귀를 단위 테스트로 고정했습니다.
+- Context:
+  - `BookSettingPageModel.nextPage()`는 `currentPage += 1`로 상한 없이 증가합니다.
+  - `BookSettingsManagerView.pageView`는 정의된 enum 값 외에는 `default: EmptyView()`로 처리합니다.
+- Risk:
+  - 반복 호출 또는 비정상 액션 누적으로 `currentPage`가 범위를 벗어나면 사용자가 빈 화면 상태를 마주할 수 있습니다.
+  - 단계형 UX 상태 머신이 숫자 오염에 취약해져 재현성 낮은 화면 이탈이 발생할 수 있습니다.
+- Target Layer:
+  - `Presentation/ViewModel` 단계 상태 머신 경계
+- Trigger Condition:
+  - 단계 전이 로직 수정, 비동기 액션 추가, 등록 플로우 회귀 시
+- Priority:
+  - P2
+- Current Evidence:
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Presentation/ViewModel/BookSettingPageModel.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Presentation/View/BookSetting/BookSettingsManagerView.swift`
+- Suggested Follow-up:
+  1. `nextPage()`에 `bookSettingDone` 상한 clamp 적용
+  2. 단계 enum 기반 전이 함수로 경계값을 타입 수준에서 제한
+  3. 단계 상한/하한 회귀 테스트 추가
+
+## TD-025: 검색 응답 경쟁으로 최신 검색 결과가 이전 질의로 역전될 수 있음
+
+- Status: Open
+- Context:
+  - `BookListView.requestSearchBooks()`는 호출마다 새 `Task`를 생성하고 이전 요청을 취소하지 않습니다.
+  - `BookSearchViewModel.searchBooks(query:)`는 응답 완료 순서 검증 없이 `books`를 즉시 갱신합니다.
+- Risk:
+  - 느린 이전 질의 응답이 나중에 도착하면 최신 질의 결과를 덮어써 화면이 과거 검색 상태로 되돌아갈 수 있습니다.
+  - 사용자는 검색 입력과 목록 결과가 불일치한 UI를 경험할 수 있습니다.
+- Target Layer:
+  - `Presentation/ViewModel` 검색 상태 전이/동시성 제어 경계
+- Trigger Condition:
+  - 검색 API 지연, 연속 검색 UX 개선, 검색 결과 불일치 제보 발생 시
+- Priority:
+  - P2
+- Current Evidence:
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Presentation/View/BookSetting/BookSearch/BookListView.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Presentation/ViewModel/BookSearchViewModel.swift`
+- Suggested Follow-up:
+  1. 검색 Task 취소 또는 request-id(epoch) 검증으로 latest-only 반영 정책을 강제
+  2. 필요 시 debounce 패턴을 도입해 연속 질의의 불필요한 요청을 축소
+  3. out-of-order 응답 회귀 테스트를 추가
+
+## TD-026: 완료 처리 진행 중 선택 변경 허용으로 전달 값 불일치 가능
+
+- Status: Open
+- Context:
+  - `completeSelection()`은 시작 시점의 `selectedBook`을 캡처해 페이지 조회를 수행합니다.
+  - 요청 진행 중에도 `BookRowView` 탭으로 `selectedBook`을 계속 변경할 수 있습니다.
+- Risk:
+  - 사용자가 완료 후 즉시 다음 단계에서 보는 값과 직전 화면에서 최종 선택했다고 인지한 값이 달라질 수 있습니다.
+  - 비동기 완료 시점에 따라 선택/페이지 값 정합성이 흔들려 재현성 낮은 UX 이슈가 발생할 수 있습니다.
+- Target Layer:
+  - `Presentation/View/BookSetting` 선택 상호작용 잠금 정책
+- Trigger Condition:
+  - 완료 액션 네트워크 지연, 선택값 불일치 제보, 등록 플로우 정합성 점검 시
+- Priority:
+  - P2
+- Current Evidence:
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Presentation/ViewModel/BookSearchViewModel.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Presentation/View/BookSetting/BookSearch/BookRowView.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Presentation/View/BookSetting/BookSearch/BookSearchView.swift`
+- Suggested Follow-up:
+  1. 완료 처리 중 목록 선택 상호작용을 잠그거나, ViewModel에서 선택 변경을 차단
+  2. 완료 시작 시 선택 스냅샷과 UI 표시값 정합성을 유지하는 정책을 명시
+  3. 완료 in-flight 중 선택 변경 회귀 테스트를 추가
+
 ## Recommended Execution Order
 
 1. TD-015: 야간 알림 시간 상수 유효 범위 이탈 (P1)
 2. TD-010: 알림 일괄 등록 권한 체크 중복 제거 (P2)
-3. TD-007: 날짜 키 시맨틱/타입 경계 후속 정리 (P2, Partial)
-4. TD-022: 컴파일 단 경계 강제 2단계(모듈화 스파이크/분리 착수) (P3)
+3. TD-025: 검색 응답 경쟁으로 최신 결과가 역전되는 문제 (P2)
+4. TD-026: 완료 in-flight 중 선택 변경으로 값 불일치 가능 (P2)
+5. TD-007: 날짜 키 시맨틱/타입 경계 후속 정리 (P2, Partial)
+6. TD-022: 컴파일 단 경계 강제 2단계(모듈화 스파이크/분리 착수) (P3)
 
 완료(2026-02-16):
 - TD-018, TD-017, TD-019, TD-020, TD-016, TD-003, TD-021
 완료(2026-02-17):
-- TD-001, TD-011, TD-006, TD-004, TD-022(Stage 1)
+- TD-001, TD-011, TD-006, TD-004, TD-022(Stage 1), TD-023, TD-024

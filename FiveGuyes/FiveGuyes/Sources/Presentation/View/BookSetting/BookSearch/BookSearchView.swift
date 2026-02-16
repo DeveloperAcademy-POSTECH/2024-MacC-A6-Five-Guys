@@ -25,32 +25,30 @@ struct BookSearchView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
-                        guard let selectedBook = bookSearchViewModel.selectedBook else { return }
-
                         Task {
-                            let totalPages =  await bookSearchViewModel
-                                .fetchBookTotalPages(
-                                    isbn: selectedBook.isbn13
-                                )
+                            guard let selection = await bookSearchViewModel.completeSelection()
+                            else { return }
 
                             bookSettingInputModel
                                 .setPageRange(
-                                    end: Int(totalPages) ?? 0
+                                    end: selection.totalPages
                                 )
 
                             bookSettingInputModel
-                                .setSelectedBook(selectedBook)
+                                .setSelectedBook(selection.selectedBook)
 
                             pageModel.nextPage()
                         }
 
                     } label: {
                         Text("완료")
-                            .foregroundStyle(bookSearchViewModel.selectedBook != nil ?
+                            .foregroundStyle((bookSearchViewModel.selectedBook != nil
+                                              && !bookSearchViewModel.isCompletingSelection) ?
                                              Color.Colors.green2
                                              : Color.Labels.tertiaryBlack3)
                     }
-                    .disabled(bookSearchViewModel.selectedBook == nil)
+                    .disabled(bookSearchViewModel.selectedBook == nil
+                              || bookSearchViewModel.isCompletingSelection)
                 }
             }
             .onAppear {
