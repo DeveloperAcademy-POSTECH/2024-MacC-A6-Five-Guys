@@ -14,10 +14,12 @@ final class SwiftDataBookRepo: BookRepo {
     // MARK: - Properties
 
     static let migrationCompletionVersionKey = "readingRecordKeyMigrationV1Completed"
+    private static let settingsDateKeyMigrationVersionKey = "settingsDateKeyMigrationV1Completed"
 
     private let modelContext: ModelContext
     private let migrationUserDefaults: UserDefaults
     private let migrationCompletionKey: String
+    private let settingsDateKeyMigrationCompletionKey: String
 
     // MARK: - Initial Methods
 
@@ -39,13 +41,14 @@ final class SwiftDataBookRepo: BookRepo {
         self.modelContext = modelContainer.mainContext
         self.migrationUserDefaults = migrationUserDefaults
         self.migrationCompletionKey = migrationCompletionKey
+        self.settingsDateKeyMigrationCompletionKey = "\(migrationCompletionKey).\(Self.settingsDateKeyMigrationVersionKey)"
     }
 
     // MARK: - Basic CRUD Operations
 
     func fetchBooks() async throws -> [FGUserBook] {
         do {
-            try migrateReadingRecordKeysIfNeeded()
+            try migrateStorageIfNeeded()
             let swiftDatabooks = try modelContext.fetch(FetchDescriptor<SDUserBook>())
             let books = swiftDatabooks.map { $0.toFGUserBook() }
             return books
@@ -55,7 +58,7 @@ final class SwiftDataBookRepo: BookRepo {
     }
 
     func fetchBook(by id: UUID) async throws -> FGUserBook {
-        try migrateReadingRecordKeysIfNeeded()
+        try migrateStorageIfNeeded()
         let book = try await findSwiftDataBook(by: id)
         return book.toFGUserBook()
     }
@@ -104,7 +107,7 @@ final class SwiftDataBookRepo: BookRepo {
         )
 
         do {
-            try migrateReadingRecordKeysIfNeeded()
+            try migrateStorageIfNeeded()
             let swiftDataBooks = try modelContext.fetch(fetchDescriptor)
             return swiftDataBooks.map { $0.toFGUserBook() }
         } catch {
@@ -120,7 +123,7 @@ final class SwiftDataBookRepo: BookRepo {
         )
 
         do {
-            try migrateReadingRecordKeysIfNeeded()
+            try migrateStorageIfNeeded()
             let swiftDataBooks = try modelContext.fetch(fetchDescriptor)
             return swiftDataBooks.map { $0.toFGUserBook() }
         } catch {
@@ -170,7 +173,12 @@ final class SwiftDataBookRepo: BookRepo {
 
     @MainActor
     func prewarmReadingRecordKeyMigrationIfNeeded() throws {
+        try migrateStorageIfNeeded()
+    }
+
+    private func migrateStorageIfNeeded() throws {
         try migrateReadingRecordKeysIfNeeded()
+        try migrateSettingsDateKeysIfNeeded()
     }
 
     /// 읽기 기록 키의 legacy 포맷을 현재 도메인 정책(`Calendar.app`) 기준으로 1회 보정합니다.
@@ -228,6 +236,38 @@ final class SwiftDataBookRepo: BookRepo {
         migrationUserDefaults.set(true, forKey: migrationCompletionKey)
     }
 
+    /// `UserSettings`의 DateKey 병행 필드를 1회 백필합니다.
+    ///
+    /// 기존 Date 데이터는 유지하고, key 필드만 채워 source-of-truth를 점진 전환합니다.
+    private func migrateSettingsDateKeysIfNeeded() throws {
+        guard !migrationUserDefaults.bool(forKey: settingsDateKeyMigrationCompletionKey) else { return }
+
+        do {
+            let swiftDataBooks = try modelContext.fetch(FetchDescriptor<SDUserBook>())
+            var hasMutatedAnyBook = false
+
+            for swiftDataBook in swiftDataBooks {
+                let settings = swiftDataBook.userSettings
+                let migration = UserSettingsDateKeyMigrationV1(settings: settings)
+
+                if migration.didMutate {
+                    settings.startDateKey = migration.startDateKey
+                    settings.targetEndDateKey = migration.targetEndDateKey
+                    settings.nonReadingDayKeys = migration.nonReadingDayKeys
+                    hasMutatedAnyBook = true
+                }
+            }
+
+            if hasMutatedAnyBook {
+                try modelContext.save()
+            }
+
+            migrationUserDefaults.set(true, forKey: settingsDateKeyMigrationCompletionKey)
+        } catch {
+            throw RepoError.fetchFailed
+        }
+    }
+
     /// UserBook으로 기존 SwiftData 모델을  업데이트
     private func updateSwiftDataModel(_ existingBook: SDUserBook, with book: FGUserBook) {
         existingBook.userSettings = book.userSettings.toUserSettings()
@@ -255,6 +295,76 @@ final class SwiftDataBookRepo: BookRepo {
         } catch {
             throw RepoError.fetchFailed
         }
+    }
+}
+
+private struct UserSettingsDateKeyMigrationV1 {
+    let startDateKey: String
+    let targetEndDateKey: String
+    let nonReadingDayKeys: [String]
+    let didMutate: Bool
+
+    init(settings: UserSettings) {
+        let migratedStartDateKey = Self.resolveDateKey(rawKey: settings.startDateKey, legacyDate: settings.startDate)
+        let migratedTargetEndDateKey = Self.resolveDateKey(
+            rawKey: settings.targetEndDateKey,
+            legacyDate: settings.targetEndDate
+        )
+        let migratedNonReadingDayKeys = Self.resolveDateKeys(
+            rawKeys: settings.nonReadingDayKeys,
+            legacyDates: settings.nonReadingDays
+        )
+
+        self.startDateKey = migratedStartDateKey
+        self.targetEndDateKey = migratedTargetEndDateKey
+        self.nonReadingDayKeys = migratedNonReadingDayKeys
+        self.didMutate =
+            settings.startDateKey != migratedStartDateKey ||
+            settings.targetEndDateKey != migratedTargetEndDateKey ||
+            settings.nonReadingDayKeys != migratedNonReadingDayKeys
+    }
+
+    private static var legacySettingsCalendar: Calendar = {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.locale = Locale(identifier: "en_US_POSIX")
+        calendar.timeZone = TimeZone(identifier: "Asia/Seoul") ?? TimeZone(secondsFromGMT: 0) ?? .autoupdatingCurrent
+        return calendar
+    }()
+
+    private static func resolveDateKey(rawKey: String?, legacyDate: Date) -> String {
+        if let rawKey,
+           let parsedKey = ReadingDateKey(parsing: rawKey, calendar: .app) {
+            return parsedKey.rawValue
+        }
+
+        return ReadingDateKey(date: legacyDate, calendar: legacySettingsCalendar).rawValue
+    }
+
+    private static func resolveDateKeys(rawKeys: [String]?, legacyDates: [Date]) -> [String] {
+        guard let rawKeys, !rawKeys.isEmpty else {
+            return legacyDates.map { ReadingDateKey(date: $0, calendar: legacySettingsCalendar).rawValue }
+        }
+
+        var resolvedKeys: [String] = []
+        resolvedKeys.reserveCapacity(rawKeys.count)
+
+        for (index, rawKey) in rawKeys.enumerated() {
+            if let parsedKey = ReadingDateKey(parsing: rawKey, calendar: .app) {
+                resolvedKeys.append(parsedKey.rawValue)
+                continue
+            }
+
+            if legacyDates.indices.contains(index) {
+                let fallbackKey = ReadingDateKey(date: legacyDates[index], calendar: legacySettingsCalendar).rawValue
+                resolvedKeys.append(fallbackKey)
+            }
+        }
+
+        if resolvedKeys.isEmpty {
+            return legacyDates.map { ReadingDateKey(date: $0, calendar: legacySettingsCalendar).rawValue }
+        }
+
+        return resolvedKeys
     }
 }
 
