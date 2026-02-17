@@ -310,7 +310,7 @@ final class SwiftDataBookRepo: BookRepo {
         } catch {
             migrationLogger.logFailure(
                 stage: .fetch,
-                migrationKeyScope: migrationCompletionKey,
+                migrationKeyScope: "\(migrationCompletionKey),\(settingsDateKeyMigrationCompletionKey)",
                 error: error,
                 didMutate: nil
             )
