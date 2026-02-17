@@ -52,6 +52,13 @@
   - Settings Date Drift Risk -> TD-007(Partial, settings LocalDate source-of-truth 병행 적용)
   - Decision Record -> ADR-0005
 
+## Review Sync (2026-02-17, Date Policy Finalization)
+
+- 본 문서는 날짜 정책 확정 후속(legacy 재유입 자동 재보정 + 구조적 진단 로깅) 반영으로 상태를 재동기화했습니다.
+- 이번 반영 매핑:
+  - legacy 재유입 조건부 재보정 -> TD-007(Partial, 재유입 보정 리스크 해소)
+  - prewarm/migration 구조적 관측성 -> TD-028(Closed)
+
 ## TD-001: 하루 경계(04:00~03:59) 규칙의 전역 강제 부족
 
 - Status: Closed (2026-02-17)
@@ -189,6 +196,7 @@
   - `FGUserSetting` 설정일을 `ReadingDateKey` source-of-truth로 전환해 설정일 비교/계산 경계에서 `Date` 절대시각 의존을 줄였습니다.
   - SwiftData `UserSettings`에 `startDateKey/targetEndDateKey/nonReadingDayKeys` 병행 필드를 추가하고 key 우선 읽기 정책을 적용했습니다.
   - legacy 설정 데이터는 `Asia/Seoul` 기준 key fallback + fetch/prewarm 1회 backfill로 점진 전환했습니다.
+  - migration completion flag가 true여도 legacy/오염 데이터가 재유입되면 조건부 재보정이 자동 실행되도록 `SwiftDataBookRepo` 보정 모드를 추가했습니다.
   - 결정 근거는 ADR-0005로 고정했습니다.
 - Context:
   - key 시맨틱은 `ReadingDateKey` + ADR-0003 호환 마이그레이션으로 이미 고정되어 있습니다.
@@ -198,7 +206,6 @@
   - 저장 모델이 문자열 key를 직접 보유하므로 호출부에서 `.rawValue` 남용이 재발할 수 있습니다.
   - `UserSettings`가 `Date` + `DateKey` 병행 필드를 동시에 보유하므로 후속 제거 마이그레이션 전까지 dual-write drift 가능성이 남습니다.
   - UI에서 타임존/day-boundary 정책을 사용자 설정으로 노출하지 않아 글로벌 UX는 아직 제한적입니다.
-  - legacy 데이터 재유입(백업 복원/import) 시 1회 마이그레이션 정책만으로는 보정이 누락될 수 있습니다.
 - Target Layer:
   - `Domain` value object(`ReadingDateKey`) 기반 키 시맨틱 유지/확장
   - 저장 경계에서도 typed key 우선 경로를 보장하는 API 정리 + record timezone policy 유지
@@ -228,7 +235,7 @@
   1. 저장 모델(`[String: ReadingRecord]`) 호출부에 typed key adapter를 추가해 raw string 직접 접근을 축소
   2. `UserSettings`의 legacy `Date` 필드를 제거하는 후속 스키마 마이그레이션을 별도 TD로 분리해 수행
   3. 글로벌 UX 확장 시 day-boundary 타임존 정책을 사용자/지역 기반으로 분리하고 전환 전략(마이그레이션 포함)을 별도 설계
-  4. legacy 데이터 재유입 가능성이 생기면 전역 1회 플래그를 버전드/조건부 마이그레이션으로 전환
+  4. 조건부 재보정 스캔 비용과 실행 빈도를 운영 로그로 모니터링하고 버전드 전략 필요 시 분리
 
 ## TD-010: 알림 일괄 등록 시 권한 체크 중복 호출
 
@@ -606,16 +613,17 @@
 
 ## TD-028: 앱 부트스트랩 마이그레이션 prewarm 실패 관측성 부족
 
-- Status: Partial (2026-02-17, print 관측성 1차 보강)
+- Status: Closed (2026-02-17, 구조적 진단 로깅 반영)
 - Resolution:
-  - `AppDependencies` prewarm `catch`에서 실패 정보를 `print`로 남기도록 보강했습니다.
-  - 즉시 진단 가능성은 확보했지만 구조적 로깅 계층(`Logger`/analytics 이벤트)은 아직 미적용입니다.
+  - `MigrationDiagnosticLogging` 경계를 추가하고 `SystemMigrationDiagnosticLogger(os.Logger)` 구현을 도입했습니다.
+  - `AppDependencies` prewarm 실패 경로를 `print`에서 구조적 로그 호출로 교체했습니다.
+  - `SwiftDataBookRepo` migration fetch/settings_backfill/record_key_migration 실패를 동일 이벤트 스키마로 기록하도록 정리했습니다.
+  - 실패 이벤트에 `stage`, `migrationKeyScope`, `didMutate`, `errorType`, `message`를 포함하도록 고정했습니다.
 - Context:
   - 앱 초기화(`AppDependencies`)에서 `prewarmReadingRecordKeyMigrationIfNeeded()` 실행 실패를 빈 `catch`로 무시합니다.
   - 재시도 경로가 있더라도 초기 실패 신호가 남지 않아 장애 원인 추적 근거가 부족합니다.
 - Risk:
-  - 초기 데이터 이상이 발생해도 원인(마이그레이션 선행 실패) 추적이 지연됩니다.
-  - 재현/분석 비용이 커지고 회귀 대응 시간이 늘어날 수 있습니다.
+  - 로깅은 확보됐지만 analytics 파이프라인 연동/대시보드화는 TD-029 범위입니다.
 - Target Layer:
   - `App` 부트스트랩 초기화 관측성/진단 로깅 경계
 - Trigger Condition:
@@ -624,10 +632,10 @@
   - P3
 - Current Evidence:
   - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/App/AppDependencies.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Domain/Service/MigrationDiagnosticLogging.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Data/RepoImpl/SwiftDataBookRepo.swift`
 - Suggested Follow-up:
-  1. `catch`에서 `Logger` 기반 구조적 로그 또는 진단 이벤트 기록
-  2. migration completion key, 에러 타입/메시지 등 원인 파악 컨텍스트를 이벤트 스키마로 고정
-  3. prewarm 실패 경로 관측성 검증(테스트 또는 진단 체크리스트) 추가
+  1. TD-029 범위에서 analytics 파이프라인으로 필요한 진단 이벤트 전달 여부를 결정
 
 ## TD-029: Presentation의 Firebase Tracking 직접 호출 경계 분리 필요
 
@@ -662,10 +670,9 @@
 4. TD-026: 완료 in-flight 중 선택 변경으로 값 불일치 가능 (P2)
 5. TD-007: 날짜 키 시맨틱/타입 경계 후속 정리 (P2, Partial)
 6. TD-022: 컴파일 단 경계 강제 2단계(모듈화 스파이크/분리 착수) (P3)
-7. TD-028: 앱 부트스트랩 마이그레이션 prewarm 구조적 관측성 보강 (P3, Partial)
-8. TD-029: Analytics 경계 분리 (P3)
+7. TD-029: Analytics 경계 분리 (P3)
 
 완료(2026-02-16):
 - TD-018, TD-017, TD-019, TD-020, TD-016, TD-003, TD-021
 완료(2026-02-17):
-- TD-001, TD-011, TD-006, TD-004, TD-022(Stage 1), TD-023, TD-024, TD-027
+- TD-001, TD-011, TD-006, TD-004, TD-022(Stage 1), TD-023, TD-024, TD-027, TD-028

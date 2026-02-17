@@ -19,7 +19,8 @@ This plan follows `/Users/zaehorang/.codex/PLANS.md` and is executed with `/User
 - [x] (2026-02-17 14:52Z) TD-007 후속 1차 완료: record-level `timeZoneID` 저장 + forward-only 정책 + ADR-0004 문서화.
 - [x] (2026-02-17 18:20Z) F1~F5 후속 반영: `Calendar.app` 현지 time zone 정책 전환, TD-027 Closed, TD-028 Partial, TD-029 신규 등록.
 - [x] (2026-02-17 17:20Z) TD-007 후속 2차 완료: 설정일 LocalDate key source-of-truth + SwiftData 병행 key 필드 + legacy backfill + ADR-0005 문서화.
-- [ ] Remaining: TD-015, TD-010, TD-007 잔여(typed key adapter + settings legacy Date 제거 마이그레이션), TD-022 Stage 2(모듈화 스파이크/분리 로드맵), TD-028 구조적 로깅, TD-029 analytics 경계 분리.
+- [x] (2026-02-17 18:24Z) 날짜 정책 확정 후속 반영: TD-007 조건부 재보정 자동실행 + TD-028 구조적 진단 로깅 적용.
+- [ ] Remaining: TD-015, TD-010, TD-007 잔여(typed key adapter + settings legacy Date 제거 마이그레이션), TD-022 Stage 2(모듈화 스파이크/분리 로드맵), TD-029 analytics 경계 분리.
 
 ## Surprises & Discoveries
 
@@ -51,15 +52,23 @@ This plan follows `/Users/zaehorang/.codex/PLANS.md` and is executed with `/User
   Rationale: 설정일 day drift를 막으면서 운영 데이터 안전성과 롤백 가능성을 함께 확보하기 위함.
   Date/Author: 2026-02-17 / Codex
 
+- Decision: 마이그레이션 completion flag가 true여도 재유입 신호가 감지되면 조건부 재보정 모드를 재실행한다.
+  Rationale: 백업 복원/import로 legacy 데이터가 다시 들어올 수 있어 1회 플래그만으로는 drift를 막기 어렵기 때문이다.
+  Date/Author: 2026-02-17 / Codex
+
+- Decision: prewarm/migration 실패 관측성은 `MigrationDiagnosticLogging` 경계로 구조화하고 Analytics 연계는 TD-029로 분리한다.
+  Rationale: 장애 원인 추적에 필요한 진단 정보는 즉시 확보하면서 SDK 결합 확대는 별도 부채로 관리하기 위해서다.
+  Date/Author: 2026-02-17 / Codex
+
 ## Outcomes & Retrospective
 
 이번 사이클에서 이슈 상태는 다음과 같이 업데이트되었습니다.
 
 1. 새로 닫힌 항목: TD-001, TD-004, TD-006, TD-011.
-2. Partial로 전환된 항목: TD-022(Stage 1 완료), TD-007(record timezone snapshot + settings LocalDate key 전환), TD-028(print 관측성 1차 보강).
+2. Partial로 전환된 항목: TD-022(Stage 1 완료), TD-007(record timezone snapshot + settings LocalDate key 전환).
 3. 기존 닫힘 유지: TD-018, TD-017, TD-003, TD-019, TD-016, TD-020, TD-021.
-4. 이번 사이클에서 TD-027은 실행일 완료 정책 확정으로 Closed 처리했다.
-5. 잔여 우선순위: TD-015(P1) -> TD-010(P2) -> TD-007 잔여(P2 Partial, Date 필드 제거 포함) -> TD-022 Stage 2(P3) -> TD-028 구조화(P3) -> TD-029(P3).
+4. 이번 사이클에서 TD-027은 실행일 완료 정책 확정, TD-028은 구조적 진단 로깅 적용으로 Closed 처리했다.
+5. 잔여 우선순위: TD-015(P1) -> TD-010(P2) -> TD-007 잔여(P2 Partial, Date 필드 제거 포함) -> TD-022 Stage 2(P3) -> TD-029(P3).
 
 검증 명령:
 
@@ -102,6 +111,13 @@ architecture-first 리베이스에서 반영한 이슈-코드 매핑은 아래�
   - `docs/decisions/adr-0005-settings-localdate-source-of-truth.md`
   - `docs/exec-plans/td-007-settings-localdate-stability-execplan.md`
 
+- TD-007/TD-028 후속 (조건부 재보정 + 구조적 진단 로깅):
+  - `FiveGuyes/FiveGuyes/Sources/Data/RepoImpl/SwiftDataBookRepo.swift`
+  - `FiveGuyes/FiveGuyes/Sources/Domain/Service/MigrationDiagnosticLogging.swift`
+  - `FiveGuyes/FiveGuyes/Sources/App/AppDependencies.swift`
+  - `FiveGuyes/FiveGuyesTests/Data/Repo/SwiftDataBookRepoTests.swift`
+  - `FiveGuyes/FiveGuyesTests/Domain/Service/MigrationDiagnosticLoggingTests.swift`
+
 ## Plan of Work
 
 이 문서는 실행 완료 이슈와 잔여 이슈를 함께 유지합니다.
@@ -113,8 +129,7 @@ architecture-first 리베이스에서 반영한 이슈-코드 매핑은 아래�
 2. TD-010: 알림 일괄 등록 권한 체크 1회화 + 테스트 고정.
 3. TD-007 잔여: typed key adapter 확장 + 글로벌 정책 UX 분리 설계.
 4. TD-022 Stage 2: Domain 분리 스파이크와 모듈화 로드맵 문서화.
-5. TD-028 잔여: prewarm 실패 구조적 로깅 경계 도입.
-6. TD-029: Presentation analytics 호출 경계 분리 로드맵 문서화/착수.
+5. TD-029: Presentation analytics 호출 경계 분리 로드맵 문서화/착수.
 
 ## Concrete Steps
 

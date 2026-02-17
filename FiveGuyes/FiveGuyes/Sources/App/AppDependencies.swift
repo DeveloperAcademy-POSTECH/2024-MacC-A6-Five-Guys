@@ -30,20 +30,19 @@ final class AppDependencies {
 
     init(modelContainer: ModelContainer) {
         let migrationCompletionKey = Self.makeMigrationCompletionKey()
+        let migrationLogger = SystemMigrationDiagnosticLogger()
         let repo = SwiftDataBookRepo(
             modelContainer: modelContainer,
             migrationUserDefaults: .standard,
-            migrationCompletionKey: migrationCompletionKey
+            migrationCompletionKey: migrationCompletionKey,
+            migrationLogger: migrationLogger
         )
 
-        do {
-            try repo.prewarmReadingRecordKeyMigrationIfNeeded()
-        } catch {
-            print(
-                "[MigrationPrewarm] failed key=\(migrationCompletionKey) " +
-                "errorType=\(String(describing: type(of: error))) message=\(error.localizedDescription)"
-            )
-        }
+        Self.prewarmMigration(
+            repo: repo,
+            migrationLogger: migrationLogger,
+            migrationCompletionKey: migrationCompletionKey
+        )
 
         let readingDateProvider = DefaultReadingDateProvider()
         let readingTimeZoneProvider = SystemReadingTimeZoneProvider()
@@ -136,5 +135,22 @@ final class AppDependencies {
     private static func makeMigrationCompletionKey() -> String {
         let bundleIdentifier = Bundle.main.bundleIdentifier ?? defaultBundleIdentifier
         return "\(bundleIdentifier).\(migrationStoreScope).\(SwiftDataBookRepo.migrationCompletionVersionKey)"
+    }
+
+    private static func prewarmMigration(
+        repo: SwiftDataBookRepo,
+        migrationLogger: any MigrationDiagnosticLogging,
+        migrationCompletionKey: String
+    ) {
+        do {
+            try repo.prewarmReadingRecordKeyMigrationIfNeeded()
+        } catch {
+            migrationLogger.logFailure(
+                stage: .prewarm,
+                migrationKeyScope: migrationCompletionKey,
+                error: error,
+                didMutate: nil
+            )
+        }
     }
 }

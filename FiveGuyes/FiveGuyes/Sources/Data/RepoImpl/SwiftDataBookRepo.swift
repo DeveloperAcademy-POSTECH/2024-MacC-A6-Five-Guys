@@ -20,6 +20,7 @@ final class SwiftDataBookRepo: BookRepo {
     private let migrationUserDefaults: UserDefaults
     private let migrationCompletionKey: String
     private let settingsDateKeyMigrationCompletionKey: String
+    private let migrationLogger: any MigrationDiagnosticLogging
 
     // MARK: - Initial Methods
 
@@ -28,7 +29,8 @@ final class SwiftDataBookRepo: BookRepo {
         self.init(
             modelContainer: modelContainer,
             migrationUserDefaults: .standard,
-            migrationCompletionKey: Self.migrationCompletionVersionKey
+            migrationCompletionKey: Self.migrationCompletionVersionKey,
+            migrationLogger: SystemMigrationDiagnosticLogger()
         )
     }
 
@@ -36,12 +38,14 @@ final class SwiftDataBookRepo: BookRepo {
     init(
         modelContainer: ModelContainer,
         migrationUserDefaults: UserDefaults,
-        migrationCompletionKey: String
+        migrationCompletionKey: String,
+        migrationLogger: any MigrationDiagnosticLogging = SystemMigrationDiagnosticLogger()
     ) {
         self.modelContext = modelContainer.mainContext
         self.migrationUserDefaults = migrationUserDefaults
         self.migrationCompletionKey = migrationCompletionKey
         self.settingsDateKeyMigrationCompletionKey = "\(migrationCompletionKey).\(Self.settingsDateKeyMigrationVersionKey)"
+        self.migrationLogger = migrationLogger
     }
 
     // MARK: - Basic CRUD Operations
@@ -177,8 +181,18 @@ final class SwiftDataBookRepo: BookRepo {
     }
 
     private func migrateStorageIfNeeded() throws {
-        try migrateReadingRecordKeysIfNeeded()
-        try migrateSettingsDateKeysIfNeeded()
+        let swiftDataBooks = try fetchBooksForMigration()
+        let shouldForceRecordRemediation = shouldRunReadingRecordKeyRemediation(in: swiftDataBooks)
+        let shouldForceSettingsRemediation = shouldRunSettingsDateKeyRemediation(in: swiftDataBooks)
+
+        try migrateReadingRecordKeysIfNeeded(
+            books: swiftDataBooks,
+            forceRemediation: shouldForceRecordRemediation
+        )
+        try migrateSettingsDateKeysIfNeeded(
+            books: swiftDataBooks,
+            forceRemediation: shouldForceSettingsRemediation
+        )
     }
 
     /// 읽기 기록 키의 legacy 포맷을 현재 도메인 정책(`Calendar.app`) 기준으로 1회 보정합니다.
@@ -186,32 +200,43 @@ final class SwiftDataBookRepo: BookRepo {
     /// 왜 fetch 경계에서 1회 실행하는가:
     /// - 과거 저장 데이터와 현재 조회 키 정책이 다를 수 있어 "기록이 비어 보이는" 문제를 사전에 제거해야 합니다.
     /// - 매 조회마다 fallback 분기를 계속 두는 방식보다, 초기 1회 write-back이 이후 런타임 비용/복잡도를 줄입니다.
-    private func migrateReadingRecordKeysIfNeeded() throws {
-        guard !isMigrationCompleted() else { return }
+    private func migrateReadingRecordKeysIfNeeded(
+        books swiftDataBooks: [SDUserBook],
+        forceRemediation: Bool
+    ) throws {
+        let wasCompleted = isMigrationCompleted()
+        guard forceRemediation || !wasCompleted else { return }
 
-        do {
-            let swiftDataBooks = try modelContext.fetch(FetchDescriptor<SDUserBook>())
-            var hasMutatedAnyBook = false
+        var hasMutatedAnyBook = false
 
-            for swiftDataBook in swiftDataBooks {
-                let migration = ReadingRecordKeyMigrationV1(
-                    records: swiftDataBook.readingProgress.readingRecords,
-                    lastReadDate: swiftDataBook.readingProgress.lastReadDate
-                )
+        for swiftDataBook in swiftDataBooks {
+            let migration = ReadingRecordKeyMigrationV1(
+                records: swiftDataBook.readingProgress.readingRecords,
+                lastReadDate: swiftDataBook.readingProgress.lastReadDate
+            )
 
-                if migration.didMutate {
-                    swiftDataBook.readingProgress.readingRecords = migration.migratedRecords
-                    hasMutatedAnyBook = true
-                }
+            if migration.didMutate {
+                swiftDataBook.readingProgress.readingRecords = migration.migratedRecords
+                hasMutatedAnyBook = true
             }
+        }
 
-            if hasMutatedAnyBook {
+        if hasMutatedAnyBook {
+            do {
                 try modelContext.save()
+            } catch {
+                migrationLogger.logFailure(
+                    stage: .recordKeyMigration,
+                    migrationKeyScope: migrationCompletionKey,
+                    error: error,
+                    didMutate: true
+                )
+                throw RepoError.fetchFailed
             }
+        }
 
+        if !wasCompleted {
             markMigrationCompleted()
-        } catch {
-            throw RepoError.fetchFailed
         }
     }
 
@@ -239,33 +264,99 @@ final class SwiftDataBookRepo: BookRepo {
     /// `UserSettings`의 DateKey 병행 필드를 1회 백필합니다.
     ///
     /// 기존 Date 데이터는 유지하고, key 필드만 채워 source-of-truth를 점진 전환합니다.
-    private func migrateSettingsDateKeysIfNeeded() throws {
-        guard !migrationUserDefaults.bool(forKey: settingsDateKeyMigrationCompletionKey) else { return }
+    private func migrateSettingsDateKeysIfNeeded(
+        books swiftDataBooks: [SDUserBook],
+        forceRemediation: Bool
+    ) throws {
+        let wasCompleted = migrationUserDefaults.bool(forKey: settingsDateKeyMigrationCompletionKey)
+        guard forceRemediation || !wasCompleted else { return }
 
-        do {
-            let swiftDataBooks = try modelContext.fetch(FetchDescriptor<SDUserBook>())
-            var hasMutatedAnyBook = false
+        var hasMutatedAnyBook = false
 
-            for swiftDataBook in swiftDataBooks {
-                let settings = swiftDataBook.userSettings
-                let migration = UserSettingsDateKeyMigrationV1(settings: settings)
+        for swiftDataBook in swiftDataBooks {
+            let settings = swiftDataBook.userSettings
+            let migration = UserSettingsDateKeyMigrationV1(settings: settings)
 
-                if migration.didMutate {
-                    settings.startDateKey = migration.startDateKey
-                    settings.targetEndDateKey = migration.targetEndDateKey
-                    settings.nonReadingDayKeys = migration.nonReadingDayKeys
-                    hasMutatedAnyBook = true
-                }
+            if migration.didMutate {
+                settings.startDateKey = migration.startDateKey
+                settings.targetEndDateKey = migration.targetEndDateKey
+                settings.nonReadingDayKeys = migration.nonReadingDayKeys
+                hasMutatedAnyBook = true
             }
+        }
 
-            if hasMutatedAnyBook {
+        if hasMutatedAnyBook {
+            do {
                 try modelContext.save()
+            } catch {
+                migrationLogger.logFailure(
+                    stage: .settingsBackfill,
+                    migrationKeyScope: settingsDateKeyMigrationCompletionKey,
+                    error: error,
+                    didMutate: true
+                )
+                throw RepoError.fetchFailed
             }
+        }
 
+        if !wasCompleted {
             migrationUserDefaults.set(true, forKey: settingsDateKeyMigrationCompletionKey)
+        }
+    }
+
+    private func fetchBooksForMigration() throws -> [SDUserBook] {
+        do {
+            return try modelContext.fetch(FetchDescriptor<SDUserBook>())
         } catch {
+            migrationLogger.logFailure(
+                stage: .fetch,
+                migrationKeyScope: migrationCompletionKey,
+                error: error,
+                didMutate: nil
+            )
             throw RepoError.fetchFailed
         }
+    }
+
+    /// completion flag가 true여도 legacy/오염 신호가 재유입되면 보정 모드로 재실행한다.
+    private func shouldRunReadingRecordKeyRemediation(in books: [SDUserBook]) -> Bool {
+        for swiftDataBook in books {
+            let records = swiftDataBook.readingProgress.readingRecords
+
+            if records.keys.contains(where: { hasInvalidStoredReadingDateKey($0) }) {
+                return true
+            }
+
+            if records.values.contains(where: { hasNonNormalizedTimeZone($0) }) {
+                return true
+            }
+
+            let migration = ReadingRecordKeyMigrationV1(
+                records: records,
+                lastReadDate: swiftDataBook.readingProgress.lastReadDate
+            )
+
+            if migration.didMutate {
+                return true
+            }
+        }
+
+        return false
+    }
+
+    private func shouldRunSettingsDateKeyRemediation(in books: [SDUserBook]) -> Bool {
+        books.contains { swiftDataBook in
+            UserSettingsDateKeyMigrationV1(settings: swiftDataBook.userSettings).didMutate
+        }
+    }
+
+    private func hasInvalidStoredReadingDateKey(_ rawKey: String) -> Bool {
+        ReadingDateKey(parsing: rawKey, calendar: .app) == nil
+    }
+
+    private func hasNonNormalizedTimeZone(_ record: ReadingRecord) -> Bool {
+        let trimmed = record.timeZoneID.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty || trimmed != record.timeZoneID
     }
 
     /// UserBook으로 기존 SwiftData 모델을  업데이트
