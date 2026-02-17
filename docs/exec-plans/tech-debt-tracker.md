@@ -206,6 +206,14 @@
   - 저장 모델이 문자열 key를 직접 보유하므로 호출부에서 `.rawValue` 남용이 재발할 수 있습니다.
   - `UserSettings`가 `Date` + `DateKey` 병행 필드를 동시에 보유하므로 후속 제거 마이그레이션 전까지 dual-write drift 가능성이 남습니다.
   - UI에서 타임존/day-boundary 정책을 사용자 설정으로 노출하지 않아 글로벌 UX는 아직 제한적입니다.
+- Deferred Note (2026-02-17):
+  - `readingRecords`의 파싱 불가 invalid key가 재유입되면 반복 재감지 루프 가능성이 남아 있습니다.
+  - 현재 운영 가정(앱 내부 저장만 사용, 백업/import 경로 없음) 기준으로 발생 가능성이 낮아 코드 수정은 보류합니다.
+  - 백업/import 경로 도입 또는 운영 로그에서 동일 신호가 재현되면 우선순위를 상향해 재개합니다.
+- Deferred Note (2026-02-17, Performance):
+  - `runMigrationPipelineIfNeeded`가 read 경계마다 전체 `SDUserBook`를 pre-scan(fetch + remediation 판별)해 O(N) 추가 읽기 비용이 발생할 수 있습니다.
+  - 이번 사이클은 데이터 정확성 우선 범위로 고정해 성능 최적화 변경은 의도적으로 제외했습니다.
+  - 홈/리스트 지연 관측, 데이터 규모 증가, startup/prewarm 전략 재정의 시점에 우선순위를 상향해 재개합니다.
 - Target Layer:
   - `Domain` value object(`ReadingDateKey`) 기반 키 시맨틱 유지/확장
   - 저장 경계에서도 typed key 우선 경로를 보장하는 API 정리 + record timezone policy 유지

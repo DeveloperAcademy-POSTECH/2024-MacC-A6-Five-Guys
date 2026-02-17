@@ -92,4 +92,20 @@ struct SettingsDateKeyPolicyTests {
         #expect(nilResolved.map(\.rawValue) == ["2026-02-11", "2026-02-21"])
         #expect(emptyResolved.map(\.rawValue) == ["2026-02-11", "2026-02-21"])
     }
+
+    @Test("raw key 배열이 legacy date보다 짧으면 legacy tail을 보존한다")
+    func resolveDateKeys_preservesLegacyTailWhenRawKeysAreShorter() {
+        let legacyDates = [
+            makeUTCDate(year: 2026, month: 2, day: 10, hour: 18),
+            makeUTCDate(year: 2026, month: 2, day: 15, hour: 18),
+            makeUTCDate(year: 2026, month: 2, day: 20, hour: 16),
+        ]
+
+        let resolved = SettingsDateKeyPolicy.resolveDateKeys(
+            rawKeys: ["2026-03-01"],
+            legacyDates: legacyDates
+        )
+
+        #expect(resolved.map(\.rawValue) == ["2026-03-01", "2026-02-16", "2026-02-21"])
+    }
 }

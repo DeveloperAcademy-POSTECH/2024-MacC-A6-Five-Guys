@@ -33,7 +33,7 @@ enum SettingsDateKeyPolicy {
         }
 
         var resolvedKeys: [ReadingDateKey] = []
-        resolvedKeys.reserveCapacity(rawKeys.count)
+        resolvedKeys.reserveCapacity(max(rawKeys.count, legacyDates.count))
 
         for (index, rawKey) in rawKeys.enumerated() {
             if let parsedKey = ReadingDateKey(parsing: rawKey, calendar: .app) {
@@ -42,6 +42,12 @@ enum SettingsDateKeyPolicy {
             }
 
             if legacyDates.indices.contains(index) {
+                resolvedKeys.append(ReadingDateKey(date: legacyDates[index], calendar: legacySettingsCalendar))
+            }
+        }
+
+        if rawKeys.count < legacyDates.count {
+            for index in rawKeys.count..<legacyDates.count {
                 resolvedKeys.append(ReadingDateKey(date: legacyDates[index], calendar: legacySettingsCalendar))
             }
         }

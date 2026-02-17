@@ -685,6 +685,45 @@ struct SwiftDataBookRepoTests {
         #expect(storedBook?.userSettings.nonReadingDayKeys == ["2026-02-16"])
     }
 
+    @Test("fetch 시 partial nonReadingDayKeys를 legacy tail까지 백필한다")
+    func testFetchBackfillsLegacySettingsNonReadingDayKeysTail() async throws {
+        let container = try createInMemoryContainer()
+        let migrationStorage = createMigrationStorage()
+        let repo = SwiftDataBookRepo(
+            modelContainer: container,
+            migrationUserDefaults: migrationStorage.userDefaults,
+            migrationCompletionKey: migrationStorage.completionKey
+        )
+
+        let legacyBook = createTestBook().toUserBookV2()
+        legacyBook.userSettings.startDate = makeUTCDate(year: 2026, month: 2, day: 10, hour: 18)
+        legacyBook.userSettings.targetEndDate = makeUTCDate(year: 2026, month: 2, day: 20, hour: 18)
+        legacyBook.userSettings.nonReadingDays = [
+            makeUTCDate(year: 2026, month: 2, day: 15, hour: 18),
+            makeUTCDate(year: 2026, month: 2, day: 20, hour: 16),
+        ]
+        legacyBook.userSettings.startDateKey = "2026-02-11"
+        legacyBook.userSettings.targetEndDateKey = "2026-02-21"
+        legacyBook.userSettings.nonReadingDayKeys = ["2026-02-16"]
+        let legacyBookID = legacyBook.id
+
+        container.mainContext.insert(legacyBook)
+        try container.mainContext.save()
+
+        let fetchedBook = try await repo.fetchBook(by: legacyBookID)
+        #expect(fetchedBook.userSettings.excludedReadingDayKeys.map(\.rawValue) == ["2026-02-16", "2026-02-21"])
+
+        var fetchDescriptor: FetchDescriptor<UserBookSchemaV2.UserBookV2> = .init(
+            predicate: #Predicate { book in
+                book.id == legacyBookID
+            }
+        )
+        fetchDescriptor.fetchLimit = 1
+        let storedBook = try container.mainContext.fetch(fetchDescriptor).first
+
+        #expect(storedBook?.userSettings.nonReadingDayKeys == ["2026-02-16", "2026-02-21"])
+    }
+
     @Test("완료 플래그가 true여도 legacy settings key 재유입 시 자동 재보정한다")
     func testMigrationRemediatesReintroducedLegacySettingsWhenFlagAlreadyTrue() async throws {
         let container = try createInMemoryContainer()
