@@ -116,9 +116,11 @@ extension BookManagementUseCasesTests {
     func testRegisterBookWithScheduleCalculation() async throws {
         let mockRepo = MockBookRepo()
         let schedulerSpy = NotificationSchedulerSpy()
+        let timeZoneProvider = ReadingTimeZoneProviderStub(timeZoneID: "America/Los_Angeles")
         let useCase = makeBookRegistrationUseCase(
             repo: mockRepo,
-            notificationScheduler: schedulerSpy
+            notificationScheduler: schedulerSpy,
+            timeZoneProvider: timeZoneProvider
         )
 
         let input = RegisterBookInput(
@@ -144,6 +146,7 @@ extension BookManagementUseCasesTests {
         let firstRecord = registeredBook.readingProgress.dailyReadingRecords[firstDateKey]
         #expect(firstRecord != nil)
         #expect((firstRecord?.targetPages ?? 0) > 0)
+        #expect(firstRecord?.timeZoneID == "America/Los_Angeles")
     }
 
     @Test("ReadingLibraryUseCase.deleteBook으로 책 삭제 시 Repo에서 제거")

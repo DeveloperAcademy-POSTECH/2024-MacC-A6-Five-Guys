@@ -55,13 +55,15 @@ struct ReadingScheduleCalculator {
     ///   - `ScheduleCalculationError.invalidPageRange`: 페이지 범위 오류
     ///   - `ScheduleCalculationError.calculationFailed`: 계산 실패
     func createInitialSchedule(
-        settings: FGUserSetting
+        settings: FGUserSetting,
+        activeTimeZoneID: String = ReadingRecord.legacyDefaultTimeZoneID
     ) throws -> FGReadingProgress {
         do {
             let records = try makeScheduleSegment(
                 settings: settings,
                 startDate: settings.startDate,
-                startPageExclusive: settings.startPage - 1
+                startPageExclusive: settings.startPage - 1,
+                activeTimeZoneID: activeTimeZoneID
             )
 
             return FGReadingProgress(
@@ -96,27 +98,30 @@ struct ReadingScheduleCalculator {
         settings: FGUserSetting,
         progress: FGReadingProgress,
         pagesRead: Int,
-        date: Date
+        date: Date,
+        activeTimeZoneID: String = ReadingRecord.legacyDefaultTimeZoneID
     ) throws -> (progress: FGReadingProgress, updatedSettings: FGUserSetting?) {
         let key = date.readingDateKey
         var newRecords = progress.dailyReadingRecords
 
         let currentRecord = newRecords[key.rawValue] ?? ReadingRecord(targetPages: 0, pagesRead: 0)
+        // forward-only 정책: "지금 쓰는 레코드"만 현재 타임존 스냅샷으로 기록한다.
         newRecords[key.rawValue] = ReadingRecord(
             targetPages: currentRecord.targetPages,
-            pagesRead: pagesRead
+            pagesRead: pagesRead,
+            timeZoneID: activeTimeZoneID
         )
 
         var updatedSettings: FGUserSetting?
-        let excludedKey = settings.excludedReadingDays.first(where: { $0.readingDateKey == key })
+        let excludedKey = settings.excludedReadingDayKeys.first(where: { $0 == key })
         if excludedKey != nil {
-            let newExcludedDays = settings.excludedReadingDays.filter { $0.readingDateKey != key }
+            let newExcludedDayKeys = settings.excludedReadingDayKeys.filter { $0 != key }
             updatedSettings = FGUserSetting(
                 startPage: settings.startPage,
                 targetEndPage: settings.targetEndPage,
-                startDate: settings.startDate,
-                targetEndDate: settings.targetEndDate,
-                excludedReadingDays: newExcludedDays
+                startDateKey: settings.startDateKey,
+                targetEndDateKey: settings.targetEndDateKey,
+                excludedReadingDayKeys: newExcludedDayKeys
             )
         }
 
@@ -131,7 +136,11 @@ struct ReadingScheduleCalculator {
             (currentRecord.targetPages != 0 && pagesRead != currentRecord.targetPages)
 
         if needsRecalculation {
-            newRecords[key.rawValue] = ReadingRecord(targetPages: pagesRead, pagesRead: pagesRead)
+            newRecords[key.rawValue] = ReadingRecord(
+                targetPages: pagesRead,
+                pagesRead: pagesRead,
+                timeZoneID: activeTimeZoneID
+            )
 
             let adjustedSettings = updatedSettings ?? settings
 
@@ -142,7 +151,8 @@ struct ReadingScheduleCalculator {
                     lastReadDate: date,
                     lastReadPage: pagesRead
                 ),
-                fromDate: date
+                fromDate: date,
+                activeTimeZoneID: activeTimeZoneID
             )
 
             return (progress: recalculatedProgress, updatedSettings: updatedSettings)
@@ -163,7 +173,8 @@ struct ReadingScheduleCalculator {
     func adjustFutureTargets(
         settings: FGUserSetting,
         progress: FGReadingProgress,
-        fromDate: Date
+        fromDate: Date,
+        activeTimeZoneID: String = ReadingRecord.legacyDefaultTimeZoneID
     ) throws -> FGReadingProgress {
         do {
             let nextDay = fromDate.addDays(1)
@@ -171,7 +182,8 @@ struct ReadingScheduleCalculator {
             let newSegment = try makeScheduleSegment(
                 settings: settings,
                 startDate: nextDay,
-                startPageExclusive: progress.lastReadPage
+                startPageExclusive: progress.lastReadPage,
+                activeTimeZoneID: activeTimeZoneID
             )
 
             let mergedProgress = mergeProgress(
@@ -200,9 +212,10 @@ struct ReadingScheduleCalculator {
     func rescheduleOnAppOpen(
         settings: FGUserSetting,
         progress: FGReadingProgress,
-        today: Date
+        today: Date,
+        activeTimeZoneID: String = ReadingRecord.legacyDefaultTimeZoneID
     ) throws -> FGReadingProgress {
-        if today.readingDateKey > settings.targetEndDate.readingDateKey {
+        if today.readingDateKey > settings.targetEndDateKey {
             throw ScheduleCalculationError.targetDatePassed
         }
 
@@ -212,7 +225,7 @@ struct ReadingScheduleCalculator {
             return progress
         }
 
-        if settings.startDate.readingDateKey >= today.readingDateKey {
+        if settings.startDateKey >= today.readingDateKey {
             return progress
         }
 
@@ -220,7 +233,8 @@ struct ReadingScheduleCalculator {
             let newSegment = try makeScheduleSegment(
                 settings: settings,
                 startDate: today,
-                startPageExclusive: progress.lastReadPage
+                startPageExclusive: progress.lastReadPage,
+                activeTimeZoneID: activeTimeZoneID
             )
 
             let mergedProgress = mergeProgress(
@@ -248,10 +262,14 @@ struct ReadingScheduleCalculator {
     func rescheduleForSettingsChange(
         newSettings: FGUserSetting,
         progress: FGReadingProgress,
-        today: Date
+        today: Date,
+        activeTimeZoneID: String = ReadingRecord.legacyDefaultTimeZoneID
     ) throws -> FGReadingProgress {
-        if newSettings.startDate.readingDateKey >= today.readingDateKey {
-            return try createInitialSchedule(settings: newSettings)
+        if newSettings.startDateKey >= today.readingDateKey {
+            return try createInitialSchedule(
+                settings: newSettings,
+                activeTimeZoneID: activeTimeZoneID
+            )
         }
 
         let cleanedBase = cleanedProgress(progress: progress, settings: newSettings)
@@ -262,7 +280,8 @@ struct ReadingScheduleCalculator {
             return try adjustFutureTargets(
                 settings: newSettings,
                 progress: cleanedBase,
-                fromDate: today
+                fromDate: today,
+                activeTimeZoneID: activeTimeZoneID
             )
         }
 
@@ -270,7 +289,8 @@ struct ReadingScheduleCalculator {
             let newSegment = try makeScheduleSegment(
                 settings: newSettings,
                 startDate: today,
-                startPageExclusive: cleanedBase.lastReadPage
+                startPageExclusive: cleanedBase.lastReadPage,
+                activeTimeZoneID: activeTimeZoneID
             )
 
             let mergedProgress = mergeProgress(
@@ -292,7 +312,8 @@ struct ReadingScheduleCalculator {
     private func makeScheduleSegment(
         settings: FGUserSetting,
         startDate: Date,
-        startPageExclusive: Int
+        startPageExclusive: Int,
+        activeTimeZoneID: String
     ) throws -> [String: ReadingRecord] {
         let validDays = try dateMath.validDays(
             from: startDate,
@@ -322,10 +343,10 @@ struct ReadingScheduleCalculator {
         var records: [String: ReadingRecord] = [:]
         var cumulativePages = startPageExclusive
         var currentDate = startDate
-        let excludedKeys = Set(settings.excludedReadingDays.map(\.readingDateKey))
+        let excludedKeys = Set(settings.excludedReadingDayKeys)
         var validDayIndex = 0
 
-        let endKey = settings.targetEndDate.readingDateKey
+        let endKey = settings.targetEndDateKey
 
         while currentDate.readingDateKey <= endKey,
               validDayIndex < pagesPerValidDay.count {
@@ -337,7 +358,8 @@ struct ReadingScheduleCalculator {
 
                 records[key.rawValue] = ReadingRecord(
                     targetPages: cumulativePages,
-                    pagesRead: 0
+                    pagesRead: 0,
+                    timeZoneID: activeTimeZoneID
                 )
 
                 validDayIndex += 1
@@ -376,9 +398,9 @@ struct ReadingScheduleCalculator {
         progress: FGReadingProgress,
         settings: FGUserSetting
     ) -> FGReadingProgress {
-        let startKey = settings.startDate.readingDateKey
-        let endKey = settings.targetEndDate.readingDateKey
-        let excludedKeys = Set(settings.excludedReadingDays.map(\.readingDateKey))
+        let startKey = settings.startDateKey
+        let endKey = settings.targetEndDateKey
+        let excludedKeys = Set(settings.excludedReadingDayKeys)
 
         let cleanedRecords = progress.dailyReadingRecords.filter { key, _ in
             let readingDateKey = ReadingDateKey.fromStoredKey(key)

@@ -29,6 +29,36 @@
   - Finding 1 -> TD-025
   - Finding 2 -> TD-026
 
+## Review Sync (2026-02-17, Presentation Regression Follow-up)
+
+- 본 문서는 2026-02-17 Presentation 회귀 후속 리뷰에서 중복 제거 후 2건(P2 1건, P3 1건)을 반영해 갱신되었습니다.
+- 이번 리뷰에서 확인된 항목 매핑:
+  - Finding 2 + Finding 3 -> TD-027
+  - Finding 1 + Finding 4 -> TD-028
+
+## Review Sync (2026-02-17, F1-F5 Execution Follow-up)
+
+- 본 문서는 F1~F5 실행 후속 반영으로 상태를 재동기화했습니다.
+- 이번 반영 매핑:
+  - Finding 1 + Finding 4 + Finding 5 -> TD-007(Partial, 후속 범위 축소)
+  - Finding 2 -> TD-027(Closed, 실행일 완료 정책 확정)
+  - Finding 3 -> TD-028(Partial, prewarm 관측성 1차 보강)
+  - Additional Debt -> TD-029(Analytics 경계 분리 부채 신규 등록)
+
+## Review Sync (2026-02-17, Settings LocalDate Stability)
+
+- 본 문서는 설정일 day drift(타임존 이동 시 시작일/종료일 하루 밀림) 후속 작업을 반영해 갱신되었습니다.
+- 이번 반영 매핑:
+  - Settings Date Drift Risk -> TD-007(Partial, settings LocalDate source-of-truth 병행 적용)
+  - Decision Record -> ADR-0005
+
+## Review Sync (2026-02-17, Date Policy Finalization)
+
+- 본 문서는 날짜 정책 확정 후속(legacy 재유입 자동 재보정 + 구조적 진단 로깅) 반영으로 상태를 재동기화했습니다.
+- 이번 반영 매핑:
+  - legacy 재유입 조건부 재보정 -> TD-007(Partial, 재유입 보정 리스크 해소)
+  - prewarm/migration 구조적 관측성 -> TD-028(Closed)
+
 ## TD-001: 하루 경계(04:00~03:59) 규칙의 전역 강제 부족
 
 - Status: Closed (2026-02-17)
@@ -154,47 +184,66 @@
 
 ## TD-007: 날짜 키 시맨틱/타입 분리 부족 + 키 포맷 타임존 명시 누락
 
-- Status: Open (Compatibility migration + scoped completion key applied)
-- Fix Required: Partial
-- Decision:
-  - `toYearMonthDayString()`/`toDate()` 타임존 명시는 반영 완료했습니다(`ReadingDateKey` 경유).
-  - 저장 키 시맨틱은 `ReadingDateKey` value object로 1차 고정했지만, 저장 딕셔너리(`[String: ReadingRecord]`)는 호환을 위해 유지했습니다.
-  - `SwiftDataBookRepo` fetch 경계에 1회 호환 마이그레이션을 도입해 legacy 저장 키를 정책 키로 정리했습니다.
-  - 마이그레이션 구현은 repository 내부 구조체(`ReadingRecordKeyMigrationV1`) + `UserDefaults` 직접 접근으로 경량화해 추후 삭제 경계를 repository 내부로 고정했습니다.
-  - 완료 플래그는 앱/스토어/버전 스코프 키를 기본으로 사용하고, 기존 단일 키는 fallback 읽기 후 승격합니다.
-  - 앱 시작 시 prewarm을 선실행하고 fetch 경계 호출은 fallback 재시도 경계로 유지합니다.
-  - 남은 범위는 raw string 저장 경계 축소, `toAdjustedYearMonthDayString` 호출 경계 제한, 글로벌 타임존 UX 확장입니다.
+- Status: Partial (2026-02-17, record timezone snapshot + settings LocalDate key parallel applied)
+- Fix Required: Remaining
+- Resolution (2026-02-17):
+  - `ReadingRecord`에 `timeZoneID`를 추가하고 legacy decode fallback(`Asia/Seoul`)을 적용했습니다.
+  - 저장 key는 `yyyy-MM-dd`를 유지하고, 신규/재계산 레코드만 현재 타임존을 기록하는 forward-only 정책을 반영했습니다.
+  - `ReadingTimeZoneProviding`을 도입해 UseCase -> Calculator write 경계에서 `activeTimeZoneID`를 명시 전달하도록 정리했습니다.
+  - `SwiftDataBookRepo` migration normalize/merge에서 `timeZoneID` 보존 정책을 추가했습니다.
+  - `toAdjustedYearMonthDayString`를 제거해 날짜 키 우회 경계를 축소했습니다.
+  - 결정 근거는 ADR-0004로 고정했습니다.
+  - `FGUserSetting` 설정일을 `ReadingDateKey` source-of-truth로 전환해 설정일 비교/계산 경계에서 `Date` 절대시각 의존을 줄였습니다.
+  - SwiftData `UserSettings`에 `startDateKey/targetEndDateKey/nonReadingDayKeys` 병행 필드를 추가하고 key 우선 읽기 정책을 적용했습니다.
+  - legacy 설정 데이터는 `Asia/Seoul` 기준 key fallback + fetch/prewarm 1회 backfill로 점진 전환했습니다.
+  - migration completion flag가 true여도 legacy/오염 데이터가 재유입되면 조건부 재보정이 자동 실행되도록 `SwiftDataBookRepo` 보정 모드를 추가했습니다.
+  - 결정 근거는 ADR-0005로 고정했습니다.
 - Context:
-  - 저장/조회 키 생성/파싱은 `ReadingDateKey` 타입으로 통일했습니다.
-  - `DayBoundaryProviding.adjustedDayKey(from:)`는 `ReadingDateKey`를 반환하도록 변경해 정책 키 경계를 타입화했습니다.
-  - 저장 호환성은 repository 레이어 1회 마이그레이션으로 보정합니다(`lastReadDate` anchor + safe shift).
-  - `toAdjustedYearMonthDayString()`는 여전히 `Date` 확장 API로 남아 있어, 장기적으로는 도메인 정책 경계로 더 수렴할 필요가 있습니다.
-  - 글로벌 사용자 UX를 위해서는 한국 고정 정책을 설정 가능 정책으로 확장해야 하지만, 이번 범위에서는 의도적으로 제외했습니다.
+  - key 시맨틱은 `ReadingDateKey` + ADR-0003 호환 마이그레이션으로 이미 고정되어 있습니다.
+  - 이번 단계에서 value 레벨 타임존 문맥(`ReadingRecord.timeZoneID`)과 settings LocalDate key 문맥(`FGUserSetting.*DateKey`)을 함께 적용해 해외 이동 시 기록/설정의 날짜 경험을 분리 보존합니다.
+  - 저장 딕셔너리(`[String: ReadingRecord]`)는 호환을 위해 유지합니다.
 - Risk:
-  - 현재 런타임 키 불일치 리스크는 감소했지만, 저장 모델이 문자열 키를 직접 보유하므로 호출부에서 `.rawValue` 남용이 재발할 수 있습니다.
-  - 정책 반영 날짜 API(`toAdjustedYearMonthDayString`)가 범용 확장에 남아 있어 경계 우회 가능성이 있습니다.
-  - 해외 사용자 환경에서는 한국 고정 기준으로 인해 day-boundary 체감 차이가 발생할 수 있습니다.
-  - 완료 플래그 충돌 리스크는 앱 스코프 키로 줄었지만, 여전히 1회 완료 모델이므로 이후 백업 복원/외부 import로 legacy 키가 재유입되면 자동 보정이 적용되지 않을 수 있습니다.
+  - 저장 모델이 문자열 key를 직접 보유하므로 호출부에서 `.rawValue` 남용이 재발할 수 있습니다.
+  - `UserSettings`가 `Date` + `DateKey` 병행 필드를 동시에 보유하므로 후속 제거 마이그레이션 전까지 dual-write drift 가능성이 남습니다.
+  - UI에서 타임존/day-boundary 정책을 사용자 설정으로 노출하지 않아 글로벌 UX는 아직 제한적입니다.
+- Deferred Note (2026-02-17):
+  - `readingRecords`의 파싱 불가 invalid key가 재유입되면 반복 재감지 루프 가능성이 남아 있습니다.
+  - 현재 운영 가정(앱 내부 저장만 사용, 백업/import 경로 없음) 기준으로 발생 가능성이 낮아 코드 수정은 보류합니다.
+  - 백업/import 경로 도입 또는 운영 로그에서 동일 신호가 재현되면 우선순위를 상향해 재개합니다.
+- Deferred Note (2026-02-17, Performance):
+  - `runMigrationPipelineIfNeeded`가 read 경계마다 전체 `SDUserBook`를 pre-scan(fetch + remediation 판별)해 O(N) 추가 읽기 비용이 발생할 수 있습니다.
+  - 이번 사이클은 데이터 정확성 우선 범위로 고정해 성능 최적화 변경은 의도적으로 제외했습니다.
+  - 홈/리스트 지연 관측, 데이터 규모 증가, startup/prewarm 전략 재정의 시점에 우선순위를 상향해 재개합니다.
 - Target Layer:
   - `Domain` value object(`ReadingDateKey`) 기반 키 시맨틱 유지/확장
-  - 저장 경계에서도 typed key 우선 경로를 보장하는 API 정리
+  - 저장 경계에서도 typed key 우선 경로를 보장하는 API 정리 + record timezone policy 유지
 - Trigger Condition:
   - 날짜 키 관련 버그 발생, 저장 포맷/정책 변경, cross-timezone 요구사항 반영 시
 - Priority:
   - P2
 - Current Evidence:
   - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Domain/Entity/ReadingDateKey.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Domain/Entity/ReadingRecord.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Domain/Service/ReadingTimeZoneProviding.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Domain/UseCase/BookManagement/DailyAndPlanUseCases.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Domain/UseCase/BookManagement/LibraryAndRegistrationUseCases.swift`
   - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Shared/Extensions/Foundation/Date+Extension.swift`
   - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Shared/Extensions/Foundation/String+Extension.swift`
   - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Domain/Service/DayBoundaryProviding.swift`
   - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Data/RepoImpl/SwiftDataBookRepo.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Data/SwiftData/Model/UserBookModelV2/UserSettings.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Data/SwiftData/Extensions/UserBookV2+toFGUserBook.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Domain/Entity/FGUserBook.swift`
   - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Shared/Extensions/Foundation/Calendar+Extension.swift`
   - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Domain/Calculator/ReadingScheduleCalculator.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/docs/decisions/adr-0004-reading-record-timezone-forward-only-policy.md`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/docs/decisions/adr-0005-settings-localdate-source-of-truth.md`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/docs/exec-plans/td-007-settings-localdate-stability-execplan.md`
 - Suggested Follow-up:
   1. 저장 모델(`[String: ReadingRecord]`) 호출부에 typed key adapter를 추가해 raw string 직접 접근을 축소
-  2. `toAdjustedYearMonthDayString` 호출 경계를 `ReadingDateProviding`/`DayBoundaryProviding`로 제한
+  2. `UserSettings`의 legacy `Date` 필드를 제거하는 후속 스키마 마이그레이션을 별도 TD로 분리해 수행
   3. 글로벌 UX 확장 시 day-boundary 타임존 정책을 사용자/지역 기반으로 분리하고 전환 전략(마이그레이션 포함)을 별도 설계
-  4. legacy 데이터 재유입 가능성이 생기면 전역 1회 플래그를 버전드/조건부 마이그레이션으로 전환
+  4. 조건부 재보정 스캔 비용과 실행 빈도를 운영 로그로 모니터링하고 버전드 전략 필요 시 분리
 
 ## TD-010: 알림 일괄 등록 시 권한 체크 중복 호출
 
@@ -545,6 +594,82 @@
   2. 완료 시작 시 선택 스냅샷과 UI 표시값 정합성을 유지하는 정책을 명시
   3. 완료 in-flight 중 선택 변경 회귀 테스트를 추가
 
+## TD-027: 미완독 종료 시 완료일 기준 회귀(목표 종료일 미반영)
+
+- Status: Closed (2026-02-17, 실행일 완료일 정책 확정)
+- Resolution:
+  - 미완독 종료/완독 저장 경로의 완료일은 `todayProvider.today()`(실행일)로 확정했습니다.
+  - 회귀 이슈가 아니라 제품 정책으로 분류하고 관련 테스트/제품 문서를 동기화했습니다.
+- Context:
+  - `UnfinishReadingViewModel.completeBook(_:)`는 완료 처리 시 `id`, `review`만 전달하고 완료일 전달 경로가 없습니다.
+  - `BookCompletionUseCase.completeBook(id:review:)`는 내부에서 `todayProvider.today()`를 완료일로 고정 해상합니다.
+- Risk:
+  - 정책 문서와 구현/테스트가 분리되면 동일 논의가 반복될 수 있습니다.
+- Target Layer:
+  - `Domain/UseCase` 완료 처리 계약(`BookCompletionUsing`) + `Presentation/ViewModel` 미완독 종료 액션 경계
+- Trigger Condition:
+  - 미완독 종료 UX 조정, 완료일 표시 정책 변경, 기간 통계 해석 이슈 제보 발생 시
+- Priority:
+  - P2
+- Current Evidence:
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Presentation/ViewModel/UnfinishReadingViewModel.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Domain/UseCase/BookManagement/CompletionUseCases.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyesTests/Domain/UseCase/BookManagementUseCasesCompletionAndPlanTests.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/docs/product/current-feature-spec.md`
+- Suggested Follow-up:
+  1. 정책 변경 요구가 생길 경우(목표 종료일 보존 모드) 별도 ADR/feature flag로 다룰 것
+
+## TD-028: 앱 부트스트랩 마이그레이션 prewarm 실패 관측성 부족
+
+- Status: Closed (2026-02-17, 구조적 진단 로깅 반영)
+- Resolution:
+  - `MigrationDiagnosticLogging` 경계를 추가하고 `SystemMigrationDiagnosticLogger(os.Logger)` 구현을 도입했습니다.
+  - `AppDependencies` prewarm 실패 경로를 `print`에서 구조적 로그 호출로 교체했습니다.
+  - `SwiftDataBookRepo` migration fetch/settings_backfill/record_key_migration 실패를 동일 이벤트 스키마로 기록하도록 정리했습니다.
+  - 실패 이벤트에 `stage`, `migrationKeyScope`, `didMutate`, `errorType`, `message`를 포함하도록 고정했습니다.
+- Context:
+  - 앱 초기화(`AppDependencies`)에서 `prewarmReadingRecordKeyMigrationIfNeeded()` 실행 실패를 빈 `catch`로 무시합니다.
+  - 재시도 경로가 있더라도 초기 실패 신호가 남지 않아 장애 원인 추적 근거가 부족합니다.
+- Risk:
+  - 로깅은 확보됐지만 analytics 파이프라인 연동/대시보드화는 TD-029 범위입니다.
+- Target Layer:
+  - `App` 부트스트랩 초기화 관측성/진단 로깅 경계
+- Trigger Condition:
+  - 마이그레이션 정책 변경, 앱 부팅 시 데이터 이상 제보, 초기화 진단 강화 작업 착수 시
+- Priority:
+  - P3
+- Current Evidence:
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/App/AppDependencies.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Domain/Service/MigrationDiagnosticLogging.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Data/RepoImpl/SwiftDataBookRepo.swift`
+- Suggested Follow-up:
+  1. TD-029 범위에서 analytics 파이프라인으로 필요한 진단 이벤트 전달 여부를 결정
+
+## TD-029: Presentation의 Firebase Tracking 직접 호출 경계 분리 필요
+
+- Status: Open
+- Context:
+  - 다수의 View가 `Tracking.Screen.*.setTracking()`을 직접 호출하고, `Tracking` 구현은 `FirebaseAnalytics`에 직접 결합되어 있습니다.
+  - 관측 이벤트 정책 변경 시 Presentation 레이어를 반복 수정해야 합니다.
+- Risk:
+  - Analytics SDK 변경/이벤트 스키마 변경 시 영향 범위가 화면 코드로 확산됩니다.
+  - 테스트 대역 주입이 어려워 이벤트 회귀를 정적 점검에 의존하게 됩니다.
+- Target Layer:
+  - `Domain/Service` 추상 이벤트 계약 + `Platform/Analytics` 구현체 분리
+- Trigger Condition:
+  - GA 이벤트 정책 변경, Analytics SDK 교체, 이벤트 테스트 자동화 요구 발생 시
+- Priority:
+  - P3
+- Current Evidence:
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Platform/Analytics/Tracking.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Presentation/View/Main/MainHomeView.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Presentation/View/BookProgress/DailyProgressView.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Presentation/View/TotalCalendar/MultiBookProgressView.swift`
+- Suggested Follow-up:
+  1. `Tracking` 호출을 ViewModel/UseCase 경계로 이동할 이벤트 계약 프로토콜을 정의
+  2. `Platform/Analytics`에서 Firebase 의존을 구현체로 한정
+  3. 핵심 이벤트 2~3개를 대상으로 대역 주입 가능한 회귀 테스트 경로를 추가
+
 ## Recommended Execution Order
 
 1. TD-015: 야간 알림 시간 상수 유효 범위 이탈 (P1)
@@ -553,8 +678,9 @@
 4. TD-026: 완료 in-flight 중 선택 변경으로 값 불일치 가능 (P2)
 5. TD-007: 날짜 키 시맨틱/타입 경계 후속 정리 (P2, Partial)
 6. TD-022: 컴파일 단 경계 강제 2단계(모듈화 스파이크/분리 착수) (P3)
+7. TD-029: Analytics 경계 분리 (P3)
 
 완료(2026-02-16):
 - TD-018, TD-017, TD-019, TD-020, TD-016, TD-003, TD-021
 완료(2026-02-17):
-- TD-001, TD-011, TD-006, TD-004, TD-022(Stage 1), TD-023, TD-024
+- TD-001, TD-011, TD-006, TD-004, TD-022(Stage 1), TD-023, TD-024, TD-027, TD-028

@@ -11,14 +11,21 @@ import Testing
 
 @Suite("ReadingDateKey 테스트")
 struct ReadingDateKeyTests {
-    @Test("ReadingDateKey는 Calendar.app 타임존 기준으로 키를 생성한다")
-    func createsKeyUsingAppTimeZone() {
+    @Test("ReadingDateKey는 전달한 calendar 타임존 기준으로 키를 생성한다")
+    func createsKeyUsingProvidedCalendarTimeZone() {
         var utcCalendar = Calendar(identifier: .gregorian)
         guard let utcTimeZone = TimeZone(secondsFromGMT: 0) else {
             Issue.record("Invalid UTC time zone fixture")
             return
         }
         utcCalendar.timeZone = utcTimeZone
+
+        var seoulCalendar = Calendar(identifier: .gregorian)
+        guard let seoulTimeZone = TimeZone(identifier: "Asia/Seoul") else {
+            Issue.record("Invalid Asia/Seoul time zone fixture")
+            return
+        }
+        seoulCalendar.timeZone = seoulTimeZone
 
         var components = DateComponents()
         components.year = 2026
@@ -32,9 +39,11 @@ struct ReadingDateKeyTests {
             return
         }
 
-        let key = ReadingDateKey(date: utcDate)
+        let utcKey = ReadingDateKey(date: utcDate, calendar: utcCalendar)
+        let seoulKey = ReadingDateKey(date: utcDate, calendar: seoulCalendar)
 
-        #expect(key.rawValue == "2026-02-15")
+        #expect(utcKey.rawValue == "2026-02-14")
+        #expect(seoulKey.rawValue == "2026-02-15")
     }
 
     @Test("ReadingDateKey 파싱은 yyyy-MM-dd 정규 포맷만 허용한다")

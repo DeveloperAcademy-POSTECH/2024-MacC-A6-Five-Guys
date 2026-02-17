@@ -30,18 +30,22 @@ final class AppDependencies {
 
     init(modelContainer: ModelContainer) {
         let migrationCompletionKey = Self.makeMigrationCompletionKey()
+        let migrationLogger = SystemMigrationDiagnosticLogger()
         let repo = SwiftDataBookRepo(
             modelContainer: modelContainer,
             migrationUserDefaults: .standard,
+            migrationCompletionKey: migrationCompletionKey,
+            migrationLogger: migrationLogger
+        )
+
+        Self.prewarmMigration(
+            repo: repo,
+            migrationLogger: migrationLogger,
             migrationCompletionKey: migrationCompletionKey
         )
 
-        do {
-            try repo.prewarmReadingRecordKeyMigrationIfNeeded()
-        } catch {
-        }
-
         let readingDateProvider = DefaultReadingDateProvider()
+        let readingTimeZoneProvider = SystemReadingTimeZoneProvider()
         let notiSettingsStore = UserDefaultsNotificationSettingsStore()
         let systemSettingsOpener = SystemSettingsManager()
         let notificationService = NotificationManager(
@@ -67,17 +71,20 @@ final class AppDependencies {
         )
         let rescheduleOnAppOpenUseCase = RescheduleOnAppOpenUseCase(
             repo: repo,
-            scheduleCalculator: scheduleCalculator
+            scheduleCalculator: scheduleCalculator,
+            timeZoneProvider: readingTimeZoneProvider
         )
         let registerBookUseCase = RegisterBookUseCase(
             repo: repo,
             notificationScheduler: notificationService,
-            scheduleCalculator: scheduleCalculator
+            scheduleCalculator: scheduleCalculator,
+            timeZoneProvider: readingTimeZoneProvider
         )
         let recordReadingUseCase = RecordReadingUseCase(
             repo: repo,
             notificationScheduler: notificationService,
-            scheduleCalculator: scheduleCalculator
+            scheduleCalculator: scheduleCalculator,
+            timeZoneProvider: readingTimeZoneProvider
         )
         let completeBookUseCase = CompleteBookUseCase(
             repo: repo,
@@ -87,7 +94,8 @@ final class AppDependencies {
         let updateReadingPlanUseCase = UpdateReadingPlanUseCase(
             repo: repo,
             notificationScheduler: notificationService,
-            scheduleCalculator: scheduleCalculator
+            scheduleCalculator: scheduleCalculator,
+            timeZoneProvider: readingTimeZoneProvider
         )
 
         self.readingLibraryUseCase = ReadingLibraryUseCase(
@@ -127,5 +135,22 @@ final class AppDependencies {
     private static func makeMigrationCompletionKey() -> String {
         let bundleIdentifier = Bundle.main.bundleIdentifier ?? defaultBundleIdentifier
         return "\(bundleIdentifier).\(migrationStoreScope).\(SwiftDataBookRepo.migrationCompletionVersionKey)"
+    }
+
+    private static func prewarmMigration(
+        repo: SwiftDataBookRepo,
+        migrationLogger: any MigrationDiagnosticLogging,
+        migrationCompletionKey: String
+    ) {
+        do {
+            try repo.prewarmReadingRecordKeyMigrationIfNeeded()
+        } catch {
+            migrationLogger.logFailure(
+                stage: .prewarm,
+                migrationKeyScope: migrationCompletionKey,
+                error: error,
+                didMutate: nil
+            )
+        }
     }
 }

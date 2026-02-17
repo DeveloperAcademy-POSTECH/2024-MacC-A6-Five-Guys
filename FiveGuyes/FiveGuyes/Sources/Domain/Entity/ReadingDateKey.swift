@@ -8,7 +8,7 @@
 import Foundation
 
 /// 독서 기록에서 사용하는 날짜 키(`yyyy-MM-dd`)를 표현하는 값 타입입니다.
-/// 키 생성/파싱은 앱 캘린더(`Calendar.app`) 타임존 규칙(현재 한국 기준)과
+/// 키 생성/파싱은 앱 캘린더(`Calendar.app`)의 현재 정책 타임존과
 /// 고정 locale(`en_US_POSIX`)을 함께 사용해 기기 언어/지역 설정 영향 없이 동일하게 동작합니다.
 struct ReadingDateKey: Hashable, Comparable, Codable, Sendable {
     let rawValue: String

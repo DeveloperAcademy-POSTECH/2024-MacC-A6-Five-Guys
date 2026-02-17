@@ -114,6 +114,33 @@ extension BookManagementUseCasesTests {
         #expect(todayProvider.callCount == 1)
     }
 
+    @Test("미완독 종료 경로 완독 처리 시 목표종료일이 지났어도 실행일(today)로 완료일을 저장한다")
+    func testCompleteBookStoresExecutionDateWhenTargetEndDateIsPast() async throws {
+        let mockRepo = MockBookRepo()
+        let schedulerSpy = NotificationSchedulerSpy()
+        let executionDate = makeDate("2025-02-05")
+        let useCase = makeBookCompletionUseCase(
+            repo: mockRepo,
+            notificationScheduler: schedulerSpy,
+            todayProvider: ReadingDateProviderStub(todayValue: executionDate)
+        )
+
+        var overdueBook = createTestBook(totalPages: 300, isCompleted: false)
+        overdueBook.userSettings = FGUserSetting(
+            startPage: 1,
+            targetEndPage: 300,
+            startDate: makeDate("2025-01-01"),
+            targetEndDate: makeDate("2025-01-31"),
+            excludedReadingDays: []
+        )
+        await mockRepo.setBooks([overdueBook])
+
+        try await useCase.completeBook(id: overdueBook.id, review: "")
+
+        let updatedBook = try await mockRepo.fetchBook(by: overdueBook.id)
+        #expect(updatedBook.userSettings.targetEndDate == executionDate)
+    }
+
     @Test("BookCompletionUseCase.completionCelebrationSummary는 todayProvider 기준으로 요약을 계산한다")
     func testCompletionCelebrationSummary() {
         let mockRepo = MockBookRepo()
