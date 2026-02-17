@@ -39,9 +39,14 @@ final class AppDependencies {
         do {
             try repo.prewarmReadingRecordKeyMigrationIfNeeded()
         } catch {
+            print(
+                "[MigrationPrewarm] failed key=\(migrationCompletionKey) " +
+                "errorType=\(String(describing: type(of: error))) message=\(error.localizedDescription)"
+            )
         }
 
         let readingDateProvider = DefaultReadingDateProvider()
+        let readingTimeZoneProvider = SystemReadingTimeZoneProvider()
         let notiSettingsStore = UserDefaultsNotificationSettingsStore()
         let systemSettingsOpener = SystemSettingsManager()
         let notificationService = NotificationManager(
@@ -67,17 +72,20 @@ final class AppDependencies {
         )
         let rescheduleOnAppOpenUseCase = RescheduleOnAppOpenUseCase(
             repo: repo,
-            scheduleCalculator: scheduleCalculator
+            scheduleCalculator: scheduleCalculator,
+            timeZoneProvider: readingTimeZoneProvider
         )
         let registerBookUseCase = RegisterBookUseCase(
             repo: repo,
             notificationScheduler: notificationService,
-            scheduleCalculator: scheduleCalculator
+            scheduleCalculator: scheduleCalculator,
+            timeZoneProvider: readingTimeZoneProvider
         )
         let recordReadingUseCase = RecordReadingUseCase(
             repo: repo,
             notificationScheduler: notificationService,
-            scheduleCalculator: scheduleCalculator
+            scheduleCalculator: scheduleCalculator,
+            timeZoneProvider: readingTimeZoneProvider
         )
         let completeBookUseCase = CompleteBookUseCase(
             repo: repo,
@@ -87,7 +95,8 @@ final class AppDependencies {
         let updateReadingPlanUseCase = UpdateReadingPlanUseCase(
             repo: repo,
             notificationScheduler: notificationService,
-            scheduleCalculator: scheduleCalculator
+            scheduleCalculator: scheduleCalculator,
+            timeZoneProvider: readingTimeZoneProvider
         )
 
         self.readingLibraryUseCase = ReadingLibraryUseCase(

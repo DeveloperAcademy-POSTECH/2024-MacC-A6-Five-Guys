@@ -107,6 +107,7 @@ struct FetchBookDetailUseCase {
 struct RescheduleOnAppOpenUseCase {
     let repo: BookRepo
     let scheduleCalculator: ReadingScheduleCalculator
+    let timeZoneProvider: any ReadingTimeZoneProviding
 
     func execute(bookId: UUID, today: Date) async throws {
         let currentBook = try await repo.fetchBook(by: bookId)
@@ -114,7 +115,8 @@ struct RescheduleOnAppOpenUseCase {
         let updatedProgress = try scheduleCalculator.rescheduleOnAppOpen(
             settings: currentBook.userSettings,
             progress: currentBook.readingProgress,
-            today: today
+            today: today,
+            activeTimeZoneID: timeZoneProvider.currentTimeZoneID()
         )
 
         guard updatedProgress != currentBook.readingProgress else {
@@ -137,9 +139,13 @@ struct RegisterBookUseCase {
     let repo: BookRepo
     let notificationScheduler: any ReadingNotificationScheduling
     let scheduleCalculator: ReadingScheduleCalculator
+    let timeZoneProvider: any ReadingTimeZoneProviding
 
     func execute(_ input: RegisterBookInput) async throws -> FGUserBook {
-        let initialProgress = try scheduleCalculator.createInitialSchedule(settings: input.userSettings)
+        let initialProgress = try scheduleCalculator.createInitialSchedule(
+            settings: input.userSettings,
+            activeTimeZoneID: timeZoneProvider.currentTimeZoneID()
+        )
 
         let bookWithSchedule = FGUserBook(
             id: UUID(),

@@ -328,7 +328,11 @@ private struct ReadingRecordKeyMigrationV1 {
     private static func mergeRecord(_ lhs: ReadingRecord, _ rhs: ReadingRecord) -> ReadingRecord {
         let merged = ReadingRecord(
             targetPages: max(lhs.targetPages, rhs.targetPages),
-            pagesRead: max(lhs.pagesRead, rhs.pagesRead)
+            pagesRead: max(lhs.pagesRead, rhs.pagesRead),
+            timeZoneID: ReadingRecord.mergedTimeZoneID(
+                lhs: lhs.timeZoneID,
+                rhs: rhs.timeZoneID
+            )
         )
         return normalize(record: merged)
     }
@@ -336,6 +340,10 @@ private struct ReadingRecordKeyMigrationV1 {
     private static func normalize(record: ReadingRecord) -> ReadingRecord {
         let pagesRead = max(0, record.pagesRead)
         let targetPages = max(record.targetPages, pagesRead)
-        return ReadingRecord(targetPages: targetPages, pagesRead: pagesRead)
+        return ReadingRecord(
+            targetPages: targetPages,
+            pagesRead: pagesRead,
+            timeZoneID: ReadingRecord.normalizedTimeZoneID(record.timeZoneID)
+        )
     }
 }

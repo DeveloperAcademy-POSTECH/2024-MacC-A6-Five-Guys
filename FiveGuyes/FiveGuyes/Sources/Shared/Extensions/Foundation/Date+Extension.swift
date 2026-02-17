@@ -64,17 +64,6 @@ extension Date {
         readingDateKey.rawValue
     }
 
-    /// 04:00 AM을 기준으로 날짜를 조정하여 "yyyy-MM-dd" 형식으로 반환
-    /// 정책 계산은 `DayBoundaryProviding`/`ReadingDateKey`로 위임하고, 호출부 호환을 위해 wrapper를 유지합니다.
-    func toAdjustedYearMonthDayString(hourOffset: Int = -4) -> String {
-        guard hourOffset == -4 else {
-            let calendar = Calendar.app
-            let adjustedDate = calendar.date(byAdding: .hour, value: hourOffset, to: self) ?? self
-            return ReadingDateKey(date: adjustedDate, calendar: calendar).rawValue
-        }
-        return DefaultReadingDateProvider().dayKey(from: self).rawValue
-    }
-
 }
 
 extension Date {

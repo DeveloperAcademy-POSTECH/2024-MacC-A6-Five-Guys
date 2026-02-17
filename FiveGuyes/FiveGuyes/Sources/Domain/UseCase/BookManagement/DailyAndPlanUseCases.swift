@@ -85,9 +85,11 @@ struct RecordReadingUseCase {
     let repo: BookRepo
     let notificationScheduler: any ReadingNotificationScheduling
     let scheduleCalculator: ReadingScheduleCalculator
+    let timeZoneProvider: any ReadingTimeZoneProviding
 
     func execute(bookId: UUID, pagesRead: Int, readDate: Date) async throws -> RecordReadingResult {
         let currentBook = try await repo.fetchBook(by: bookId)
+        let activeTimeZoneID = timeZoneProvider.currentTimeZoneID()
 
         if pagesRead > currentBook.userSettings.targetEndPage {
             return .exceedsTarget(currentTarget: currentBook.userSettings.targetEndPage)
@@ -102,7 +104,8 @@ struct RecordReadingUseCase {
             try await handleDateExtension(
                 book: currentBook,
                 pagesRead: pagesRead,
-                readDate: readDate
+                readDate: readDate,
+                activeTimeZoneID: activeTimeZoneID
             )
             return .dateExtended
         }
@@ -111,7 +114,8 @@ struct RecordReadingUseCase {
             settings: currentBook.userSettings,
             progress: currentBook.readingProgress,
             pagesRead: pagesRead,
-            date: readDate
+            date: readDate,
+            activeTimeZoneID: activeTimeZoneID
         )
 
         let finalSettings = result.updatedSettings ?? currentBook.userSettings
@@ -140,7 +144,8 @@ struct RecordReadingUseCase {
     private func handleDateExtension(
         book: FGUserBook,
         pagesRead: Int,
-        readDate: Date
+        readDate: Date,
+        activeTimeZoneID: String
     ) async throws {
         let extendedSettings = FGUserSetting(
             startPage: book.userSettings.startPage,
@@ -154,7 +159,8 @@ struct RecordReadingUseCase {
             settings: extendedSettings,
             progress: book.readingProgress,
             pagesRead: pagesRead,
-            date: readDate
+            date: readDate,
+            activeTimeZoneID: activeTimeZoneID
         )
 
         let finalSettings = result.updatedSettings ?? extendedSettings
@@ -179,6 +185,7 @@ struct UpdateReadingPlanUseCase {
     let repo: BookRepo
     let notificationScheduler: any ReadingNotificationScheduling
     let scheduleCalculator: ReadingScheduleCalculator
+    let timeZoneProvider: any ReadingTimeZoneProviding
 
     func execute(
         bookId: UUID,
@@ -200,7 +207,8 @@ struct UpdateReadingPlanUseCase {
         let updatedProgress = try scheduleCalculator.rescheduleForSettingsChange(
             newSettings: newSettings,
             progress: currentBook.readingProgress,
-            today: today
+            today: today,
+            activeTimeZoneID: timeZoneProvider.currentTimeZoneID()
         )
 
         let updatedBook = FGUserBook(

@@ -11,7 +11,8 @@ extension Calendar {
     static var app: Calendar = {
         var calendar = Calendar(identifier: .gregorian)
         calendar.locale = Locale(identifier: "ko_KR")
-        calendar.timeZone = TimeZone(identifier: "Asia/Seoul") ?? .current
+        // UI locale은 한국형 표기를 유지하고, 날짜 버킷팅 기준은 현재 기기 타임존을 따른다.
+        calendar.timeZone = .autoupdatingCurrent
         calendar.firstWeekday = 1            // 일요일 시작
         calendar.minimumDaysInFirstWeek = 1  // 하루만 있어도 1주차
         return calendar
