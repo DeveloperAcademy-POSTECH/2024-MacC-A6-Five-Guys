@@ -305,15 +305,18 @@ private struct UserSettingsDateKeyMigrationV1 {
     let didMutate: Bool
 
     init(settings: UserSettings) {
-        let migratedStartDateKey = Self.resolveDateKey(rawKey: settings.startDateKey, legacyDate: settings.startDate)
-        let migratedTargetEndDateKey = Self.resolveDateKey(
+        let migratedStartDateKey = SettingsDateKeyPolicy.resolveDateKey(
+            rawKey: settings.startDateKey,
+            legacyDate: settings.startDate
+        ).rawValue
+        let migratedTargetEndDateKey = SettingsDateKeyPolicy.resolveDateKey(
             rawKey: settings.targetEndDateKey,
             legacyDate: settings.targetEndDate
-        )
-        let migratedNonReadingDayKeys = Self.resolveDateKeys(
+        ).rawValue
+        let migratedNonReadingDayKeys = SettingsDateKeyPolicy.resolveDateKeys(
             rawKeys: settings.nonReadingDayKeys,
             legacyDates: settings.nonReadingDays
-        )
+        ).map(\.rawValue)
 
         self.startDateKey = migratedStartDateKey
         self.targetEndDateKey = migratedTargetEndDateKey
@@ -322,49 +325,6 @@ private struct UserSettingsDateKeyMigrationV1 {
             settings.startDateKey != migratedStartDateKey ||
             settings.targetEndDateKey != migratedTargetEndDateKey ||
             settings.nonReadingDayKeys != migratedNonReadingDayKeys
-    }
-
-    private static var legacySettingsCalendar: Calendar = {
-        var calendar = Calendar(identifier: .gregorian)
-        calendar.locale = Locale(identifier: "en_US_POSIX")
-        calendar.timeZone = TimeZone(identifier: "Asia/Seoul") ?? TimeZone(secondsFromGMT: 0) ?? .autoupdatingCurrent
-        return calendar
-    }()
-
-    private static func resolveDateKey(rawKey: String?, legacyDate: Date) -> String {
-        if let rawKey,
-           let parsedKey = ReadingDateKey(parsing: rawKey, calendar: .app) {
-            return parsedKey.rawValue
-        }
-
-        return ReadingDateKey(date: legacyDate, calendar: legacySettingsCalendar).rawValue
-    }
-
-    private static func resolveDateKeys(rawKeys: [String]?, legacyDates: [Date]) -> [String] {
-        guard let rawKeys, !rawKeys.isEmpty else {
-            return legacyDates.map { ReadingDateKey(date: $0, calendar: legacySettingsCalendar).rawValue }
-        }
-
-        var resolvedKeys: [String] = []
-        resolvedKeys.reserveCapacity(rawKeys.count)
-
-        for (index, rawKey) in rawKeys.enumerated() {
-            if let parsedKey = ReadingDateKey(parsing: rawKey, calendar: .app) {
-                resolvedKeys.append(parsedKey.rawValue)
-                continue
-            }
-
-            if legacyDates.indices.contains(index) {
-                let fallbackKey = ReadingDateKey(date: legacyDates[index], calendar: legacySettingsCalendar).rawValue
-                resolvedKeys.append(fallbackKey)
-            }
-        }
-
-        if resolvedKeys.isEmpty {
-            return legacyDates.map { ReadingDateKey(date: $0, calendar: legacySettingsCalendar).rawValue }
-        }
-
-        return resolvedKeys
     }
 }
 

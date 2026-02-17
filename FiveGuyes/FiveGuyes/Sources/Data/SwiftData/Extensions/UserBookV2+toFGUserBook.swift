@@ -32,15 +32,15 @@ extension BookMetaData {
 
 extension UserSettings {
     func toFGUserSetting() -> FGUserSetting {
-        let resolvedStartDateKey = Self.resolveDateKey(
+        let resolvedStartDateKey = SettingsDateKeyPolicy.resolveDateKey(
             rawKey: startDateKey,
             legacyDate: startDate
         )
-        let resolvedTargetEndDateKey = Self.resolveDateKey(
+        let resolvedTargetEndDateKey = SettingsDateKeyPolicy.resolveDateKey(
             rawKey: targetEndDateKey,
             legacyDate: targetEndDate
         )
-        let resolvedExcludedReadingDayKeys = Self.resolveDateKeys(
+        let resolvedExcludedReadingDayKeys = SettingsDateKeyPolicy.resolveDateKeys(
             rawKeys: nonReadingDayKeys,
             legacyDates: nonReadingDays
         )
@@ -52,49 +52,6 @@ extension UserSettings {
             targetEndDateKey: resolvedTargetEndDateKey,
             excludedReadingDayKeys: resolvedExcludedReadingDayKeys
         )
-    }
-
-    // legacy `Date` 기반 설정 데이터를 최초 key로 채울 때는 기존 운영 기준(Asia/Seoul)을 사용합니다.
-    private static var legacySettingsCalendar: Calendar = {
-        var calendar = Calendar(identifier: .gregorian)
-        calendar.locale = Locale(identifier: "en_US_POSIX")
-        calendar.timeZone = TimeZone(identifier: "Asia/Seoul") ?? TimeZone(secondsFromGMT: 0) ?? .autoupdatingCurrent
-        return calendar
-    }()
-
-    private static func resolveDateKey(rawKey: String?, legacyDate: Date) -> ReadingDateKey {
-        if let rawKey,
-           let parsedKey = ReadingDateKey(parsing: rawKey, calendar: .app) {
-            return parsedKey
-        }
-
-        return ReadingDateKey(date: legacyDate, calendar: legacySettingsCalendar)
-    }
-
-    private static func resolveDateKeys(rawKeys: [String]?, legacyDates: [Date]) -> [ReadingDateKey] {
-        guard let rawKeys, !rawKeys.isEmpty else {
-            return legacyDates.map { ReadingDateKey(date: $0, calendar: legacySettingsCalendar) }
-        }
-
-        var resolvedKeys: [ReadingDateKey] = []
-        resolvedKeys.reserveCapacity(rawKeys.count)
-
-        for (index, rawKey) in rawKeys.enumerated() {
-            if let parsedKey = ReadingDateKey(parsing: rawKey, calendar: .app) {
-                resolvedKeys.append(parsedKey)
-                continue
-            }
-
-            if legacyDates.indices.contains(index) {
-                resolvedKeys.append(ReadingDateKey(date: legacyDates[index], calendar: legacySettingsCalendar))
-            }
-        }
-
-        if resolvedKeys.isEmpty {
-            return legacyDates.map { ReadingDateKey(date: $0, calendar: legacySettingsCalendar) }
-        }
-
-        return resolvedKeys
     }
 }
 

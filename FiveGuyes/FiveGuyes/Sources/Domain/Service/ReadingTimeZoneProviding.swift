@@ -15,6 +15,6 @@ protocol ReadingTimeZoneProviding {
 struct SystemReadingTimeZoneProvider: ReadingTimeZoneProviding {
     func currentTimeZoneID() -> String {
         let identifier = TimeZone.autoupdatingCurrent.identifier
-        return identifier.isEmpty ? ReadingRecord.legacyDefaultTimeZoneID : identifier
+        return identifier.isEmpty ? LegacyTimeZoneFallbackPolicy.readingRecordDefaultTimeZoneID : identifier
     }
 }
