@@ -45,6 +45,13 @@
   - Finding 3 -> TD-028(Partial, prewarm 관측성 1차 보강)
   - Additional Debt -> TD-029(Analytics 경계 분리 부채 신규 등록)
 
+## Review Sync (2026-02-17, Settings LocalDate Stability)
+
+- 본 문서는 설정일 day drift(타임존 이동 시 시작일/종료일 하루 밀림) 후속 작업을 반영해 갱신되었습니다.
+- 이번 반영 매핑:
+  - Settings Date Drift Risk -> TD-007(Partial, settings LocalDate source-of-truth 병행 적용)
+  - Decision Record -> ADR-0005
+
 ## TD-001: 하루 경계(04:00~03:59) 규칙의 전역 강제 부족
 
 - Status: Closed (2026-02-17)
@@ -170,7 +177,7 @@
 
 ## TD-007: 날짜 키 시맨틱/타입 분리 부족 + 키 포맷 타임존 명시 누락
 
-- Status: Partial (2026-02-17, record-level timezone snapshot + forward-only applied)
+- Status: Partial (2026-02-17, record timezone snapshot + settings LocalDate key parallel applied)
 - Fix Required: Remaining
 - Resolution (2026-02-17):
   - `ReadingRecord`에 `timeZoneID`를 추가하고 legacy decode fallback(`Asia/Seoul`)을 적용했습니다.
@@ -179,12 +186,17 @@
   - `SwiftDataBookRepo` migration normalize/merge에서 `timeZoneID` 보존 정책을 추가했습니다.
   - `toAdjustedYearMonthDayString`를 제거해 날짜 키 우회 경계를 축소했습니다.
   - 결정 근거는 ADR-0004로 고정했습니다.
+  - `FGUserSetting` 설정일을 `ReadingDateKey` source-of-truth로 전환해 설정일 비교/계산 경계에서 `Date` 절대시각 의존을 줄였습니다.
+  - SwiftData `UserSettings`에 `startDateKey/targetEndDateKey/nonReadingDayKeys` 병행 필드를 추가하고 key 우선 읽기 정책을 적용했습니다.
+  - legacy 설정 데이터는 `Asia/Seoul` 기준 key fallback + fetch/prewarm 1회 backfill로 점진 전환했습니다.
+  - 결정 근거는 ADR-0005로 고정했습니다.
 - Context:
   - key 시맨틱은 `ReadingDateKey` + ADR-0003 호환 마이그레이션으로 이미 고정되어 있습니다.
-  - 이번 단계에서 value 레벨 타임존 문맥(`ReadingRecord.timeZoneID`)을 추가해 해외 이동 시 과거/현재 기록의 날짜 경험 분리를 지원합니다.
+  - 이번 단계에서 value 레벨 타임존 문맥(`ReadingRecord.timeZoneID`)과 settings LocalDate key 문맥(`FGUserSetting.*DateKey`)을 함께 적용해 해외 이동 시 기록/설정의 날짜 경험을 분리 보존합니다.
   - 저장 딕셔너리(`[String: ReadingRecord]`)는 호환을 위해 유지합니다.
 - Risk:
   - 저장 모델이 문자열 key를 직접 보유하므로 호출부에서 `.rawValue` 남용이 재발할 수 있습니다.
+  - `UserSettings`가 `Date` + `DateKey` 병행 필드를 동시에 보유하므로 후속 제거 마이그레이션 전까지 dual-write drift 가능성이 남습니다.
   - UI에서 타임존/day-boundary 정책을 사용자 설정으로 노출하지 않아 글로벌 UX는 아직 제한적입니다.
   - legacy 데이터 재유입(백업 복원/import) 시 1회 마이그레이션 정책만으로는 보정이 누락될 수 있습니다.
 - Target Layer:
@@ -204,13 +216,19 @@
   - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Shared/Extensions/Foundation/String+Extension.swift`
   - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Domain/Service/DayBoundaryProviding.swift`
   - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Data/RepoImpl/SwiftDataBookRepo.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Data/SwiftData/Model/UserBookModelV2/UserSettings.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Data/SwiftData/Extensions/UserBookV2+toFGUserBook.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Domain/Entity/FGUserBook.swift`
   - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Shared/Extensions/Foundation/Calendar+Extension.swift`
   - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Domain/Calculator/ReadingScheduleCalculator.swift`
   - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/docs/decisions/adr-0004-reading-record-timezone-forward-only-policy.md`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/docs/decisions/adr-0005-settings-localdate-source-of-truth.md`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/docs/exec-plans/td-007-settings-localdate-stability-execplan.md`
 - Suggested Follow-up:
   1. 저장 모델(`[String: ReadingRecord]`) 호출부에 typed key adapter를 추가해 raw string 직접 접근을 축소
-  2. 글로벌 UX 확장 시 day-boundary 타임존 정책을 사용자/지역 기반으로 분리하고 전환 전략(마이그레이션 포함)을 별도 설계
-  3. legacy 데이터 재유입 가능성이 생기면 전역 1회 플래그를 버전드/조건부 마이그레이션으로 전환
+  2. `UserSettings`의 legacy `Date` 필드를 제거하는 후속 스키마 마이그레이션을 별도 TD로 분리해 수행
+  3. 글로벌 UX 확장 시 day-boundary 타임존 정책을 사용자/지역 기반으로 분리하고 전환 전략(마이그레이션 포함)을 별도 설계
+  4. legacy 데이터 재유입 가능성이 생기면 전역 1회 플래그를 버전드/조건부 마이그레이션으로 전환
 
 ## TD-010: 알림 일괄 등록 시 권한 체크 중복 호출
 

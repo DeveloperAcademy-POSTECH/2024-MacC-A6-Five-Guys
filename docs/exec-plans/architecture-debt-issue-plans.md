@@ -18,7 +18,8 @@ This plan follows `/Users/zaehorang/.codex/PLANS.md` and is executed with `/User
 - [x] (2026-02-17 00:12Z) TD-022 Stage 1 완료: `.swiftlint.yml` custom guard rules + acceptance 검색 0건.
 - [x] (2026-02-17 14:52Z) TD-007 후속 1차 완료: record-level `timeZoneID` 저장 + forward-only 정책 + ADR-0004 문서화.
 - [x] (2026-02-17 18:20Z) F1~F5 후속 반영: `Calendar.app` 현지 time zone 정책 전환, TD-027 Closed, TD-028 Partial, TD-029 신규 등록.
-- [ ] Remaining: TD-015, TD-010, TD-007 잔여(typed key adapter), TD-022 Stage 2(모듈화 스파이크/분리 로드맵), TD-028 구조적 로깅, TD-029 analytics 경계 분리.
+- [x] (2026-02-17 17:20Z) TD-007 후속 2차 완료: 설정일 LocalDate key source-of-truth + SwiftData 병행 key 필드 + legacy backfill + ADR-0005 문서화.
+- [ ] Remaining: TD-015, TD-010, TD-007 잔여(typed key adapter + settings legacy Date 제거 마이그레이션), TD-022 Stage 2(모듈화 스파이크/분리 로드맵), TD-028 구조적 로깅, TD-029 analytics 경계 분리.
 
 ## Surprises & Discoveries
 
@@ -46,15 +47,19 @@ This plan follows `/Users/zaehorang/.codex/PLANS.md` and is executed with `/User
   Rationale: write-only timezone 저장으로는 현지 날짜 UX 요구를 충족하지 못해 save/read/reschedule 기준 타임존을 단일화해야 한다.
   Date/Author: 2026-02-17 / Codex
 
+- Decision: 설정일(start/end/non-reading)은 `Date`가 아닌 `ReadingDateKey`를 source-of-truth로 사용하고 SwiftData는 병행 필드 전략으로 점진 전환한다.
+  Rationale: 설정일 day drift를 막으면서 운영 데이터 안전성과 롤백 가능성을 함께 확보하기 위함.
+  Date/Author: 2026-02-17 / Codex
+
 ## Outcomes & Retrospective
 
 이번 사이클에서 이슈 상태는 다음과 같이 업데이트되었습니다.
 
 1. 새로 닫힌 항목: TD-001, TD-004, TD-006, TD-011.
-2. Partial로 전환된 항목: TD-022(Stage 1 완료), TD-007(record timezone snapshot + 현지 버킷팅 정책 반영), TD-028(print 관측성 1차 보강).
+2. Partial로 전환된 항목: TD-022(Stage 1 완료), TD-007(record timezone snapshot + settings LocalDate key 전환), TD-028(print 관측성 1차 보강).
 3. 기존 닫힘 유지: TD-018, TD-017, TD-003, TD-019, TD-016, TD-020, TD-021.
 4. 이번 사이클에서 TD-027은 실행일 완료 정책 확정으로 Closed 처리했다.
-5. 잔여 우선순위: TD-015(P1) -> TD-010(P2) -> TD-007 잔여(P2 Partial) -> TD-022 Stage 2(P3) -> TD-028 구조화(P3) -> TD-029(P3).
+5. 잔여 우선순위: TD-015(P1) -> TD-010(P2) -> TD-007 잔여(P2 Partial, Date 필드 제거 포함) -> TD-022 Stage 2(P3) -> TD-028 구조화(P3) -> TD-029(P3).
 
 검증 명령:
 
@@ -88,6 +93,14 @@ architecture-first 리베이스에서 반영한 이슈-코드 매핑은 아래�
   - `FiveGuyes/FiveGuyes/Sources/Domain/UseCase/BookManagement/DailyAndPlanUseCases.swift`
   - `FiveGuyes/FiveGuyes/Sources/Domain/UseCase/BookManagement/LibraryAndRegistrationUseCases.swift`
   - `docs/decisions/adr-0004-reading-record-timezone-forward-only-policy.md`
+
+- TD-007 후속 2차 (settings LocalDate stability):
+  - `FiveGuyes/FiveGuyes/Sources/Domain/Entity/FGUserBook.swift`
+  - `FiveGuyes/FiveGuyes/Sources/Data/SwiftData/Model/UserBookModelV2/UserSettings.swift`
+  - `FiveGuyes/FiveGuyes/Sources/Data/SwiftData/Extensions/UserBookV2+toFGUserBook.swift`
+  - `FiveGuyes/FiveGuyes/Sources/Data/RepoImpl/SwiftDataBookRepo.swift`
+  - `docs/decisions/adr-0005-settings-localdate-source-of-truth.md`
+  - `docs/exec-plans/td-007-settings-localdate-stability-execplan.md`
 
 ## Plan of Work
 
@@ -150,6 +163,7 @@ architecture-first 리베이스에서 반영한 이슈-코드 매핑은 아래�
 4. `ReadingDateSettingViewModelTests.swift`
 5. `.swiftlint.yml` custom rule 3종
 6. `adr-0004-reading-record-timezone-forward-only-policy.md`
+7. `adr-0005-settings-localdate-source-of-truth.md`
 
 ## Interfaces and Dependencies
 
@@ -161,3 +175,4 @@ architecture-first 리베이스에서 반영한 이슈-코드 매핑은 아래�
 4. `ReadingDateSettingViewModel` (View 계산 경계)
 
 Plan revision note (2026-02-17): Rebased from bug-first 기록 to architecture-first execution status and synced issue states with tracker.
+Plan revision note (2026-02-17): Added TD-007 settings LocalDate stabilization sync (parallel DateKey fields, legacy backfill, ADR-0005).

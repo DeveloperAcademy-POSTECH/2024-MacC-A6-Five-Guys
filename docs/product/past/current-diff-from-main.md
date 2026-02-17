@@ -252,10 +252,13 @@ xcodebuild test \
 - 이전 기준:
   - 조회 전 1회 `reading record key migration` 실행
   - 필요 시 write-back(save) 발생 가능
-- 현재 HEAD: 동일 (추가로 사용되지 않는 partial update API 정리)
+- 현재 HEAD:
+  - 읽기 기록 key migration 1회 정책 유지
+  - 설정일 key(`startDateKey`, `targetEndDateKey`, `nonReadingDayKeys`) 1회 backfill 추가
+  - 사용되지 않는 partial update API 정리
 - 판정: `개선`(데이터 정합성 보정)
 - 권고안: 현재 HEAD 확정  
-  단, 제품 명세에는 `조회 시 1회 마이그레이션 write-back 가능`을 명시
+  단, 제품 명세에는 `조회 시 1회 마이그레이션 write-back 가능`과 `settings legacy Date 필드 제거는 후속 분리`를 명시
 - 승인 상태: `CONFIRMED (2026-02-17, 현재 HEAD 기준)`
 
 ---
@@ -267,11 +270,11 @@ main 대비 사용자 관찰 동작 차이가 있던 항목의 확정 결과:
 1. `F-08` 완독 축하 종료일 기준: `todayProvider.today()` 확정
 2. `F-09` 완독 소감 입력 검증: trim 기준 빈값 차단 확정
 3. `F-12` 미완독 종료: 완료상태 + 실행일(today) 완료처리 + 시작일 보정 + 알림 해제 확정
-4. `F-05/F-07/F-10/F-11/F-16` 날짜 정책: 현재 기기 time zone + 04:00 경계 기준 확정
+4. `F-05/F-07/F-10/F-11/F-16` 날짜 정책: 현재 기기 time zone + 04:00 경계 기준 + 설정일 LocalDate key source-of-truth 확정
 5. `F-13` 알림 OFF 상태 시간 변경: 시간 저장만 수행, 재등록 미실행 확정
 6. `F-14` 알림 계산/재등록: 강화된 하한/페이지 계산 + 재등록 전 권한 재검증 확정
 7. `F-15` 삭제 후 알림 정책: 남은 읽는 책 재설정/없으면 전체 해제 확정
-8. `F-17` 조회 경계: 1회 마이그레이션 write-back 허용 확정
+8. `F-17` 조회 경계: 읽기 기록/설정일 key 1회 마이그레이션 write-back 허용 확정
 
 최종 제품 명세 적용 규칙:
 
