@@ -142,4 +142,34 @@ extension ReadingScheduleCalculatorTests {
         #expect(result.progress.dailyReadingRecords["2025-01-11"]?.targetPages == 62)
         #expect(result.progress.dailyReadingRecords["2025-01-14"]?.targetPages == 100)
     }
+
+    @Test("applyTodayReading - 타임존 변경 후 기존 기록은 유지되고 신규/재계산 기록만 새 타임존을 사용")
+    func applyTodayReading_keepsLegacyRecordTimeZoneAndUsesActiveTimeZoneForNewWrites() throws {
+        let settings = makeSettings(
+            startPage: 1,
+            targetEndPage: 100,
+            startDate: makeDate("2025-01-10"),
+            targetEndDate: makeDate("2025-01-12")
+        )
+
+        let initial = try calculator.createInitialSchedule(
+            settings: settings,
+            activeTimeZoneID: "Asia/Seoul"
+        )
+
+        let result = try calculator.applyTodayReading(
+            settings: settings,
+            progress: initial,
+            pagesRead: 40,
+            date: makeDate("2025-01-11"),
+            activeTimeZoneID: "America/Los_Angeles"
+        )
+
+        #expect(result.progress.dailyReadingRecords["2025-01-10"]?.timeZoneID == "Asia/Seoul")
+        #expect(result.progress.dailyReadingRecords["2025-01-11"]?.timeZoneID == "America/Los_Angeles")
+        #expect(result.progress.dailyReadingRecords["2025-01-12"]?.timeZoneID == "America/Los_Angeles")
+
+        let keys = Set(result.progress.dailyReadingRecords.keys)
+        #expect(keys == ["2025-01-10", "2025-01-11", "2025-01-12"])
+    }
 }

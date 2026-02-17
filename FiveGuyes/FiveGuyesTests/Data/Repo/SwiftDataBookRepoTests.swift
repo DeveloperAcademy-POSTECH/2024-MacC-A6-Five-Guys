@@ -547,6 +547,39 @@ struct SwiftDataBookRepoTests {
         #expect(sanitizedTarget.targetPages == 10)
     }
 
+    @Test("마이그레이션은 timeZoneID를 정규화하고 유효 값은 보존한다")
+    func testMigrationNormalizesAndPreservesTimeZoneID() async throws {
+        let container = try createInMemoryContainer()
+        let migrationStorage = createMigrationStorage()
+        let repo = SwiftDataBookRepo(
+            modelContainer: container,
+            migrationUserDefaults: migrationStorage.userDefaults,
+            migrationCompletionKey: migrationStorage.completionKey
+        )
+
+        let legacyBook = createTestBook().toUserBookV2()
+        legacyBook.readingProgress.readingRecords = [
+            "2025-01-09": ReadingRecord(targetPages: 10, pagesRead: 10, timeZoneID: " "),
+            "2025-01-10": ReadingRecord(targetPages: 20, pagesRead: 20, timeZoneID: "America/New_York")
+        ]
+        legacyBook.readingProgress.lastReadDate = makeDate("2025-01-10")
+        legacyBook.readingProgress.lastPagesRead = 20
+
+        container.mainContext.insert(legacyBook)
+        try container.mainContext.save()
+
+        let fetchedBook = try await repo.fetchBook(by: legacyBook.id)
+
+        #expect(
+            fetchedBook.readingProgress.dailyReadingRecords["2025-01-09"]?.timeZoneID
+                == ReadingRecord.legacyDefaultTimeZoneID
+        )
+        #expect(
+            fetchedBook.readingProgress.dailyReadingRecords["2025-01-10"]?.timeZoneID
+                == "America/New_York"
+        )
+    }
+
     @Test("마이그레이션 변경이 없어도 완료 플래그는 기록된다")
     func testMigrationMarksCompletedWhenNoMutation() async throws {
         let container = try createInMemoryContainer()

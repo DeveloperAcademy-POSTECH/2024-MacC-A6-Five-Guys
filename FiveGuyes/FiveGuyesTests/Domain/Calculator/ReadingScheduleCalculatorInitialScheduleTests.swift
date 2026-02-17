@@ -116,4 +116,24 @@ extension ReadingScheduleCalculatorTests {
         #expect(result.dailyReadingRecords["2025-01-10"]?.targetPages == 59)
         #expect(result.dailyReadingRecords["2025-01-16"]?.targetPages == 120)
     }
+
+    @Test("createInitialSchedule - 신규 생성 레코드는 전달된 타임존을 기록한다")
+    func createInitialSchedule_stampsProvidedTimeZone() throws {
+        let settings = makeSettings(
+            startPage: 1,
+            targetEndPage: 30,
+            startDate: makeDate("2025-01-10"),
+            targetEndDate: makeDate("2025-01-12")
+        )
+
+        let result = try calculator.createInitialSchedule(
+            settings: settings,
+            activeTimeZoneID: "America/Los_Angeles"
+        )
+
+        #expect(result.dailyReadingRecords.count == 3)
+        #expect(result.dailyReadingRecords["2025-01-10"]?.timeZoneID == "America/Los_Angeles")
+        #expect(result.dailyReadingRecords["2025-01-11"]?.timeZoneID == "America/Los_Angeles")
+        #expect(result.dailyReadingRecords["2025-01-12"]?.timeZoneID == "America/Los_Angeles")
+    }
 }

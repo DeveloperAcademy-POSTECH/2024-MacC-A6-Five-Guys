@@ -146,4 +146,27 @@ extension BookManagementUseCasesTests {
         #expect(updatedBook.readingProgress.lastReadDate == makeDate("2025-01-07"))
         #expect(todayProvider.callCount == 1)
     }
+
+    @Test("DailyReadingUseCase.recordReading은 현재 타임존을 기록에 스탬프한다")
+    func testRecordReadingUsesCurrentTimeZoneID() async throws {
+        let mockRepo = MockBookRepo()
+        let schedulerSpy = NotificationSchedulerSpy()
+        let today = makeDate("2025-01-07")
+        let timeZoneProvider = ReadingTimeZoneProviderStub(timeZoneID: "America/Los_Angeles")
+        let useCase = makeDailyReadingUseCase(
+            repo: mockRepo,
+            notificationScheduler: schedulerSpy,
+            todayProvider: ReadingDateProviderStub(todayValue: today),
+            timeZoneProvider: timeZoneProvider
+        )
+
+        let testBook = createTestBook(totalPages: 300)
+        await mockRepo.setBooks([testBook])
+
+        _ = try await useCase.recordReading(bookId: testBook.id, pagesRead: 10)
+
+        let updatedBook = try await mockRepo.fetchBook(by: testBook.id)
+        let key = today.toYearMonthDayString()
+        #expect(updatedBook.readingProgress.dailyReadingRecords[key]?.timeZoneID == "America/Los_Angeles")
+    }
 }

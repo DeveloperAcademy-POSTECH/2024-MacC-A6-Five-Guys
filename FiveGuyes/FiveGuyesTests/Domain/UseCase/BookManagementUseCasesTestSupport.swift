@@ -58,7 +58,8 @@ struct BookManagementUseCasesTests {
     func makeReadingLibraryUseCase(
         repo: BookRepo,
         notificationScheduler: any ReadingNotificationScheduling,
-        todayProvider: any ReadingDateProviding = ReadingDateProviderStub(todayValue: .distantPast)
+        todayProvider: any ReadingDateProviding = ReadingDateProviderStub(todayValue: .distantPast),
+        timeZoneProvider: any ReadingTimeZoneProviding = ReadingTimeZoneProviderStub()
     ) -> ReadingLibraryUseCase {
         ReadingLibraryUseCase(
             fetchReadingBooksUseCase: FetchReadingBooksUseCase(repo: repo),
@@ -69,7 +70,8 @@ struct BookManagementUseCasesTests {
             ),
             rescheduleOnAppOpenUseCase: RescheduleOnAppOpenUseCase(
                 repo: repo,
-                scheduleCalculator: ReadingScheduleCalculator()
+                scheduleCalculator: ReadingScheduleCalculator(),
+                timeZoneProvider: timeZoneProvider
             ),
             todayProvider: todayProvider
         )
@@ -78,13 +80,15 @@ struct BookManagementUseCasesTests {
     func makeDailyReadingUseCase(
         repo: BookRepo,
         notificationScheduler: any ReadingNotificationScheduling,
-        todayProvider: any ReadingDateProviding = ReadingDateProviderStub(todayValue: .distantPast)
+        todayProvider: any ReadingDateProviding = ReadingDateProviderStub(todayValue: .distantPast),
+        timeZoneProvider: any ReadingTimeZoneProviding = ReadingTimeZoneProviderStub()
     ) -> DailyReadingUseCase {
         DailyReadingUseCase(
             recordReadingUseCase: RecordReadingUseCase(
                 repo: repo,
                 notificationScheduler: notificationScheduler,
-                scheduleCalculator: ReadingScheduleCalculator()
+                scheduleCalculator: ReadingScheduleCalculator(),
+                timeZoneProvider: timeZoneProvider
             ),
             todayProvider: todayProvider
         )
@@ -108,13 +112,15 @@ struct BookManagementUseCasesTests {
     func makeReadingPlanUseCase(
         repo: BookRepo,
         notificationScheduler: any ReadingNotificationScheduling,
-        todayProvider: any ReadingDateProviding = ReadingDateProviderStub(todayValue: .distantPast)
+        todayProvider: any ReadingDateProviding = ReadingDateProviderStub(todayValue: .distantPast),
+        timeZoneProvider: any ReadingTimeZoneProviding = ReadingTimeZoneProviderStub()
     ) -> ReadingPlanUseCase {
         ReadingPlanUseCase(
             updateReadingPlanUseCase: UpdateReadingPlanUseCase(
                 repo: repo,
                 notificationScheduler: notificationScheduler,
-                scheduleCalculator: ReadingScheduleCalculator()
+                scheduleCalculator: ReadingScheduleCalculator(),
+                timeZoneProvider: timeZoneProvider
             ),
             todayProvider: todayProvider
         )
@@ -122,13 +128,15 @@ struct BookManagementUseCasesTests {
 
     func makeBookRegistrationUseCase(
         repo: BookRepo,
-        notificationScheduler: any ReadingNotificationScheduling
+        notificationScheduler: any ReadingNotificationScheduling,
+        timeZoneProvider: any ReadingTimeZoneProviding = ReadingTimeZoneProviderStub()
     ) -> BookRegistrationUseCase {
         BookRegistrationUseCase(
             registerBookUseCase: RegisterBookUseCase(
                 repo: repo,
                 notificationScheduler: notificationScheduler,
-                scheduleCalculator: ReadingScheduleCalculator()
+                scheduleCalculator: ReadingScheduleCalculator(),
+                timeZoneProvider: timeZoneProvider
             )
         )
     }
@@ -178,5 +186,17 @@ struct ReadingDateProviderStub: ReadingDateProviding {
 
     func today() -> Date {
         todayValue
+    }
+}
+
+struct ReadingTimeZoneProviderStub: ReadingTimeZoneProviding {
+    let timeZoneID: String
+
+    init(timeZoneID: String = ReadingRecord.legacyDefaultTimeZoneID) {
+        self.timeZoneID = timeZoneID
+    }
+
+    func currentTimeZoneID() -> String {
+        timeZoneID
     }
 }
