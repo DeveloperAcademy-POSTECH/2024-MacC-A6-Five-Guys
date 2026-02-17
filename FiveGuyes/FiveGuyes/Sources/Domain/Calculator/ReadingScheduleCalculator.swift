@@ -102,6 +102,7 @@ struct ReadingScheduleCalculator {
         activeTimeZoneID: String = ReadingRecord.legacyDefaultTimeZoneID
     ) throws -> (progress: FGReadingProgress, updatedSettings: FGUserSetting?) {
         let key = date.readingDateKey
+        let isBeforeStartDate = key < settings.startDateKey
         var newRecords = progress.dailyReadingRecords
 
         let currentRecord = newRecords[key.rawValue] ?? ReadingRecord(targetPages: 0, pagesRead: 0)
@@ -131,11 +132,14 @@ struct ReadingScheduleCalculator {
             lastReadPage: pagesRead
         )
 
-        let needsRecalculation =
-            updatedSettings != nil ||
-            (currentRecord.targetPages != 0 && pagesRead != currentRecord.targetPages)
+        let shouldRecalculate = needsRecalculation(
+            hasUpdatedSettings: updatedSettings != nil,
+            currentTargetPages: currentRecord.targetPages,
+            pagesRead: pagesRead,
+            isBeforeStartDate: isBeforeStartDate
+        )
 
-        if needsRecalculation {
+        if shouldRecalculate {
             newRecords[key.rawValue] = ReadingRecord(
                 targetPages: pagesRead,
                 pagesRead: pagesRead,
@@ -143,6 +147,11 @@ struct ReadingScheduleCalculator {
             )
 
             let adjustedSettings = updatedSettings ?? settings
+            let baseDate = recalculationBaseDate(
+                isBeforeStartDate: isBeforeStartDate,
+                settings: adjustedSettings,
+                recordDate: date
+            )
 
             let recalculatedProgress = try adjustFutureTargets(
                 settings: adjustedSettings,
@@ -151,7 +160,7 @@ struct ReadingScheduleCalculator {
                     lastReadDate: date,
                     lastReadPage: pagesRead
                 ),
-                fromDate: date,
+                fromDate: baseDate,
                 activeTimeZoneID: activeTimeZoneID
             )
 
@@ -308,6 +317,25 @@ struct ReadingScheduleCalculator {
     }
 
     // MARK: - Private Helper Methods
+
+    private func needsRecalculation(
+        hasUpdatedSettings: Bool,
+        currentTargetPages: Int,
+        pagesRead: Int,
+        isBeforeStartDate: Bool
+    ) -> Bool {
+        hasUpdatedSettings ||
+            (currentTargetPages != 0 && pagesRead != currentTargetPages) ||
+            (isBeforeStartDate && pagesRead > 0)
+    }
+
+    private func recalculationBaseDate(
+        isBeforeStartDate: Bool,
+        settings: FGUserSetting,
+        recordDate: Date
+    ) -> Date {
+        isBeforeStartDate ? settings.startDate.addDays(-1) : recordDate
+    }
 
     private func makeScheduleSegment(
         settings: FGUserSetting,

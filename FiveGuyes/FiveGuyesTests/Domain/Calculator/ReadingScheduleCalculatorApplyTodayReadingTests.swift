@@ -117,6 +117,37 @@ extension ReadingScheduleCalculatorTests {
         #expect(result.progress.dailyReadingRecords["2025-01-10"]?.pagesRead == 0)
     }
 
+    @Test("applyTodayReading - 시작일 이전 기록 시 시작일부터 재분배")
+    func applyTodayReading_beforeStartDate_recalculateFromStartDate() throws {
+        let settings = makeSettings(
+            startPage: 1,
+            targetEndPage: 100,
+            startDate: makeDate("2025-01-20"),
+            targetEndDate: makeDate("2025-01-24")
+        )
+
+        let progress = try calculator.createInitialSchedule(settings: settings)
+
+        let result = try calculator.applyTodayReading(
+            settings: settings,
+            progress: progress,
+            pagesRead: 30,
+            date: makeDate("2025-01-15")
+        )
+
+        #expect(result.updatedSettings == nil)
+        #expect(result.progress.lastReadPage == 30)
+        #expect(result.progress.dailyReadingRecords["2025-01-15"]?.pagesRead == 30)
+        #expect(result.progress.dailyReadingRecords["2025-01-15"]?.targetPages == 30)
+
+        #expect(result.progress.dailyReadingRecords["2025-01-16"] == nil)
+        #expect(result.progress.dailyReadingRecords["2025-01-19"] == nil)
+
+        #expect(result.progress.dailyReadingRecords["2025-01-20"]?.targetPages == 44)
+        #expect(result.progress.dailyReadingRecords["2025-01-24"]?.targetPages == 100)
+        #expect(result.progress.dailyReadingRecords.count == 6)
+    }
+
     @Test("applyTodayReading - 중간 페이지 독서 진행")
     func applyTodayReading_middlePage() throws {
         let settings = makeSettings(
