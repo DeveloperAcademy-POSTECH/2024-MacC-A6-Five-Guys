@@ -20,17 +20,17 @@ final class CompletionReviewViewModel {
     var showEmptyReviewAlert = false
     private(set) var isSubmitting = false
 
-    private let bookManagementService: any BookManagementService
+    private let bookCompletionUseCase: any BookCompletionUsing
 
-    init(bookManagementService: any BookManagementService) {
-        self.bookManagementService = bookManagementService
+    init(bookCompletionUseCase: any BookCompletionUsing) {
+        self.bookCompletionUseCase = bookCompletionUseCase
     }
 
     func preloadReview(_ review: String) {
         reflectionText = review
     }
 
-    func submit(userBookId: UUID, isUpdateMode: Bool, completionDate: Date) async -> SubmitOutcome {
+    func submit(userBookId: UUID, isUpdateMode: Bool) async -> SubmitOutcome {
         guard !isSubmitting else { return .none }
 
         let review = reflectionText.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -44,14 +44,13 @@ final class CompletionReviewViewModel {
 
         do {
             if isUpdateMode {
-                try await bookManagementService.updateCompletionReview(
+                try await bookCompletionUseCase.updateCompletionReview(
                     id: userBookId,
                     review: review
                 )
             } else {
-                try await bookManagementService.completeBook(
+                try await bookCompletionUseCase.completeBook(
                     id: userBookId,
-                    completionDate: completionDate,
                     review: review
                 )
             }

@@ -10,7 +10,7 @@ import SwiftUI
 struct BookSettingProgressBar: View {
     private let totalPages = 4  // 총 페이지 수
     var currentPage: Int = 1
-    
+
     var body: some View {
         HStack(spacing: 4) { // 간격 추가
             ForEach(0..<totalPages, id: \.self) { index in
@@ -21,7 +21,7 @@ struct BookSettingProgressBar: View {
             }
         }
     }
-    
+
     private func progressColor(for index: Int) -> Color {
         if index + 1 < currentPage {
             return Color.Colors.green // 지나온 페이지 색상

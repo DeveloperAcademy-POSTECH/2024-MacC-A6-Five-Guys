@@ -41,3 +41,32 @@ type_body_length: # From https://realm.github.io/SwiftLint/type_body_length.html
 
 # 제외할 파일 경로 (`included`보다 우선순위 높음)
 #excluded:
+
+custom_rules:
+    no_service_dependency_in_viewmodel:
+        name: "No Service Dependency In ViewModel"
+        included:
+            - "FiveGuyes/Sources/Presentation/ViewModel"
+        regex: "\\b(?:any\\s+)?\\w+(Managing|Providing|Storing|Opening)\\b"
+        message: "ViewModel은 ...Managing/...Providing/...Storing/...Opening 직접 의존 대신 UseCase(...Using) 경계를 사용하세요."
+        severity: error
+
+    no_usecase_dependency_in_view:
+        name: "No UseCase Dependency In View"
+        included:
+            - "FiveGuyes/Sources/Presentation/View/"
+        excluded:
+            - "FiveGuyes/Sources/Presentation/ViewModel/"
+        regex: "\\b(?:any\\s+)?\\w+Using\\b"
+        message: "View는 any ...Using을 직접 참조하지 말고 ViewModel 경유로 호출하세요."
+        severity: error
+
+    no_app_dependencies_environment_in_view:
+        name: "No AppDependencies Environment In View"
+        included:
+            - "FiveGuyes/Sources/Presentation/View/"
+        excluded:
+            - "FiveGuyes/Sources/Presentation/ViewModel/"
+        regex: "@Environment\\(AppDependencies\\.self\\)"
+        message: "AppDependencies는 Coordinator/Composition Root에서 조립하고 View에서는 직접 사용하지 않습니다."
+        severity: error

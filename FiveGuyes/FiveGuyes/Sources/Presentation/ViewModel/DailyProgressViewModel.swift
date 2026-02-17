@@ -21,14 +21,19 @@ final class DailyProgressViewModel {
     var showTargetExceededAlert = false
     private(set) var isSubmitting = false
 
-    private let bookManagementService: any BookManagementService
+    private let dailyReadingUseCase: any DailyReadingUsing
 
-    init(bookManagementService: any BookManagementService) {
-        self.bookManagementService = bookManagementService
+    init(dailyReadingUseCase: any DailyReadingUsing) {
+        self.dailyReadingUseCase = dailyReadingUseCase
     }
 
-    func preloadPages(userBook: FGUserBook, adjustedToday: Date) {
-        guard let readingRecord = userBook.readingProgress.getDailyReadingRecord(for: adjustedToday) else { return }
+    func today() -> Date {
+        dailyReadingUseCase.today()
+    }
+
+    func preloadPages(userBook: FGUserBook) {
+        let today = dailyReadingUseCase.today()
+        guard let readingRecord = userBook.readingProgress.getDailyReadingRecord(for: today) else { return }
         pagesToReadToday = readingRecord.targetPages
     }
 
@@ -44,7 +49,7 @@ final class DailyProgressViewModel {
         pagesToReadToday = targetEndPage
     }
 
-    func submit(bookId: UUID, readDate: Date) async -> SubmitOutcome {
+    func submit(bookId: UUID) async -> SubmitOutcome {
         guard !isSubmitting else { return .none }
 
         isSubmitting = true
@@ -52,10 +57,9 @@ final class DailyProgressViewModel {
         defer { isSubmitting = false }
 
         do {
-            let result = try await bookManagementService.recordReading(
+            let result = try await dailyReadingUseCase.recordReading(
                 bookId: bookId,
-                pagesRead: pagesRead,
-                readDate: readDate
+                pagesRead: pagesRead
             )
 
             switch result {

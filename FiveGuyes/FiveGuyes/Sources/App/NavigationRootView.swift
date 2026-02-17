@@ -5,8 +5,8 @@
 //  Created by zaehorang on 11/6/24.
 //
 
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 struct NavigationRootView: View {
     @State private var coordinator: NavigationCoordinator
@@ -19,7 +19,7 @@ struct NavigationRootView: View {
 
     var body: some View {
         NavigationStack(path: $coordinator.paths) {
-            
+
             coordinator.navigate(to: .mainHome)
                 .navigationDestination(for: Screens.self) { screen in
                     coordinator.navigate(to: screen)
@@ -31,8 +31,11 @@ struct NavigationRootView: View {
 }
 
 #Preview {
-    let container = try! ModelContainer(for: UserBookSchemaV2.UserBookV2.self)
-    let dependencies = AppDependencies(modelContainer: container)
-    NavigationRootView(appDependencies: dependencies)
-        .environment(dependencies)
+    if let container = try? ModelContainer(for: UserBookSchemaV2.UserBookV2.self) {
+        let dependencies = AppDependencies(modelContainer: container)
+        NavigationRootView(appDependencies: dependencies)
+            .environment(dependencies)
+    } else {
+        Text("Preview unavailable")
+    }
 }

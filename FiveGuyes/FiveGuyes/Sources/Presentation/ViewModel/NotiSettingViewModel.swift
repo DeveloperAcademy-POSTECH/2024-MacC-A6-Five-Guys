@@ -8,40 +8,6 @@
 import Foundation
 import Observation
 
-protocol NotificationManaging {
-    func requestAuthorization() async -> Bool
-    func clearRequests() async
-    func setupAllNotifications(_ readingBook: FGUserBook) async
-    func updateNotification(notificationType: NotificationType) async
-}
-
-extension NotificationManager: NotificationManaging {}
-
-protocol NotificationSettingsStoring {
-    func saveNotificationDisabled(_ isNotificationDisabled: Bool)
-    func fetchNotificationDisabled() -> Bool
-    func saveNotificationTime(hour: Int, minute: Int)
-    func fetchNotificationReminderTime() -> (hour: Int, minute: Int)
-}
-
-struct UserDefaultsNotificationSettingsStore: NotificationSettingsStoring {
-    func saveNotificationDisabled(_ isNotificationDisabled: Bool) {
-        UserDefaultsManager.saveNotificationDisabled(isNotificationDisabled)
-    }
-
-    func fetchNotificationDisabled() -> Bool {
-        UserDefaultsManager.fetchNotificationDisabled()
-    }
-
-    func saveNotificationTime(hour: Int, minute: Int) {
-        UserDefaultsManager.saveNotificationTime(hour: hour, minute: minute)
-    }
-
-    func fetchNotificationReminderTime() -> (hour: Int, minute: Int) {
-        UserDefaultsManager.fetchNotificationReminderTime()
-    }
-}
-
 @MainActor
 @Observable
 final class NotiSettingViewModel {
@@ -53,17 +19,14 @@ final class NotiSettingViewModel {
     private var notificationStatusTask: Task<Void, Never>?
     private var notificationTimeTask: Task<Void, Never>?
 
-    private let notificationManager: any NotificationManaging
-    private let settingsStore: any NotificationSettingsStoring
+    private let notificationSettingUseCase: any NotificationSettingUsing
     private let nowProvider: () -> Date
 
     init(
-        notificationManager: any NotificationManaging,
-        settingsStore: any NotificationSettingsStoring,
+        notificationSettingUseCase: any NotificationSettingUsing,
         nowProvider: @escaping () -> Date = Date.init
     ) {
-        self.notificationManager = notificationManager
-        self.settingsStore = settingsStore
+        self.notificationSettingUseCase = notificationSettingUseCase
         self.nowProvider = nowProvider
     }
 
@@ -77,59 +40,41 @@ final class NotiSettingViewModel {
     }
 
     func loadPersistedSettings() {
-        let calendar = Calendar.app
-        let (hour, minute) = settingsStore.fetchNotificationReminderTime()
-
-        selectedTime = calendar.date(
-            bySettingHour: hour,
-            minute: minute,
-            second: 0,
-            of: nowProvider()
-        ) ?? nowProvider()
-
-        isNotificationDisabled = settingsStore.fetchNotificationDisabled()
+        let snapshot = notificationSettingUseCase.loadSnapshot(now: nowProvider())
+        selectedTime = snapshot.selectedTime
+        isNotificationDisabled = snapshot.isNotificationDisabled
     }
 
     func refreshSystemNotificationAuthorization() async {
-        isSystemNotificationEnabled = await notificationManager.requestAuthorization()
+        isSystemNotificationEnabled = await notificationSettingUseCase.refreshSystemAuthorization()
     }
 
     func handleNotificationStatusChange(userBook: FGUserBook?) {
         notificationStatusTask?.cancel()
         let isDisabled = isNotificationDisabled
-        settingsStore.saveNotificationDisabled(isDisabled)
 
         notificationStatusTask = Task {
-            guard let userBook else { return }
             guard !Task.isCancelled else { return }
-
-            if isDisabled {
-                await notificationManager.clearRequests()
-            } else {
-                await notificationManager.setupAllNotifications(userBook)
-            }
+            await notificationSettingUseCase.setNotificationDisabled(isDisabled, userBook: userBook)
         }
     }
 
     func handleNotificationTimeChange(userBook: FGUserBook?) {
         notificationTimeTask?.cancel()
         let currentSelectedTime = selectedTime
-        saveNotificationTime(currentSelectedTime)
+        let isDisabled = isNotificationDisabled
 
         notificationTimeTask = Task {
-            guard let userBook else { return }
             guard !Task.isCancelled else { return }
-
-            await notificationManager.updateNotification(
-                notificationType: .morning(readingBook: userBook)
+            await notificationSettingUseCase.updateReminderTime(
+                currentSelectedTime,
+                isNotificationDisabled: isDisabled,
+                userBook: userBook
             )
         }
     }
 
-    private func saveNotificationTime(_ time: Date) {
-        let calendar = Calendar.app
-        let hour = calendar.component(.hour, from: time)
-        let minute = calendar.component(.minute, from: time)
-        settingsStore.saveNotificationTime(hour: hour, minute: minute)
+    func openSystemSettings() {
+        notificationSettingUseCase.openSystemSettings()
     }
 }

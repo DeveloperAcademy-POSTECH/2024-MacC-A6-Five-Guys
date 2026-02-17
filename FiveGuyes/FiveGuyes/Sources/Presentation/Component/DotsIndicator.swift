@@ -10,17 +10,16 @@ import SwiftUI
 struct DotsIndicator: View {
     let count: Int
     @Binding var selectedIndex: Int?
-    
-    // Customization
+
     let dotSize: CGFloat = 6
     let spacing: CGFloat = 4
     let activeColor: Color = Color.Labels.primaryBlack1
     let inactiveColor: Color = Color.Labels.quaternaryBlack4
     let includeTrailingSpacer: Bool = true
     let animation: Animation = .easeInOut(duration: 0.2)
-    
+
     var body: some View {
-        
+
         HStack(spacing: spacing) {
             if count > 1 {
                 ForEach(0..<max(count, 0), id: \.self) { idx in
@@ -43,11 +42,11 @@ struct DotsIndicator: View {
     struct PreviewWrapper: View {
         @State private var selectedIndex: Int? = 0
         let total = 5
-        
+
         var body: some View {
             VStack(spacing: 20) {
                 DotsIndicator(count: total, selectedIndex: $selectedIndex)
-                
+
                 HStack {
                     Button("← Left") {
                         if let idx = selectedIndex, idx > 0 {
@@ -64,6 +63,6 @@ struct DotsIndicator: View {
             .padding()
         }
     }
-    
+
     return PreviewWrapper()
 }

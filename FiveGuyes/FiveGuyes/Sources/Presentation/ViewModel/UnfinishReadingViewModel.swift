@@ -5,6 +5,7 @@
 //  Created by zaehorang on 2/13/26.
 //
 
+import Foundation
 import Observation
 
 @MainActor
@@ -12,10 +13,10 @@ import Observation
 final class UnfinishReadingViewModel {
     private(set) var isCompleting = false
 
-    private let bookManagementService: any BookManagementService
+    private let bookCompletionUseCase: any BookCompletionUsing
 
-    init(bookManagementService: any BookManagementService) {
-        self.bookManagementService = bookManagementService
+    init(bookCompletionUseCase: any BookCompletionUsing) {
+        self.bookCompletionUseCase = bookCompletionUseCase
     }
 
     func completeBook(_ userBook: FGUserBook) async -> Bool {
@@ -25,9 +26,8 @@ final class UnfinishReadingViewModel {
         defer { isCompleting = false }
 
         do {
-            try await bookManagementService.completeBook(
+            try await bookCompletionUseCase.completeBook(
                 id: userBook.id,
-                completionDate: userBook.userSettings.targetEndDate,
                 review: ""
             )
             return true

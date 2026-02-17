@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import SwiftData
 
 enum BookSettingsPage: Int {
     case bookSearch = 1
@@ -18,29 +17,43 @@ enum BookSettingsPage: Int {
 
 struct BookSettingsManagerView: View {
     @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
-    @Environment(AppDependencies.self) private var appDependencies
-    
+
+    @State private var viewModel: BookSettingsManagerViewModel
+    @State private var bookSearchViewModel: BookSearchViewModel
+    @State private var finishGoalViewModel: FinishGoalViewModel
+    @State private var readingDateSettingViewModel: ReadingDateSettingViewModel
     @State private var bookSettingInputModel = BookSettingInputModel()
     @State private var pageModel = BookSettingPageModel()
 
     init(
+        viewModel: BookSettingsManagerViewModel,
+        bookSearchViewModel: BookSearchViewModel,
+        finishGoalViewModel: FinishGoalViewModel,
+        readingDateSettingViewModel: ReadingDateSettingViewModel,
         bookSettingInputModel: BookSettingInputModel = BookSettingInputModel(),
         pageModel: BookSettingPageModel = BookSettingPageModel()
     ) {
+        _viewModel = State(initialValue: viewModel)
+        _bookSearchViewModel = State(initialValue: bookSearchViewModel)
+        _finishGoalViewModel = State(initialValue: finishGoalViewModel)
+        _readingDateSettingViewModel = State(initialValue: readingDateSettingViewModel)
         _bookSettingInputModel = State(initialValue: bookSettingInputModel)
         _pageModel = State(initialValue: pageModel)
     }
-    
+
     var body: some View {
         ZStack(alignment: .top) {
             if [BookSettingsPage.bookDurationSetting.rawValue,
                 BookSettingsPage.bookNoneReadingDaySetting.rawValue]
                 .contains(pageModel.currentPage) {
-                ReadingDateSettingView()
+                ReadingDateSettingView(
+                    today: viewModel.today(),
+                    viewModel: readingDateSettingViewModel
+                )
             } else {
                 pageView
             }
-            
+
             if pageModel.currentPage != BookSettingsPage.bookSettingDone.rawValue {
                 BookSettingProgressBar(currentPage: pageModel.currentPage)
                     .padding(.top, 5)
@@ -71,7 +84,7 @@ struct BookSettingsManagerView: View {
         .environment(bookSettingInputModel)
         .environment(pageModel)
     }
-    
+
     private func handleBackButton() {
         if pageModel.currentPage > BookSettingsPage.bookSearch.rawValue {
             clearBookSetting()
@@ -82,7 +95,7 @@ struct BookSettingsManagerView: View {
             navigationCoordinator.pop()
         }
     }
-    
+
     private func clearBookSetting() {
         if let page = BookSettingsPage(rawValue: pageModel.currentPage) {
             switch page {
@@ -100,24 +113,16 @@ struct BookSettingsManagerView: View {
             }
         }
     }
-    
+
     @ViewBuilder
     private var pageView: some View {
         switch BookSettingsPage(rawValue: pageModel.currentPage) {
         case .bookSearch:
-            BookSearchView(
-                viewModel: BookSearchViewModel(
-                    bookSearchStore: appDependencies.makeBookSearchStore()
-                )
-            )
+            BookSearchView(viewModel: bookSearchViewModel)
         case .bookPageSetting:
             BookPageSettingView()
         case .bookSettingDone:
-            FinishGoalView(
-                viewModel: FinishGoalViewModel(
-                    bookManagementService: appDependencies.bookManagementService
-                )
-            )
+            FinishGoalView(viewModel: finishGoalViewModel)
         default:
             EmptyView()
         }
@@ -157,14 +162,30 @@ private func makeBookSettingsManagerPreview(
 ) -> some View {
     let dependencies = PreviewSupport.makeDependencies()
     let coordinator = NavigationCoordinator(appDependencies: dependencies)
+    let managerViewModel = BookSettingsManagerViewModel(
+        readingPlanUseCase: dependencies.readingPlanUseCase
+    )
+    let bookSearchViewModel = BookSearchViewModel(
+        bookSearchUseCase: dependencies.bookSearchUseCase
+    )
+    let finishGoalViewModel = FinishGoalViewModel(
+        bookRegistrationUseCase: dependencies.bookRegistrationUseCase,
+        readingGoalMetricsUseCase: dependencies.readingGoalMetricsUseCase
+    )
+    let readingDateSettingViewModel = ReadingDateSettingViewModel(
+        readingGoalMetricsUseCase: dependencies.readingGoalMetricsUseCase
+    )
     let pageModel = makeBookSettingsPreviewPageModel(advanceCount: pageAdvanceCount)
 
     return BookSettingsManagerView(
+        viewModel: managerViewModel,
+        bookSearchViewModel: bookSearchViewModel,
+        finishGoalViewModel: finishGoalViewModel,
+        readingDateSettingViewModel: readingDateSettingViewModel,
         bookSettingInputModel: inputModel,
         pageModel: pageModel
     )
     .environment(coordinator)
-    .environment(dependencies)
 }
 
 private func makeBookSettingsPreviewPageModel(advanceCount: Int) -> BookSettingPageModel {

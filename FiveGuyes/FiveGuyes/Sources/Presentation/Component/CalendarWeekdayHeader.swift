@@ -9,7 +9,7 @@ import SwiftUI
 
 struct CalendarWeekdayHeader: View {
     let calendarCalculator: CalendarCalculator
-    
+
     var body: some View {
         HStack(spacing: 20) {
             ForEach(calendarCalculator.getWeekdayHeaders(), id: \.self) { day in

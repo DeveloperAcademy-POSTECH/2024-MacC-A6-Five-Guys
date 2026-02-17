@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct MainHomeView: View {
-    // Derived UI State
     private enum HomeState {
         case reading(book: FGUserBook)
         case hasCompletedNoReading
@@ -16,7 +15,6 @@ struct MainHomeView: View {
     }
 
     let mainAlertMessage = "삭제 후에는 복원할 수 없어요"
-    let today = Date().adjustedDate()
 
     @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
 
@@ -111,7 +109,6 @@ struct MainHomeView: View {
                     .padding(.bottom, 22)
                     .padding(.horizontal, 20)
 
-                // Home Main Section
                 homeMainSection
                     .padding(.bottom, 12)
                     .shadow(color: .black.opacity(0.04), radius: 2, x: 0, y: 4)
@@ -210,7 +207,7 @@ struct MainHomeView: View {
             case .reading:
                 ReadingBooksCarousel(
                     readingBooks: readingBooks,
-                    today: today,
+                    today: viewModel.today(),
                     activeID: $activeBookID
                 )
             case .hasCompletedNoReading:
@@ -241,7 +238,12 @@ struct MainHomeView: View {
 
         return Button {
             if isReadingBookAvailable {
-                navigationCoordinator.push(.totalCalendar(books: readingBooks))
+                navigationCoordinator.push(
+                    .totalCalendar(
+                        books: readingBooks,
+                        today: viewModel.today()
+                    )
+                )
             }
         } label: {
             HStack(spacing: 8) {
@@ -329,7 +331,6 @@ struct MainHomeView: View {
         let deleted = await viewModel.deleteBook(id: bookToDelete.id)
         guard deleted else { return }
 
-        // 삭제 후 인덱스 업데이트
         if readingBooks.isEmpty {
             selectedBookIndex = nil
         } else if index >= readingBooks.count {
@@ -355,7 +356,7 @@ struct MainHomeView: View {
 
     @MainActor
     private func reassignReadingSchedules() async {
-        let overdueBooks = await viewModel.rescheduleOnAppOpen(today: today)
+        let overdueBooks = await viewModel.rescheduleOnAppOpen()
         guard !overdueBooks.isEmpty else { return }
 
         for book in overdueBooks {

@@ -14,10 +14,15 @@ final class FinishGoalViewModel {
     var pagesPerDay = 0
     private(set) var isSubmitting = false
 
-    private let bookManagementService: any BookManagementService
+    private let bookRegistrationUseCase: any BookRegistrationUsing
+    private let readingGoalMetricsUseCase: any ReadingGoalMetricsUsing
 
-    init(bookManagementService: any BookManagementService) {
-        self.bookManagementService = bookManagementService
+    init(
+        bookRegistrationUseCase: any BookRegistrationUsing,
+        readingGoalMetricsUseCase: any ReadingGoalMetricsUsing
+    ) {
+        self.bookRegistrationUseCase = bookRegistrationUseCase
+        self.readingGoalMetricsUseCase = readingGoalMetricsUseCase
     }
 
     func calculateRecommendedPagesPerDay(
@@ -27,26 +32,17 @@ final class FinishGoalViewModel {
         endDate: Date,
         excludedDays: [Date]
     ) {
-        let totalDays = try? ReadingDateCalculator().calculateValidReadingDays(
+        pagesPerDay = readingGoalMetricsUseCase.recommendedPagesPerDay(
+            startPage: startPage,
+            targetEndPage: targetEndPage,
             startDate: startDate,
             endDate: endDate,
-            excludedDates: excludedDays
+            excludedDays: excludedDays
         )
-
-        guard let totalDays, totalDays > 0 else {
-            pagesPerDay = 0
-            return
-        }
-
-        pagesPerDay = ReadingPagesCalculator().calculatePagesPerDayAndRemainder(
-            totalDays: totalDays,
-            startPage: startPage,
-            endPage: targetEndPage
-        ).pagesPerDay
     }
 
     func registerBook(
-        selectedBook: Book,
+        selectedBook: BookSearchItem,
         startPage: Int,
         targetEndPage: Int,
         startDate: Date,
@@ -75,7 +71,7 @@ final class FinishGoalViewModel {
         )
 
         do {
-            _ = try await bookManagementService.registerBook(input)
+            _ = try await bookRegistrationUseCase.registerBook(input)
             return true
         } catch {
             print("책 등록 중 오류 발생: \(error.localizedDescription)")

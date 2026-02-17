@@ -13,7 +13,7 @@ final class BookMetaData {
     var author: String
     var coverURL: String?
     var totalPages: Int
-    
+
     init(title: String, author: String, coverURL: String?, totalPages: Int) {
         self.title = title
         self.author = author
