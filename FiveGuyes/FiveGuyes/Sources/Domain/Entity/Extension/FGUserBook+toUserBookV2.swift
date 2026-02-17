@@ -35,7 +35,10 @@ extension FGUserSetting {
             targetEndPage: self.targetEndPage,
             startDate: self.startDate,
             targetEndDate: self.targetEndDate,
-            nonReadingDays: self.excludedReadingDays
+            nonReadingDays: self.excludedReadingDays,
+            startDateKey: self.startDateKey.rawValue,
+            targetEndDateKey: self.targetEndDateKey.rawValue,
+            nonReadingDayKeys: self.excludedReadingDayKeys.map(\.rawValue)
         )
     }
 }

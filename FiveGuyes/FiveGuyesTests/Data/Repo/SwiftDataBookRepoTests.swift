@@ -71,6 +71,31 @@ struct SwiftDataBookRepoTests {
         return date.onlyDate
     }
 
+    /// UTC 기준 절대 시각 fixture 생성
+    private func makeUTCDate(
+        year: Int,
+        month: Int,
+        day: Int,
+        hour: Int = 0,
+        minute: Int = 0
+    ) -> Date {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(secondsFromGMT: 0) ?? .autoupdatingCurrent
+
+        var components = DateComponents()
+        components.year = year
+        components.month = month
+        components.day = day
+        components.hour = hour
+        components.minute = minute
+        components.timeZone = calendar.timeZone
+
+        guard let date = calendar.date(from: components) else {
+            fatalError("Invalid UTC date fixture")
+        }
+        return date
+    }
+
     private func createMigrationStorage() -> (userDefaults: UserDefaults, completionKey: String) {
         let suiteName = "SwiftDataBookRepoTests.\(UUID().uuidString)"
         guard let userDefaults = UserDefaults(suiteName: suiteName) else {
@@ -80,6 +105,10 @@ struct SwiftDataBookRepoTests {
 
         let completionKey = "\(SwiftDataBookRepo.migrationCompletionVersionKey).\(UUID().uuidString)"
         return (userDefaults: userDefaults, completionKey: completionKey)
+    }
+
+    private func makeSettingsMigrationCompletionKey(_ completionKey: String) -> String {
+        "\(completionKey).settingsDateKeyMigrationV1Completed"
     }
 
     // MARK: - Mapping Tests
@@ -119,6 +148,45 @@ struct SwiftDataBookRepoTests {
                 == originalBook.readingProgress.lastReadPage)
         #expect(convertedBook.completionStatus.isCompleted
                 == originalBook.completionStatus.isCompleted)
+    }
+
+    @Test("UserSettings 매핑은 저장된 DateKey를 우선 사용한다")
+    func testUserSettingsMappingPrefersStoredDateKeys() throws {
+        let settings = UserSettings(
+            startPage: 1,
+            targetEndPage: 200,
+            startDate: makeUTCDate(year: 2026, month: 2, day: 10, hour: 18),
+            targetEndDate: makeUTCDate(year: 2026, month: 2, day: 20, hour: 18),
+            nonReadingDays: [makeUTCDate(year: 2026, month: 2, day: 12, hour: 18)],
+            startDateKey: "2026-03-01",
+            targetEndDateKey: "2026-03-31",
+            nonReadingDayKeys: ["2026-03-10"]
+        )
+
+        let converted = settings.toFGUserSetting()
+
+        #expect(converted.startDateKey.rawValue == "2026-03-01")
+        #expect(converted.targetEndDateKey.rawValue == "2026-03-31")
+        #expect(converted.excludedReadingDayKeys.map(\.rawValue) == ["2026-03-10"])
+    }
+
+    @Test("UserSettings 매핑은 invalid DateKey를 legacy Date(Asia/Seoul) 기준으로 보정한다")
+    func testUserSettingsMappingFallsBackToLegacyDateForInvalidKey() throws {
+        let settings = UserSettings(
+            startPage: 1,
+            targetEndPage: 200,
+            startDate: makeUTCDate(year: 2026, month: 2, day: 10, hour: 18, minute: 0),
+            targetEndDate: makeUTCDate(year: 2026, month: 2, day: 20, hour: 18, minute: 0),
+            nonReadingDays: [],
+            startDateKey: "invalid",
+            targetEndDateKey: nil,
+            nonReadingDayKeys: nil
+        )
+
+        let converted = settings.toFGUserSetting()
+
+        #expect(converted.startDateKey.rawValue == "2026-02-11")
+        #expect(converted.targetEndDateKey.rawValue == "2026-02-21")
     }
 
     // MARK: - Basic CRUD Tests
@@ -420,8 +488,8 @@ struct SwiftDataBookRepoTests {
         #expect(fetchedBook.readingProgress.dailyReadingRecords["2025-01-10"] != nil)
     }
 
-    @Test("legacy 완료 키가 true면 앱 스코프 키로 승격하고 마이그레이션을 건너뛴다")
-    func testLegacyCompletionKeyPromotesScopedKeyAndSkipsMigration() async throws {
+    @Test("legacy 완료 키가 true여도 재보정 신호가 없으면 마이그레이션을 건너뛴다")
+    func testLegacyCompletionKeyPromotesScopedKeyAndSkipsWhenNoSignal() async throws {
         let container = try createInMemoryContainer()
         let migrationStorage = createMigrationStorage()
         migrationStorage.userDefaults.set(true, forKey: legacyMigrationCompletionKey)
@@ -434,7 +502,7 @@ struct SwiftDataBookRepoTests {
 
         let legacyBook = createTestBook().toUserBookV2()
         legacyBook.readingProgress.readingRecords = [
-            "2025-01-09": ReadingRecord(targetPages: 10, pagesRead: 10)
+            "2025-01-10": ReadingRecord(targetPages: 10, pagesRead: 10)
         ]
         legacyBook.readingProgress.lastReadDate = makeDate("2025-01-10")
         legacyBook.readingProgress.lastPagesRead = 10
@@ -443,13 +511,13 @@ struct SwiftDataBookRepoTests {
         try container.mainContext.save()
 
         let fetchedBook = try await repo.fetchBook(by: legacyBook.id)
-        #expect(fetchedBook.readingProgress.dailyReadingRecords["2025-01-09"] != nil)
-        #expect(fetchedBook.readingProgress.dailyReadingRecords["2025-01-10"] == nil)
+        #expect(fetchedBook.readingProgress.dailyReadingRecords["2025-01-09"] == nil)
+        #expect(fetchedBook.readingProgress.dailyReadingRecords["2025-01-10"] != nil)
         #expect(migrationStorage.userDefaults.bool(forKey: migrationStorage.completionKey) == true)
     }
 
-    @Test("마이그레이션 완료 플래그가 있으면 추가 fetch에서 재실행하지 않는다")
-    func testMigrationRunsOnlyOnce() async throws {
+    @Test("마이그레이션 완료 플래그가 true여도 legacy 읽기 키 재유입 시 자동 재보정한다")
+    func testMigrationRemediatesReintroducedLegacyRecordWhenFlagAlreadyTrue() async throws {
         let container = try createInMemoryContainer()
         let migrationStorage = createMigrationStorage()
         let repo = SwiftDataBookRepo(
@@ -471,20 +539,20 @@ struct SwiftDataBookRepoTests {
         _ = try await repo.fetchBooks()
         #expect(migrationStorage.userDefaults.bool(forKey: migrationStorage.completionKey) == true)
 
-        let secondLegacyBook = createTestBook().toUserBookV2()
-        secondLegacyBook.readingProgress.readingRecords = [
+        let reintroducedLegacyBook = createTestBook().toUserBookV2()
+        reintroducedLegacyBook.readingProgress.readingRecords = [
             "2025-01-09": ReadingRecord(targetPages: 20, pagesRead: 20)
         ]
-        secondLegacyBook.readingProgress.lastReadDate = makeDate("2025-01-10")
-        secondLegacyBook.readingProgress.lastPagesRead = 20
+        reintroducedLegacyBook.readingProgress.lastReadDate = makeDate("2025-01-10")
+        reintroducedLegacyBook.readingProgress.lastPagesRead = 20
 
-        container.mainContext.insert(secondLegacyBook)
+        container.mainContext.insert(reintroducedLegacyBook)
         try container.mainContext.save()
 
-        let fetchedSecondBook = try await repo.fetchBook(by: secondLegacyBook.id)
+        let fetchedSecondBook = try await repo.fetchBook(by: reintroducedLegacyBook.id)
 
-        #expect(fetchedSecondBook.readingProgress.dailyReadingRecords["2025-01-09"] != nil)
-        #expect(fetchedSecondBook.readingProgress.dailyReadingRecords["2025-01-10"] == nil)
+        #expect(fetchedSecondBook.readingProgress.dailyReadingRecords["2025-01-09"] == nil)
+        #expect(fetchedSecondBook.readingProgress.dailyReadingRecords["2025-01-10"] != nil)
     }
 
     @Test("day shift 추론이 ±1 범위를 벗어나면 이동하지 않는다")
@@ -578,6 +646,125 @@ struct SwiftDataBookRepoTests {
             fetchedBook.readingProgress.dailyReadingRecords["2025-01-10"]?.timeZoneID
                 == "America/New_York"
         )
+    }
+
+    @Test("fetch 시 legacy UserSettings Date를 DateKey로 1회 백필한다")
+    func testFetchBackfillsLegacyUserSettingsDateKeys() async throws {
+        let container = try createInMemoryContainer()
+        let migrationStorage = createMigrationStorage()
+        let repo = SwiftDataBookRepo(
+            modelContainer: container,
+            migrationUserDefaults: migrationStorage.userDefaults,
+            migrationCompletionKey: migrationStorage.completionKey
+        )
+
+        let legacyBook = createTestBook().toUserBookV2()
+        legacyBook.userSettings.startDate = makeUTCDate(year: 2026, month: 2, day: 10, hour: 18)
+        legacyBook.userSettings.targetEndDate = makeUTCDate(year: 2026, month: 2, day: 20, hour: 18)
+        legacyBook.userSettings.nonReadingDays = [makeUTCDate(year: 2026, month: 2, day: 15, hour: 18)]
+        legacyBook.userSettings.startDateKey = nil
+        legacyBook.userSettings.targetEndDateKey = nil
+        legacyBook.userSettings.nonReadingDayKeys = nil
+        let legacyBookID = legacyBook.id
+
+        container.mainContext.insert(legacyBook)
+        try container.mainContext.save()
+
+        _ = try await repo.fetchBook(by: legacyBookID)
+
+        var fetchDescriptor: FetchDescriptor<UserBookSchemaV2.UserBookV2> = .init(
+            predicate: #Predicate { book in
+                book.id == legacyBookID
+            }
+        )
+        fetchDescriptor.fetchLimit = 1
+        let storedBook = try container.mainContext.fetch(fetchDescriptor).first
+
+        #expect(storedBook?.userSettings.startDateKey == "2026-02-11")
+        #expect(storedBook?.userSettings.targetEndDateKey == "2026-02-21")
+        #expect(storedBook?.userSettings.nonReadingDayKeys == ["2026-02-16"])
+    }
+
+    @Test("fetch 시 partial nonReadingDayKeys를 legacy tail까지 백필한다")
+    func testFetchBackfillsLegacySettingsNonReadingDayKeysTail() async throws {
+        let container = try createInMemoryContainer()
+        let migrationStorage = createMigrationStorage()
+        let repo = SwiftDataBookRepo(
+            modelContainer: container,
+            migrationUserDefaults: migrationStorage.userDefaults,
+            migrationCompletionKey: migrationStorage.completionKey
+        )
+
+        let legacyBook = createTestBook().toUserBookV2()
+        legacyBook.userSettings.startDate = makeUTCDate(year: 2026, month: 2, day: 10, hour: 18)
+        legacyBook.userSettings.targetEndDate = makeUTCDate(year: 2026, month: 2, day: 20, hour: 18)
+        legacyBook.userSettings.nonReadingDays = [
+            makeUTCDate(year: 2026, month: 2, day: 15, hour: 18),
+            makeUTCDate(year: 2026, month: 2, day: 20, hour: 16),
+        ]
+        legacyBook.userSettings.startDateKey = "2026-02-11"
+        legacyBook.userSettings.targetEndDateKey = "2026-02-21"
+        legacyBook.userSettings.nonReadingDayKeys = ["2026-02-16"]
+        let legacyBookID = legacyBook.id
+
+        container.mainContext.insert(legacyBook)
+        try container.mainContext.save()
+
+        let fetchedBook = try await repo.fetchBook(by: legacyBookID)
+        #expect(fetchedBook.userSettings.excludedReadingDayKeys.map(\.rawValue) == ["2026-02-16", "2026-02-21"])
+
+        var fetchDescriptor: FetchDescriptor<UserBookSchemaV2.UserBookV2> = .init(
+            predicate: #Predicate { book in
+                book.id == legacyBookID
+            }
+        )
+        fetchDescriptor.fetchLimit = 1
+        let storedBook = try container.mainContext.fetch(fetchDescriptor).first
+
+        #expect(storedBook?.userSettings.nonReadingDayKeys == ["2026-02-16", "2026-02-21"])
+    }
+
+    @Test("완료 플래그가 true여도 legacy settings key 재유입 시 자동 재보정한다")
+    func testMigrationRemediatesReintroducedLegacySettingsWhenFlagAlreadyTrue() async throws {
+        let container = try createInMemoryContainer()
+        let migrationStorage = createMigrationStorage()
+        migrationStorage.userDefaults.set(true, forKey: migrationStorage.completionKey)
+        migrationStorage.userDefaults.set(
+            true,
+            forKey: makeSettingsMigrationCompletionKey(migrationStorage.completionKey)
+        )
+
+        let repo = SwiftDataBookRepo(
+            modelContainer: container,
+            migrationUserDefaults: migrationStorage.userDefaults,
+            migrationCompletionKey: migrationStorage.completionKey
+        )
+
+        let legacyBook = createTestBook().toUserBookV2()
+        legacyBook.userSettings.startDate = makeUTCDate(year: 2026, month: 2, day: 10, hour: 18)
+        legacyBook.userSettings.targetEndDate = makeUTCDate(year: 2026, month: 2, day: 20, hour: 18)
+        legacyBook.userSettings.nonReadingDays = [makeUTCDate(year: 2026, month: 2, day: 15, hour: 18)]
+        legacyBook.userSettings.startDateKey = nil
+        legacyBook.userSettings.targetEndDateKey = "invalid"
+        legacyBook.userSettings.nonReadingDayKeys = ["invalid"]
+        let legacyBookID = legacyBook.id
+
+        container.mainContext.insert(legacyBook)
+        try container.mainContext.save()
+
+        _ = try await repo.fetchBook(by: legacyBookID)
+
+        var fetchDescriptor: FetchDescriptor<UserBookSchemaV2.UserBookV2> = .init(
+            predicate: #Predicate { book in
+                book.id == legacyBookID
+            }
+        )
+        fetchDescriptor.fetchLimit = 1
+        let storedBook = try container.mainContext.fetch(fetchDescriptor).first
+
+        #expect(storedBook?.userSettings.startDateKey == "2026-02-11")
+        #expect(storedBook?.userSettings.targetEndDateKey == "2026-02-21")
+        #expect(storedBook?.userSettings.nonReadingDayKeys == ["2026-02-16"])
     }
 
     @Test("마이그레이션 변경이 없어도 완료 플래그는 기록된다")

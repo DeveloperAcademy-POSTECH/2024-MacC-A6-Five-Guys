@@ -14,10 +14,13 @@ final class SwiftDataBookRepo: BookRepo {
     // MARK: - Properties
 
     static let migrationCompletionVersionKey = "readingRecordKeyMigrationV1Completed"
+    private static let settingsDateKeyMigrationVersionKey = "settingsDateKeyMigrationV1Completed"
 
     private let modelContext: ModelContext
     private let migrationUserDefaults: UserDefaults
     private let migrationCompletionKey: String
+    private let settingsDateKeyMigrationCompletionKey: String
+    private let migrationLogger: any MigrationDiagnosticLogging
 
     // MARK: - Initial Methods
 
@@ -26,7 +29,8 @@ final class SwiftDataBookRepo: BookRepo {
         self.init(
             modelContainer: modelContainer,
             migrationUserDefaults: .standard,
-            migrationCompletionKey: Self.migrationCompletionVersionKey
+            migrationCompletionKey: Self.migrationCompletionVersionKey,
+            migrationLogger: SystemMigrationDiagnosticLogger()
         )
     }
 
@@ -34,18 +38,21 @@ final class SwiftDataBookRepo: BookRepo {
     init(
         modelContainer: ModelContainer,
         migrationUserDefaults: UserDefaults,
-        migrationCompletionKey: String
+        migrationCompletionKey: String,
+        migrationLogger: any MigrationDiagnosticLogging = SystemMigrationDiagnosticLogger()
     ) {
         self.modelContext = modelContainer.mainContext
         self.migrationUserDefaults = migrationUserDefaults
         self.migrationCompletionKey = migrationCompletionKey
+        self.settingsDateKeyMigrationCompletionKey = "\(migrationCompletionKey).\(Self.settingsDateKeyMigrationVersionKey)"
+        self.migrationLogger = migrationLogger
     }
 
     // MARK: - Basic CRUD Operations
 
     func fetchBooks() async throws -> [FGUserBook] {
         do {
-            try migrateReadingRecordKeysIfNeeded()
+            try migrateStorageIfNeeded()
             let swiftDatabooks = try modelContext.fetch(FetchDescriptor<SDUserBook>())
             let books = swiftDatabooks.map { $0.toFGUserBook() }
             return books
@@ -55,7 +62,7 @@ final class SwiftDataBookRepo: BookRepo {
     }
 
     func fetchBook(by id: UUID) async throws -> FGUserBook {
-        try migrateReadingRecordKeysIfNeeded()
+        try migrateStorageIfNeeded()
         let book = try await findSwiftDataBook(by: id)
         return book.toFGUserBook()
     }
@@ -104,7 +111,7 @@ final class SwiftDataBookRepo: BookRepo {
         )
 
         do {
-            try migrateReadingRecordKeysIfNeeded()
+            try migrateStorageIfNeeded()
             let swiftDataBooks = try modelContext.fetch(fetchDescriptor)
             return swiftDataBooks.map { $0.toFGUserBook() }
         } catch {
@@ -120,7 +127,7 @@ final class SwiftDataBookRepo: BookRepo {
         )
 
         do {
-            try migrateReadingRecordKeysIfNeeded()
+            try migrateStorageIfNeeded()
             let swiftDataBooks = try modelContext.fetch(fetchDescriptor)
             return swiftDataBooks.map { $0.toFGUserBook() }
         } catch {
@@ -170,62 +177,21 @@ final class SwiftDataBookRepo: BookRepo {
 
     @MainActor
     func prewarmReadingRecordKeyMigrationIfNeeded() throws {
-        try migrateReadingRecordKeysIfNeeded()
+        try migrateStorageIfNeeded()
     }
 
-    /// 읽기 기록 키의 legacy 포맷을 현재 도메인 정책(`Calendar.app`) 기준으로 1회 보정합니다.
-    ///
-    /// 왜 fetch 경계에서 1회 실행하는가:
-    /// - 과거 저장 데이터와 현재 조회 키 정책이 다를 수 있어 "기록이 비어 보이는" 문제를 사전에 제거해야 합니다.
-    /// - 매 조회마다 fallback 분기를 계속 두는 방식보다, 초기 1회 write-back이 이후 런타임 비용/복잡도를 줄입니다.
-    private func migrateReadingRecordKeysIfNeeded() throws {
-        guard !isMigrationCompleted() else { return }
-
-        do {
-            let swiftDataBooks = try modelContext.fetch(FetchDescriptor<SDUserBook>())
-            var hasMutatedAnyBook = false
-
-            for swiftDataBook in swiftDataBooks {
-                let migration = ReadingRecordKeyMigrationV1(
-                    records: swiftDataBook.readingProgress.readingRecords,
-                    lastReadDate: swiftDataBook.readingProgress.lastReadDate
-                )
-
-                if migration.didMutate {
-                    swiftDataBook.readingProgress.readingRecords = migration.migratedRecords
-                    hasMutatedAnyBook = true
-                }
-            }
-
-            if hasMutatedAnyBook {
-                try modelContext.save()
-            }
-
-            markMigrationCompleted()
-        } catch {
-            throw RepoError.fetchFailed
-        }
+    private func migrateStorageIfNeeded() throws {
+        try Self.runMigrationPipelineIfNeeded(using: makeMigrationDependencies())
     }
 
-    private func isMigrationCompleted() -> Bool {
-        if migrationUserDefaults.bool(forKey: migrationCompletionKey) {
-            return true
-        }
-
-        guard migrationCompletionKey != Self.migrationCompletionVersionKey else {
-            return false
-        }
-
-        if migrationUserDefaults.bool(forKey: Self.migrationCompletionVersionKey) {
-            migrationUserDefaults.set(true, forKey: migrationCompletionKey)
-            return true
-        }
-
-        return false
-    }
-
-    private func markMigrationCompleted() {
-        migrationUserDefaults.set(true, forKey: migrationCompletionKey)
+    private func makeMigrationDependencies() -> MigrationDependencies {
+        MigrationDependencies(
+            modelContext: modelContext,
+            migrationUserDefaults: migrationUserDefaults,
+            migrationCompletionKey: migrationCompletionKey,
+            settingsDateKeyMigrationCompletionKey: settingsDateKeyMigrationCompletionKey,
+            migrationLogger: migrationLogger
+        )
     }
 
     /// UserBook으로 기존 SwiftData 모델을  업데이트
@@ -256,94 +222,12 @@ final class SwiftDataBookRepo: BookRepo {
             throw RepoError.fetchFailed
         }
     }
-}
 
-private struct ReadingRecordKeyMigrationV1 {
-    let migratedRecords: [String: ReadingRecord]
-    let didMutate: Bool
-
-    init(records: [String: ReadingRecord], lastReadDate: Date?) {
-        guard !records.isEmpty else {
-            self.migratedRecords = records
-            self.didMutate = false
-            return
-        }
-
-        let dayShift = Self.inferDayShift(from: records, lastReadDate: lastReadDate)
-        var migratedRecords: [String: ReadingRecord] = [:]
-        migratedRecords.reserveCapacity(records.count)
-
-        for (rawKey, record) in records {
-            let shiftedKey = Self.shiftedRawKey(from: rawKey, by: dayShift)
-            let normalizedRecord = Self.normalize(record: record)
-
-            if let existing = migratedRecords[shiftedKey] {
-                migratedRecords[shiftedKey] = Self.mergeRecord(existing, normalizedRecord)
-            } else {
-                migratedRecords[shiftedKey] = normalizedRecord
-            }
-        }
-
-        self.migratedRecords = migratedRecords
-        self.didMutate = migratedRecords != records
-    }
-
-    /// 기본값은 0(이동 없음)입니다. 근거가 충분할 때만 -1 또는 +1 이동을 허용합니다.
-    private static func inferDayShift(from records: [String: ReadingRecord], lastReadDate: Date?) -> Int {
-        guard let lastReadDate else { return 0 }
-        guard let anchorKey = migrationAnchorKey(from: records),
-              let anchorDate = anchorKey.toDate(),
-              let expectedDate = lastReadDate.readingDateKey.toDate() else {
-            return 0
-        }
-
-        let diff = Calendar.app.dateComponents([.day], from: anchorDate, to: expectedDate).day ?? 0
-        return abs(diff) <= 1 ? diff : 0
-    }
-
-    private static func migrationAnchorKey(from records: [String: ReadingRecord]) -> ReadingDateKey? {
-        let readKeys = records
-            .filter { $0.value.pagesRead > 0 }
-            .keys
-            .map { ReadingDateKey.fromStoredKey($0) }
-
-        if let latestReadKey = readKeys.max() {
-            return latestReadKey
-        }
-
-        return records.keys.map { ReadingDateKey.fromStoredKey($0) }.max()
-    }
-
-    private static func shiftedRawKey(from rawKey: String, by days: Int) -> String {
-        let key = ReadingDateKey.fromStoredKey(rawKey)
-        guard days != 0,
-              let date = key.toDate(),
-              let shiftedDate = Calendar.app.date(byAdding: .day, value: days, to: date) else {
-            return key.rawValue
-        }
-
-        return ReadingDateKey(date: shiftedDate).rawValue
-    }
-
-    private static func mergeRecord(_ lhs: ReadingRecord, _ rhs: ReadingRecord) -> ReadingRecord {
-        let merged = ReadingRecord(
-            targetPages: max(lhs.targetPages, rhs.targetPages),
-            pagesRead: max(lhs.pagesRead, rhs.pagesRead),
-            timeZoneID: ReadingRecord.mergedTimeZoneID(
-                lhs: lhs.timeZoneID,
-                rhs: rhs.timeZoneID
-            )
-        )
-        return normalize(record: merged)
-    }
-
-    private static func normalize(record: ReadingRecord) -> ReadingRecord {
-        let pagesRead = max(0, record.pagesRead)
-        let targetPages = max(record.targetPages, pagesRead)
-        return ReadingRecord(
-            targetPages: targetPages,
-            pagesRead: pagesRead,
-            timeZoneID: ReadingRecord.normalizedTimeZoneID(record.timeZoneID)
-        )
+    struct MigrationDependencies {
+        let modelContext: ModelContext
+        let migrationUserDefaults: UserDefaults
+        let migrationCompletionKey: String
+        let settingsDateKeyMigrationCompletionKey: String
+        let migrationLogger: any MigrationDiagnosticLogging
     }
 }

@@ -25,13 +25,56 @@ struct FGBookMetaData: Hashable {
 struct FGUserSetting: Hashable {
     let startPage: Int
     let targetEndPage: Int
-    let startDate: Date
-    let targetEndDate: Date
-    let excludedReadingDays: [Date]
+    let startDateKey: ReadingDateKey
+    let targetEndDateKey: ReadingDateKey
+    let excludedReadingDayKeys: [ReadingDateKey]
+
+    /// 기존 Date 기반 호출부 호환을 위해 계산 프로퍼티를 유지합니다.
+    /// 실제 저장/비교의 단일 소스는 `...DateKey`입니다.
+    var startDate: Date {
+        Self.resolveDate(from: startDateKey)
+    }
+
+    var targetEndDate: Date {
+        Self.resolveDate(from: targetEndDateKey)
+    }
+
+    var excludedReadingDays: [Date] {
+        excludedReadingDayKeys.map { Self.resolveDate(from: $0) }
+    }
+
+    init(
+        startPage: Int,
+        targetEndPage: Int,
+        startDate: Date,
+        targetEndDate: Date,
+        excludedReadingDays: [Date]
+    ) {
+        self.startPage = startPage
+        self.targetEndPage = targetEndPage
+        self.startDateKey = ReadingDateKey(date: startDate, calendar: .app)
+        self.targetEndDateKey = ReadingDateKey(date: targetEndDate, calendar: .app)
+        self.excludedReadingDayKeys = excludedReadingDays.map { ReadingDateKey(date: $0, calendar: .app) }
+    }
+
+    init(
+        startPage: Int,
+        targetEndPage: Int,
+        startDateKey: ReadingDateKey,
+        targetEndDateKey: ReadingDateKey,
+        excludedReadingDayKeys: [ReadingDateKey]
+    ) {
+        self.startPage = startPage
+        self.targetEndPage = targetEndPage
+        self.startDateKey = startDateKey
+        self.targetEndDateKey = targetEndDateKey
+        self.excludedReadingDayKeys = excludedReadingDayKeys
+    }
 
     /// 독서 시작일부터 종료일까지 포함된 각 주의 시작 날짜 배열을 반환
     func weeklyStartDates(today: Date) -> [Date] {
-        let effectiveStartDay = today < startDate ? today : startDate
+        let todayKey = today.readingDateKey
+        let effectiveStartDay = todayKey < startDateKey ? today : startDate
 
         let calendar = Calendar.app
         let firstWeekStart = calendar.dateInterval(of: .weekOfMonth, for: effectiveStartDay)?.start ?? effectiveStartDay
@@ -56,6 +99,15 @@ struct FGUserSetting: Hashable {
         )
 
         return remainingReadingDays ?? 0
+    }
+
+    private static func resolveDate(from key: ReadingDateKey) -> Date {
+        if let resolvedDate = key.toDate(calendar: .app) {
+            return resolvedDate
+        }
+
+        assertionFailure("Invalid ReadingDateKey: \(key.rawValue)")
+        return Date(timeIntervalSince1970: 0)
     }
 }
 

@@ -142,6 +142,7 @@ Then:
 - 과거 날짜는 선택할 수 없습니다.
 - 날짜 비교는 `Calendar.app` 기준 정규화 날짜를 사용합니다.
 - `Calendar.app`은 현재 기기 time zone을 사용하며, 04:00 경계를 기준으로 날짜를 해석합니다.
+- 설정일(start/end/non-reading)은 저장 시 `ReadingDateKey(yyyy-MM-dd)`를 source-of-truth로 유지하며, `Date`는 호환용으로만 사용합니다.
 
 관찰 가능 기준:
 - 기간 재선택 시 쉬는날 정리 여부.
@@ -262,6 +263,7 @@ Then:
 - 시작일이 미래로 이동하면 전체 스케줄 재생성 경로를 사용합니다.
 - 오늘 이미 읽은 기록이 있으면 다음날부터 재분배합니다.
 - 재분배 기준일(today)은 현재 기기 time zone + 04:00 경계 기준입니다.
+- 설정일 비교/정리는 `FGUserSetting.startDateKey/targetEndDateKey/excludedReadingDayKeys` 기준으로 수행됩니다.
 
 엣지/오류 처리:
 - 변경 범위 밖 기록/쉬는날은 정리 대상입니다.
@@ -436,7 +438,9 @@ Then:
 
 엣지/오류 처리:
 - `fetch`/`get` 조회 경계에서 읽기 기록 키 1회 마이그레이션을 허용하며, 필요 시 write-back(save)이 발생할 수 있습니다.
+- `fetch`/`get` 조회 경계에서 설정일 key(`startDateKey`, `targetEndDateKey`, `nonReadingDayKeys`) 1회 backfill을 허용하며, 필요 시 write-back(save)이 발생할 수 있습니다.
 - 마이그레이션 완료 키가 기록된 이후에는 재실행하지 않습니다.
+- 설정일 `Date` 레거시 필드 제거는 별도 스키마 마이그레이션 작업으로 분리합니다.
 
 관찰 가능 기준:
 - 첫 조회 시 키 마이그레이션/완료 키 기록 여부.

@@ -9,7 +9,7 @@ import Foundation
 
 struct ReadingRecord: Codable, Hashable {
     // Legacy 레코드(필드 없음)와 빈 값은 모두 이 정책 기본 타임존으로 수렴시킨다.
-    static let legacyDefaultTimeZoneID = "Asia/Seoul"
+    static let legacyDefaultTimeZoneID = LegacyTimeZoneFallbackPolicy.readingRecordDefaultTimeZoneID
 
     var targetPages: Int   // 목표로 설정된 페이지 수
     var pagesRead: Int     // 실제 읽은 페이지 수
