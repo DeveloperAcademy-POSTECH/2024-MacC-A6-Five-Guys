@@ -16,7 +16,9 @@ This plan follows `/Users/zaehorang/.codex/PLANS.md` and is executed with `/User
 - [x] (2026-02-16 13:45Z) 기존 리뷰 항목 완료 동기화: TD-018, TD-017, TD-003, TD-019, TD-016, TD-020, TD-021.
 - [x] (2026-02-17 00:10Z) architecture-first 묶음 완료: TD-011, TD-006, TD-004, TD-001.
 - [x] (2026-02-17 00:12Z) TD-022 Stage 1 완료: `.swiftlint.yml` custom guard rules + acceptance 검색 0건.
-- [ ] Remaining: TD-015, TD-010, TD-022 Stage 2(모듈화 스파이크/분리 로드맵).
+- [x] (2026-02-17 14:52Z) TD-007 후속 1차 완료: record-level `timeZoneID` 저장 + forward-only 정책 + ADR-0004 문서화.
+- [x] (2026-02-17 18:20Z) F1~F5 후속 반영: `Calendar.app` 현지 time zone 정책 전환, TD-027 Closed, TD-028 Partial, TD-029 신규 등록.
+- [ ] Remaining: TD-015, TD-010, TD-007 잔여(typed key adapter), TD-022 Stage 2(모듈화 스파이크/분리 로드맵), TD-028 구조적 로깅, TD-029 analytics 경계 분리.
 
 ## Surprises & Discoveries
 
@@ -36,14 +38,23 @@ This plan follows `/Users/zaehorang/.codex/PLANS.md` and is executed with `/User
   Rationale: 즉시 차단 가능한 범위와 고비용 구조 변경을 분리해 위험을 낮춘다.
   Date/Author: 2026-02-16 / Codex
 
+- Decision: TD-007 후속은 key 포맷 변경 없이 record value(`timeZoneID`) 스냅샷 + forward-only로 처리한다.
+  Rationale: ADR-0003 key 호환성을 유지하면서 해외 이동 시 과거 날짜 경험 보존 요구를 만족하기 위해서다.
+  Date/Author: 2026-02-17 / Codex
+
+- Decision: 날짜 버킷팅 정책은 `Calendar.app(현재 기기 time zone + 04:00 경계)`로 통일한다.
+  Rationale: write-only timezone 저장으로는 현지 날짜 UX 요구를 충족하지 못해 save/read/reschedule 기준 타임존을 단일화해야 한다.
+  Date/Author: 2026-02-17 / Codex
+
 ## Outcomes & Retrospective
 
 이번 사이클에서 이슈 상태는 다음과 같이 업데이트되었습니다.
 
 1. 새로 닫힌 항목: TD-001, TD-004, TD-006, TD-011.
-2. Partial로 전환된 항목: TD-022(Stage 1 완료).
+2. Partial로 전환된 항목: TD-022(Stage 1 완료), TD-007(record timezone snapshot + 현지 버킷팅 정책 반영), TD-028(print 관측성 1차 보강).
 3. 기존 닫힘 유지: TD-018, TD-017, TD-003, TD-019, TD-016, TD-020, TD-021.
-4. 잔여 우선순위: TD-015(P1) -> TD-010(P2) -> TD-007(P2 Partial) -> TD-022 Stage 2(P3).
+4. 이번 사이클에서 TD-027은 실행일 완료 정책 확정으로 Closed 처리했다.
+5. 잔여 우선순위: TD-015(P1) -> TD-010(P2) -> TD-007 잔여(P2 Partial) -> TD-022 Stage 2(P3) -> TD-028 구조화(P3) -> TD-029(P3).
 
 검증 명령:
 
@@ -70,6 +81,14 @@ architecture-first 리베이스에서 반영한 이슈-코드 매핑은 아래�
 - TD-022 Stage 1 (정적 가드룰):
   - `FiveGuyes/.swiftlint.yml`
 
+- TD-007 후속 1차 (record timezone snapshot):
+  - `FiveGuyes/FiveGuyes/Sources/Domain/Entity/ReadingRecord.swift`
+  - `FiveGuyes/FiveGuyes/Sources/Domain/Service/ReadingTimeZoneProviding.swift`
+  - `FiveGuyes/FiveGuyes/Sources/Domain/Calculator/ReadingScheduleCalculator.swift`
+  - `FiveGuyes/FiveGuyes/Sources/Domain/UseCase/BookManagement/DailyAndPlanUseCases.swift`
+  - `FiveGuyes/FiveGuyes/Sources/Domain/UseCase/BookManagement/LibraryAndRegistrationUseCases.swift`
+  - `docs/decisions/adr-0004-reading-record-timezone-forward-only-policy.md`
+
 ## Plan of Work
 
 이 문서는 실행 완료 이슈와 잔여 이슈를 함께 유지합니다.
@@ -79,8 +98,10 @@ architecture-first 리베이스에서 반영한 이슈-코드 매핑은 아래�
 
 1. TD-015: 야간 알림 시간 상수 유효 범위 수정 + 테스트 고정.
 2. TD-010: 알림 일괄 등록 권한 체크 1회화 + 테스트 고정.
-3. TD-007: 날짜 키 경계 후속 정리(typed key adapter 확장).
+3. TD-007 잔여: typed key adapter 확장 + 글로벌 정책 UX 분리 설계.
 4. TD-022 Stage 2: Domain 분리 스파이크와 모듈화 로드맵 문서화.
+5. TD-028 잔여: prewarm 실패 구조적 로깅 경계 도입.
+6. TD-029: Presentation analytics 호출 경계 분리 로드맵 문서화/착수.
 
 ## Concrete Steps
 
@@ -128,6 +149,7 @@ architecture-first 리베이스에서 반영한 이슈-코드 매핑은 아래�
 3. `ReadingDateSettingViewModel.swift`
 4. `ReadingDateSettingViewModelTests.swift`
 5. `.swiftlint.yml` custom rule 3종
+6. `adr-0004-reading-record-timezone-forward-only-policy.md`
 
 ## Interfaces and Dependencies
 
