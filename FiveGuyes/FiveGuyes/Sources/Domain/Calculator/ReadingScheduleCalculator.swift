@@ -185,9 +185,17 @@ struct ReadingScheduleCalculator {
         fromDate: Date,
         activeTimeZoneID: String = ReadingRecord.legacyDefaultTimeZoneID
     ) throws -> FGReadingProgress {
-        do {
-            let nextDay = fromDate.addDays(1)
+        let nextDay = fromDate.addDays(1)
 
+        if progress.lastReadPage >= settings.targetEndPage {
+            return mergeProgress(
+                base: progress,
+                replacingFrom: nextDay,
+                with: [:]
+            )
+        }
+
+        do {
             let newSegment = try makeScheduleSegment(
                 settings: settings,
                 startDate: nextDay,

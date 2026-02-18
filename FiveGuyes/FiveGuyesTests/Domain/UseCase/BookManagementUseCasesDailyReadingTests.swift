@@ -150,6 +150,51 @@ extension BookManagementUseCasesTests {
         }
     }
 
+    @Test("DailyReadingUseCase.recordReading으로 중간 날짜 조기 완독 시 completed 반환 및 미래 목표 제거")
+    func testRecordReadingEarlyCompletionRemovesFutureTargets() async throws {
+        let mockRepo = MockBookRepo()
+        let schedulerSpy = NotificationSchedulerSpy()
+        let today = makeDate("2025-01-11")
+        let useCase = makeDailyReadingUseCase(
+            repo: mockRepo,
+            notificationScheduler: schedulerSpy,
+            todayProvider: ReadingDateProviderStub(todayValue: today)
+        )
+
+        var testBook = createTestBook(totalPages: 100)
+        testBook.userSettings = FGUserSetting(
+            startPage: 1,
+            targetEndPage: 100,
+            startDate: makeDate("2025-01-10"),
+            targetEndDate: makeDate("2025-01-14"),
+            excludedReadingDays: []
+        )
+        testBook.readingProgress = try ReadingScheduleCalculator().createInitialSchedule(settings: testBook.userSettings)
+        await mockRepo.setBooks([testBook])
+
+        let result = try await useCase.recordReading(
+            bookId: testBook.id,
+            pagesRead: 100
+        )
+
+        switch result {
+        case .completed(let updatedBook):
+            #expect(updatedBook.readingProgress.lastReadDate == today)
+            #expect(updatedBook.readingProgress.lastReadPage == 100)
+            #expect(updatedBook.readingProgress.dailyReadingRecords["2025-01-10"]?.targetPages == 20)
+            #expect(updatedBook.readingProgress.dailyReadingRecords["2025-01-11"]?.targetPages == 100)
+            #expect(updatedBook.readingProgress.dailyReadingRecords["2025-01-11"]?.pagesRead == 100)
+            #expect(updatedBook.readingProgress.dailyReadingRecords["2025-01-12"] == nil)
+            #expect(updatedBook.readingProgress.dailyReadingRecords["2025-01-14"] == nil)
+            #expect(updatedBook.readingProgress.dailyReadingRecords.count == 2)
+
+            let setupCount = await schedulerSpy.setupCount()
+            #expect(setupCount == 1)
+        default:
+            Issue.record("Expected .completed, got \(result)")
+        }
+    }
+
     @Test("DailyReadingUseCase.recordReading으로 마지막 날 목표 미달 시 날짜 자동 연장")
     func testRecordReadingDateExtension() async throws {
         let mockRepo = MockBookRepo()
