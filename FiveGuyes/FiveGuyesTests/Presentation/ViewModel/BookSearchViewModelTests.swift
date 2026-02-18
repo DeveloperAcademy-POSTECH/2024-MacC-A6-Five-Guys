@@ -42,6 +42,21 @@ struct BookSearchViewModelTests {
         #expect(viewModel.books.count == 1)
         #expect(viewModel.books.first?.title == "초기 도서")
         #expect(provider.fetchBooksQueries == ["초기", "실패"])
+        #expect(!viewModel.showSearchConfigAlert)
+    }
+
+    @Test("BookSearchViewModel: missingAPIKey 검색 실패 시 설정 알럿 노출")
+    func bookSearch_searchBooks_missingAPIKey_showsConfigAlert() async {
+        let provider = BookSearchProviderStub()
+        let useCase = BookSearchUseCase(bookSearchProvider: provider)
+        provider.fetchBooksError = BookSearchNetworkError.missingAPIKey
+        let viewModel = BookSearchViewModel(bookSearchUseCase: useCase)
+
+        await viewModel.searchBooks(query: "설정 오류")
+
+        #expect(viewModel.showSearchConfigAlert)
+        #expect(!viewModel.searchConfigAlertMessage.isEmpty)
+        #expect(viewModel.searchConfigAlertMessage.contains("API_KEY"))
     }
 
     @Test("BookSearchViewModel: 총 페이지 조회 성공 시 문자열 반환")
@@ -67,6 +82,22 @@ struct BookSearchViewModelTests {
         let totalPages = await viewModel.fetchBookTotalPages(isbn: "9781234567890")
 
         #expect(totalPages == "0")
+        #expect(!viewModel.showSearchConfigAlert)
+    }
+
+    @Test("BookSearchViewModel: missingAPIKey 총 페이지 조회 실패 시 0 반환 + 설정 알럿 노출")
+    func bookSearch_fetchTotalPages_missingAPIKey_showsConfigAlertAndReturnsZero() async {
+        let provider = BookSearchProviderStub()
+        let useCase = BookSearchUseCase(bookSearchProvider: provider)
+        provider.fetchBookTotalPagesError = BookSearchNetworkError.missingAPIKey
+        let viewModel = BookSearchViewModel(bookSearchUseCase: useCase)
+
+        let totalPages = await viewModel.fetchBookTotalPages(isbn: "9781234567890")
+
+        #expect(totalPages == "0")
+        #expect(viewModel.showSearchConfigAlert)
+        #expect(!viewModel.searchConfigAlertMessage.isEmpty)
+        #expect(viewModel.searchConfigAlertMessage.contains("API_KEY"))
     }
 
     @Test("BookSearchViewModel: 완료 처리 성공 시 선택 책과 페이지 반환")
