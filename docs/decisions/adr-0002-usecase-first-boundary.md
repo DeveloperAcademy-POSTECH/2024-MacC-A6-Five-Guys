@@ -93,7 +93,7 @@ Presentation 계층(ViewModel)은 도메인 실행 경계를 `BookManagementServ
 - 완료: `BookManagementService` 프로토콜과 Preview/Test 어댑터(`PreviewBookManagementService`, `BookManagementServiceStub`)를 제거해 전체 코드 경계를 UseCase 인터페이스로 단일화했다.
 - 완료: action-level `...Using` 프로토콜은 제거하고, Presentation 경계에는 feature-level UseCase 프로토콜만 유지해 과분리를 완화했다.
 - 완료: 테스트 기준도 UseCase 중심으로 전환해 `BookManagementUseCasesTests`가 등록/기록/완독/계획변경 핵심 시나리오를 검증한다.
-- 완료: `MainHomeViewModel`은 인프라(`NotificationManaging`) 직접 의존 없이 `ReadingLibraryUsing.setupNotifications(for:)`를 통해 알림 트리거를 실행한다.
+- 완료: `MainHomeViewModel`은 인프라(`NotificationManaging`) 직접 의존 없이 `HomeNotificationUsing` 경계를 통해 알림 트리거를 실행한다.
 - 완료: `BookSearchViewModel`은 인프라 프로토콜(`BookSearching`) 대신 UseCase 경계(`BookSearchUsing`)를 주입받고, 인프라 연동은 `BookSearchUseCase` 내부로 캡슐화되었다.
 - 완료: 알림 관련 의존 변수명은 `notificationService`로 통일해 `Service` 용어 규칙을 코드 레벨에서 일치시켰다(타입명 `NotificationManager`는 유지).
 - 완료: `BookManagementUseCases.swift` 단일 파일을 기능군 3파일(`Library+Registration`, `Daily+Plan`, `Completion`)로 분리해 feature-level UseCase 경계를 유지하면서 파일 책임을 분명히 했다.

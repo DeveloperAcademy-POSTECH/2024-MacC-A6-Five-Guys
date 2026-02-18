@@ -39,6 +39,51 @@ extension ReadingScheduleCalculatorTests {
         #expect(result.dailyReadingRecords["2025-01-14"]?.targetPages == 100)
     }
 
+    @Test("adjustFutureTargets - 유효 독서일 0일이면 calculationFailed")
+    func adjustFutureTargets_noValidDays_throwsCalculationFailed() {
+        let settings = makeSettings(
+            startPage: 1,
+            targetEndPage: 100,
+            startDate: makeDate("2025-01-10"),
+            targetEndDate: makeDate("2025-01-10"),
+            excludedReadingDays: [makeDate("2025-01-10")]
+        )
+
+        let progress = FGReadingProgress(
+            dailyReadingRecords: [
+                makeDate("2025-01-09").toYearMonthDayString(): ReadingRecord(targetPages: 10, pagesRead: 10)
+            ],
+            lastReadDate: makeDate("2025-01-09"),
+            lastReadPage: 10
+        )
+
+        do {
+            _ = try calculator.adjustFutureTargets(
+                settings: settings,
+                progress: progress,
+                fromDate: makeDate("2025-01-09")
+            )
+            Issue.record("Expected calculationFailed error but succeeded")
+        } catch let error as ScheduleCalculationError {
+            switch error {
+            case .calculationFailed(let underlying):
+                guard let mathError = underlying as? PageMathCalculator.MathError else {
+                    Issue.record("Expected PageMathCalculator.MathError as underlying")
+                    return
+                }
+
+                #expect({
+                    if case .divisionByZero = mathError { return true }
+                    return false
+                }(), "Expected divisionByZero, got \(mathError)")
+            default:
+                Issue.record("Expected calculationFailed, got \(error)")
+            }
+        } catch {
+            Issue.record("Expected ScheduleCalculationError, got \(error)")
+        }
+    }
+
     @Test("rescheduleOnAppOpen - 정상 재분배")
     func rescheduleOnAppOpen_normal() throws {
         let settings = makeSettings(
