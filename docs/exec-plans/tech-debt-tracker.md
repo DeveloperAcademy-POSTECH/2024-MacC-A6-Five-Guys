@@ -12,6 +12,7 @@
   - Date 정책 후속 잔여 -> `TD-007 (Partial)`
   - 독서 UseCase 흐름 리팩토링 유예 -> `TD-031`
   - UI 알럿 인지 E2E 검증 유예 -> `TD-032`
+  - Navigation back 버튼 UI 회귀 자동화 유예 -> `TD-033`
 - 코드 재검증 기준:
   - 본 문서에 남은 항목은 2026-02-18 코드 리뷰 기준 미해결(`Open`/`Partial`)만 포함합니다.
   - 해결 완료 항목은 본 문서에서 제거했고, 이력은 Git 히스토리로 추적합니다.
@@ -223,6 +224,31 @@
   2. E2E에서 설정 누락/일반 오류 경로를 분리 검증
   3. CI 파이프라인에 UITest 스모크 경로를 선택적으로 연결
 
+## TD-033: customNavigationBackButton backBehavior UI 회귀 자동화 부재
+
+- Status: Open
+- Context:
+  - `customNavigationBackButton`의 `backBehavior(.pop/.none)` 분기는 코드와 coordinator 단위 테스트로는 검증되지만, 실제 버튼 탭 기반 UI 시나리오 자동화는 없습니다.
+  - 이번 사이클은 UITest 타깃 신설 없이 문서/단위 테스트 경계 정렬을 우선 적용합니다.
+- Risk:
+  - 버튼 바인딩/화면 이동 분기 회귀가 발생해도 단위 테스트만으로는 실제 UI 탭 동작 실패를 즉시 감지하지 못할 수 있습니다.
+- Target Layer:
+  - `Presentation/View` back 탭 사용자 흐름 E2E 검증 경계
+- Trigger Condition:
+  - back 동작 회귀 제보, 릴리스 전 UI 회귀 점검 강화 필요, UITest 인프라 준비 시
+- Priority:
+  - P3
+- Current Evidence:
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Presentation/Shared/CustomBackButton.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Presentation/View/BookCompletion/CompletionReviewView.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyesTests/Presentation/ViewModel/NavigationCoordinatorTests.swift`
+- Deferred Decision (2026-02-18):
+  - 이번 사이클은 UITest를 범위에서 제외하고 문서화 + 단위 테스트 경계로 유지한다.
+- Suggested Follow-up:
+  1. `popToRootOnBack=true` 경로에서 back 1회 탭 시 root 1회 복귀를 E2E로 검증
+  2. 일반 경로에서 back 1회 탭 시 one-step pop을 E2E로 검증
+  3. 더블 탭 시 동일 화면 중복 진입 차단을 E2E로 검증
+
 ## Recommended Execution Order
 
 1. TD-015: 야간 알림 시간 상수 유효 범위 이탈 (P1)
@@ -234,3 +260,4 @@
 7. TD-031: 독서 UseCase 내부 흐름 리팩토링 유예 항목 (P3)
 8. TD-029: Analytics 경계 분리 (P3)
 9. TD-032: BookSearch 설정 Alert 사용자 인지 경로 UITest 보강 (P3)
+10. TD-033: Navigation back 버튼 분기 UI 회귀 자동화 보강 (P3)
