@@ -7,6 +7,18 @@
 
 import SwiftUI
 
+enum ScreenRouteKey: Hashable {
+    case mainHome
+    case notiSetting
+    case bookSettingsManager
+    case totalCalendar
+    case dailyProgress
+    case completionCelebration
+    case completionReviewUpdate
+    case readingDateEdit
+    case unfinishReading
+}
+
 enum Screens: Hashable {
     case mainHome
     case notiSetting(book: FGUserBook?)
@@ -17,13 +29,36 @@ enum Screens: Hashable {
     case completionReviewUpdate(book: FGUserBook, popToRootOnBack: Bool)
     case readingDateEdit(book: FGUserBook)
     case unfinishReading(book: FGUserBook)
+
+    var routeKey: ScreenRouteKey {
+        switch self {
+        case .mainHome:
+            return .mainHome
+        case .notiSetting:
+            return .notiSetting
+        case .bookSettingsManager:
+            return .bookSettingsManager
+        case .totalCalendar:
+            return .totalCalendar
+        case .dailyProgress:
+            return .dailyProgress
+        case .completionCelebration:
+            return .completionCelebration
+        case .completionReviewUpdate:
+            return .completionReviewUpdate
+        case .readingDateEdit:
+            return .readingDateEdit
+        case .unfinishReading:
+            return .unfinishReading
+        }
+    }
 }
 
 @Observable
 @MainActor
 final class NavigationCoordinator {
     private let appDependencies: AppDependencies
-    var paths = NavigationPath()
+    var paths: [Screens] = []
     private(set) var viewReloadTrigger = UUID()
 
     init(appDependencies: AppDependencies) {
@@ -112,16 +147,36 @@ final class NavigationCoordinator {
         }
     }
 
-    func push(_ screen: Screens) {
+    @discardableResult
+    func push(_ screen: Screens, allowDuplicateRoute: Bool = false) -> Bool {
+        if !allowDuplicateRoute,
+           let topScreen = paths.last,
+           topScreen.routeKey == screen.routeKey {
+            return false
+        }
+
         paths.append(screen)
+        return true
     }
 
-    func pop() {
+    @discardableResult
+    func pop() -> Bool {
+        guard !paths.isEmpty else {
+            return false
+        }
+
         paths.removeLast()
+        return true
     }
 
-    func popToRoot() {
-        paths.removeLast(paths.count)
+    @discardableResult
+    func popToRoot() -> Bool {
+        guard !paths.isEmpty else {
+            return false
+        }
+
+        paths.removeAll()
+        return true
     }
 
     func reloadView() {

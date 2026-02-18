@@ -7,14 +7,22 @@
 
 import SwiftUI
 
+enum BackNavigationBehavior {
+    case pop
+    case none
+}
+
 struct CustomBackButton: View {
-    @Environment(\.presentationMode) private var presentationMode: Binding<PresentationMode>
+    @Environment(NavigationCoordinator.self) private var navigationCoordinator
     var action: (() -> Void)? // 추가 액션을 위한 옵셔널 클로저
+    var backBehavior: BackNavigationBehavior = .pop
 
     var body: some View {
         Button {
             action?() // 액션이 있으면 실행
-            presentationMode.wrappedValue.dismiss()
+            if backBehavior == .pop {
+                _ = navigationCoordinator.pop()
+            }
         } label: {
             Image(systemName: "chevron.left")
                 .resizable()
@@ -26,13 +34,17 @@ struct CustomBackButton: View {
 
 struct NavigationBackButtonModifier: ViewModifier {
     var action: (() -> Void)? // 추가 액션
+    var backBehavior: BackNavigationBehavior = .pop
 
     func body(content: Content) -> some View {
         content
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    CustomBackButton(action: action)
+                    CustomBackButton(
+                        action: action,
+                        backBehavior: backBehavior
+                    )
                 }
             }
             .navigationBarBackButtonHidden(true)
@@ -40,8 +52,16 @@ struct NavigationBackButtonModifier: ViewModifier {
 }
 
 extension View {
-    func customNavigationBackButton(action: (() -> Void)? = nil) -> some View {
-        self.modifier(NavigationBackButtonModifier(action: action))
+    func customNavigationBackButton(
+        action: (() -> Void)? = nil,
+        backBehavior: BackNavigationBehavior = .pop
+    ) -> some View {
+        self.modifier(
+            NavigationBackButtonModifier(
+                action: action,
+                backBehavior: backBehavior
+            )
+        )
     }
 }
 
@@ -50,4 +70,5 @@ extension View {
         Color.red
             .customNavigationBackButton()
     }
+    .environment(PreviewSupport.makeCoordinator())
 }

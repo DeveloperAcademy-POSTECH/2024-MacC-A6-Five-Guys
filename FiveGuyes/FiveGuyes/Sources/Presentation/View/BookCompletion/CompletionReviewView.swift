@@ -88,7 +88,7 @@ struct CompletionReviewView: View {
             if popToRootOnBack {
                 navigationCoordinator.popToRoot()
             }
-        })
+        }, backBehavior: popToRootOnBack ? .none : .pop)
         .onAppear {
             viewModel.preloadReview(userBook.completionStatus.reviewAfterCompletion)
             isFocusedTextEditor = true

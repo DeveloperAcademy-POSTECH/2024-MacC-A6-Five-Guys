@@ -142,6 +142,7 @@ struct MultiBookProgressView: View {
             today: today
         )
     }
+    .environment(PreviewSupport.makeCoordinator())
 }
 
 #Preview("한 권 진행 중") {
@@ -152,5 +153,6 @@ struct MultiBookProgressView: View {
             today: today
         )
     }
+    .environment(PreviewSupport.makeCoordinator())
 }
 #endif
