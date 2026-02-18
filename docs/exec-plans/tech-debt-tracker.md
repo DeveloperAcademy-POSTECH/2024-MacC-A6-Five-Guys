@@ -10,8 +10,8 @@
 - 최근 반영 매핑:
   - Presentation 경쟁 조건 후속 -> `TD-025`, `TD-026`
   - Date 정책 후속 잔여 -> `TD-007 (Partial)`
-  - API_KEY fatal 유지 결정 -> `TD-030`
   - 독서 UseCase 흐름 리팩토링 유예 -> `TD-031`
+  - UI 알럿 인지 E2E 검증 유예 -> `TD-032`
 - 코드 재검증 기준:
   - 본 문서에 남은 항목은 2026-02-18 코드 리뷰 기준 미해결(`Open`/`Partial`)만 포함합니다.
   - 해결 완료 항목은 본 문서에서 제거했고, 이력은 Git 히스토리로 추적합니다.
@@ -168,29 +168,6 @@
   2. Firebase 결합을 Platform 구현체 내부로 제한
   3. 핵심 이벤트 회귀 테스트 경로 추가
 
-## TD-030: API_KEY 누락 시 앱 시작 fatalError로 실패 범위가 확대됨
-
-- Status: Open
-- Context:
-  - `AppDependencies`에서 검색 provider를 즉시 생성하고, `API_KEY` 누락 시 `fatalError`가 발생합니다.
-- Risk:
-  - 검색 기능 오류가 앱 런치 실패로 확대됩니다.
-- Target Layer:
-  - App Composition Root 검색 의존성 생성 시점 경계
-- Trigger Condition:
-  - 검색/DI 리팩터링, 안정화 작업
-- Priority:
-  - P2
-- Current Evidence:
-  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/App/AppDependencies.swift`
-  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Platform/BookSearch/AladinBookSearchProvider.swift`
-- Deferred Decision (2026-02-18):
-  - 이번 사이클은 fatal 동작 유지(코드 변경 보류)
-- Suggested Follow-up:
-  1. lazy/feature-entry 생성으로 실패 범위 축소
-  2. recoverable error + UI 안내 경로 도입
-  3. API_KEY 누락 회귀 테스트 추가
-
 ## TD-031: 독서 UseCase 내부 분기 집중으로 흐름 추적 난이도가 높음
 
 - Status: Open
@@ -219,14 +196,41 @@
   4. 리팩토링 전후 `BookManagementUseCasesDailyReadingTests`와 `ReadingScheduleCalculator*Tests` 동등 통과로 behavior-preserving 검증
   5. 공개 인터페이스(`DailyReadingUsing`, `ReadingPlanUsing`, `ReadingLibraryUsing`, `BookCompletionUsing`, `RecordReadingResult`) 유지
 
+## TD-032: BookSearch 설정 Alert 사용자 인지 경로의 UITest 부재
+
+- Status: Open
+- Context:
+  - BookSearch 설정 누락(`missingAPIKey`) 인지 경로는 ViewModel/Domain/Provider 테스트로 검증되지만, 화면 단 사용자 가시 흐름(E2E UI)은 자동화되지 않았습니다.
+  - 이번 사이클은 UITest 타깃 신설 없이 Swift Testing 도메인 회귀를 우선 적용합니다.
+- Risk:
+  - Alert 바인딩/프레젠테이션 회귀가 발생해도 현재 테스트 세트로는 UI 표시 실패를 즉시 감지하지 못할 수 있습니다.
+- Target Layer:
+  - `Presentation/View` 사용자 인지 흐름(UI Alert 노출) E2E 검증 경계
+- Trigger Condition:
+  - 릴리스 전 UI 회귀 점검 강화가 필요하거나 UITest 인프라가 준비될 때
+- Priority:
+  - P3
+- Current Evidence:
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Presentation/View/BookSetting/BookSearch/BookSearchView.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Presentation/ViewModel/BookSearchViewModel.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyesTests/Domain/UseCase/BookSearchUseCaseTests.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyesTests/Presentation/ViewModel/BookSearchViewModelTests.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyesTests/Platform/BookSearch/AladinBookSearchProviderTests.swift`
+- Deferred Decision (2026-02-18):
+  - 이번 사이클은 Swift Testing 도메인/뷰모델 회귀로 유지하고 UITest는 후속으로 분리합니다.
+- Suggested Follow-up:
+  1. `FiveGuyesUITests` 타깃 신설 후 BookSearch 설정 누락 시 Alert 노출 시나리오 E2E 추가
+  2. E2E에서 설정 누락/일반 오류 경로를 분리 검증
+  3. CI 파이프라인에 UITest 스모크 경로를 선택적으로 연결
+
 ## Recommended Execution Order
 
 1. TD-015: 야간 알림 시간 상수 유효 범위 이탈 (P1)
 2. TD-010: 알림 일괄 등록 권한 체크 중복 제거 (P2)
 3. TD-025: 검색 응답 경쟁으로 최신 결과 역전 (P2)
 4. TD-026: 완료 in-flight 중 선택 변경 불일치 (P2)
-5. TD-030: API_KEY 누락 시 앱 시작 fatalError 확산 (P2)
-6. TD-007: 날짜 키 시맨틱/타입 경계 잔여 정리 (P2, Partial)
-7. TD-022: 컴파일 단 경계 강제 2단계(모듈화) (P3, Partial)
-8. TD-031: 독서 UseCase 내부 흐름 리팩토링 유예 항목 (P3)
-9. TD-029: Analytics 경계 분리 (P3)
+5. TD-007: 날짜 키 시맨틱/타입 경계 잔여 정리 (P2, Partial)
+6. TD-022: 컴파일 단 경계 강제 2단계(모듈화) (P3, Partial)
+7. TD-031: 독서 UseCase 내부 흐름 리팩토링 유예 항목 (P3)
+8. TD-029: Analytics 경계 분리 (P3)
+9. TD-032: BookSearch 설정 Alert 사용자 인지 경로 UITest 보강 (P3)
