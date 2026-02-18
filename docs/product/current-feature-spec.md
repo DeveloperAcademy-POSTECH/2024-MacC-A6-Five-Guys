@@ -2,8 +2,10 @@
 
 이 문서는 **현재 브랜치(HEAD)** 에서 실제 제공되는 피처 계약을 단일 문서로 고정합니다.
 `main` 기준 원본 계약은 `docs/product/past/main-feature-baseline.md`에 보관하고, 본 문서는 현재 브랜치 운영 기준으로 사용합니다.
+`docs/product/past/*` 문서는 이력/비교 기록이며, 현재 운영 계약의 source-of-truth는 본 문서입니다.
 
-기준 브랜치: `bugfix/no-ticket-prestart-redistribution-docs` (`origin/develop@6a01e21` 기반 워킹트리)  
+기준 브랜치: `develop@e9084df`  
+프로덕트 버전: `2026.02.18+e9084df`  
 적용 범위: `FiveGuyes/FiveGuyes/Sources/**`
 
 작성 기준:

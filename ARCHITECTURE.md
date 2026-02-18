@@ -1,5 +1,10 @@
 # FiveGuyes Architecture
 
+문서 메타:
+- 문서 버전: `2026.02.18+e9084df`
+- 프로덕트 기준 버전: `2026.02.18+e9084df (develop HEAD)`
+- 최종 갱신일: `2026-02-18`
+
 이 문서는 자주 기여하는 개발자와 리뷰어를 위한 **안정적인 아키텍처 지도**입니다.
 
 ## 1) Bird's-eye view
@@ -45,7 +50,8 @@ FiveGuyes는 사용자의 책/목표일/목표페이지를 입력받아, 매일 
 - `Domain/`: 엔티티, 서비스 인터페이스, 비즈니스 규칙
 - `Data/`: Repository 구현, SwiftData 스키마/매핑
 - `Platform/`: 알림/분석/시스템 설정/외부 API 같은 OS·네트워크 연동 구현
-- `Util/`: 도메인 계산기가 조합해서 쓰는 순수 계산 유틸리티
+- `Domain/Calculator/`: 도메인 계산기(`ReadingScheduleCalculator`, `DateMathCalculator`, `PageMathCalculator`)
+- `Shared/Extensions/`: Foundation 확장과 날짜/문자열 정규화 유틸리티
 
 주요 컴포넌트:
 
@@ -83,12 +89,12 @@ FiveGuyes는 사용자의 책/목표일/목표페이지를 입력받아, 매일 
 
 **Architecture Invariant: 도서 관리 핵심 도메인 데이터는 `FG*` 타입으로 계층 경계를 넘는다**
 - Rationale: 저장소 기술(SwiftData) 변경 시 UI/도메인 영향 최소화
-- Enforced by: `BookRepository`, `BookManagement` feature-level UseCase 시그니처 (`BookSearch`는 전용 도메인 타입 `BookSearchItem` 사용)
+- Enforced by: `BookRepo`, `BookManagement` feature-level UseCase 시그니처 (`BookSearch`는 전용 도메인 타입 `BookSearchItem` 사용)
 - Violation symptoms: View에서 SwiftData 모델 필드 직접 수정
 
 **Architecture Invariant: SwiftData fetch/save는 Data 계층에서만 수행한다**
 - Rationale: 테스트 가능성과 사이드이펙트 예측 가능성 확보
-- Enforced by: `SwiftDataBookRepository`로 영속성 집중
+- Enforced by: `SwiftDataBookRepo`로 영속성 집중
 - Violation symptoms: View의 `modelContext.insert/save/delete`
 
 **Architecture Invariant: 스케줄 계산 로직은 단일 계산기 경로를 사용한다**
@@ -129,7 +135,7 @@ Boundary A: 도메인 실행 경계 `UseCase` 인터페이스
 - 넘어오는 것: 사용자 액션 의도(등록/기록/완독/삭제/조회)
 - 금지되는 것: SwiftData 모델 객체 자체, View 상태 객체
 
-Boundary B: 영속성 인터페이스 `BookRepository`
+Boundary B: 영속성 인터페이스 `BookRepo`
 - 넘어오는 것: `FGUserBook`, `FGReadingProgress`, `FGUserSetting` 등 Domain 타입
 - 금지되는 것: ViewModel/SwiftUI 상태 객체
 
@@ -142,7 +148,7 @@ Boundary D: 인프라 서비스 경계 (`ReadingNotificationScheduling`, `Notifi
 - 금지되는 것: Presentation 계층에서 직접 시스템 권한/요청 생성, UseCase의 concrete 플랫폼 타입 직접 의존
 
 "only here" 규칙:
-- SwiftData IO는 `Data/RepositoryImpl`에서만 수행
+- SwiftData IO는 `Data/RepoImpl`에서만 수행
 - SwiftData <-> Domain 매핑은 `Data/SwiftData/Extensions`, `Domain/Entity/Extension`에서만 수행
 - 외부 API 호출은 `Platform/BookSearch/AladinBookSearchProvider.swift`(또는 이후 동등 Gateway)에서만 수행
 
@@ -153,10 +159,10 @@ Boundary D: 인프라 서비스 경계 (`ReadingNotificationScheduling`, `Notifi
 - UseCase/화면 경계 테스트: `FiveGuyes/FiveGuyesTests/Presentation/ViewModel/*.swift`
 - UseCase 실행 테스트: `FiveGuyes/FiveGuyesTests/Domain/UseCase/BookManagementUseCases*.swift`, `FiveGuyes/FiveGuyesTests/Domain/UseCase/BookSearchUseCaseTests.swift`
 - 알림/다음 독서 계산 테스트: `FiveGuyes/FiveGuyesTests/Domain/Entity/FGReadingProgressNotificationTests.swift`
-- 저장소 테스트: `FiveGuyes/FiveGuyesTests/Data/Repository/SwiftDataBookRepositoryTests.swift` (In-memory SwiftData)
+- 저장소 테스트: `FiveGuyes/FiveGuyesTests/Data/Repo/SwiftDataBookRepoTests.swift` (In-memory SwiftData)
 
 에러 처리 전략:
-- Data 계층은 `RepositoryError`로 저장소 실패를 표준화
+- Data 계층은 `RepoError`로 저장소 실패를 표준화
 - Domain 계산 실패는 `ScheduleCalculationError`로 래핑
 - Presentation은 도메인 에러를 사용자 액션 단위 메시지로 변환
 
