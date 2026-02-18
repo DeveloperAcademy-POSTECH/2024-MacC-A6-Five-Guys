@@ -22,9 +22,14 @@ final class DailyProgressViewModel {
     private(set) var isSubmitting = false
 
     private let dailyReadingUseCase: any DailyReadingUsing
+    private let bookCompletionUseCase: any BookCompletionUsing
 
-    init(dailyReadingUseCase: any DailyReadingUsing) {
+    init(
+        dailyReadingUseCase: any DailyReadingUsing,
+        bookCompletionUseCase: any BookCompletionUsing
+    ) {
         self.dailyReadingUseCase = dailyReadingUseCase
+        self.bookCompletionUseCase = bookCompletionUseCase
     }
 
     func today() -> Date {
@@ -66,6 +71,10 @@ final class DailyProgressViewModel {
             case .recorded, .dateExtended:
                 return .popToRoot
             case .completed(let updatedBook):
+                try await bookCompletionUseCase.completeBook(
+                    id: bookId,
+                    review: ""
+                )
                 return .completionCelebration(book: updatedBook)
             case .exceedsTarget:
                 showTargetExceededAlert = true

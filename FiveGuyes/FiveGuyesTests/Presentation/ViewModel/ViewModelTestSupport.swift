@@ -229,9 +229,12 @@ final class BookCompletionUseCaseStub: BookCompletionUsing {
 
     var completeBookCallCount = 0
     var updateCompletionReviewCallCount = 0
+    var completeBookInputs: [(id: UUID, review: String)] = []
+    var updateCompletionReviewInputs: [(id: UUID, review: String)] = []
 
     func completeBook(id: UUID, review: String) async throws {
         completeBookCallCount += 1
+        completeBookInputs.append((id: id, review: review))
         if let onCompleteBookStart {
             await onCompleteBookStart()
         }
@@ -246,6 +249,7 @@ final class BookCompletionUseCaseStub: BookCompletionUsing {
 
     func updateCompletionReview(id: UUID, review: String) async throws {
         updateCompletionReviewCallCount += 1
+        updateCompletionReviewInputs.append((id: id, review: review))
         if updateCompletionReviewDelayNanoseconds > 0 {
             try? await Task.sleep(nanoseconds: updateCompletionReviewDelayNanoseconds)
         }

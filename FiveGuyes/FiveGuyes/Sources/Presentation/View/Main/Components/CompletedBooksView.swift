@@ -94,7 +94,12 @@ struct CompletedBooksView: View {
 
                             Menu {
                                 Button {
-                                    navigationCoordinator.push(.completionReviewUpdate(book: completedBooks[safeSelectedIndex]))
+                                    navigationCoordinator.push(
+                                        .completionReviewUpdate(
+                                            book: completedBooks[safeSelectedIndex],
+                                            popToRootOnBack: false
+                                        )
+                                    )
                                 } label: {
                                     Label("내용 수정하기", systemImage: "pencil")
                                 }

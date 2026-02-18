@@ -54,6 +54,52 @@ struct CompletionReviewViewModelTests {
         #expect(bookCompletionUseCase.completeBookCallCount == 0)
     }
 
+    @Test("CompletionReviewViewModel: 수정 모드에서 빈 입력이면 저장 차단")
+    func completionReview_updateMode_emptyReview_showsAlert() async {
+        let book = makeBook(isCompleted: true)
+        let bookCompletionUseCase = BookCompletionUseCaseStub()
+        let viewModel = CompletionReviewViewModel(
+            bookCompletionUseCase: bookCompletionUseCase
+        )
+        viewModel.preloadReview("   ")
+
+        let outcome = await viewModel.submit(
+            userBookId: book.id,
+            isUpdateMode: true
+        )
+
+        if case .none = outcome {
+            #expect(viewModel.showEmptyReviewAlert)
+            #expect(bookCompletionUseCase.updateCompletionReviewCallCount == 0)
+            #expect(bookCompletionUseCase.completeBookCallCount == 0)
+        } else {
+            Issue.record("Expected .none for empty update review")
+        }
+    }
+
+    @Test("CompletionReviewViewModel: 수정 모드에서 개행만 입력이면 저장 차단")
+    func completionReview_updateMode_newlineOnlyReview_showsAlert() async {
+        let book = makeBook(isCompleted: true)
+        let bookCompletionUseCase = BookCompletionUseCaseStub()
+        let viewModel = CompletionReviewViewModel(
+            bookCompletionUseCase: bookCompletionUseCase
+        )
+        viewModel.preloadReview("\n\n")
+
+        let outcome = await viewModel.submit(
+            userBookId: book.id,
+            isUpdateMode: true
+        )
+
+        if case .none = outcome {
+            #expect(viewModel.showEmptyReviewAlert)
+            #expect(bookCompletionUseCase.updateCompletionReviewCallCount == 0)
+            #expect(bookCompletionUseCase.completeBookCallCount == 0)
+        } else {
+            Issue.record("Expected .none for newline-only update review")
+        }
+    }
+
     @Test("CompletionReviewViewModel: 수정 모드에서 updateCompletionReview 호출")
     func completionReview_updateMode_callsUpdateCommand() async {
         let book = makeBook(isCompleted: true)
@@ -71,6 +117,8 @@ struct CompletionReviewViewModelTests {
         if case .popToRoot = outcome {
             #expect(bookCompletionUseCase.updateCompletionReviewCallCount == 1)
             #expect(bookCompletionUseCase.completeBookCallCount == 0)
+            #expect(bookCompletionUseCase.updateCompletionReviewInputs.first?.id == book.id)
+            #expect(bookCompletionUseCase.updateCompletionReviewInputs.first?.review == "수정된 소감")
         } else {
             Issue.record("Expected .popToRoot for update mode")
         }

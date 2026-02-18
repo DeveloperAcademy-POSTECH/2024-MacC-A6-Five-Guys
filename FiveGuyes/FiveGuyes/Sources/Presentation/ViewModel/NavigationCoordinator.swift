@@ -14,8 +14,7 @@ enum Screens: Hashable {
     case totalCalendar(books: [FGUserBook], today: Date)
     case dailyProgress(book: FGUserBook)
     case completionCelebration(book: FGUserBook)
-    case completionReview(book: FGUserBook)
-    case completionReviewUpdate(book: FGUserBook)
+    case completionReviewUpdate(book: FGUserBook, popToRootOnBack: Bool)
     case readingDateEdit(book: FGUserBook)
     case unfinishReading(book: FGUserBook)
 }
@@ -73,7 +72,8 @@ final class NavigationCoordinator {
             DailyProgressView(
                 userBook: book,
                 viewModel: DailyProgressViewModel(
-                    dailyReadingUseCase: appDependencies.dailyReadingUseCase
+                    dailyReadingUseCase: appDependencies.dailyReadingUseCase,
+                    bookCompletionUseCase: appDependencies.bookCompletionUseCase
                 )
             )
         case .completionCelebration(book: let book):
@@ -83,16 +83,10 @@ final class NavigationCoordinator {
                     bookCompletionUseCase: appDependencies.bookCompletionUseCase
                 )
             )
-        case .completionReview(book: let book):
-            CompletionReviewView(
-                userBook: book,
-                viewModel: CompletionReviewViewModel(
-                    bookCompletionUseCase: appDependencies.bookCompletionUseCase
-                )
-            )
-        case .completionReviewUpdate(book: let book):
+        case .completionReviewUpdate(book: let book, popToRootOnBack: let popToRootOnBack):
             CompletionReviewView(
                 isUpdateMode: true,
+                popToRootOnBack: popToRootOnBack,
                 userBook: book,
                 viewModel: CompletionReviewViewModel(
                     bookCompletionUseCase: appDependencies.bookCompletionUseCase
