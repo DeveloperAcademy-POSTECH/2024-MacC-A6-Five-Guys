@@ -7,27 +7,15 @@
 
 import Foundation
 
-enum BookSearchNetworkError: Error, Equatable {
-    case invalidResponse
-    case unexpectedStatusCode(Int)
-}
-
 final class AladinBookSearchProvider: BookSearchProviding {
-    private let apiKey: String
+    private let configuredAPIKey: String?
     private let urlSession: URLSession
 
     private let searchBaseURL = "https://www.aladin.co.kr/ttb/api/ItemSearch.aspx"
     private let lookupBaseURL = "https://www.aladin.co.kr/ttb/api/ItemLookUp.aspx"
 
     init(apiKey: String? = nil, urlSession: URLSession = .shared) {
-        if let apiKey {
-            self.apiKey = apiKey
-        } else {
-            guard let key = Bundle.main.object(forInfoDictionaryKey: "API_KEY") as? String else {
-                fatalError("API 키를 로드하지 못했습니다.")
-            }
-            self.apiKey = key
-        }
+        self.configuredAPIKey = apiKey ?? (Bundle.main.object(forInfoDictionaryKey: "API_KEY") as? String)
         self.urlSession = urlSession
     }
 
@@ -48,6 +36,7 @@ final class AladinBookSearchProvider: BookSearchProviding {
     }
 
     private func makeSearchURL(query: String) throws -> URL {
+        let apiKey = try resolveAPIKey()
         var components = URLComponents(string: searchBaseURL)
         components?.queryItems = [
             URLQueryItem(name: "ttbkey", value: apiKey),
@@ -65,6 +54,7 @@ final class AladinBookSearchProvider: BookSearchProviding {
     }
 
     private func makeLookupURL(isbn: String) throws -> URL {
+        let apiKey = try resolveAPIKey()
         var components = URLComponents(string: lookupBaseURL)
         components?.queryItems = [
             URLQueryItem(name: "ttbkey", value: apiKey),
@@ -89,5 +79,20 @@ final class AladinBookSearchProvider: BookSearchProviding {
         guard (200..<300).contains(httpResponse.statusCode) else {
             throw BookSearchNetworkError.unexpectedStatusCode(httpResponse.statusCode)
         }
+    }
+
+    private func resolveAPIKey() throws -> String {
+        guard let apiKey = configuredAPIKey?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !apiKey.isEmpty,
+              !isUnresolvedPlaceholder(apiKey)
+        else {
+            throw BookSearchNetworkError.missingAPIKey
+        }
+
+        return apiKey
+    }
+
+    private func isUnresolvedPlaceholder(_ value: String) -> Bool {
+        value.hasPrefix("$(") && value.hasSuffix(")")
     }
 }

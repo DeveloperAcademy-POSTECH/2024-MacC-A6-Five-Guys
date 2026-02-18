@@ -2,8 +2,10 @@
 
 이 문서는 **현재 브랜치(HEAD)** 에서 실제 제공되는 피처 계약을 단일 문서로 고정합니다.
 `main` 기준 원본 계약은 `docs/product/past/main-feature-baseline.md`에 보관하고, 본 문서는 현재 브랜치 운영 기준으로 사용합니다.
+`docs/product/past/*` 문서는 이력/비교 기록이며, 현재 운영 계약의 source-of-truth는 본 문서입니다.
 
-기준 브랜치: `bugfix/no-ticket-prestart-redistribution-docs` (`origin/develop@6a01e21` 기반 워킹트리)  
+기준 브랜치: `develop@e9084df`  
+프로덕트 버전: `2026.02.18+e9084df`  
 적용 범위: `FiveGuyes/FiveGuyes/Sources/**`
 
 작성 기준:
@@ -76,7 +78,7 @@ Then:
 
 Given:
 - 사용자가 검색어를 입력할 수 있습니다.
-- 앱 번들에 `API_KEY`가 존재합니다.
+- 앱 번들의 `API_KEY`는 환경에 따라 설정/미설정 상태일 수 있습니다.
 
 When:
 - 검색 실행 후 특정 책을 선택하고 "완료"를 누릅니다.
@@ -88,7 +90,7 @@ Then:
 - 선택한 책 정보를 등록 입력 모델에 저장하고 다음 단계로 이동합니다.
 
 엣지/오류 처리:
-- `API_KEY`가 없으면 즉시 실패(`fatalError`)합니다.
+- `API_KEY`가 없거나 미치환 placeholder(`$(API_KEY)`)이면 검색 호출 시 `BookSearchNetworkError.missingAPIKey`로 실패 처리되고, 검색 화면 Alert로 설정 누락을 안내합니다(앱 런치는 유지).
 - 검색/상세 조회 URL은 `URLComponents`로 구성해 쿼리 인코딩을 보장합니다.
 - HTTP 응답이 2xx가 아니면 명시적 네트워크 오류로 처리합니다.
 - 검색/상세 조회 실패 시 오류 로그를 남기고 총 페이지는 `0`으로 처리합니다.

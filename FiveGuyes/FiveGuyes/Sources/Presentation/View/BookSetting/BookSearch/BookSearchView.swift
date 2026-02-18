@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct BookSearchView: View {
+    private let searchConfigAlertTitle = "검색 설정을 확인해주세요"
+
     @Environment(BookSettingInputModel.self) var bookSettingInputModel: BookSettingInputModel
     @Environment(BookSettingPageModel.self) var pageModel: BookSettingPageModel
 
@@ -18,6 +20,7 @@ struct BookSearchView: View {
     }
 
     var body: some View {
+        @Bindable var bindableViewModel = bookSearchViewModel
 
         BookListView(bookSearchViewModel: bookSearchViewModel)
             .background(Color.Fills.white)
@@ -50,6 +53,14 @@ struct BookSearchView: View {
                     .disabled(bookSearchViewModel.selectedBook == nil
                               || bookSearchViewModel.isCompletingSelection)
                 }
+            }
+            .alert(
+                searchConfigAlertTitle,
+                isPresented: $bindableViewModel.showSearchConfigAlert
+            ) {
+                Button("확인", role: .cancel) {}
+            } message: {
+                Text(bindableViewModel.searchConfigAlertMessage)
             }
             .onAppear {
                 Tracking.Screen.bookSearch.setTracking()

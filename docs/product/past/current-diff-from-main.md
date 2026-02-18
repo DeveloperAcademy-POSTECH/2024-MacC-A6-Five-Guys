@@ -3,6 +3,8 @@
 이 문서는 `docs/product/past/main-feature-baseline.md`(main 계약)를 기준으로,  
 `이전 리팩토링 기준`과 `현재 HEAD`를 함께 비교해 피처 확정 결과를 기록합니다.
 
+> 과거 기록 안내: 이 문서의 `현재 HEAD` 표기는 작성 당시 기준(역사 기록)이며 현재 운영 기준이 아닙니다. 현재 운영 계약은 `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/docs/product/current-feature-spec.md`를 기준으로 하며, 현재 프로덕트 버전은 `2026.02.18+e9084df`입니다.
+
 기준 커밋:
 - `main`: `8f590c55c163266580bfe425477c76849a88feac`
 - `이전 기준`: `1f402295081417fd19f0269b1ea279deca8afae3`

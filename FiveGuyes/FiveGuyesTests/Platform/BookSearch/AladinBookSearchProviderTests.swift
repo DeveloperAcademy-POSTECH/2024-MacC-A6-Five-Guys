@@ -95,6 +95,51 @@ struct AladinBookSearchProviderTests {
         }
     }
 
+    @Test("fetchBooks는 API_KEY가 빈 문자열이면 missingAPIKey 오류를 반환")
+    func aladinProvider_fetchBooks_emptyAPIKey_throwsMissingAPIKey() async throws {
+        let session = makeStubSession(stubID: UUID().uuidString)
+        let provider = AladinBookSearchProvider(apiKey: "", urlSession: session)
+
+        do {
+            _ = try await provider.fetchBooks(query: "테스트")
+            Issue.record("빈 API_KEY에서는 missingAPIKey 오류가 발생해야 합니다.")
+        } catch let error as BookSearchNetworkError {
+            #expect(error == .missingAPIKey)
+        } catch {
+            Issue.record("예상하지 못한 오류 타입: \(error)")
+        }
+    }
+
+    @Test("fetchBookTotalPages는 API_KEY가 공백 문자열이면 missingAPIKey 오류를 반환")
+    func aladinProvider_fetchBookTotalPages_whitespaceAPIKey_throwsMissingAPIKey() async throws {
+        let session = makeStubSession(stubID: UUID().uuidString)
+        let provider = AladinBookSearchProvider(apiKey: "   ", urlSession: session)
+
+        do {
+            _ = try await provider.fetchBookTotalPages(isbn: "9781234567890")
+            Issue.record("공백 API_KEY에서는 missingAPIKey 오류가 발생해야 합니다.")
+        } catch let error as BookSearchNetworkError {
+            #expect(error == .missingAPIKey)
+        } catch {
+            Issue.record("예상하지 못한 오류 타입: \(error)")
+        }
+    }
+
+    @Test("fetchBooks는 미치환 플레이스홀더 API_KEY에서 missingAPIKey 오류를 반환")
+    func aladinProvider_fetchBooks_unresolvedPlaceholderAPIKey_throwsMissingAPIKey() async throws {
+        let session = makeStubSession(stubID: UUID().uuidString)
+        let provider = AladinBookSearchProvider(apiKey: "$(API_KEY)", urlSession: session)
+
+        do {
+            _ = try await provider.fetchBooks(query: "테스트")
+            Issue.record("미치환 플레이스홀더 API_KEY에서는 missingAPIKey 오류가 발생해야 합니다.")
+        } catch let error as BookSearchNetworkError {
+            #expect(error == .missingAPIKey)
+        } catch {
+            Issue.record("예상하지 못한 오류 타입: \(error)")
+        }
+    }
+
     @Test("fetchBookTotalPages는 ItemId를 인코딩해 요청하고 페이지 수를 반환")
     func aladinProvider_fetchBookTotalPages_encodesISBNAndReturnsPageCount() async throws {
         let stubID = UUID().uuidString

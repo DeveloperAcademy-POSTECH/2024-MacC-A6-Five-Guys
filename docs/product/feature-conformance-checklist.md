@@ -1,5 +1,8 @@
 # 확정 명세 기준 코드 적합성 체크리스트 (2026-02-18)
 
+프로덕트 버전(현재 기준): `2026.02.18+e9084df`  
+검증 기준 브랜치: `develop@e9084df`
+
 ## 판정 기준
 
 본 체크리스트는 아래 2개 문서를 조합한 계약을 기준으로 판정한다.
@@ -8,7 +11,7 @@
 2. 확정 오버라이드: `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/docs/product/past/current-diff-from-main.md` 의 `최종 확정 결과 (2026-02-17)`
 
 검증 대상 코드:
-- 커밋/브랜치: `origin/develop@6a01e21` + `bugfix/no-ticket-prestart-redistribution-docs` working tree
+- 커밋/브랜치: `develop@e9084df`
 - 시뮬레이터: `iPhone 17 (iOS 26.2)`
 
 ## 실행 증거
@@ -62,12 +65,12 @@
 | --- | --- | --- | --- | --- | --- |
 | F-01 | 앱 시작 시 컨테이너/루트 네비게이션 초기화 | `FiveGuyes/FiveGuyes/Sources/App/FiveGuyesApp.swift`, `FiveGuyes/FiveGuyes/Sources/App/NavigationRootView.swift` | 전용 자동화 테스트 없음 (정적 확인) | PASS(정적) | UI 스모크 테스트 추가 권장 |
 | F-02 | 홈 대시보드 상태 분기/재분배/알림 트리거 | `FiveGuyes/FiveGuyes/Sources/Presentation/ViewModel/MainHomeViewModel.swift`, `FiveGuyes/FiveGuyes/Sources/Domain/UseCase/BookManagement/LibraryAndRegistrationUseCases.swift` | `MainHomeViewModelTests.*`, `BookManagementUseCasesQueryAndRegistrationTests.testFetchLibrarySnapshot` | PASS | 없음 |
-| F-03 | 검색/선택/총페이지 조회 경로 | `FiveGuyes/FiveGuyes/Sources/Platform/BookSearch/AladinBookSearchProvider.swift`, `FiveGuyes/FiveGuyes/Sources/Domain/UseCase/BookSearch/BookSearchUseCase.swift`, `FiveGuyes/FiveGuyes/Sources/Presentation/ViewModel/BookSearchViewModel.swift` | `AladinBookSearchProviderTests.*`, `BookSearchUseCaseTests.*`, `BookSearchViewModelTests.*` | PASS | 없음 |
+| F-03 | 검색/선택/총페이지 조회 경로 | `FiveGuyes/FiveGuyes/Sources/Platform/BookSearch/AladinBookSearchProvider.swift`, `FiveGuyes/FiveGuyes/Sources/Domain/UseCase/BookSearch/BookSearchUseCase.swift`, `FiveGuyes/FiveGuyes/Sources/Presentation/ViewModel/BookSearchViewModel.swift`, `FiveGuyes/FiveGuyes/Sources/Presentation/View/BookSetting/BookSearch/BookSearchView.swift` | `AladinBookSearchProviderTests.*`, `BookSearchUseCaseTests.*`, `BookSearchViewModelTests.bookSearch_searchBooks_missingAPIKey_showsConfigAlert`, `BookSearchViewModelTests.bookSearch_fetchTotalPages_missingAPIKey_showsConfigAlertAndReturnsZero` | PASS | 없음 |
 | F-04 | 등록 마법사 단계/입력 상태 관리 | `FiveGuyes/FiveGuyes/Sources/Presentation/ViewModel/BookSettingPageModel.swift`, `FiveGuyes/FiveGuyes/Sources/Presentation/ViewModel/BookSettingInputModel.swift` | 전용 자동화 테스트 없음 (정적 확인) | PASS(정적) | 단계 전이/입력 초기화 회귀 테스트 추가 권장 |
 | F-05 | 기간/쉬는날 규칙 및 일일 분량 계산(현재 기기 time zone + 04:00 경계, 설정일 LocalDate key source-of-truth) | `FiveGuyes/FiveGuyes/Sources/Presentation/ViewModel/CalendarCellModel.swift`, `FiveGuyes/FiveGuyes/Sources/Presentation/ViewModel/ReadingDateSettingViewModel.swift`, `FiveGuyes/FiveGuyes/Sources/Domain/Entity/FGUserBook.swift` | `ReadingDateSettingViewModelTests.*`, `DayBoundaryPolicyTests.dayBoundary_respectsInjectedCalendarTimeZone`, `SwiftDataBookRepoTests.testFetchBackfillsLegacyUserSettingsDateKeys` | PASS | 캘린더 셀 상호작용(UI) 회귀 테스트 추가 권장 |
 | F-06 | 등록 완료 시 초기 스케줄/알림 생성 | `FiveGuyes/FiveGuyes/Sources/Presentation/ViewModel/FinishGoalViewModel.swift`, `FiveGuyes/FiveGuyes/Sources/Domain/UseCase/BookManagement/LibraryAndRegistrationUseCases.swift` | `FinishGoalViewModelTests.*`, `BookManagementUseCasesQueryAndRegistrationTests.testRegisterBook`, `BookManagementUseCasesQueryAndRegistrationTests.testRegisterBookWithScheduleCalculation` | PASS | 없음 |
 | F-07 | 일일 독서 기록 분기/재분배/알림 반영(현재 기기 time zone + 04:00 경계). 시작일 이전 기록은 저장하되, 시작일 이전 자동 스케줄을 만들지 않고 시작일부터 재분배 | `FiveGuyes/FiveGuyes/Sources/Presentation/ViewModel/DailyProgressViewModel.swift`, `FiveGuyes/FiveGuyes/Sources/Domain/UseCase/BookManagement/DailyAndPlanUseCases.swift`, `FiveGuyes/FiveGuyes/Sources/Domain/Calculator/ReadingScheduleCalculator.swift` | `DailyProgressViewModelTests.*`, `BookManagementUseCasesDailyReadingTests.testRecordReadingBeforeStartDateRecalculateFromStartDate`, `BookManagementUseCasesDailyReadingTests.testRecordReadingRecalculationFailurePropagatesError`, `ReadingScheduleCalculatorApplyTodayReadingTests.applyTodayReading_beforeStartDate_recalculateFromStartDate`, `ReadingScheduleCalculatorRescheduleTests.adjustFutureTargets_noValidDays_throwsCalculationFailed` | PASS | 없음 |
-| F-10 | 기존 책 목표기간 수정 및 재분배(현재 기기 time zone today 기준, 설정일 비교는 DateKey 기준) | `FiveGuyes/FiveGuyes/Sources/Presentation/ViewModel/ReadingDateEditViewModel.swift`, `FiveGuyes/FiveGuyes/Sources/Domain/UseCase/BookManagement/CompletionUseCases.swift`, `FiveGuyes/FiveGuyes/Sources/Domain/Calculator/ReadingScheduleCalculator.swift` | `ReadingDateEditViewModelTests.*`, `BookManagementUseCasesCompletionAndPlanTests.testUpdateReadingPlan`, `BookManagementUseCasesCompletionAndPlanTests.testUpdateReadingPlanUsesTodayProvider` | PASS | 없음 |
+| F-10 | 기존 책 목표기간 수정 및 재분배(현재 기기 time zone today 기준, 설정일 비교는 DateKey 기준) | `FiveGuyes/FiveGuyes/Sources/Presentation/ViewModel/ReadingDateEditViewModel.swift`, `FiveGuyes/FiveGuyes/Sources/Domain/UseCase/BookManagement/DailyAndPlanUseCases.swift`, `FiveGuyes/FiveGuyes/Sources/Domain/Calculator/ReadingScheduleCalculator.swift` | `ReadingDateEditViewModelTests.*`, `BookManagementUseCasesCompletionAndPlanTests.testUpdateReadingPlan`, `BookManagementUseCasesCompletionAndPlanTests.testUpdateReadingPlanUsesTodayProvider` | PASS | 없음 |
 | F-11 | 앱 재진입 시 자동 재분배(현재 기기 time zone today 기준) | `FiveGuyes/FiveGuyes/Sources/Presentation/ViewModel/MainHomeViewModel.swift`, `FiveGuyes/FiveGuyes/Sources/Domain/UseCase/BookManagement/LibraryAndRegistrationUseCases.swift` | `MainHomeViewModelTests.mainHome_overdueBooks_detectedOnReschedule`, `BookManagementUseCasesQueryAndRegistrationTests.testRescheduleOnAppOpenUsesTodayProvider` | PASS | 없음 |
 | F-16 | 전체 캘린더/주간 진행률 날짜키 정규화(현재 기기 time zone 기반) | `FiveGuyes/FiveGuyes/Sources/Domain/Entity/ReadingDateKey.swift`, `FiveGuyes/FiveGuyes/Sources/Shared/Extensions/Foundation/Date+Extension.swift`, `FiveGuyes/FiveGuyes/Sources/Shared/Extensions/Foundation/String+Extension.swift` | `ReadingDateKeyTests.*`, `DayBoundaryPolicyTests.dayBoundary_respectsInjectedCalendarTimeZone` | PASS | 없음 |
 

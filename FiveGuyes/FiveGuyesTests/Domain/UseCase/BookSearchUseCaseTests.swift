@@ -44,6 +44,22 @@ struct BookSearchUseCaseTests {
         }
     }
 
+    @Test("BookSearchUseCase.fetchBooks는 missingAPIKey 에러를 변환 없이 전파")
+    func bookSearchUseCase_fetchBooks_rethrowsMissingAPIKeyError() async throws {
+        let provider = BookSearchProviderSpy()
+        provider.fetchBooksError = BookSearchNetworkError.missingAPIKey
+        let useCase = BookSearchUseCase(bookSearchProvider: provider)
+
+        do {
+            _ = try await useCase.fetchBooks(query: "설정 오류")
+            Issue.record("missingAPIKey 오류가 그대로 전파되어야 합니다.")
+        } catch let error as BookSearchNetworkError {
+            #expect(error == .missingAPIKey)
+        } catch {
+            Issue.record("예상하지 못한 오류 타입: \(error)")
+        }
+    }
+
     @Test("BookSearchUseCase.fetchBookTotalPages는 provider 값을 반환")
     func bookSearchUseCase_fetchBookTotalPages_returnsProviderResult() async throws {
         let provider = BookSearchProviderSpy()
