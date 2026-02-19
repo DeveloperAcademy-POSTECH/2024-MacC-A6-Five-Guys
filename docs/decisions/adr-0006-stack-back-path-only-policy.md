@@ -2,6 +2,7 @@
 
 - Status: Accepted
 - Date: 2026-02-18
+- Last Updated: 2026-02-19
 - Owners: FiveGuyes team
 
 ## Decision
@@ -14,6 +15,10 @@
 추가로, 빠른 연속 탭으로 같은 화면이 중복 적재되지 않도록 `NavigationCoordinator.push`는 기본적으로 동일 route 연속 push를 차단한다.
 필요한 경우에만 `allowDuplicateRoute: true`로 opt-in 한다.
 
+swipe back 제스처 정책은 `BackSwipePolicy`로 제어하되, `.systemDefault`에서는 `interactivePopGestureRecognizer.isEnabled = (viewControllers.count > 1)`만 적용한다.
+앱 코드에서 `interactivePopGestureRecognizer.delegate`는 교체하지 않는다.
+`.disabled`는 `isEnabled = false`로만 차단한다.
+
 ## Context
 
 이전 구현은 shared back에서 action 실행 후 `dismiss`를 항상 호출했다.
@@ -21,6 +26,25 @@
 현재 루트 stack에서는 항상 재현되지 않지만, 재사용 컨테이너/탭 타이밍에 따라 간헐적인 이중 이동으로 보이는 리스크가 있었다.
 
 또한 push는 호출부별로 직접 실행되어 더블 탭 시 동일 화면 중복 적재 가능성이 남아 있었다.
+
+2026-02-19 점검에서 swipe back 보조 구현(`NavigationSwipeBackPolicyViewController`)이 `interactivePopGestureRecognizer.delegate`를 캡처/복원하는 방어 로직을 포함하고 있음을 확인했다.
+해당 방식은 접근 자체는 가능하지만, stack 단위 공유 제스처 상태에 불필요한 mutable 지점을 늘려 정책 이해/검증 비용을 키울 수 있었다.
+
+## 2026-02-19 Revision: Swipe Back Policy Simplification
+
+초기 접근은 “delegate 캡처/복원 + isEnabled 제어”였다.
+이 접근의 목적은 화면 전환 사이클에서 원래 상태를 보존하려는 방어였다.
+
+이번 개정에서는 swipe back 정책을 `isEnabled` 전용으로 단순화했다.
+즉, `.systemDefault`는 stack depth 기반 허용, `.disabled`는 강제 차단만 수행하고 delegate에는 관여하지 않는다.
+
+이유는 다음과 같다.
+
+- `interactivePopGestureRecognizer`는 `UINavigationController` 소유 프로퍼티로 stack 화면이 공유하는 제스처 상태다.
+- `UIGestureRecognizer.delegate`는 인식 시작 판정에 직접 관여한다.
+- 이번 요구사항(허용/차단)은 `isEnabled`만으로 충분히 충족된다.
+
+따라서 delegate 관여를 제거하는 편이 구현 단순성, 정책 가독성, 회귀 분석 용이성에서 더 안전하다고 판단했다.
 
 ## Options considered
 
@@ -61,7 +85,9 @@ Apple SwiftUI navigation 가이드는 stack 이동을 path/state로 다루는 �
 - `NavigationCoordinator.paths`는 typed path(`[Screens]`)를 사용한다.
 - `NavigationCoordinator.push(_:allowDuplicateRoute:)` 기본값은 `allowDuplicateRoute = false`다.
 - `Screens.routeKey`는 payload와 무관한 route 타입 식별자로 사용한다.
-- `CustomBackButton` 기본 동작은 `coordinator.pop()`이며, 특수 화면은 `backBehavior = .none` + custom action 조합으로 제어한다.
+- `CustomBackButton`은 `backMode`(`.pop`, `.popToRoot`, `.none`)로 stack back 동작을 제어한다.
+- swipe back 제스처는 기본 허용이며, 필요한 화면에서만 `swipeBackPolicy = .disabled`로 비활성화한다.
+- swipe back 정책 구현은 `interactivePopGestureRecognizer.isEnabled`만 제어하고, 앱 코드에서 delegate를 교체하지 않는다.
 - modal dismiss가 필요한 경우, modal 전용 뷰/버튼에서만 `@Environment(\\.dismiss)`를 사용한다.
 
 ## Consequences
@@ -70,6 +96,7 @@ Apple SwiftUI navigation 가이드는 stack 이동을 path/state로 다루는 �
 - back 동작 예측 가능성이 높아지고 간헐적 이중 이동 리스크가 줄어든다.
 - 더블 탭 중복 화면 적재가 coordinator 경계에서 일괄 차단된다.
 - 네비게이션 규칙이 문서/코드/테스트에서 동일 의미로 정렬된다.
+- swipe 정책 구현 복잡도와 분석 지점(delegate 캡처/복원)이 줄어든다.
 
 비용/리스크:
 - 기존에 route 타입 중복 적재를 암묵적으로 허용하던 시나리오는 명시적 opt-in이 필요하다.
@@ -81,5 +108,9 @@ Apple SwiftUI navigation 가이드는 stack 이동을 path/state로 다루는 �
   <https://developer.apple.com/videos/play/wwdc2022/10054/>
 - SwiftUI `dismiss` environment value  
   <https://developer.apple.com/documentation/swiftui/environmentvalues/dismiss>
+- SwiftUI `navigationBarBackButtonHidden(_:)`  
+  <https://developer.apple.com/documentation/swiftui/view/navigationbarbackbuttonhidden(_:)>  
+- UIKit `interactivePopGestureRecognizer`  
+  <https://developer.apple.com/documentation/uikit/uinavigationcontroller/interactivepopgesturerecognizer?language=objc>
 - Apple sample: Food Truck  
   <https://github.com/apple/sample-food-truck>

@@ -16,7 +16,7 @@ This plan follows `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/PL
 - [x] (2026-02-18 17:58Z) `Screens.routeKey`를 도입하고 `push(_:allowDuplicateRoute:)` 기본 정책에서 동일 route 연속 push 차단을 적용했다.
 - [x] (2026-02-18 18:00Z) `pop()`/`popToRoot()`를 crash-free 계약(`Bool` 반환)으로 변경했다.
 - [x] (2026-02-18 18:02Z) `CustomBackButton`에서 `dismiss` 경로를 제거하고 coordinator 기반 `pop` 기본 동작으로 전환했다.
-- [x] (2026-02-18 18:03Z) `CompletionReviewView` 특수 분기를 `backBehavior(.none)` + `popToRoot` action으로 고정했다.
+- [x] (2026-02-18 18:03Z) `CompletionReviewView` 특수 분기를 `backMode(.popToRoot)`로 고정했다.
 - [x] (2026-02-18 18:04Z) `NotiSettingView`, `MultiBookProgressView`, `CustomBackButton` preview에 coordinator 환경을 보강했다.
 - [x] (2026-02-18 18:06Z) `NavigationCoordinatorTests`를 신규 추가해 중복 push 가드와 안전 pop 계약을 검증했다.
 - [x] (2026-02-18 18:08Z) 타깃 자동 테스트(`NavigationCoordinatorTests`, `CompletionReviewViewModelTests`, `DailyProgressViewModelTests`)를 실행해 통과했다.
@@ -86,7 +86,7 @@ This plan follows `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/PL
 
 첫 단계로 coordinator를 typed path로 옮기고 routeKey 기반 중복 push 가드를 추가했습니다. 이 변경으로 화면 이동 정책이 라우팅 경계에 집중됩니다.
 
-둘째 단계로 shared back을 `dismiss` 기반에서 coordinator `pop` 기반으로 교체했습니다. 특수 흐름(완독 소감 편집/작성)의 root 복귀는 `backBehavior(.none)` + action(`popToRoot`) 조합으로 분리했습니다.
+둘째 단계로 shared back을 `dismiss` 기반에서 coordinator `pop` 기반으로 교체했습니다. 특수 흐름(완독 소감 편집/작성)의 root 복귀는 `backMode(.popToRoot)`로 분리했습니다.
 
 셋째 단계로 preview의 coordinator 환경 누락을 보정해 개발/검증 경로를 안정화했습니다.
 
@@ -100,8 +100,8 @@ This plan follows `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/PL
 
 1. 코드 수정
    - `NavigationCoordinator.swift`: typed path, routeKey, push/pop/popToRoot 계약 변경
-   - `CustomBackButton.swift`: dismiss 제거, backBehavior 기반 coordinator pop
-   - `CompletionReviewView.swift`: `backBehavior` 분기 반영
+   - `CustomBackButton.swift`: dismiss 제거, backMode 기반 coordinator pop/popToRoot
+   - `CompletionReviewView.swift`: `backMode` 분기 반영
    - `NotiSettingView.swift`, `MultiBookProgressView.swift`: preview coordinator 주입
 
 2. 테스트 추가
@@ -165,8 +165,8 @@ This plan follows `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/PL
 - `push(_ screen: Screens, allowDuplicateRoute: Bool = false) -> Bool`
 - `pop() -> Bool`
 - `popToRoot() -> Bool`
-- `customNavigationBackButton(action:backBehavior:)`
-- `BackNavigationBehavior` (`.pop`, `.none`)
+- `customNavigationBackButton(action:backMode:swipeBackPolicy:)`
+- `BackNavigationMode` (`.pop`, `.none`, `.popToRoot`)
 
 외부 라이브러리 추가/변경은 없습니다.
 
