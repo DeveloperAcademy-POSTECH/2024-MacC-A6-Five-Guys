@@ -84,11 +84,10 @@ struct CompletionReviewView: View {
                 .alertFontStyle(.title3, weight: .semibold),
                   dismissButton: .default(Text("확인")))
         }
-        .customNavigationBackButton(action: {
-            if popToRootOnBack {
-                navigationCoordinator.popToRoot()
-            }
-        }, backBehavior: popToRootOnBack ? .none : .pop)
+        .customNavigationBackButton(
+            backMode: popToRootOnBack ? .popToRoot : .pop,
+            swipeBackPolicy: popToRootOnBack ? .disabled : .systemDefault
+        )
         .onAppear {
             viewModel.preloadReview(userBook.completionStatus.reviewAfterCompletion)
             isFocusedTextEditor = true

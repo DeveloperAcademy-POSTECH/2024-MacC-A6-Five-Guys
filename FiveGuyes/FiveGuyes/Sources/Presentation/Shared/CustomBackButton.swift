@@ -7,21 +7,32 @@
 
 import SwiftUI
 
-enum BackNavigationBehavior {
+enum BackNavigationMode {
     case pop
+    case popToRoot
     case none
+}
+
+enum BackSwipePolicy {
+    case systemDefault
+    case disabled
 }
 
 struct CustomBackButton: View {
     @Environment(NavigationCoordinator.self) private var navigationCoordinator
     var action: (() -> Void)? // 추가 액션을 위한 옵셔널 클로저
-    var backBehavior: BackNavigationBehavior = .pop
+    var backMode: BackNavigationMode = .pop
 
     var body: some View {
         Button {
             action?() // 액션이 있으면 실행
-            if backBehavior == .pop {
+            switch backMode {
+            case .pop:
                 _ = navigationCoordinator.pop()
+            case .popToRoot:
+                _ = navigationCoordinator.popToRoot()
+            case .none:
+                break
             }
         } label: {
             Image(systemName: "chevron.left")
@@ -34,7 +45,8 @@ struct CustomBackButton: View {
 
 struct NavigationBackButtonModifier: ViewModifier {
     var action: (() -> Void)? // 추가 액션
-    var backBehavior: BackNavigationBehavior = .pop
+    var backMode: BackNavigationMode = .pop
+    var swipeBackPolicy: BackSwipePolicy = .systemDefault
 
     func body(content: Content) -> some View {
         content
@@ -43,23 +55,26 @@ struct NavigationBackButtonModifier: ViewModifier {
                 ToolbarItem(placement: .cancellationAction) {
                     CustomBackButton(
                         action: action,
-                        backBehavior: backBehavior
+                        backMode: backMode
                     )
                 }
             }
             .navigationBarBackButtonHidden(true)
+            .navigationSwipeBackPolicy(swipeBackPolicy)
     }
 }
 
 extension View {
     func customNavigationBackButton(
         action: (() -> Void)? = nil,
-        backBehavior: BackNavigationBehavior = .pop
+        backMode: BackNavigationMode = .pop,
+        swipeBackPolicy: BackSwipePolicy = .systemDefault
     ) -> some View {
         self.modifier(
             NavigationBackButtonModifier(
                 action: action,
-                backBehavior: backBehavior
+                backMode: backMode,
+                swipeBackPolicy: swipeBackPolicy
             )
         )
     }

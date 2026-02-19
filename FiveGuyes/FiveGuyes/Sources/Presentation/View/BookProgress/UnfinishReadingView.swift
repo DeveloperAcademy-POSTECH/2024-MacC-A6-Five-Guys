@@ -54,10 +54,12 @@ struct UnfinishReadingView: View {
 
         }
         .background(Color.Fills.lightGreen.ignoresSafeArea())
-        .disableNavigationGesture()
-        .customNavigationBackButton {
-            markBookAsCompletedInBackground()
-        }
+        .customNavigationBackButton(
+            action: {
+                markBookAsCompletedInBackground()
+            },
+            swipeBackPolicy: .disabled
+        )
     }
 
     private func unfinishTitle(_ text: String) -> some View {
