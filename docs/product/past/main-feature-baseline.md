@@ -29,7 +29,7 @@ When:
 
 Then:
 - 앱은 `ModelContainer`를 생성해 환경에 주입합니다.
-- 루트 라우팅은 `NavigationCoordinator`의 `paths`, `viewReloadTrigger` 상태로 통제됩니다.
+- 루트 라우팅은 `NavigationCoordinator`의 `paths` 상태로 통제됩니다.
 - 초기 화면은 홈(`.mainHome`)으로 렌더링됩니다.
 - 앱 델리게이트에서 Firebase 초기화와 ATT 요청을 수행합니다.
 

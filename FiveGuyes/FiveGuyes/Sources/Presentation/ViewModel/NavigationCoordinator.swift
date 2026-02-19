@@ -59,7 +59,6 @@ enum Screens: Hashable {
 final class NavigationCoordinator {
     private let appDependencies: AppDependencies
     var paths: [Screens] = []
-    private(set) var viewReloadTrigger = UUID()
 
     init(appDependencies: AppDependencies) {
         self.appDependencies = appDependencies
@@ -177,13 +176,5 @@ final class NavigationCoordinator {
 
         paths.removeAll()
         return true
-    }
-
-    func reloadView() {
-        viewReloadTrigger = UUID()
-    }
-
-    func getViewReloadTrigger() -> UUID {
-        viewReloadTrigger
     }
 }
