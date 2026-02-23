@@ -114,7 +114,7 @@ FiveGuyes는 사용자의 책/목표일/목표페이지를 입력받아, 매일 
 
 **Architecture Invariant: Stack back 이동은 `NavigationCoordinator` path 명령(`pop`/`popToRoot`)만 사용한다**
 - Rationale: 스택 경로 제어와 presentation dismiss 책임을 분리해 컨테이너 재사용 시 의도치 않은 상위 dismiss를 방지한다
-- Enforced by: `NavigationCoordinator.paths: [Screens]` + `CustomBackButton`의 coordinator 기반 back + ADR-0006 정책
+- Enforced by: `NavigationCoordinator.paths: [NavigationPathItem]` + `CustomBackButton`의 coordinator 기반 back + ADR-0006 정책
 - Violation symptoms: 한 back 액션에서 `dismiss`와 `pop`이 혼용되어 화면이 간헐적으로 두 단계 이상 닫힘
 
 **Architecture Invariant: `customNavigationBackButton`는 스택 전용 계약으로 사용한다**

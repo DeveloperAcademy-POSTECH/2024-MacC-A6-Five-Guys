@@ -251,13 +251,17 @@
 
 ## TD-034: Main 강제 리로드 워크어라운드와 스택 back 간헐 실패 상관 이슈
 
-- Status: Partial (2026-02-19)
+- Status: Partial (2026-02-20)
 - Fix Required: Remaining
 - Context:
   - 증상: back 버튼 탭 액션은 보이나 pop이 즉시 일어나지 않는 케이스가 간헐적으로 관측됩니다.
   - 영향 화면: 알림 설정, 책 등록 관리자(사용자 관측).
   - 2026-02-19 완화 조치: `viewReloadTrigger`, `reloadView()`, `getViewReloadTrigger()`를 제거했습니다.
   - 2026-02-19 2차 완화 조치: swipe back 정책에서 `interactivePopGestureRecognizer.delegate` 관여를 제거하고 `isEnabled`만 depth 기반으로 제어하도록 단순화했습니다.
+  - 2026-02-20 3차 완화 조치: route 기본 정책 + top override를 `NavigationCoordinator`에서 계산하고, root 단일 host에서만 swipe 정책을 적용하도록 중앙화했습니다.
+  - 2026-02-20 4차 완화 조치: legacy 호출부(`CompletionReviewView`, `UnfinishReadingView`, `CompletionCelebrationView`)의 no-op/레거시 인자 사용을 제거하고 중앙 정책 호출만 남겼습니다.
+  - 2026-02-20 5차 정리: `customNavigationBackButton(action:backMode:swipeBackPolicy:)` 오버로드를 제거하고 `customNavigationBackButton(action:)` 단일 API로 정리했습니다.
+  - 2026-02-20 테스트 보강: `NavigationCoordinatorTests`에 정책/override 경계 케이스를 추가해 회귀 감시 범위를 확장했습니다.
   - 조치 후 관측: 화면 렌더링/백 동작 체감은 개선됐지만, 잔여 간헐 증상은 남아 있습니다.
   - 현재 판단: 강제 리로드 워크어라운드는 back 간헐 실패의 유력 원인(가설) 또는 기여 요인으로 관리하며, 원인 확정은 후속 RCA로 분리합니다.
 - Risk:
@@ -270,11 +274,17 @@
   - P2
 - Current Evidence:
   - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Presentation/ViewModel/NavigationCoordinator.swift` (리로드 트리거 제거 반영)
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/App/NavigationRootView.swift` (`navigationRootBackHost()` 기반 root host 부착)
   - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Presentation/View/Main/MainHomeView.swift` (강제 리로드 호출 부재)
-  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Presentation/Shared/CustomBackButton.swift`
-  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Presentation/Shared/Extensions/View+NavigationSwipeBackPolicy.swift` (delegate 무관여 + `isEnabled` 기반 정책 반영)
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Presentation/Shared/CustomBackButton.swift` (`customNavigationBackButton(action:)` 단일 API)
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Presentation/Shared/Navigation/NavigationInteractivePopHost.swift` (root 단일 swipe 정책 적용)
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Presentation/Shared/Extensions/View+NavigationSwipeBackPolicy.swift` (화면별 UIKit 제어 제거)
   - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Presentation/View/BookSetting/BookSettingsManagerView.swift`
-  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/docs/decisions/adr-0006-stack-back-path-only-policy.md` (2026-02-19 개정: 초기 설계 대비 단순화 근거)
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Presentation/View/BookCompletion/CompletionReviewView.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Presentation/View/BookProgress/UnfinishReadingView.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Presentation/View/BookCompletion/CompletionCelebrationView.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyesTests/Presentation/ViewModel/NavigationCoordinatorTests.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/docs/decisions/adr-0006-stack-back-path-only-policy.md` (2026-02-20 개정: route + dynamic override 중앙화 근거)
   - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/docs/product/current-feature-spec.md`
   - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/docs/product/past/main-feature-baseline.md`
   - 사용자 관측 메모(2026-02-19): "기존 대비 개선, 잔여 간헐 존재"

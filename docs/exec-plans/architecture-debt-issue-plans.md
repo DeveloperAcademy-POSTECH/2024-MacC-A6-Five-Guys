@@ -23,6 +23,9 @@ This plan follows `/Users/zaehorang/.codex/PLANS.md` and is executed with `/User
 - [x] (2026-02-19 08:17Z) TD-034 신규 등록: 강제 리로드 제거 이후 개선 관측을 유력 원인(가설)로 문서화하고, 원인 확정은 후속 RCA로 분리하기로 결정.
 - [x] (2026-02-19 10:05Z) TD-034 2차 완화 반영: swipe back 정책을 delegate 관여 없이 `isEnabled` depth 제어로 단순화하고 ADR-0006/tracker 근거를 동기화.
 - [x] (2026-02-19 16:37Z) TD-034 검증 반영: `xcodebuild ... build` 성공으로 컴파일 회귀 없음 확인(`** BUILD SUCCEEDED **`).
+- [x] (2026-02-20 11:05Z) TD-034 3차 완화 반영: route 기본 정책 + top override를 coordinator로 중앙화하고 root 단일 host에서 swipe 정책 적용.
+- [x] (2026-02-20 16:20Z) TD-034 4차 완화 반영: legacy back 호출부/no-op modifier를 정리하고 `NavigationCoordinatorTests` 정책 경계 케이스를 보강.
+- [x] (2026-02-20 21:45Z) TD-034 5차 정리 반영: `customNavigationBackButton` 레거시 오버로드 제거 + `navigationRootBackHost()` 네이밍 모디파이어 적용.
 - [ ] Remaining: TD-015, TD-010, TD-034(back 간헐 재현 계측 + RCA), TD-007 잔여(typed key adapter + settings legacy Date 제거 마이그레이션), TD-022 Stage 2(모듈화 스파이크/분리 로드맵), TD-029 analytics 경계 분리.
 
 ## Surprises & Discoveries
@@ -44,6 +47,12 @@ This plan follows `/Users/zaehorang/.codex/PLANS.md` and is executed with `/User
 
 - Observation: 정적 검색에서 swipe 정책 확장 파일 기준 delegate 직접 할당 문자열이 더 이상 검색되지 않습니다.
   Evidence: `rg -n "interactivePopGestureRecognizer\\.delegate|baselineGesture|captureBaselineIfNeeded|restoreBaselineIfNeeded" .../View+NavigationSwipeBackPolicy.swift` 결과 0건.
+
+- Observation: swipe 정책 적용 지점을 root 단일 host로 이동하면서, 화면별 UIKit 제스처 접근 경로가 제거되었습니다.
+  Evidence: `NavigationInteractivePopHost.swift` 신규 도입 + `View+NavigationSwipeBackPolicy.swift` no-op 전환.
+
+- Observation: legacy 인자/no-op 호출 지점을 정리하면서 화면 코드의 정책 소스가 `NavigationCoordinator` 단일 경로로 수렴했습니다.
+  Evidence: `CompletionReviewView.swift`/`UnfinishReadingView.swift`에서 legacy 인자 제거, `CompletionCelebrationView.swift`의 `disableNavigationGesture()` 호출 제거.
 
 ## Decision Log
 
@@ -87,6 +96,14 @@ This plan follows `/Users/zaehorang/.codex/PLANS.md` and is executed with `/User
   Rationale: 이번 범위의 목표(허용/차단)는 isEnabled만으로 충족되며, delegate 관여 지점을 줄여 회귀 분석과 정책 이해 비용을 낮추기 위함이다.
   Date/Author: 2026-02-19 / Codex
 
+- Decision: swipe 정책의 UIKit 적용 책임은 root 단일 host(`NavigationInteractivePopHost`)로 고정하고, 화면 파일에서 UIKit 제어를 금지한다.
+  Rationale: stack 공유 상태 변경 지점을 1곳으로 제한하면 정책 누수/생명주기 타이밍 충돌을 줄이고 RCA 가시성을 높일 수 있다.
+  Date/Author: 2026-02-20 / Codex
+
+- Decision: `customNavigationBackButton`는 `action` 단일 시그니처로 고정하고, 레거시 오버로드는 제거한다.
+  Rationale: 무시되는 인자를 남겨두면 정책 소스를 오해하기 쉬워서, API 계약을 코드 구조와 동일하게 맞추기 위함이다.
+  Date/Author: 2026-02-20 / Codex
+
 ## Outcomes & Retrospective
 
 이번 사이클에서 이슈 상태는 다음과 같이 업데이트되었습니다.
@@ -97,8 +114,10 @@ This plan follows `/Users/zaehorang/.codex/PLANS.md` and is executed with `/User
 4. 이번 사이클에서 TD-027은 실행일 완료 정책 확정, TD-028은 구조적 진단 로깅 적용으로 Closed 처리했다.
 5. 이번 사이클에서 TD-034를 Partial로 신규 등록했고, 강제 리로드 워크어라운드는 back 간헐 실패의 유력 원인(가설)로 관리한다.
 6. 잔여 우선순위: TD-015(P1) -> TD-010(P2) -> TD-034(P2 Partial) -> TD-007 잔여(P2 Partial, Date 필드 제거 포함) -> TD-022 Stage 2(P3) -> TD-029(P3).
-7. TD-034 후속 완화로 swipe 정책을 delegate 무관여 + depth 기반 `isEnabled` 제어로 단순화했고, 원인 확정은 계속 RCA 분리 원칙을 유지한다.
-8. 컴파일 검증은 `xcodebuild ... build` 성공으로 통과했으며, 화면별 swipe 수동 반복 시나리오는 사용자 검증 단계로 남겨둔다.
+7. TD-034 후속 완화로 swipe 정책을 delegate 무관여 + depth 기반 `isEnabled` 제어로 단순화했고, 2026-02-20에는 route + dynamic override 정책을 root 단일 host 적용 구조로 중앙화했다.
+8. TD-034 4차 완화에서 legacy/no-op 호출 정리와 `NavigationCoordinatorTests` 정책 경계 보강을 반영했다.
+9. TD-034 5차 정리에서 `customNavigationBackButton(action:)` 단일 API 정리와 `navigationRootBackHost()` 네이밍 정합화를 반영했다.
+10. 컴파일 검증은 `xcodebuild ... build` 성공으로 통과했으며, 화면별 swipe 수동 반복 시나리오는 사용자 검증 단계로 남겨둔다.
 
 검증 명령:
 
@@ -150,10 +169,16 @@ architecture-first 리베이스에서 반영한 이슈-코드 매핑은 아래�
 
 - TD-034 (Main 강제 리로드 워크어라운드와 back 간헐 실패 상관 이슈):
   - `FiveGuyes/FiveGuyes/Sources/Presentation/ViewModel/NavigationCoordinator.swift`
+  - `FiveGuyes/FiveGuyes/Sources/App/NavigationRootView.swift`
   - `FiveGuyes/FiveGuyes/Sources/Presentation/View/Main/MainHomeView.swift`
   - `FiveGuyes/FiveGuyes/Sources/Presentation/Shared/CustomBackButton.swift`
+  - `FiveGuyes/FiveGuyes/Sources/Presentation/Shared/Navigation/NavigationInteractivePopHost.swift`
   - `FiveGuyes/FiveGuyes/Sources/Presentation/Shared/Extensions/View+NavigationSwipeBackPolicy.swift`
   - `FiveGuyes/FiveGuyes/Sources/Presentation/View/BookSetting/BookSettingsManagerView.swift`
+  - `FiveGuyes/FiveGuyes/Sources/Presentation/View/BookCompletion/CompletionReviewView.swift`
+  - `FiveGuyes/FiveGuyes/Sources/Presentation/View/BookProgress/UnfinishReadingView.swift`
+  - `FiveGuyes/FiveGuyes/Sources/Presentation/View/BookCompletion/CompletionCelebrationView.swift`
+  - `FiveGuyes/FiveGuyesTests/Presentation/ViewModel/NavigationCoordinatorTests.swift`
   - `docs/decisions/adr-0006-stack-back-path-only-policy.md`
   - `docs/product/current-feature-spec.md`
   - `docs/product/past/main-feature-baseline.md`
@@ -235,3 +260,6 @@ Plan revision note (2026-02-17): Rebased from bug-first 기록 to architecture-f
 Plan revision note (2026-02-17): Added TD-007 settings LocalDate stabilization sync (parallel DateKey fields, legacy backfill, ADR-0005).
 Plan revision note (2026-02-19): Added TD-034 swipe policy simplification sync (delegate non-interference + isEnabled-only depth policy) and aligned tracker/ADR evidence links.
 Plan revision note (2026-02-19): Added TD-034 validation notes (static grep + `xcodebuild build` success) and kept manual swipe regression as remaining RCA input.
+Plan revision note (2026-02-20): Added TD-034 route + dynamic override centralization sync (root host single-point swipe policy application).
+Plan revision note (2026-02-20): Added TD-034 stage-2 cleanup sync (legacy/no-op call-site cleanup + NavigationCoordinator policy test hardening).
+Plan revision note (2026-02-20): Added TD-034 final polish sync (legacy back overload removal + root modifier naming alignment).

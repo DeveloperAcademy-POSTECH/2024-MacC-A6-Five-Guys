@@ -2,7 +2,7 @@
 
 - Status: Accepted
 - Date: 2026-02-18
-- Last Updated: 2026-02-19
+- Last Updated: 2026-02-20
 - Owners: FiveGuyes team
 
 ## Decision
@@ -15,9 +15,10 @@
 추가로, 빠른 연속 탭으로 같은 화면이 중복 적재되지 않도록 `NavigationCoordinator.push`는 기본적으로 동일 route 연속 push를 차단한다.
 필요한 경우에만 `allowDuplicateRoute: true`로 opt-in 한다.
 
-swipe back 제스처 정책은 `BackSwipePolicy`로 제어하되, `.systemDefault`에서는 `interactivePopGestureRecognizer.isEnabled = (viewControllers.count > 1)`만 적용한다.
-앱 코드에서 `interactivePopGestureRecognizer.delegate`는 교체하지 않는다.
-`.disabled`는 `isEnabled = false`로만 차단한다.
+swipe back 제스처 정책은 화면별 UIKit 제어 대신 `NavigationCoordinator` 계산값으로 중앙화한다.
+즉, `Screens.defaultBackPolicy`를 기준으로 `effectiveTopPolicy`를 계산하고,
+`NavigationRootView`에 단일 attach된 `NavigationInteractivePopHost`에서만 `interactivePopGestureRecognizer` 상태를 적용한다.
+화면 파일에서는 `interactivePopGestureRecognizer`를 직접 제어하지 않는다.
 
 ## Context
 
@@ -27,8 +28,8 @@ swipe back 제스처 정책은 `BackSwipePolicy`로 제어하되, `.systemDefaul
 
 또한 push는 호출부별로 직접 실행되어 더블 탭 시 동일 화면 중복 적재 가능성이 남아 있었다.
 
-2026-02-19 점검에서 swipe back 보조 구현(`NavigationSwipeBackPolicyViewController`)이 `interactivePopGestureRecognizer.delegate`를 캡처/복원하는 방어 로직을 포함하고 있음을 확인했다.
-해당 방식은 접근 자체는 가능하지만, stack 단위 공유 제스처 상태에 불필요한 mutable 지점을 늘려 정책 이해/검증 비용을 키울 수 있었다.
+2026-02-19~2026-02-20 점검에서 swipe back 보조 구현이 화면별로 분산 적용되면, 정책 누수/적용 타이밍 차이로 간헐 증상 분석이 어려워진다는 점을 확인했다.
+특히 route별 금지/허용 정책과 뷰 생명주기 기반 UIKit 접근이 섞이면 회귀 원인 추적이 복잡해진다.
 
 ## 2026-02-19 Revision: Swipe Back Policy Simplification
 
@@ -45,6 +46,32 @@ swipe back 제스처 정책은 `BackSwipePolicy`로 제어하되, `.systemDefaul
 - 이번 요구사항(허용/차단)은 `isEnabled`만으로 충분히 충족된다.
 
 따라서 delegate 관여를 제거하는 편이 구현 단순성, 정책 가독성, 회귀 분석 용이성에서 더 안전하다고 판단했다.
+
+## 2026-02-20 Revision: Root-Central Route + Fixed Screen Policy
+
+초기 개선 이후에도 간헐 증상 분석 비용이 컸기 때문에, swipe 정책 적용 지점을 root 단일 host로 중앙화했다.
+
+최종 구조는 다음과 같다.
+
+- route 기본 정책: `Screens.defaultBackPolicy`
+- 기본 back 정책 상수: `NavigationBackPolicy.standard` (`pop + systemDefault + showsBackButton=true`)
+- 최종 정책: `NavigationCoordinator.effectiveTopPolicy` (top route 기본 정책)
+- 적용 지점: `NavigationInteractivePopHost`(root 1곳)
+
+추가로 custom back UI는 유지하되, 버튼 동작은 화면 파라미터가 아니라 `effectiveTopPolicy.backMode`를 읽어 수행한다.
+따라서 화면별 `swipeBackPolicy`/UIKit 직접 제어 없이도 금지/허용 정책을 일관되게 적용할 수 있다.
+
+## 2026-02-20 Revision: Stage-2 Compatibility Cleanup
+
+중앙화 이후 호출부 호환 잔재를 줄이기 위해 다음을 반영했다.
+
+- `customNavigationBackButton(action:backMode:swipeBackPolicy:)` 오버로드를 제거하고, `customNavigationBackButton(routeKey:beforeBackAction:onStepPopExitAction:)` 단일 API(모든 인자 optional)로 정리했다.
+- 화면 호출부는 기본 경로에서 `customNavigationBackButton()`을 사용하고, 특수 back 훅이 필요한 화면만 `routeKey`/hook 인자를 전달한다.
+- `disableNavigationGesture()`/`navigationSwipeBackPolicy(_:)` 호환 레이어와 관련 파일을 제거하고, 호출부는 `customNavigationBackButton` + root host(`navigationRootBackHost()`) 기준으로 정리했다.
+- `NavigationRootView`는 루트 전용 모디파이어(`navigationRootBackHost()`)로 host 부착 의도를 명시한다.
+- `NavigationCoordinatorTests`에 route 기본 정책, `bookSettingsManager` 고정 swipe 비활성, `isInteractivePopEnabled` 경계 테스트를 추가했다.
+
+목표는 API 단절 없이 오해를 줄이고, 중앙 정책 회귀를 테스트로 고정하는 것이다.
 
 ## Options considered
 
@@ -82,12 +109,14 @@ Apple SwiftUI navigation 가이드는 stack 이동을 path/state로 다루는 �
 
 ## Guardrails
 
-- `NavigationCoordinator.paths`는 typed path(`[Screens]`)를 사용한다.
+- `NavigationCoordinator.paths`는 typed path(`[NavigationPathItem]`)를 사용한다.
 - `NavigationCoordinator.push(_:allowDuplicateRoute:)` 기본값은 `allowDuplicateRoute = false`다.
 - `Screens.routeKey`는 payload와 무관한 route 타입 식별자로 사용한다.
-- `CustomBackButton`은 `backMode`(`.pop`, `.popToRoot`, `.none`)로 stack back 동작을 제어한다.
-- swipe back 제스처는 기본 허용이며, 필요한 화면에서만 `swipeBackPolicy = .disabled`로 비활성화한다.
-- swipe back 정책 구현은 `interactivePopGestureRecognizer.isEnabled`만 제어하고, 앱 코드에서 delegate를 교체하지 않는다.
+- `Screens.defaultBackPolicy`는 `NavigationBackPolicy.standard`를 기본값으로 사용하고, 예외 route만 별도 정책을 선언한다.
+- `bookSettingsManager`는 기본 정책에서 swipe를 비활성화하고, page2~5의 단계 롤백은 `beforeBackAction`으로 처리한다.
+- `customNavigationBackButton(routeKey:beforeBackAction:onStepPopExitAction:)`는 `CustomBackButton`을 통해 `NavigationCoordinator.effectiveTopPolicy.backMode` 기준으로 stack back 동작을 제어하며, 필요 시 화면별 hook(`beforeBackAction`/`onStepPopExitAction`)을 연결한다.
+- `NavigationRootView`는 `navigationRootBackHost()`로 root host를 부착한다.
+- `interactivePopGestureRecognizer` 접근은 `NavigationInteractivePopHost`로 제한하고, 화면별 UIKit 제어 코드는 두지 않는다.
 - modal dismiss가 필요한 경우, modal 전용 뷰/버튼에서만 `@Environment(\\.dismiss)`를 사용한다.
 
 ## Consequences
