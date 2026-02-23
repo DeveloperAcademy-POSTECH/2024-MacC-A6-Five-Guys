@@ -16,8 +16,6 @@ enum BookSettingsPage: Int {
 }
 
 struct BookSettingsManagerView: View {
-    @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
-
     @State private var viewModel: BookSettingsManagerViewModel
     @State private var bookSearchViewModel: BookSearchViewModel
     @State private var finishGoalViewModel: FinishGoalViewModel
@@ -63,37 +61,27 @@ struct BookSettingsManagerView: View {
         .background(Color.Fills.white)
         .navigationTitle("완독할 책 추가하기")
         .navigationBarTitleDisplayMode(.inline)
-        .navigationBarBackButtonHidden(true)
-        .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                Button {
-                    handleBackButton()
-                } label: {
-                    HStack(spacing: 3) {
-                        HStack {
-                            Image(systemName: "chevron.left")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(height: 20)
-                                .tint(Color.Labels.tertiaryBlack3)
-                        }
+        .customNavigationBackButton(
+            routeKey: .bookSettingsManager,
+            beforeBackAction: {
+                // 단계 전환은 이 화면의 로컬 상태(page/input) 책임이므로 뷰에서 처리합니다.
+                if isEditingBookSettingFlow {
+                    clearBookSetting()
+                    withAnimation(.easeOut) {
+                        pageModel.previousPage()
                     }
+                    return .cancel
                 }
+
+                return .proceed
             }
-        }
+        )
         .environment(bookSettingInputModel)
         .environment(pageModel)
     }
 
-    private func handleBackButton() {
-        if pageModel.currentPage > BookSettingsPage.bookSearch.rawValue {
-            clearBookSetting()
-            withAnimation(.easeOut) {
-                pageModel.previousPage()
-            }
-        } else {
-            navigationCoordinator.pop()
-        }
+    private var isEditingBookSettingFlow: Bool {
+        pageModel.currentPage > BookSettingsPage.bookSearch.rawValue
     }
 
     private func clearBookSetting() {

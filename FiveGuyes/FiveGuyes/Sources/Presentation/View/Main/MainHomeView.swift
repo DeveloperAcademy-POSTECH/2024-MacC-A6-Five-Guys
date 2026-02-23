@@ -112,8 +112,6 @@ struct MainHomeView: View {
                 homeMainSection
                     .padding(.bottom, 12)
                     .shadow(color: .black.opacity(0.04), radius: 2, x: 0, y: 4)
-                    .id(navigationCoordinator.getViewReloadTrigger())
-                    .onAppear(perform: navigationCoordinator.reloadView)
 
                 HStack(spacing: 16) {
                     calendarFullScreenButton
@@ -360,7 +358,10 @@ struct MainHomeView: View {
         guard !overdueBooks.isEmpty else { return }
 
         for book in overdueBooks {
-            navigationCoordinator.push(.unfinishReading(book: book))
+            navigationCoordinator.push(
+                .unfinishReading(book: book),
+                allowDuplicateRoute: true
+            )
         }
     }
 

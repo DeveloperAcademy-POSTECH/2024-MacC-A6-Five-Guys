@@ -193,6 +193,7 @@ struct NotiSettingView: View {
             viewModel: makeNotiSettingPreviewViewModel()
         )
     }
+    .environment(PreviewSupport.makeCoordinator())
 }
 
 #Preview("시스템 알림 비활성화") {
@@ -202,6 +203,7 @@ struct NotiSettingView: View {
             viewModel: makeNotiSettingPreviewViewModel(isSystemNotificationEnabled: false)
         )
     }
+    .environment(PreviewSupport.makeCoordinator())
 }
 
 #Preview("리마인드 시간 피커 열림") {
@@ -214,6 +216,7 @@ struct NotiSettingView: View {
             )
         )
     }
+    .environment(PreviewSupport.makeCoordinator())
 }
 
 @MainActor

@@ -112,6 +112,21 @@ FiveGuyes는 사용자의 책/목표일/목표페이지를 입력받아, 매일 
 - Enforced by: `NavigationCoordinator` 조립 + `BookSettingsManagerView` 생성자 주입 패턴 + `.swiftlint.yml` custom rule
 - Violation symptoms: `Presentation/View`에서 `any ...Using` 또는 `@Environment(AppDependencies.self)` 직접 사용
 
+**Architecture Invariant: Stack back 이동은 `NavigationCoordinator` path 명령(`pop`/`popToRoot`)만 사용한다**
+- Rationale: 스택 경로 제어와 presentation dismiss 책임을 분리해 컨테이너 재사용 시 의도치 않은 상위 dismiss를 방지한다
+- Enforced by: `NavigationCoordinator.paths: [NavigationPathItem]` + `CustomBackButton`의 coordinator 기반 back + ADR-0006 정책
+- Violation symptoms: 한 back 액션에서 `dismiss`와 `pop`이 혼용되어 화면이 간헐적으로 두 단계 이상 닫힘
+
+**Architecture Invariant: `customNavigationBackButton`는 스택 전용 계약으로 사용한다**
+- Rationale: 해당 modifier는 `NavigationCoordinator.pop/popToRoot` path 명령을 전제로 하므로 modal dismiss 경계와 혼용하면 계약 불일치가 발생한다
+- Enforced by: `CustomBackButton`의 `@Environment(NavigationCoordinator.self)` 의존 + ADR-0006(`Stack Back Path-Only Policy`)
+- Violation symptoms: coordinator 환경 누락으로 back no-op/런타임 오류 발생, modal에서 스택용 back 사용으로 의도치 않은 동작 발생
+
+**Architecture Invariant: 동일 route의 연속 push는 `NavigationCoordinator` 기본 정책에서 차단한다**
+- Rationale: 빠른 연속 탭으로 같은 화면이 중복 적재되는 문제를 라우팅 경계에서 일관되게 차단한다
+- Enforced by: `Screens.routeKey` + `NavigationCoordinator.push(_:allowDuplicateRoute:)` 기본값(`false`)
+- Violation symptoms: 더블 탭 시 동일 타입 화면이 연속으로 쌓여 back 동작이 비결정적으로 보임
+
 **Architecture Invariant: ViewModel은 서비스 프로토콜(`...Managing/...Providing/...Storing/...Opening`)을 직접 의존하지 않는다**
 - Rationale: ViewModel 경계에서 UseCase-first 흐름을 강제해 도메인 실행 단위를 명확히 유지한다
 - Enforced by: `NotificationSettingUsing`, `HomeNotificationUsing` 같은 feature UseCase + `.swiftlint.yml` custom rule
@@ -147,6 +162,8 @@ Boundary D: 인프라 서비스 경계 (`ReadingNotificationScheduling`, `Notifi
 - 넘어오는 것: Domain 기반 상태(책 정보, 알림 시간 설정)
 - 금지되는 것: Presentation 계층에서 직접 시스템 권한/요청 생성, UseCase의 concrete 플랫폼 타입 직접 의존
 
+Navigation 경계 규칙: stack 경로 back은 `customNavigationBackButton` + `NavigationCoordinator` path 명령으로만 처리하고, modal close는 `@Environment(\.dismiss)` 전용으로 분리한다(혼용 금지).
+
 "only here" 규칙:
 - SwiftData IO는 `Data/RepoImpl`에서만 수행
 - SwiftData <-> Domain 매핑은 `Data/SwiftData/Extensions`, `Domain/Entity/Extension`에서만 수행
@@ -173,3 +190,4 @@ Boundary D: 인프라 서비스 경계 (`ReadingNotificationScheduling`, `Notifi
 - Architecture debt 이슈별 계획: `./docs/exec-plans/architecture-debt-issue-plans.md`
 - Presentation 패턴 결정 기록(ADR): `./docs/decisions/adr-0001-presentation-architecture.md`
 - UseCase/Service 경계 결정 기록(ADR): `./docs/decisions/adr-0002-usecase-first-boundary.md`
+- Stack back path-only 정책(ADR): `./docs/decisions/adr-0006-stack-back-path-only-policy.md`

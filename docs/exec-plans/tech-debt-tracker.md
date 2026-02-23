@@ -12,6 +12,7 @@
   - Date 정책 후속 잔여 -> `TD-007 (Partial)`
   - 독서 UseCase 흐름 리팩토링 유예 -> `TD-031`
   - UI 알럿 인지 E2E 검증 유예 -> `TD-032`
+  - Navigation back 버튼 UI 회귀 자동화 유예 -> `TD-033`
 - 코드 재검증 기준:
   - 본 문서에 남은 항목은 2026-02-18 코드 리뷰 기준 미해결(`Open`/`Partial`)만 포함합니다.
   - 해결 완료 항목은 본 문서에서 제거했고, 이력은 Git 히스토리로 추적합니다.
@@ -223,14 +224,85 @@
   2. E2E에서 설정 누락/일반 오류 경로를 분리 검증
   3. CI 파이프라인에 UITest 스모크 경로를 선택적으로 연결
 
+## TD-033: customNavigationBackButton backMode UI 회귀 자동화 부재
+
+- Status: Open
+- Context:
+  - `customNavigationBackButton`의 `backMode(.pop/.none/.popToRoot)` 분기는 코드와 coordinator 단위 테스트로는 검증되지만, 실제 버튼 탭/스와이프 기반 UI 시나리오 자동화는 없습니다.
+  - 이번 사이클은 UITest 타깃 신설 없이 문서/단위 테스트 경계 정렬을 우선 적용합니다.
+- Risk:
+  - 버튼 바인딩/화면 이동 분기 회귀가 발생해도 단위 테스트만으로는 실제 UI 탭 동작 실패를 즉시 감지하지 못할 수 있습니다.
+- Target Layer:
+  - `Presentation/View` back 탭 사용자 흐름 E2E 검증 경계
+- Trigger Condition:
+  - back 동작 회귀 제보, 릴리스 전 UI 회귀 점검 강화 필요, UITest 인프라 준비 시
+- Priority:
+  - P3
+- Current Evidence:
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Presentation/Shared/CustomBackButton.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Presentation/View/BookCompletion/CompletionReviewView.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyesTests/Presentation/ViewModel/NavigationCoordinatorTests.swift`
+- Deferred Decision (2026-02-18):
+  - 이번 사이클은 UITest를 범위에서 제외하고 문서화 + 단위 테스트 경계로 유지한다.
+- Suggested Follow-up:
+  1. `popToRootOnBack=true` 경로에서 back 1회 탭 시 root 1회 복귀를 E2E로 검증
+  2. 일반 경로에서 back 1회 탭 시 one-step pop을 E2E로 검증
+  3. 더블 탭 시 동일 화면 중복 진입 차단을 E2E로 검증
+
+## TD-034: Main 강제 리로드 워크어라운드와 스택 back 간헐 실패 상관 이슈
+
+- Status: Partial (2026-02-20)
+- Fix Required: Remaining
+- Context:
+  - 증상: back 버튼 탭 액션은 보이나 pop이 즉시 일어나지 않는 케이스가 간헐적으로 관측됩니다.
+  - 영향 화면: 알림 설정, 책 등록 관리자(사용자 관측).
+  - 2026-02-19 완화 조치: `viewReloadTrigger`, `reloadView()`, `getViewReloadTrigger()`를 제거했습니다.
+  - 2026-02-19 2차 완화 조치: swipe back 정책에서 `interactivePopGestureRecognizer.delegate` 관여를 제거하고 `isEnabled`만 depth 기반으로 제어하도록 단순화했습니다.
+  - 2026-02-20 3차 완화 조치: route 기본 정책 + top override를 `NavigationCoordinator`에서 계산하고, root 단일 host에서만 swipe 정책을 적용하도록 중앙화했습니다.
+  - 2026-02-20 4차 완화 조치: legacy 호출부(`CompletionReviewView`, `UnfinishReadingView`, `CompletionCelebrationView`)의 no-op/레거시 인자 사용을 제거하고 중앙 정책 호출만 남겼습니다.
+  - 2026-02-20 5차 정리: `customNavigationBackButton(action:backMode:swipeBackPolicy:)` 오버로드를 제거하고 `customNavigationBackButton(action:)` 단일 API로 정리했습니다.
+  - 2026-02-20 테스트 보강: `NavigationCoordinatorTests`에 정책/override 경계 케이스를 추가해 회귀 감시 범위를 확장했습니다.
+  - 조치 후 관측: 화면 렌더링/백 동작 체감은 개선됐지만, 잔여 간헐 증상은 남아 있습니다.
+  - 현재 판단: 강제 리로드 워크어라운드는 back 간헐 실패의 유력 원인(가설) 또는 기여 요인으로 관리하며, 원인 확정은 후속 RCA로 분리합니다.
+- Risk:
+  - 내비게이션 신뢰도 저하로 사용자의 반복 탭을 유도하고, 동일 플로우의 체감 품질 편차를 키울 수 있습니다.
+- Target Layer:
+  - `Presentation` navigation lifecycle + stack path 동기 경계
+- Trigger Condition:
+  - back 회귀 제보, 릴리스 전 back 안정성 재점검, 수동/자동 시나리오 재현 시
+- Priority:
+  - P2
+- Current Evidence:
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Presentation/ViewModel/NavigationCoordinator.swift` (리로드 트리거 제거 반영)
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/App/NavigationRootView.swift` (`navigationRootBackHost()` 기반 root host 부착)
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Presentation/View/Main/MainHomeView.swift` (강제 리로드 호출 부재)
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Presentation/Shared/CustomBackButton.swift` (`customNavigationBackButton(action:)` 단일 API)
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Presentation/Shared/Navigation/NavigationInteractivePopHost.swift` (root 단일 swipe 정책 적용)
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Presentation/Shared/Extensions/View+NavigationSwipeBackPolicy.swift` (화면별 UIKit 제어 제거)
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Presentation/View/BookSetting/BookSettingsManagerView.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Presentation/View/BookCompletion/CompletionReviewView.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Presentation/View/BookProgress/UnfinishReadingView.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Presentation/View/BookCompletion/CompletionCelebrationView.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyesTests/Presentation/ViewModel/NavigationCoordinatorTests.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/docs/decisions/adr-0006-stack-back-path-only-policy.md` (2026-02-20 개정: route + dynamic override 중앙화 근거)
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/docs/product/current-feature-spec.md`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/docs/product/past/main-feature-baseline.md`
+  - 사용자 관측 메모(2026-02-19): "기존 대비 개선, 잔여 간헐 존재"
+- Suggested Follow-up:
+  1. back 탭 시점/stack depth/routeKey 진단 로그를 임시 계측해 재현 샘플을 수집
+  2. 재현 시나리오를 화면별(알림 설정/책 등록 관리자)로 분리해 성공률을 수치화
+  3. `TD-033`과 연계해 반복 탭 기반 back 회귀 시나리오 UITest 적용 여부 검토
+
 ## Recommended Execution Order
 
 1. TD-015: 야간 알림 시간 상수 유효 범위 이탈 (P1)
 2. TD-010: 알림 일괄 등록 권한 체크 중복 제거 (P2)
-3. TD-025: 검색 응답 경쟁으로 최신 결과 역전 (P2)
-4. TD-026: 완료 in-flight 중 선택 변경 불일치 (P2)
-5. TD-007: 날짜 키 시맨틱/타입 경계 잔여 정리 (P2, Partial)
-6. TD-022: 컴파일 단 경계 강제 2단계(모듈화) (P3, Partial)
-7. TD-031: 독서 UseCase 내부 흐름 리팩토링 유예 항목 (P3)
-8. TD-029: Analytics 경계 분리 (P3)
-9. TD-032: BookSearch 설정 Alert 사용자 인지 경로 UITest 보강 (P3)
+3. TD-034: Main 강제 리로드 워크어라운드와 스택 back 간헐 실패 상관 이슈 (P2, Partial)
+4. TD-025: 검색 응답 경쟁으로 최신 결과 역전 (P2)
+5. TD-026: 완료 in-flight 중 선택 변경 불일치 (P2)
+6. TD-007: 날짜 키 시맨틱/타입 경계 잔여 정리 (P2, Partial)
+7. TD-022: 컴파일 단 경계 강제 2단계(모듈화) (P3, Partial)
+8. TD-031: 독서 UseCase 내부 흐름 리팩토링 유예 항목 (P3)
+9. TD-029: Analytics 경계 분리 (P3)
+10. TD-032: BookSearch 설정 Alert 사용자 인지 경로 UITest 보강 (P3)
+11. TD-033: Navigation back 버튼 분기 UI 회귀 자동화 보강 (P3)

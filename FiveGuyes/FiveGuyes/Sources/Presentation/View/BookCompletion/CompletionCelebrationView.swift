@@ -108,7 +108,7 @@ struct CompletionCelebrationView: View {
 
     private var reflectionButton: some View {
         Button {
-            navigationCoordinator.push(.completionReview(book: userBook))
+            navigationCoordinator.push(.completionReviewUpdate(book: userBook))
         } label: {
             Text("완독 소감 작성하기")
                 .fontStyle(.title2, weight: .semibold)

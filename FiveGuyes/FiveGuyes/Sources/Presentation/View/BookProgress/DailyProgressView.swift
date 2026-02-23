@@ -136,7 +136,8 @@ struct DailyProgressView: View {
         DailyProgressView(
             userBook: binding.userBook,
             viewModel: DailyProgressViewModel(
-                dailyReadingUseCase: binding.useCase
+                dailyReadingUseCase: binding.useCase,
+                bookCompletionUseCase: binding.useCase
             )
         )
     }
@@ -156,7 +157,8 @@ struct DailyProgressView: View {
         DailyProgressView(
             userBook: binding.userBook,
             viewModel: DailyProgressViewModel(
-                dailyReadingUseCase: binding.useCase
+                dailyReadingUseCase: binding.useCase,
+                bookCompletionUseCase: binding.useCase
             )
         )
     }
