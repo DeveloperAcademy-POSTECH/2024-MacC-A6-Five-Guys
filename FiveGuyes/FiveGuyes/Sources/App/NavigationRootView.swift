@@ -21,9 +21,10 @@ struct NavigationRootView: View {
         NavigationStack(path: $coordinator.paths) {
 
             coordinator.navigate(to: .mainHome)
-                .navigationDestination(for: Screens.self) { screen in
-                    coordinator.navigate(to: screen)
+                .navigationDestination(for: NavigationPathItem.self) { pathItem in
+                    coordinator.navigate(to: pathItem.screen)
                 }
+                .navigationRootBackHost()
         }
         .background(Color.Fills.white)
         .environment(coordinator)

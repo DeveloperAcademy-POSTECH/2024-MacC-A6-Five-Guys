@@ -7,32 +7,13 @@
 
 import SwiftUI
 
-enum BackNavigationMode {
-    case pop
-    case popToRoot
-    case none
-}
-
-enum BackSwipePolicy {
-    case systemDefault
-    case disabled
-}
-
 struct CustomBackButton: View {
     @Environment(NavigationCoordinator.self) private var navigationCoordinator
-    var action: (() -> Void)? // 추가 액션을 위한 옵셔널 클로저
-    var backMode: BackNavigationMode = .pop
 
     var body: some View {
         Button {
-            action?() // 액션이 있으면 실행
-            switch backMode {
-            case .pop:
-                _ = navigationCoordinator.pop()
-            case .popToRoot:
-                _ = navigationCoordinator.popToRoot()
-            case .none:
-                break
+            Task {
+                _ = await navigationCoordinator.handleBackButtonTap()
             }
         } label: {
             Image(systemName: "chevron.left")
@@ -44,42 +25,68 @@ struct CustomBackButton: View {
 }
 
 struct NavigationBackButtonModifier: ViewModifier {
-    var action: (() -> Void)? // 추가 액션
-    var backMode: BackNavigationMode = .pop
-    var swipeBackPolicy: BackSwipePolicy = .systemDefault
+    @Environment(NavigationCoordinator.self) private var navigationCoordinator
+    @State private var hookOwner = UUID()
+
+    let routeKey: ScreenRouteKey?
+    let beforeBackAction: (() async -> BackDecision)?
+    let onStepPopExitAction: (() async -> Void)?
 
     func body(content: Content) -> some View {
         content
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    CustomBackButton(
-                        action: action,
-                        backMode: backMode
-                    )
+                if navigationCoordinator.effectiveTopPolicy.showsBackButton {
+                    ToolbarItem(placement: .cancellationAction) {
+                        CustomBackButton()
+                    }
                 }
             }
             .navigationBarBackButtonHidden(true)
-            .navigationSwipeBackPolicy(swipeBackPolicy)
+            .onAppear {
+                syncBackHooks()
+            }
+            .onDisappear {
+                navigationCoordinator.clearTopBackHooks(owner: hookOwner)
+            }
+    }
+
+    private func syncBackHooks() {
+        guard let routeKey else {
+            navigationCoordinator.clearTopBackHooks(owner: hookOwner)
+            return
+        }
+
+        navigationCoordinator.setTopBackHooks(
+            owner: hookOwner,
+            routeKey: routeKey,
+            beforeBackAction: beforeBackAction,
+            onStepPopExitAction: onStepPopExitAction
+        )
     }
 }
 
 extension View {
+    /// `NavigationCoordinator`의 중앙 정책을 따라 커스텀 백버튼을 붙입니다.
+    ///
+    /// 실제 back 동작과 버튼 노출 여부는 런타임의
+    /// `effectiveTopPolicy`에서 결정됩니다.
     func customNavigationBackButton(
-        action: (() -> Void)? = nil,
-        backMode: BackNavigationMode = .pop,
-        swipeBackPolicy: BackSwipePolicy = .systemDefault
+        routeKey: ScreenRouteKey? = nil,
+        beforeBackAction: (() async -> BackDecision)? = nil,
+        onStepPopExitAction: (() async -> Void)? = nil
     ) -> some View {
         self.modifier(
             NavigationBackButtonModifier(
-                action: action,
-                backMode: backMode,
-                swipeBackPolicy: swipeBackPolicy
+                routeKey: routeKey,
+                beforeBackAction: beforeBackAction,
+                onStepPopExitAction: onStepPopExitAction
             )
         )
     }
 }
 
+#if DEBUG
 #Preview {
     NavigationStack {
         Color.red
@@ -87,3 +94,4 @@ extension View {
     }
     .environment(PreviewSupport.makeCoordinator())
 }
+#endif

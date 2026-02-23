@@ -358,7 +358,10 @@ struct MainHomeView: View {
         guard !overdueBooks.isEmpty else { return }
 
         for book in overdueBooks {
-            navigationCoordinator.push(.unfinishReading(book: book))
+            navigationCoordinator.push(
+                .unfinishReading(book: book),
+                allowDuplicateRoute: true
+            )
         }
     }
 

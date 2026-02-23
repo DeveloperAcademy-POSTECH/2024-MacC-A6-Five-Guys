@@ -55,10 +55,10 @@ struct UnfinishReadingView: View {
         }
         .background(Color.Fills.lightGreen.ignoresSafeArea())
         .customNavigationBackButton(
-            action: {
-                markBookAsCompletedInBackground()
-            },
-            swipeBackPolicy: .disabled
+            routeKey: .unfinishReading,
+            onStepPopExitAction: {
+                _ = await viewModel.completeBook(userBook)
+            }
         )
     }
 
@@ -154,11 +154,6 @@ struct UnfinishReadingView: View {
         }
     }
 
-    private func markBookAsCompletedInBackground() {
-        Task {
-            _ = await viewModel.completeBook(userBook)
-        }
-    }
 }
 
 #if DEBUG

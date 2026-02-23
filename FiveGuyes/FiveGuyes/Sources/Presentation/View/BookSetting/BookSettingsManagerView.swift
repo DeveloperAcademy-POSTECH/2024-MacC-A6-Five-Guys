@@ -62,16 +62,19 @@ struct BookSettingsManagerView: View {
         .navigationTitle("완독할 책 추가하기")
         .navigationBarTitleDisplayMode(.inline)
         .customNavigationBackButton(
-            action: {
+            routeKey: .bookSettingsManager,
+            beforeBackAction: {
+                // 단계 전환은 이 화면의 로컬 상태(page/input) 책임이므로 뷰에서 처리합니다.
                 if isEditingBookSettingFlow {
                     clearBookSetting()
                     withAnimation(.easeOut) {
                         pageModel.previousPage()
                     }
+                    return .cancel
                 }
-            },
-            backMode: isEditingBookSettingFlow ? .none : .pop,
-            swipeBackPolicy: isEditingBookSettingFlow ? .disabled : .systemDefault
+
+                return .proceed
+            }
         )
         .environment(bookSettingInputModel)
         .environment(pageModel)

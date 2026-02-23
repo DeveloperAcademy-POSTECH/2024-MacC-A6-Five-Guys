@@ -43,8 +43,7 @@ struct CompletionCelebrationView: View {
             Image("completionBackground")
                 .ignoresSafeArea()
         }
-        .navigationBarBackButtonHidden(true)
-        .disableNavigationGesture()
+        .customNavigationBackButton()
     }
 
     private var celebrationTitle: some View {
@@ -109,7 +108,7 @@ struct CompletionCelebrationView: View {
 
     private var reflectionButton: some View {
         Button {
-            navigationCoordinator.push(.completionReviewUpdate(book: userBook, popToRootOnBack: true))
+            navigationCoordinator.push(.completionReviewUpdate(book: userBook))
         } label: {
             Text("완독 소감 작성하기")
                 .fontStyle(.title2, weight: .semibold)

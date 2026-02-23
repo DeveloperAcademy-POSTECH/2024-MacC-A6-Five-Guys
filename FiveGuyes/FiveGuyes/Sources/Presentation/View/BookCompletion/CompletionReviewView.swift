@@ -17,18 +17,15 @@ struct CompletionReviewView: View {
     @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
 
     var isUpdateMode: Bool = false
-    var popToRootOnBack: Bool = false
 
     let userBook: FGUserBook
 
     init(
         isUpdateMode: Bool = false,
-        popToRootOnBack: Bool = false,
         userBook: FGUserBook,
         viewModel: CompletionReviewViewModel
     ) {
         self.isUpdateMode = isUpdateMode
-        self.popToRootOnBack = popToRootOnBack
         self.userBook = userBook
         _viewModel = State(initialValue: viewModel)
     }
@@ -84,10 +81,7 @@ struct CompletionReviewView: View {
                 .alertFontStyle(.title3, weight: .semibold),
                   dismissButton: .default(Text("확인")))
         }
-        .customNavigationBackButton(
-            backMode: popToRootOnBack ? .popToRoot : .pop,
-            swipeBackPolicy: popToRootOnBack ? .disabled : .systemDefault
-        )
+        .customNavigationBackButton()
         .onAppear {
             viewModel.preloadReview(userBook.completionStatus.reviewAfterCompletion)
             isFocusedTextEditor = true
