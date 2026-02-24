@@ -13,6 +13,8 @@
   - 독서 UseCase 흐름 리팩토링 유예 -> `TD-031`
   - UI 알럿 인지 E2E 검증 유예 -> `TD-032`
   - Navigation back 버튼 UI 회귀 자동화 유예 -> `TD-033`
+  - SwiftData `mainContext` 동시성 핫픽스 후속 -> `TD-035`
+  - FIAM API 비활성 운영 노이즈 관리 -> `TD-036`
 - 코드 재검증 기준:
   - 본 문서에 남은 항목은 2026-02-18 코드 리뷰 기준 미해결(`Open`/`Partial`)만 포함합니다.
   - 해결 완료 항목은 본 문서에서 제거했고, 이력은 Git 히스토리로 추적합니다.
@@ -293,6 +295,54 @@
   2. 재현 시나리오를 화면별(알림 설정/책 등록 관리자)로 분리해 성공률을 수치화
   3. `TD-033`과 연계해 반복 탭 기반 back 회귀 시나리오 UITest 적용 여부 검토
 
+## TD-035: SwiftData `mainContext` 의존 저장소의 actor 경계 한계 (`ModelActor` 전환 필요)
+
+- Status: Open
+- Context:
+  - `SwiftDataBookRepo`가 `modelContainer.mainContext`를 저장해 모든 fetch/save를 수행합니다.
+  - 2026-02-24 핫픽스로 저장소 경계에 `@MainActor`를 적용해 off-main 경고를 차단했지만, 구조적으로는 메인 actor 의존이 유지됩니다.
+- Risk:
+  - 저장 경로가 메인 actor에 고정되어 확장 시 병목/응답성 저하 가능성이 있습니다.
+  - 새 비동기 경로 추가 시 격리 누락이 재발할 수 있습니다.
+- Target Layer:
+  - `Data/RepoImpl` 저장소 격리 구조(`@ModelActor` 기반)
+- Trigger Condition:
+  - `ModelContext` 격리 경고 재발, 저장 경로 성능 이슈, 저장소 동시성 기능 확장 시
+- Priority:
+  - P2
+- Current Evidence:
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Data/RepoImpl/SwiftDataBookRepo.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Data/RepoImpl/SwiftDataBookRepo+Migration.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/App/AppDependencies.swift`
+- Suggested Follow-up:
+  1. `@ModelActor` 기반 저장소 타입을 도입해 `mainContext` 직접 의존을 제거
+  2. 마이그레이션 파이프라인(fetch/save)도 actor 경계 내부로 통합
+  3. 저장소 동시성 회귀 테스트(연속 호출/취소/호출 순서)를 보강
+
+## TD-036: FIAM API 비활성 상태에서 SDK 요청(403) 노이즈
+
+- Status: Open
+- Context:
+  - 타깃이 `FirebaseInAppMessaging-Beta`를 링크한 상태에서, 프로젝트 API 비활성 시 런타임 fetch가 403(`SERVICE_DISABLED`)를 반복합니다.
+  - Analytics(GA)는 별도 SDK로 동작하므로, FIAM 운영 정책을 별도로 정리할 필요가 있습니다.
+- Risk:
+  - 반복 에러 로그와 재시도로 운영 로그 신호대잡음비가 악화됩니다.
+  - 불필요 네트워크 요청으로 디버깅 가시성이 저하됩니다.
+- Target Layer:
+  - Firebase 제품 구성/링킹 정책(`FIAM` 사용 여부와 API 활성화 기준)
+- Trigger Condition:
+  - 런타임 로그 정리 필요, FIAM 기능 도입/비도입 결정, 배포 전 관측성 점검 시
+- Priority:
+  - P3
+- Current Evidence:
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes.xcodeproj/project.pbxproj`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/App/FiveGuyesApp.swift`
+  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes.xcodeproj/xcshareddata/xcschemes/FiveGuyes.xcscheme`
+- Suggested Follow-up:
+  1. 정책 확정: `FIAM` 미사용이면 SDK 제거, 사용이면 콘솔 API 활성화
+  2. 팀 운영 문서에 Firebase 제품별 활성화 체크리스트를 추가
+  3. 배포 전 로그 점검 항목에 `FIAM 403` 여부를 포함
+
 ## Recommended Execution Order
 
 1. TD-015: 야간 알림 시간 상수 유효 범위 이탈 (P1)
@@ -301,8 +351,10 @@
 4. TD-025: 검색 응답 경쟁으로 최신 결과 역전 (P2)
 5. TD-026: 완료 in-flight 중 선택 변경 불일치 (P2)
 6. TD-007: 날짜 키 시맨틱/타입 경계 잔여 정리 (P2, Partial)
-7. TD-022: 컴파일 단 경계 강제 2단계(모듈화) (P3, Partial)
-8. TD-031: 독서 UseCase 내부 흐름 리팩토링 유예 항목 (P3)
-9. TD-029: Analytics 경계 분리 (P3)
-10. TD-032: BookSearch 설정 Alert 사용자 인지 경로 UITest 보강 (P3)
-11. TD-033: Navigation back 버튼 분기 UI 회귀 자동화 보강 (P3)
+7. TD-035: SwiftData `mainContext` actor 경계 개선(`ModelActor` 전환) (P2)
+8. TD-022: 컴파일 단 경계 강제 2단계(모듈화) (P3, Partial)
+9. TD-031: 독서 UseCase 내부 흐름 리팩토링 유예 항목 (P3)
+10. TD-029: Analytics 경계 분리 (P3)
+11. TD-036: FIAM API 비활성 운영 노이즈 정리 (P3)
+12. TD-032: BookSearch 설정 Alert 사용자 인지 경로 UITest 보강 (P3)
+13. TD-033: Navigation back 버튼 분기 UI 회귀 자동화 보강 (P3)
