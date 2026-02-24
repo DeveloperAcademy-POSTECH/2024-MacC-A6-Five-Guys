@@ -26,7 +26,8 @@ This plan follows `/Users/zaehorang/.codex/PLANS.md` and is executed with `/User
 - [x] (2026-02-20 11:05Z) TD-034 3차 완화 반영: route 기본 정책 + top override를 coordinator로 중앙화하고 root 단일 host에서 swipe 정책 적용.
 - [x] (2026-02-20 16:20Z) TD-034 4차 완화 반영: legacy back 호출부/no-op modifier를 정리하고 `NavigationCoordinatorTests` 정책 경계 케이스를 보강.
 - [x] (2026-02-20 21:45Z) TD-034 5차 정리 반영: `customNavigationBackButton` 레거시 오버로드 제거 + `navigationRootBackHost()` 네이밍 모디파이어 적용.
-- [ ] Remaining: TD-015, TD-010, TD-034(back 간헐 재현 계측 + RCA), TD-007 잔여(typed key adapter + settings legacy Date 제거 마이그레이션), TD-022 Stage 2(모듈화 스파이크/분리 로드맵), TD-029 analytics 경계 분리.
+- [x] (2026-02-24 08:30Z) SwiftData `ModelContext` off-main 경고 핫픽스(`@MainActor` 경계 보강)와 후속 debt(TD-035/TD-036) tracker 동기화 반영.
+- [ ] Remaining: TD-015, TD-010, TD-034(back 간헐 재현 계측 + RCA), TD-007 잔여(typed key adapter + settings legacy Date 제거 마이그레이션), TD-035(`ModelActor` 전환), TD-022 Stage 2(모듈화 스파이크/분리 로드맵), TD-029 analytics 경계 분리, TD-036(FIAM API 비활성 운영 노이즈 정리).
 
 ## Surprises & Discoveries
 
@@ -104,6 +105,10 @@ This plan follows `/Users/zaehorang/.codex/PLANS.md` and is executed with `/User
   Rationale: 무시되는 인자를 남겨두면 정책 소스를 오해하기 쉬워서, API 계약을 코드 구조와 동일하게 맞추기 위함이다.
   Date/Author: 2026-02-20 / Codex
 
+- Decision: `mainContext` 경고는 저장소 `@MainActor` 경계 보강으로 우선 차단하고, `@ModelActor` 전환은 별도 debt(TD-035)로 분리한다.
+  Rationale: 런타임 안정화가 우선이며, 저장소 격리 구조 전환은 DI/테스트/마이그레이션 경계를 함께 다뤄야 해 별도 사이클이 필요하다.
+  Date/Author: 2026-02-24 / Codex
+
 ## Outcomes & Retrospective
 
 이번 사이클에서 이슈 상태는 다음과 같이 업데이트되었습니다.
@@ -118,6 +123,8 @@ This plan follows `/Users/zaehorang/.codex/PLANS.md` and is executed with `/User
 8. TD-034 4차 완화에서 legacy/no-op 호출 정리와 `NavigationCoordinatorTests` 정책 경계 보강을 반영했다.
 9. TD-034 5차 정리에서 `customNavigationBackButton(action:)` 단일 API 정리와 `navigationRootBackHost()` 네이밍 정합화를 반영했다.
 10. 컴파일 검증은 `xcodebuild ... build` 성공으로 통과했으며, 화면별 swipe 수동 반복 시나리오는 사용자 검증 단계로 남겨둔다.
+11. 2026-02-24 기준으로 `SwiftDataBookRepo` 저장소 경계 `@MainActor` 핫픽스를 반영했고, 구조 개선 과제는 TD-035(`ModelActor` 전환)로 분리 등록했다.
+12. FIAM API 비활성 403 운영 노이즈는 TD-036으로 분리 등록해 Firebase 제품 구성 정책을 후속 결정하기로 했다.
 
 검증 명령:
 
@@ -197,6 +204,8 @@ architecture-first 리베이스에서 반영한 이슈-코드 매핑은 아래�
 4. TD-007 잔여: typed key adapter 확장 + 글로벌 정책 UX 분리 설계.
 5. TD-022 Stage 2: Domain 분리 스파이크와 모듈화 로드맵 문서화.
 6. TD-029: Presentation analytics 호출 경계 분리 로드맵 문서화/착수.
+7. TD-035: `@ModelActor` 기반 저장소 격리 구조 전환 설계/구현.
+8. TD-036: FIAM SDK/콘솔 API 운영 정책 확정(제거 vs 활성화) 및 체크리스트화.
 
 ## Concrete Steps
 
@@ -263,3 +272,4 @@ Plan revision note (2026-02-19): Added TD-034 validation notes (static grep + `x
 Plan revision note (2026-02-20): Added TD-034 route + dynamic override centralization sync (root host single-point swipe policy application).
 Plan revision note (2026-02-20): Added TD-034 stage-2 cleanup sync (legacy/no-op call-site cleanup + NavigationCoordinator policy test hardening).
 Plan revision note (2026-02-20): Added TD-034 final polish sync (legacy back overload removal + root modifier naming alignment).
+Plan revision note (2026-02-24): Added SwiftData `ModelContext` concurrency hotfix sync and registered TD-035(`ModelActor` migration) / TD-036(FIAM 403 operations noise) as remaining architecture debt.
