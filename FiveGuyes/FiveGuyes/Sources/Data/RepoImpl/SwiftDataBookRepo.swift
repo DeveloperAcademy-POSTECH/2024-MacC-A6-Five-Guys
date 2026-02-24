@@ -8,6 +8,7 @@
 import Foundation
 import SwiftData
 
+@MainActor
 final class SwiftDataBookRepo: BookRepo {
     typealias SDUserBook = UserBookSchemaV2.UserBookV2
 
@@ -24,7 +25,6 @@ final class SwiftDataBookRepo: BookRepo {
 
     // MARK: - Initial Methods
 
-    @MainActor
     convenience init(modelContainer: ModelContainer) {
         self.init(
             modelContainer: modelContainer,
@@ -34,7 +34,6 @@ final class SwiftDataBookRepo: BookRepo {
         )
     }
 
-    @MainActor
     init(
         modelContainer: ModelContainer,
         migrationUserDefaults: UserDefaults,
@@ -175,7 +174,6 @@ final class SwiftDataBookRepo: BookRepo {
 
     // MARK: - Helper Methods
 
-    @MainActor
     func prewarmReadingRecordKeyMigrationIfNeeded() throws {
         try migrateStorageIfNeeded()
     }
