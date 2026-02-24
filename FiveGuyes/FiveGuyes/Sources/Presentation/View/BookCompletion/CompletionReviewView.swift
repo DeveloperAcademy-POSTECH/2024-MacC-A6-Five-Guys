@@ -5,37 +5,38 @@
 //  Created by zaehorang on 11/4/24.
 //
 
-import SwiftData
 import SwiftUI
 
 struct CompletionReviewView: View {
-    typealias UserBook = UserBookSchemaV2.UserBookV2
-    
     private let placeholder: String = "책 속 한 줄이 남긴 여운은 무엇인가요?"
-    
-    @State private var reflectionText: String = ""
-    @State private var showAlert = false
+
+    @State private var viewModel: CompletionReviewViewModel
     @FocusState private var isFocusedTextEditor: Bool
     @ObservedObject private var keyboardObserver = KeyboardObserver()
-    
+
     @Environment(NavigationCoordinator.self) var navigationCoordinator: NavigationCoordinator
-    
-    // 업데이트 상황을 나타내는 불 변수
+
     var isUpdateMode: Bool = false
-        
-    // 외부에서 주입받을 수 있는 책 변수
-    var userBook: UserBook
-    
+
+    let userBook: FGUserBook
+
+    init(
+        isUpdateMode: Bool = false,
+        userBook: FGUserBook,
+        viewModel: CompletionReviewViewModel
+    ) {
+        self.isUpdateMode = isUpdateMode
+        self.userBook = userBook
+        _viewModel = State(initialValue: viewModel)
+    }
+
     var body: some View {
-        let bookMetadata: BookMetaDataProtocol = userBook.bookMetaData
-        var completionStatus: CompletionStatusProtocol = userBook.completionStatus
-        let userSettings = userBook.userSettings
-        
-        let title = bookMetadata.title
-        
+        @Bindable var bindableViewModel = viewModel
+        let title = userBook.bookMetaData.title
+
         ZStack {
             Color.Fills.white.ignoresSafeArea()
-            
+
             VStack(spacing: 24) {
                 VStack(alignment: .leading, spacing: 24) {
                     VStack(alignment: .leading, spacing: 0) {
@@ -45,36 +46,23 @@ struct CompletionReviewView: View {
                     .fontStyle(.title1, weight: .semibold)
                     .foregroundStyle(Color.Labels.primaryBlack1)
                     .lineLimit(1)
-                    
-                    TextEditor(text: $reflectionText)
-                        .customStyleEditor(placeholder: placeholder, userInput: $reflectionText)
+
+                    TextEditor(text: $bindableViewModel.reflectionText)
+                        .customStyleEditor(
+                            placeholder: placeholder,
+                            userInput: $bindableViewModel.reflectionText
+                        )
                         .frame(height: 222)
                         .focused($isFocusedTextEditor)
                 }
                 .padding(.horizontal, 20)
-                
+
                 Spacer()
-                
+
                 if keyboardObserver.keyboardIsVisible {
                     Button {
-                        if reflectionText.isEmpty {
-                            showAlert = true
-                        } else {
-                            
-                            if !isUpdateMode {
-                                completionStatus.markAsCompleted(review: reflectionText)
-                                
-                                // TODO: 해당 로직 모델로 옮기기 🐯
-                                userSettings.targetEndDate = Date()
-                                if userSettings.startDate > userSettings.targetEndDate {
-                                    userSettings.startDate = userSettings.targetEndDate
-                                }
-                            } else {
-                                // 업데이트 모드인 경우
-                                completionStatus.completionReview = reflectionText
-                            }
-                            
-                            navigationCoordinator.popToRoot()
+                        Task {
+                            await submitReview()
                         }
                     } label: {
                         Text("저장")
@@ -84,22 +72,67 @@ struct CompletionReviewView: View {
                             .foregroundStyle(Color.Fills.white)
                     }
                     .ignoresSafeArea(.keyboard, edges: .bottom)
+                    .disabled(viewModel.isSubmitting)
                 }
             }
         }
-        .alert(isPresented: $showAlert) {
+        .alert(isPresented: $bindableViewModel.showEmptyReviewAlert) {
             Alert(title: Text("내용을 입력해주세요")
                 .alertFontStyle(.title3, weight: .semibold),
                   dismissButton: .default(Text("확인")))
         }
         .customNavigationBackButton()
         .onAppear {
-            reflectionText = completionStatus.completionReview
+            viewModel.preloadReview(userBook.completionStatus.reviewAfterCompletion)
             isFocusedTextEditor = true
+        }
+    }
+
+    @MainActor
+    private func submitReview() async {
+        let outcome = await viewModel.submit(
+            userBookId: userBook.id,
+            isUpdateMode: isUpdateMode
+        )
+
+        if case .popToRoot = outcome {
+            navigationCoordinator.popToRoot()
         }
     }
 }
 
-//#Preview {
-//    CompletionReviewView()
-//}
+#if DEBUG
+#Preview("완독 소감 작성") {
+    let binding = PreviewSupport.bindCompletedBook(PreviewSupport.sampleCompletedBook)
+
+    NavigationStack {
+        CompletionReviewView(
+            userBook: binding.userBook,
+            viewModel: CompletionReviewViewModel(
+                bookCompletionUseCase: binding.useCase
+            )
+        )
+    }
+    .environment(PreviewSupport.makeCoordinator())
+}
+
+#Preview("완독 소감 수정") {
+    let reviewedBook = PreviewSupport.makeBook(
+        title: "소감이 있는 도서",
+        isCompleted: true,
+        reviewAfterCompletion: "이미 남겨둔 완독 소감입니다."
+    )
+    let binding = PreviewSupport.bindCompletedBook(reviewedBook)
+
+    NavigationStack {
+        CompletionReviewView(
+            isUpdateMode: true,
+            userBook: binding.userBook,
+            viewModel: CompletionReviewViewModel(
+                bookCompletionUseCase: binding.useCase
+            )
+        )
+    }
+    .environment(PreviewSupport.makeCoordinator())
+}
+#endif

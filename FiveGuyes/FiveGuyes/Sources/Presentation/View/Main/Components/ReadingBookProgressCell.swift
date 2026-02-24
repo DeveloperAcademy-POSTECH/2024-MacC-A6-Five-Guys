@@ -7,39 +7,38 @@
 
 import SwiftUI
 
-// 읽고 있는 책의 정보를 보여주는 셀(책 한 권에 관해서)
 struct ReadingBookProgressCell: View {
     let book: FGUserBook
     let today: Date
-    
+
     private var readingState: FGReadingProgress.TodayReadingState {
         book.readingProgress.readingState(on: today)
     }
-    
+
     private var remainingDays: Int {
         book.userSettings.remainingReadingDays(today: today)
     }
-    
+
     // MARK: - Layout
-    
+
     var body: some View {
         ZStack(alignment: .bottom) {
             backgroundCard()
-            
+
             VStack(spacing: 0) {
                 HStack(alignment: .bottom, spacing: 0) {
                     VStack(alignment: .leading, spacing: 4) {
                         remainingDaysBadge(remainingDays)
                         readingStatePrompt(readingState)
                     }
-                    
+
                     Spacer()
-                    
+
                     userBookImage(book)
                 }
                 .padding(.horizontal, 16)
                 .padding(.bottom, 16)
-                
+
                 WeeklyProgressCalendar(
                     userBook: book,
                     today: today
@@ -49,16 +48,16 @@ struct ReadingBookProgressCell: View {
             }
         }
     }
-    
+
     // MARK: - Subviews
-    
+
     private func backgroundCard() -> some View {
         Rectangle()
             .frame(height: 210)
             .foregroundStyle(Color.Backgrounds.primary)
             .cornerRadius(16)
     }
-    
+
     private func remainingDaysBadge(_ days: Int) -> some View {
         Text("완독까지 D-\(days)")
             .fontStyle(.caption1, weight: .regular)
@@ -70,7 +69,7 @@ struct ReadingBookProgressCell: View {
                     .stroke(Color.Separators.green, lineWidth: 1)
             }
     }
-    
+
     private func userBookImage(_ userBook: FGUserBook) -> some View {
         BookCoverImageView(
             coverURL: userBook.bookMetaData.coverImageURL,
@@ -78,7 +77,7 @@ struct ReadingBookProgressCell: View {
             height: 161
         )
     }
-    
+
     private func promptTexts(for state: FGReadingProgress.TodayReadingState) -> (primary: String, secondary: String) {
         switch state {
         case .completed:
@@ -95,15 +94,15 @@ struct ReadingBookProgressCell: View {
                     "잠시 쉬어가도 좋아요")
         }
     }
-    
+
     private func readingStatePrompt(_ state: FGReadingProgress.TodayReadingState) -> some View {
         let prompt = promptTexts(for: state)
-        
+
         return VStack(alignment: .leading, spacing: 0) {
             Text(prompt.primary)
                 .fontStyle(.body, weight: .semibold)
                 .foregroundStyle(Color.Labels.primaryBlack1)
-            
+
             Text(prompt.secondary)
                 .fontStyle(.caption1)
                 .foregroundStyle(Color.Labels.secondaryBlack2)
@@ -112,6 +111,9 @@ struct ReadingBookProgressCell: View {
 }
 
 #Preview {
-    ReadingBookProgressCell(book: .dummy, today: Date())
+    ReadingBookProgressCell(
+        book: .dummy,
+        today: DefaultReadingDateProvider().today()
+    )
         .background(.blue) // 프리뷰에서 흰색 카드가 보이도록 파란 배경 추가
 }

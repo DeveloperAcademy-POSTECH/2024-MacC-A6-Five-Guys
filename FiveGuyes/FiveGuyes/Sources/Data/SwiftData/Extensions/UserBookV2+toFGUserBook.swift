@@ -5,6 +5,8 @@
 //  Created by zaehorang on 4/6/25.
 //
 
+import Foundation
+
 extension UserBookSchemaV2.UserBookV2 {
     func toFGUserBook() -> FGUserBook {
         return FGUserBook(
@@ -30,12 +32,25 @@ extension BookMetaData {
 
 extension UserSettings {
     func toFGUserSetting() -> FGUserSetting {
-        FGUserSetting(
+        let resolvedStartDateKey = SettingsDateKeyPolicy.resolveDateKey(
+            rawKey: startDateKey,
+            legacyDate: startDate
+        )
+        let resolvedTargetEndDateKey = SettingsDateKeyPolicy.resolveDateKey(
+            rawKey: targetEndDateKey,
+            legacyDate: targetEndDate
+        )
+        let resolvedExcludedReadingDayKeys = SettingsDateKeyPolicy.resolveDateKeys(
+            rawKeys: nonReadingDayKeys,
+            legacyDates: nonReadingDays
+        )
+
+        return FGUserSetting(
             startPage: self.startPage,
             targetEndPage: self.targetEndPage,
-            startDate: self.startDate,
-            targetEndDate: self.targetEndDate,
-            excludedReadingDays: self.nonReadingDays
+            startDateKey: resolvedStartDateKey,
+            targetEndDateKey: resolvedTargetEndDateKey,
+            excludedReadingDayKeys: resolvedExcludedReadingDayKeys
         )
     }
 }

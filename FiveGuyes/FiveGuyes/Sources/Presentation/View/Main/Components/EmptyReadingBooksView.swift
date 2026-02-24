@@ -14,7 +14,7 @@ enum EmptyReadingState {
 
 struct EmptyReadingBooksView: View {
     let state: EmptyReadingState
-    
+
     private var title: String {
         switch state {
         case .noCompleted:
@@ -23,7 +23,7 @@ struct EmptyReadingBooksView: View {
             return "독서 기록이 쌓이고 있어요!"
         }
     }
-    
+
     private var subtitle: String {
         switch state {
         case .noCompleted:
@@ -32,7 +32,7 @@ struct EmptyReadingBooksView: View {
             return "새로운 한 권을 추가해보세요"
         }
     }
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             VStack(alignment: .leading, spacing: 0) {
@@ -44,7 +44,7 @@ struct EmptyReadingBooksView: View {
                     .fontStyle(.caption1)
             }
             .padding(.bottom, 24)
-            
+
             HStack {
                 Spacer()
                 Image("NothingWandoki")
@@ -58,7 +58,7 @@ struct EmptyReadingBooksView: View {
             backgroundCard()
         }
     }
-    
+
     private func backgroundCard() -> some View {
         Rectangle()
             .foregroundStyle(Color.Backgrounds.primary)
@@ -66,11 +66,12 @@ struct EmptyReadingBooksView: View {
     }
 }
 
-#Preview {
-    VStack(spacing: 50) {
-        EmptyReadingBooksView(state: .noCompleted)
-        EmptyReadingBooksView(state: .hasCompleted)
-    }
-    .background(.blue)
-    
+#if DEBUG
+#Preview("완독/독서 모두 없음") {
+    EmptyReadingBooksView(state: .noCompleted)
 }
+
+#Preview("완독 있음, 독서 없음") {
+    EmptyReadingBooksView(state: .hasCompleted)
+}
+#endif

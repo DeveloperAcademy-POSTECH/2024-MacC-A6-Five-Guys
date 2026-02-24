@@ -5,68 +5,48 @@
 //  Created by zaehorang on 11/27/24.
 //
 
-import SwiftData
 import SwiftUI
 
 struct NotiSettingView: View {
-    typealias UserBook = UserBookSchemaV2.UserBookV2
-    
     @Environment(\.scenePhase) private var scenePhase // 앱 상태 감지
-    
-    @State private var selectedTime: Date = Date() // 데이트 피커에 사용될 시간
-    
-    @State private var isNotificationDisabled: Bool = false // 모든 알람 수신 토글
-    @State private var isReminderTimePickerVisible: Bool = false // 데이트 피커 표시 여부
-    @State private var isSystemNotificationEnabled = true // 시스템 노티 권한 여부
-    
-    @State private var notificationStatusTask: Task<Void, Never>?
-    @State private var notificationTimeTask: Task<Void, Never>?
-    
-    let userBook: UserBook?
-    
-    private let notificationManager = NotificationManager()
-    
-    // Toggle 바인딩 변수
+
+    @State private var viewModel: NotiSettingViewModel
+    let userBook: FGUserBook?
+
+    init(userBook: FGUserBook?, viewModel: NotiSettingViewModel) {
+        self.userBook = userBook
+        self._viewModel = State(initialValue: viewModel)
+    }
+
     private var isNotificationToggleEnabled: Binding<Bool> {
         Binding(
-            get: { !isNotificationDisabled },
-            set: { isNotificationDisabled = !$0 }
+            get: { !viewModel.isNotificationDisabled },
+            set: { viewModel.isNotificationDisabled = !$0 }
         )
     }
-    
-    // 시간 범위 설정: 04:00 ~ 23:55
-    private var timeSelectionRange: ClosedRange<Date> {
-        let calendar = Calendar.app
-        let now = Date()
-        let startOfDay = calendar.startOfDay(for: now)
-        let start = calendar.date(bySettingHour: 4, minute: 0, second: 0, of: startOfDay)!
-        let end = calendar.date(bySettingHour: 23, minute: 55, second: 0, of: startOfDay)!
-        return start...end
-    }
-    
+
     var body: some View {
         ZStack {
             Color.Fills.white // 배경색 지정
                 .ignoresSafeArea()
-            
+
             VStack(alignment: .leading, spacing: .zero) {
-                if !isSystemNotificationEnabled {
+                if !viewModel.isSystemNotificationEnabled {
                     notificationDisabledView
                 }
-                
+
                 toggleSection
-                
+
                 dividerLine
                     .padding(.top, 12)
-                
-                // 하루 독서 미완료 알림
+
                 timePickerSection
                     .padding(.top, 16)
-                
-                if isReminderTimePickerVisible {
+
+                if viewModel.isReminderTimePickerVisible {
                     timePicker
                 }
-                
+
                 Spacer()
             }
         }
@@ -75,39 +55,26 @@ struct NotiSettingView: View {
         .navigationTitle("알림 설정")
         .customNavigationBackButton()
         .task {
-            isSystemNotificationEnabled = await notificationManager.requestAuthorization()
+            await viewModel.refreshSystemNotificationAuthorization()
         }
         .onAppear {
-            fetchNotificationTime()
-            fetchNotificationDisabled()
+            viewModel.loadPersistedSettings()
         }
-        .onChange(of: isNotificationDisabled) {
-            // 기존 Task 취소
-            notificationStatusTask?.cancel()
-            
-            // 새로운 Task 생성
-            notificationStatusTask = Task {
-                await handleNotificationStatusChange(isDisabled: isNotificationDisabled, userBook: userBook)
-            }
+        .onChange(of: viewModel.isNotificationDisabled) {
+            viewModel.handleNotificationStatusChange(userBook: userBook)
         }
-        .onChange(of: selectedTime) {
-            // 기존 Task 취소
-            notificationTimeTask?.cancel()
-            
-            // 새로운 Task 생성
-            notificationTimeTask = Task {
-                await handleNotificationTimeChange(newTime: selectedTime, userBook: userBook)
-            }
+        .onChange(of: viewModel.selectedTime) {
+            viewModel.handleNotificationTimeChange(userBook: userBook)
         }
         .onChange(of: scenePhase) {
             if scenePhase == .active { // 시스템 설정에 갔다가 다시 오는 상황 체크
                 Task {
-                    isSystemNotificationEnabled = await notificationManager.requestAuthorization()
+                    await viewModel.refreshSystemNotificationAuthorization()
                 }
             }
         }
     }
-    
+
     // MARK: - View Property
     private func primaryTitle(_ title: String) -> some View {
         Text(title)
@@ -115,25 +82,25 @@ struct NotiSettingView: View {
             .foregroundStyle(Color.Labels.primaryBlack1)
             .multilineTextAlignment(.leading)
     }
-    
+
     private func secondaryTitle(_ title: String) -> some View {
         Text(title)
             .fontStyle(.body)
             .foregroundStyle(Color.Labels.secondaryBlack2)
             .multilineTextAlignment(.leading)
     }
-    
+
     private var notificationDisabledView: some View {
-        Button(action: SystemSettingsManager.openSettings) {
+        Button(action: viewModel.openSystemSettings) {
             HStack {
                 VStack(alignment: .leading, spacing: .zero) {
                     primaryTitle("기기의 알림 설정이 꺼져 있어요!")
                     secondaryTitle("설정을 변경하고, 완독에 도움이 되는 알림을\n받아보세요")
                 }
                 .padding(.leading, 16)
-                
+
                 Spacer()
-                
+
                 Image(systemName: "chevron.forward")
                     .frame(width: 15, height: 22)
                     .scaledToFit()
@@ -148,25 +115,24 @@ struct NotiSettingView: View {
             .padding(.bottom, 32)
         }
     }
-    
+
     private var toggleSection: some View {
         VStack(alignment: .leading, spacing: .zero) {
             Toggle("알림 끄기", isOn: isNotificationToggleEnabled)
                 .toggleStyle(.switch)
                 .fontStyle(.title2, weight: .semibold)
                 .foregroundStyle(Color.Labels.primaryBlack1)
-            
+
             secondaryTitle("한입독서와 관련된 알림 수신이 중단돼요")
         }
     }
-    
+
     private var dividerLine: some View {
         Rectangle()
             .frame(height: 1)
             .foregroundStyle(Color.Separators.gray)
     }
-    
-    // 데이터 피커를 포함한 섹션
+
     private var timePickerSection: some View {
         VStack(alignment: .leading, spacing: .zero) {
             HStack {
@@ -177,14 +143,14 @@ struct NotiSettingView: View {
             secondaryTitle("지정된 시간에 오늘의 독서 목표를 알릴게요")
         }
     }
-    
+
     private var timerPickerButton: some View {
         Button {
             withAnimation(.easeIn) {
-                isReminderTimePickerVisible.toggle()
+                viewModel.isReminderTimePickerVisible.toggle()
             }
         } label: {
-            Text(selectedTime, style: .time)
+            Text(viewModel.selectedTime, style: .time)
                 .fontStyle(.body)
                 .foregroundStyle(Color.Colors.green2)
                 .multilineTextAlignment(.center)
@@ -196,14 +162,14 @@ struct NotiSettingView: View {
                 .foregroundStyle(Color.Fills.lightGreen)
         }
     }
-    
-    // 실제로 데이터 피커가 보이는곳에 쓰이는 피커 컴포넌트
+
     private var timePicker: some View {
-        VStack {
+        @Bindable var bindableViewModel = viewModel
+        return VStack {
             DatePicker(
                 "",
-                selection: $selectedTime,
-                in: timeSelectionRange,
+                selection: $bindableViewModel.selectedTime,
+                in: viewModel.timeSelectionRange,
                 displayedComponents: .hourAndMinute
             )
             .datePickerStyle(WheelDatePickerStyle())
@@ -217,54 +183,70 @@ struct NotiSettingView: View {
             UIDatePicker.appearance().minuteInterval = 1
         }
     }
-    
-    // MARK: - Method
-    // 시간과 분만 저장
-    private func saveNotificationTime(_ time: Date) {
-        let calendar = Calendar.app
-        let hour = calendar.component(.hour, from: time)
-        let minute = calendar.component(.minute, from: time)
-        print("Save: \(hour): \(minute)")
-        
-        UserDefaultsManager.saveNotificationTime(hour: hour, minute: minute)
-    }
-    
-    private func saveNotificationStatus(_ isNotificationDisabled: Bool) {
-        UserDefaultsManager.saveNotificationDisabled(isNotificationDisabled)
-    }
-    
-    // 저장된 시간과 분 불러오기
-    private func fetchNotificationTime() {
-        let calendar = Calendar.app
-        let (hour, minute) = UserDefaultsManager.fetchNotificationReminderTime()
-        
-        selectedTime =
-        calendar.date(bySettingHour: hour, minute: minute, second: 0, of: Date()) ?? Date()
-    }
-    
-    private func fetchNotificationDisabled() {
-        isNotificationDisabled = UserDefaultsManager.fetchNotificationDisabled()
-    }
-    
-    private func handleNotificationStatusChange(isDisabled: Bool, userBook: UserBook?) async {
-        saveNotificationStatus(isDisabled)
-        
-        // 등록된 책이 없을 때는 노티 설정 X
-        guard let userBook else { return }
-        
-        if isDisabled {
-            await notificationManager.clearRequests()
-        } else {
-            await notificationManager.setupAllNotifications(userBook)
-        }
-    }
-    
-    private func handleNotificationTimeChange(newTime: Date, userBook: UserBook?) async {
-        saveNotificationTime(newTime)
-        
-        // 등록된 책이 없을 때는 노티 설정 X
-        guard let userBook else { return }
-        
-        await notificationManager.updateNotification(notificationType: .morning(readingBook: userBook))
-    }
 }
+
+#if DEBUG
+#Preview("기본 상태") {
+    NavigationStack {
+        NotiSettingView(
+            userBook: PreviewSupport.sampleReadingBook,
+            viewModel: makeNotiSettingPreviewViewModel()
+        )
+    }
+    .environment(PreviewSupport.makeCoordinator())
+}
+
+#Preview("시스템 알림 비활성화") {
+    NavigationStack {
+        NotiSettingView(
+            userBook: PreviewSupport.sampleReadingBook,
+            viewModel: makeNotiSettingPreviewViewModel(isSystemNotificationEnabled: false)
+        )
+    }
+    .environment(PreviewSupport.makeCoordinator())
+}
+
+#Preview("리마인드 시간 피커 열림") {
+    NavigationStack {
+        NotiSettingView(
+            userBook: PreviewSupport.sampleReadingBook,
+            viewModel: makeNotiSettingPreviewViewModel(
+                isNotificationDisabled: true,
+                isReminderTimePickerVisible: true
+            )
+        )
+    }
+    .environment(PreviewSupport.makeCoordinator())
+}
+
+@MainActor
+private func makeNotiSettingPreviewViewModel(
+    isSystemNotificationEnabled: Bool = true,
+    isNotificationDisabled: Bool = false,
+    isReminderTimePickerVisible: Bool = false
+) -> NotiSettingViewModel {
+    let notificationService = PreviewNotificationManager()
+    notificationService.isAuthorized = isSystemNotificationEnabled
+
+    let settingsStore = PreviewNotificationSettingsStore(
+        isDisabled: isNotificationDisabled,
+        reminderHour: 8,
+        reminderMinute: 30
+    )
+    let notificationSettingUseCase = NotificationSettingUseCase(
+        notificationService: notificationService,
+        systemSettingsOpener: SystemSettingsManager(),
+        settingsStore: settingsStore
+    )
+
+    let viewModel = NotiSettingViewModel(
+        notificationSettingUseCase: notificationSettingUseCase
+    )
+    viewModel.isSystemNotificationEnabled = isSystemNotificationEnabled
+    viewModel.isNotificationDisabled = isNotificationDisabled
+    viewModel.isReminderTimePickerVisible = isReminderTimePickerVisible
+    viewModel.loadPersistedSettings()
+    viewModel.isReminderTimePickerVisible = isReminderTimePickerVisible
+    return viewModel
+}
+#endif

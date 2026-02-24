@@ -8,12 +8,12 @@
 import SwiftData
 
 @Model
-final class BookMetaData: BookMetaDataProtocol {
+final class BookMetaData {
     var title: String
     var author: String
     var coverURL: String?
     var totalPages: Int
-    
+
     init(title: String, author: String, coverURL: String?, totalPages: Int) {
         self.title = title
         self.author = author

@@ -10,9 +10,9 @@ import SwiftUI
 struct ReadingBooksCarousel: View {
     let readingBooks: [FGUserBook]
     let today: Date
-    
+
     @Binding var activeID: UUID?
-    
+
     var body: some View {
         ScrollView(.horizontal) {
             HStack(spacing: 8) {
@@ -34,9 +34,10 @@ struct ReadingBooksCarousel: View {
 }
 
 #Preview {
+    let today = DefaultReadingDateProvider().today()
     ReadingBooksCarousel(
         readingBooks: .init(repeating: .dummy, count: 7),
-        today: Date(),
+        today: today,
         activeID: .constant(UUID())
     )
     .background(.blue)  // 프리뷰에서 흰색 카드가 보이도록 파란 배경 추가

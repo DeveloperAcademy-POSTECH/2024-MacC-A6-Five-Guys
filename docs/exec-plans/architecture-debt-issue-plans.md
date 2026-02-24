@@ -1,0 +1,265 @@
+# Architecture Debt Issue Plans (Architecture-first Execution Sync)
+
+This ExecPlan is a living document. The sections `Progress`, `Surprises & Discoveries`, `Decision Log`, and `Outcomes & Retrospective` must be kept up to date as work proceeds.
+
+This plan follows `/Users/zaehorang/.codex/PLANS.md` and is executed with `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/docs/exec-plans/architecture-debt-remediation-wave-plan.md`.
+
+## Purpose / Big Picture
+
+이 문서는 2026-02-16 리뷰 항목과 기존 debt를 이슈 단위로 분해해, 어떤 항목이 코드/테스트/문서 기준으로 완료되었고 어떤 항목이 남았는지 즉시 파악할 수 있게 유지합니다.
+
+목표는 “이슈 단위 상태 + 근거 파일 + 다음 액션”을 단일 문서에서 제공하는 것입니다.
+
+## Progress
+
+- [x] (2026-02-16 12:40Z) 초기 이슈별 실행 계획 작성.
+- [x] (2026-02-16 13:45Z) 기존 리뷰 항목 완료 동기화: TD-018, TD-017, TD-003, TD-019, TD-016, TD-020, TD-021.
+- [x] (2026-02-17 00:10Z) architecture-first 묶음 완료: TD-011, TD-006, TD-004, TD-001.
+- [x] (2026-02-17 00:12Z) TD-022 Stage 1 완료: `.swiftlint.yml` custom guard rules + acceptance 검색 0건.
+- [x] (2026-02-17 14:52Z) TD-007 후속 1차 완료: record-level `timeZoneID` 저장 + forward-only 정책 + ADR-0004 문서화.
+- [x] (2026-02-17 18:20Z) F1~F5 후속 반영: `Calendar.app` 현지 time zone 정책 전환, TD-027 Closed, TD-028 Partial, TD-029 신규 등록.
+- [x] (2026-02-17 17:20Z) TD-007 후속 2차 완료: 설정일 LocalDate key source-of-truth + SwiftData 병행 key 필드 + legacy backfill + ADR-0005 문서화.
+- [x] (2026-02-17 18:24Z) 날짜 정책 확정 후속 반영: TD-007 조건부 재보정 자동실행 + TD-028 구조적 진단 로깅 적용.
+- [x] (2026-02-19 08:17Z) TD-034 신규 등록: 강제 리로드 제거 이후 개선 관측을 유력 원인(가설)로 문서화하고, 원인 확정은 후속 RCA로 분리하기로 결정.
+- [x] (2026-02-19 10:05Z) TD-034 2차 완화 반영: swipe back 정책을 delegate 관여 없이 `isEnabled` depth 제어로 단순화하고 ADR-0006/tracker 근거를 동기화.
+- [x] (2026-02-19 16:37Z) TD-034 검증 반영: `xcodebuild ... build` 성공으로 컴파일 회귀 없음 확인(`** BUILD SUCCEEDED **`).
+- [x] (2026-02-20 11:05Z) TD-034 3차 완화 반영: route 기본 정책 + top override를 coordinator로 중앙화하고 root 단일 host에서 swipe 정책 적용.
+- [x] (2026-02-20 16:20Z) TD-034 4차 완화 반영: legacy back 호출부/no-op modifier를 정리하고 `NavigationCoordinatorTests` 정책 경계 케이스를 보강.
+- [x] (2026-02-20 21:45Z) TD-034 5차 정리 반영: `customNavigationBackButton` 레거시 오버로드 제거 + `navigationRootBackHost()` 네이밍 모디파이어 적용.
+- [ ] Remaining: TD-015, TD-010, TD-034(back 간헐 재현 계측 + RCA), TD-007 잔여(typed key adapter + settings legacy Date 제거 마이그레이션), TD-022 Stage 2(모듈화 스파이크/분리 로드맵), TD-029 analytics 경계 분리.
+
+## Surprises & Discoveries
+
+- Observation: custom lint rule의 경로 지정이 느슨하면 의도한 계층 외 파일까지 위반으로 탐지됩니다.
+  Evidence: `Presentation/View` 룰이 `Presentation/ViewModel`까지 매칭되어 rule `excluded`를 추가해 수정.
+
+- Observation: 선택 테스트 실행에서도 테스트 타깃 컴파일 에러는 전체 테스트 소스에 영향을 줍니다.
+  Evidence: `ViewModelTestSupport.swift` 반환 누락으로 대상 테스트와 무관하게 빌드 실패.
+
+- Observation: `viewReloadTrigger` 계열 제거 이후 홈 화면 표시와 back 동작 체감이 기존 대비 개선되었습니다.
+  Evidence: 사용자 관측 메모(2026-02-19) "화면 잘 보입니다. 백버튼도 기존보다는 잘 되는 거 같아요."
+
+- Observation: 개선 관측이 있어도 잔여 간헐 증상이 남아 단일 원인으로 확정할 수 없습니다.
+  Evidence: 사용자 관측 메모(2026-02-19) "기존 대비 개선, 잔여 간헐 존재" + 후속 재현 계측 필요.
+
+- Observation: swipe 정책에서 `interactivePopGestureRecognizer.delegate` 관여를 제거해 구현 경계가 `isEnabled` depth 제어로 단순화되었습니다.
+  Evidence: `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/FiveGuyes/FiveGuyes/Sources/Presentation/Shared/Extensions/View+NavigationSwipeBackPolicy.swift`에서 delegate 할당 경로 제거.
+
+- Observation: 정적 검색에서 swipe 정책 확장 파일 기준 delegate 직접 할당 문자열이 더 이상 검색되지 않습니다.
+  Evidence: `rg -n "interactivePopGestureRecognizer\\.delegate|baselineGesture|captureBaselineIfNeeded|restoreBaselineIfNeeded" .../View+NavigationSwipeBackPolicy.swift` 결과 0건.
+
+- Observation: swipe 정책 적용 지점을 root 단일 host로 이동하면서, 화면별 UIKit 제스처 접근 경로가 제거되었습니다.
+  Evidence: `NavigationInteractivePopHost.swift` 신규 도입 + `View+NavigationSwipeBackPolicy.swift` no-op 전환.
+
+- Observation: legacy 인자/no-op 호출 지점을 정리하면서 화면 코드의 정책 소스가 `NavigationCoordinator` 단일 경로로 수렴했습니다.
+  Evidence: `CompletionReviewView.swift`/`UnfinishReadingView.swift`에서 legacy 인자 제거, `CompletionCelebrationView.swift`의 `disableNavigationGesture()` 호출 제거.
+
+## Decision Log
+
+- Decision: 아키텍처 경계 부채는 기능 버그 잔여 항목보다 먼저 처리한다.
+  Rationale: 경계 고정이 선행되어야 이후 수정의 재발을 줄일 수 있다.
+  Date/Author: 2026-02-16 / Codex
+
+- Decision: TD-022는 Stage 1(정적 가드룰)과 Stage 2(모듈 분리)로 분할한다.
+  Rationale: 즉시 차단 가능한 범위와 고비용 구조 변경을 분리해 위험을 낮춘다.
+  Date/Author: 2026-02-16 / Codex
+
+- Decision: TD-007 후속은 key 포맷 변경 없이 record value(`timeZoneID`) 스냅샷 + forward-only로 처리한다.
+  Rationale: ADR-0003 key 호환성을 유지하면서 해외 이동 시 과거 날짜 경험 보존 요구를 만족하기 위해서다.
+  Date/Author: 2026-02-17 / Codex
+
+- Decision: 날짜 버킷팅 정책은 `Calendar.app(현재 기기 time zone + 04:00 경계)`로 통일한다.
+  Rationale: write-only timezone 저장으로는 현지 날짜 UX 요구를 충족하지 못해 save/read/reschedule 기준 타임존을 단일화해야 한다.
+  Date/Author: 2026-02-17 / Codex
+
+- Decision: 설정일(start/end/non-reading)은 `Date`가 아닌 `ReadingDateKey`를 source-of-truth로 사용하고 SwiftData는 병행 필드 전략으로 점진 전환한다.
+  Rationale: 설정일 day drift를 막으면서 운영 데이터 안전성과 롤백 가능성을 함께 확보하기 위함.
+  Date/Author: 2026-02-17 / Codex
+
+- Decision: 마이그레이션 completion flag가 true여도 재유입 신호가 감지되면 조건부 재보정 모드를 재실행한다.
+  Rationale: 백업 복원/import로 legacy 데이터가 다시 들어올 수 있어 1회 플래그만으로는 drift를 막기 어렵기 때문이다.
+  Date/Author: 2026-02-17 / Codex
+
+- Decision: prewarm/migration 실패 관측성은 `MigrationDiagnosticLogging` 경계로 구조화하고 Analytics 연계는 TD-029로 분리한다.
+  Rationale: 장애 원인 추적에 필요한 진단 정보는 즉시 확보하면서 SDK 결합 확대는 별도 부채로 관리하기 위해서다.
+  Date/Author: 2026-02-17 / Codex
+
+- Decision: back 간헐 실패와 강제 리로드 워크어라운드의 관계는 "유력 원인(가설)"로만 관리하고, 이번 사이클에서 원인 확정은 하지 않는다.
+  Rationale: 제거 후 개선 관측은 존재하지만 잔여 간헐 증상도 남아 있어 단정 시 오판 리스크가 크다.
+  Date/Author: 2026-02-19 / Codex
+
+- Decision: hotfix 범위(리로드 제거/정합화)와 RCA 범위(재현 계측/원인 확정)를 TD-034에서 분리 추적한다.
+  Rationale: 사용자 체감 개선을 우선 반영하면서도, 후속 원인 분석의 검증 책임을 명확히 분리하기 위함이다.
+  Date/Author: 2026-02-19 / Codex
+
+- Decision: swipe back 정책은 `.systemDefault`/`.disabled` 모두 `interactivePopGestureRecognizer.isEnabled`만 제어하고 delegate는 앱 코드에서 교체하지 않는다.
+  Rationale: 이번 범위의 목표(허용/차단)는 isEnabled만으로 충족되며, delegate 관여 지점을 줄여 회귀 분석과 정책 이해 비용을 낮추기 위함이다.
+  Date/Author: 2026-02-19 / Codex
+
+- Decision: swipe 정책의 UIKit 적용 책임은 root 단일 host(`NavigationInteractivePopHost`)로 고정하고, 화면 파일에서 UIKit 제어를 금지한다.
+  Rationale: stack 공유 상태 변경 지점을 1곳으로 제한하면 정책 누수/생명주기 타이밍 충돌을 줄이고 RCA 가시성을 높일 수 있다.
+  Date/Author: 2026-02-20 / Codex
+
+- Decision: `customNavigationBackButton`는 `action` 단일 시그니처로 고정하고, 레거시 오버로드는 제거한다.
+  Rationale: 무시되는 인자를 남겨두면 정책 소스를 오해하기 쉬워서, API 계약을 코드 구조와 동일하게 맞추기 위함이다.
+  Date/Author: 2026-02-20 / Codex
+
+## Outcomes & Retrospective
+
+이번 사이클에서 이슈 상태는 다음과 같이 업데이트되었습니다.
+
+1. 새로 닫힌 항목: TD-001, TD-004, TD-006, TD-011.
+2. Partial로 전환된 항목: TD-022(Stage 1 완료), TD-007(record timezone snapshot + settings LocalDate key 전환).
+3. 기존 닫힘 유지: TD-018, TD-017, TD-003, TD-019, TD-016, TD-020, TD-021.
+4. 이번 사이클에서 TD-027은 실행일 완료 정책 확정, TD-028은 구조적 진단 로깅 적용으로 Closed 처리했다.
+5. 이번 사이클에서 TD-034를 Partial로 신규 등록했고, 강제 리로드 워크어라운드는 back 간헐 실패의 유력 원인(가설)로 관리한다.
+6. 잔여 우선순위: TD-015(P1) -> TD-010(P2) -> TD-034(P2 Partial) -> TD-007 잔여(P2 Partial, Date 필드 제거 포함) -> TD-022 Stage 2(P3) -> TD-029(P3).
+7. TD-034 후속 완화로 swipe 정책을 delegate 무관여 + depth 기반 `isEnabled` 제어로 단순화했고, 2026-02-20에는 route + dynamic override 정책을 root 단일 host 적용 구조로 중앙화했다.
+8. TD-034 4차 완화에서 legacy/no-op 호출 정리와 `NavigationCoordinatorTests` 정책 경계 보강을 반영했다.
+9. TD-034 5차 정리에서 `customNavigationBackButton(action:)` 단일 API 정리와 `navigationRootBackHost()` 네이밍 정합화를 반영했다.
+10. 컴파일 검증은 `xcodebuild ... build` 성공으로 통과했으며, 화면별 swipe 수동 반복 시나리오는 사용자 검증 단계로 남겨둔다.
+
+검증 명령:
+
+- `xcodebuild test -quiet -parallel-testing-enabled NO -project FiveGuyes/FiveGuyes.xcodeproj -scheme FiveGuyes -destination 'platform=iOS Simulator,name=iPhone 17,OS=26.2' -only-testing:FiveGuyesTests/NotiSettingViewModelTests -only-testing:FiveGuyesTests/MainHomeViewModelTests -only-testing:FiveGuyesTests/ReadingDateEditViewModelTests -only-testing:FiveGuyesTests/ReadingDateSettingViewModelTests -only-testing:FiveGuyesTests/BookManagementUseCasesQueryAndRegistrationTests -only-testing:FiveGuyesTests/BookManagementUseCasesDailyReadingTests -only-testing:FiveGuyesTests/BookManagementUseCasesCompletionAndPlanTests -only-testing:FiveGuyesTests/DayBoundaryPolicyTests`
+
+## Context and Orientation
+
+architecture-first 리베이스에서 반영한 이슈-코드 매핑은 아래와 같습니다.
+
+- TD-011 (Home 알림 오케스트레이션 분리):
+  - `FiveGuyes/FiveGuyes/Sources/Domain/UseCase/Home/HomeNotificationUseCase.swift`
+  - `FiveGuyes/FiveGuyes/Sources/Domain/UseCase/BookManagement/LibraryAndRegistrationUseCases.swift`
+  - `FiveGuyes/FiveGuyes/Sources/Presentation/ViewModel/MainHomeViewModel.swift`
+
+- TD-006 (Composition Root 상향):
+  - `FiveGuyes/FiveGuyes/Sources/Presentation/View/BookSetting/BookSettingsManagerView.swift`
+  - `FiveGuyes/FiveGuyes/Sources/Presentation/ViewModel/NavigationCoordinator.swift`
+
+- TD-004/TD-001 (DayBoundary/provider 경계 정리):
+  - `FiveGuyes/FiveGuyes/Sources/Domain/Service/ReadingDateProviding.swift`
+  - `FiveGuyes/FiveGuyes/Sources/Shared/Extensions/Foundation/Date+Extension.swift`
+  - Preview/sample today 입력이 있는 `Presentation/View/**` 프리뷰 블록
+
+- TD-022 Stage 1 (정적 가드룰):
+  - `FiveGuyes/.swiftlint.yml`
+
+- TD-007 후속 1차 (record timezone snapshot):
+  - `FiveGuyes/FiveGuyes/Sources/Domain/Entity/ReadingRecord.swift`
+  - `FiveGuyes/FiveGuyes/Sources/Domain/Service/ReadingTimeZoneProviding.swift`
+  - `FiveGuyes/FiveGuyes/Sources/Domain/Calculator/ReadingScheduleCalculator.swift`
+  - `FiveGuyes/FiveGuyes/Sources/Domain/UseCase/BookManagement/DailyAndPlanUseCases.swift`
+  - `FiveGuyes/FiveGuyes/Sources/Domain/UseCase/BookManagement/LibraryAndRegistrationUseCases.swift`
+  - `docs/decisions/adr-0004-reading-record-timezone-forward-only-policy.md`
+
+- TD-007 후속 2차 (settings LocalDate stability):
+  - `FiveGuyes/FiveGuyes/Sources/Domain/Entity/FGUserBook.swift`
+  - `FiveGuyes/FiveGuyes/Sources/Data/SwiftData/Model/UserBookModelV2/UserSettings.swift`
+  - `FiveGuyes/FiveGuyes/Sources/Data/SwiftData/Extensions/UserBookV2+toFGUserBook.swift`
+  - `FiveGuyes/FiveGuyes/Sources/Data/RepoImpl/SwiftDataBookRepo.swift`
+  - `docs/decisions/adr-0005-settings-localdate-source-of-truth.md`
+  - `docs/exec-plans/td-007-settings-localdate-stability-execplan.md`
+
+- TD-007/TD-028 후속 (조건부 재보정 + 구조적 진단 로깅):
+  - `FiveGuyes/FiveGuyes/Sources/Data/RepoImpl/SwiftDataBookRepo.swift`
+  - `FiveGuyes/FiveGuyes/Sources/Domain/Service/MigrationDiagnosticLogging.swift`
+  - `FiveGuyes/FiveGuyes/Sources/App/AppDependencies.swift`
+  - `FiveGuyes/FiveGuyesTests/Data/Repo/SwiftDataBookRepoTests.swift`
+  - `FiveGuyes/FiveGuyesTests/Domain/Service/MigrationDiagnosticLoggingTests.swift`
+
+- TD-034 (Main 강제 리로드 워크어라운드와 back 간헐 실패 상관 이슈):
+  - `FiveGuyes/FiveGuyes/Sources/Presentation/ViewModel/NavigationCoordinator.swift`
+  - `FiveGuyes/FiveGuyes/Sources/App/NavigationRootView.swift`
+  - `FiveGuyes/FiveGuyes/Sources/Presentation/View/Main/MainHomeView.swift`
+  - `FiveGuyes/FiveGuyes/Sources/Presentation/Shared/CustomBackButton.swift`
+  - `FiveGuyes/FiveGuyes/Sources/Presentation/Shared/Navigation/NavigationInteractivePopHost.swift`
+  - `FiveGuyes/FiveGuyes/Sources/Presentation/Shared/Extensions/View+NavigationSwipeBackPolicy.swift`
+  - `FiveGuyes/FiveGuyes/Sources/Presentation/View/BookSetting/BookSettingsManagerView.swift`
+  - `FiveGuyes/FiveGuyes/Sources/Presentation/View/BookCompletion/CompletionReviewView.swift`
+  - `FiveGuyes/FiveGuyes/Sources/Presentation/View/BookProgress/UnfinishReadingView.swift`
+  - `FiveGuyes/FiveGuyes/Sources/Presentation/View/BookCompletion/CompletionCelebrationView.swift`
+  - `FiveGuyes/FiveGuyesTests/Presentation/ViewModel/NavigationCoordinatorTests.swift`
+  - `docs/decisions/adr-0006-stack-back-path-only-policy.md`
+  - `docs/product/current-feature-spec.md`
+  - `docs/product/past/main-feature-baseline.md`
+  - `docs/exec-plans/tech-debt-tracker.md`
+
+## Plan of Work
+
+이 문서는 실행 완료 이슈와 잔여 이슈를 함께 유지합니다.
+
+- 완료된 이슈는 `tech-debt-tracker.md`의 `Status: Closed` 또는 `Partial`로 동기화하고 근거 파일을 보강합니다.
+- 잔여 이슈는 아래 순서로 수행합니다.
+
+1. TD-015: 야간 알림 시간 상수 유효 범위 수정 + 테스트 고정.
+2. TD-010: 알림 일괄 등록 권한 체크 1회화 + 테스트 고정.
+3. TD-034: back 간헐 실패 재현 계측(탭 시점/stack depth/routeKey) + RCA 착수 조건 확정.
+4. TD-007 잔여: typed key adapter 확장 + 글로벌 정책 UX 분리 설계.
+5. TD-022 Stage 2: Domain 분리 스파이크와 모듈화 로드맵 문서화.
+6. TD-029: Presentation analytics 호출 경계 분리 로드맵 문서화/착수.
+
+## Concrete Steps
+
+작업 루트: `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys`
+
+1. 코드 변경
+
+    이슈별 대상 파일만 수정하고 out-of-scope 변경을 금지
+
+2. 경계 감사
+
+    `rg -n "\b(any\s+)?\w+(Managing|Providing|Storing|Opening)\b" FiveGuyes/FiveGuyes/Sources/Presentation/ViewModel -g'*.swift'`
+
+    `rg -n "\b(any\s+)?\w+Using\b" FiveGuyes/FiveGuyes/Sources/Presentation/View -g'*.swift'`
+
+    `rg -n "@Environment\(AppDependencies\.self\)" FiveGuyes/FiveGuyes/Sources/Presentation/View -g'*.swift'`
+
+3. 회귀 테스트
+
+    `xcodebuild test ... -only-testing:<대상 테스트들>`
+
+4. 문서 동기화
+
+    `docs/exec-plans/tech-debt-tracker.md` + 본 문서 `Progress/Decision Log/Outcomes` 갱신
+
+## Validation and Acceptance
+
+완료로 판정하려면 아래를 모두 만족해야 합니다.
+
+1. 이슈별 코드 경계가 목표 레이어로 수렴됨.
+2. 최소 1개 이상의 회귀 검증(테스트 또는 명시적 테스트 갭 문서화).
+3. tracker 상태와 근거 파일이 최신화됨.
+4. architecture acceptance 검색 3패턴이 0건.
+
+## Idempotence and Recovery
+
+이슈 단위로 독립 적용되므로 실패 시 해당 이슈 범위 파일만 되돌려 재시도할 수 있습니다. Stage 분리 항목(TD-022)은 Stage 1 완료 상태를 유지한 채 Stage 2를 별도 커밋으로 진행합니다.
+
+## Artifacts and Notes
+
+현재까지 추가된 주요 아키텍처 산출물:
+
+1. `NotificationSettingUseCase.swift`
+2. `HomeNotificationUseCase.swift`
+3. `ReadingDateSettingViewModel.swift`
+4. `ReadingDateSettingViewModelTests.swift`
+5. `.swiftlint.yml` custom rule 3종
+6. `adr-0004-reading-record-timezone-forward-only-policy.md`
+7. `adr-0005-settings-localdate-source-of-truth.md`
+
+## Interfaces and Dependencies
+
+이번 sync에서 새로 확정된 인터페이스는 다음과 같습니다.
+
+1. `NotificationSettingUsing`
+2. `HomeNotificationUsing`
+3. 축소된 `ReadingLibraryUsing` (알림 오케스트레이션 책임 제거)
+4. `ReadingDateSettingViewModel` (View 계산 경계)
+
+Plan revision note (2026-02-17): Rebased from bug-first 기록 to architecture-first execution status and synced issue states with tracker.
+Plan revision note (2026-02-17): Added TD-007 settings LocalDate stabilization sync (parallel DateKey fields, legacy backfill, ADR-0005).
+Plan revision note (2026-02-19): Added TD-034 swipe policy simplification sync (delegate non-interference + isEnabled-only depth policy) and aligned tracker/ADR evidence links.
+Plan revision note (2026-02-19): Added TD-034 validation notes (static grep + `xcodebuild build` success) and kept manual swipe regression as remaining RCA input.
+Plan revision note (2026-02-20): Added TD-034 route + dynamic override centralization sync (root host single-point swipe policy application).
+Plan revision note (2026-02-20): Added TD-034 stage-2 cleanup sync (legacy/no-op call-site cleanup + NavigationCoordinator policy test hardening).
+Plan revision note (2026-02-20): Added TD-034 final polish sync (legacy back overload removal + root modifier naming alignment).
