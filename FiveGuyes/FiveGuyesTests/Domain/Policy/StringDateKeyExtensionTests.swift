@@ -22,17 +22,17 @@ struct StringDateKeyExtensionTests {
         #expect("invalid".extractYear() == "invalid")
     }
 
-    @Test("String.toDate와 ReadingDateKey는 동일 키로 라운드트립된다")
-    func stringToDate_roundTripWithReadingDateKey() {
+    @Test("String.toReadingDateKey와 Date.readingDateKey는 동일 키로 라운드트립된다")
+    func stringToReadingDateKey_roundTripWithReadingDateKey() {
         let original = "2026-02-15"
-        let parsedDate = original.toDate()
+        let parsedDate = original.toReadingDateKey()?.toDate(calendar: .app)
         let roundTrip = parsedDate?.readingDateKey.rawValue
 
         #expect(roundTrip == original)
     }
 
-    @Test("Date.toYearMonthDayString은 readingDateKey.rawValue와 동일하다")
-    func dateToYearMonthDayString_matchesReadingDateKey() {
+    @Test("Date.readingDateKey는 yyyy-MM-dd 형식 키를 생성한다")
+    func dateReadingDateKey_matchesExpectedFormat() {
         var components = DateComponents()
         components.year = 2026
         components.month = 2
@@ -46,6 +46,6 @@ struct StringDateKeyExtensionTests {
             return
         }
 
-        #expect(date.toYearMonthDayString() == date.readingDateKey.rawValue)
+        #expect(date.readingDateKey.rawValue == "2026-02-15")
     }
 }

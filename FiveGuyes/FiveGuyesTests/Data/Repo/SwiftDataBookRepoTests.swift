@@ -211,9 +211,9 @@ struct SwiftDataBookRepoTests {
         #expect(fetchedBook.bookMetaData.author == "새로운 작가")
     }
 
-    /// fetchBooks 테스트: 여러 책 조회
-    @Test("fetchBooks로 여러 책 조회")
-    func testFetchBooks() async throws {
+    /// getReadingBooks 테스트: 여러 읽는 중 책 조회
+    @Test("getReadingBooks로 여러 읽는 중 책 조회")
+    func testGetReadingBooks_multipleResults() async throws {
         let container = try createInMemoryContainer()
         let repo = SwiftDataBookRepo(modelContainer: container)
 
@@ -226,8 +226,8 @@ struct SwiftDataBookRepoTests {
         try await repo.addBook(book2)
         try await repo.addBook(book3)
 
-        // 모든 책 조회
-        let books = try await repo.fetchBooks()
+        // 읽는 중 책 조회
+        let books = try await repo.getReadingBooks()
 
         // 검증
         #expect(books.count == 3)
@@ -340,32 +340,6 @@ struct SwiftDataBookRepoTests {
     }
 
     // MARK: - Partial Update Tests
-
-    /// updateReadingProgress 테스트
-    @Test("updateReadingProgress로 진행 상황만 수정")
-    func testUpdateReadingProgress() async throws {
-        let container = try createInMemoryContainer()
-        let repo = SwiftDataBookRepo(modelContainer: container)
-
-        // 책 추가
-        let testBook = createTestBook()
-        try await repo.addBook(testBook)
-
-        // 진행 상황 수정
-        let newProgress = FGReadingProgress(
-            dailyReadingRecords: ["2025-01-10": ReadingRecord(targetPages: 10, pagesRead: 10)],
-            lastReadDate: makeDate("2025-01-10"),
-            lastReadPage: 10
-        )
-
-        try await repo.updateReadingProgress(bookId: testBook.id, progress: newProgress)
-
-        // 수정 확인
-        let fetchedBook = try await repo.fetchBook(by: testBook.id)
-        #expect(fetchedBook.readingProgress.lastReadPage == 10)
-        #expect(fetchedBook.readingProgress.lastReadDate == makeDate("2025-01-10"))
-        #expect(fetchedBook.readingProgress.dailyReadingRecords.count == 1)
-    }
 
     /// updateSettings 테스트
     @Test("updateSettings로 설정만 수정")
@@ -536,7 +510,7 @@ struct SwiftDataBookRepoTests {
         container.mainContext.insert(firstLegacyBook)
         try container.mainContext.save()
 
-        _ = try await repo.fetchBooks()
+        _ = try await repo.fetchBook(by: firstLegacyBook.id)
         #expect(migrationStorage.userDefaults.bool(forKey: migrationStorage.completionKey) == true)
 
         let reintroducedLegacyBook = createTestBook().toUserBookV2()

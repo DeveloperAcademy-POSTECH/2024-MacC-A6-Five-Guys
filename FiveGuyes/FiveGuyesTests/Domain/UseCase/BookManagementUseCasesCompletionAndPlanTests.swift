@@ -162,9 +162,9 @@ extension BookManagementUseCasesTests {
         )
         testBook.readingProgress = FGReadingProgress(
             dailyReadingRecords: [
-                makeDate("2025-01-01").toYearMonthDayString(): ReadingRecord(targetPages: 10, pagesRead: 10),
-                makeDate("2025-01-02").toYearMonthDayString(): ReadingRecord(targetPages: 10, pagesRead: 0),
-                makeDate("2025-01-03").toYearMonthDayString(): ReadingRecord(targetPages: 10, pagesRead: 20)
+                makeDate("2025-01-01").readingDateKey.rawValue: ReadingRecord(targetPages: 10, pagesRead: 10),
+                makeDate("2025-01-02").readingDateKey.rawValue: ReadingRecord(targetPages: 10, pagesRead: 0),
+                makeDate("2025-01-03").readingDateKey.rawValue: ReadingRecord(targetPages: 10, pagesRead: 20)
             ],
             lastReadDate: nil,
             lastReadPage: 20
@@ -209,8 +209,8 @@ extension BookManagementUseCasesTests {
 
         let summary = useCase.completionCelebrationSummary(for: testBook)
 
-        #expect(summary.startDate.toYearMonthDayString() == "2025-01-01")
-        #expect(summary.endDate.toYearMonthDayString() == "2025-01-19")
+        #expect(summary.startDate.readingDateKey.rawValue == "2025-01-01")
+        #expect(summary.endDate.readingDateKey.rawValue == "2025-01-19")
     }
 
     @Test("BookCompletionUseCase.completionCelebrationSummary는 시작일이 오늘보다 늦으면 오늘로 보정한다")
@@ -277,8 +277,8 @@ extension BookManagementUseCasesTests {
         var testBook = createTestBook(totalPages: 300, isCompleted: false)
         testBook.readingProgress = FGReadingProgress(
             dailyReadingRecords: [
-                makeDate("2025-01-01").toYearMonthDayString(): ReadingRecord(targetPages: 10, pagesRead: 10),
-                makeDate("2025-01-02").toYearMonthDayString(): ReadingRecord(targetPages: 20, pagesRead: 20)
+                makeDate("2025-01-01").readingDateKey.rawValue: ReadingRecord(targetPages: 10, pagesRead: 10),
+                makeDate("2025-01-02").readingDateKey.rawValue: ReadingRecord(targetPages: 20, pagesRead: 20)
             ],
             lastReadDate: makeDate("2025-01-02"),
             lastReadPage: 20
@@ -367,9 +367,5 @@ private struct FixedNowDayBoundaryPolicy: DayBoundaryProviding {
 
     func adjustedDate(from date: Date) -> Date {
         policy.adjustedDate(from: date)
-    }
-
-    func adjustedDayKey(from date: Date) -> ReadingDateKey {
-        policy.adjustedDayKey(from: date)
     }
 }
