@@ -11,8 +11,6 @@ import Foundation
 /// 현재 정책은 04:00 경계 보정이 적용된 날짜입니다.
 protocol ReadingDateProviding {
     func today() -> Date
-    func adjustedDate(from date: Date) -> Date
-    func dayKey(from date: Date) -> ReadingDateKey
 }
 
 struct DefaultReadingDateProvider: ReadingDateProviding {
@@ -24,23 +22,5 @@ struct DefaultReadingDateProvider: ReadingDateProviding {
 
     func today() -> Date {
         dayBoundaryPolicy.adjustedNow()
-    }
-
-    func adjustedDate(from date: Date) -> Date {
-        dayBoundaryPolicy.adjustedDate(from: date)
-    }
-
-    func dayKey(from date: Date) -> ReadingDateKey {
-        dayBoundaryPolicy.adjustedDayKey(from: date)
-    }
-}
-
-extension ReadingDateProviding {
-    func adjustedDate(from date: Date) -> Date {
-        date.onlyDate
-    }
-
-    func dayKey(from date: Date) -> ReadingDateKey {
-        ReadingDateKey(date: adjustedDate(from: date), calendar: .app)
     }
 }

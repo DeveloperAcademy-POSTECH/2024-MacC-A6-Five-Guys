@@ -294,7 +294,7 @@ extension BookManagementUseCasesTests {
         _ = try await useCase.recordReading(bookId: testBook.id, pagesRead: 10)
 
         let updatedBook = try await mockRepo.fetchBook(by: testBook.id)
-        let key = today.toYearMonthDayString()
+        let key = today.readingDateKey.rawValue
         #expect(updatedBook.readingProgress.dailyReadingRecords[key]?.timeZoneID == "America/Los_Angeles")
     }
 }
