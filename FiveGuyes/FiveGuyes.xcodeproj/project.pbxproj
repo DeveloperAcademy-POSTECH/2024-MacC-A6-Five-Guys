@@ -39,6 +39,7 @@
 			membershipExceptions = (
 				Info.plist,
 				Sources/Platform/Analytics/CLAUDE.md,
+				Sources/Presentation/CLAUDE.md,
 			);
 			target = 26890B902CAE811A008DFF49 /* FiveGuyes */;
 		};
