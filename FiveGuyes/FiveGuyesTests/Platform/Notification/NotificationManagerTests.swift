@@ -76,7 +76,7 @@ struct NotificationManagerTests {
             ),
             readingProgress: FGReadingProgress(
                 dailyReadingRecords: [
-                    nextReadingDate.toYearMonthDayString(): ReadingRecord(targetPages: 15, pagesRead: 0)
+                    nextReadingDate.readingDateKey.rawValue: ReadingRecord(targetPages: 15, pagesRead: 0)
                 ],
                 lastReadDate: today,
                 lastReadPage: 15

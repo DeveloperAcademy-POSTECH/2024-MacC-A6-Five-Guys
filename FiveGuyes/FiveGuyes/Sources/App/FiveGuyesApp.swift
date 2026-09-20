@@ -47,7 +47,17 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
     ) -> Bool {
+        // Debug에서는 GoogleService-Info.plist가 없으면 Firebase 초기화를 건너뜁니다.
+        // plist는 gitignore 대상이라 CI와 자격증명 없는 로컬 환경에는 존재하지 않고,
+        // 그대로 configure()를 부르면 앱이 launch 중 abort해 테스트도 실행되지 않습니다.
+        // Release에서는 plist 누락이 배포 사고이므로 기존대로 크래시로 드러냅니다.
+        #if DEBUG
+        if Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") != nil {
+            FirebaseApp.configure()
+        }
+        #else
         FirebaseApp.configure()
+        #endif
 
         Task {
             await requestTrackingAuthorization()

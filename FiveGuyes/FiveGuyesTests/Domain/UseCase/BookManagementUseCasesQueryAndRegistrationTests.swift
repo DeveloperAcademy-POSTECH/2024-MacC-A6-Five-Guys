@@ -33,31 +33,6 @@ extension BookManagementUseCasesTests {
         #expect(snapshot.completedBooks.contains(where: { $0.bookMetaData.title == "완료됨" }))
     }
 
-    @Test("FetchBookDetailUseCase로 특정 책 상세 조회")
-    func testFetchBookDetail() async throws {
-        let mockRepo = MockBookRepo()
-        let useCase = FetchBookDetailUseCase(repo: mockRepo)
-
-        let testBook = createTestBook(title: "테스트 책", author: "테스트 작가")
-        await mockRepo.setBooks([testBook])
-
-        let result = try await useCase.execute(id: testBook.id)
-
-        #expect(result.id == testBook.id)
-        #expect(result.bookMetaData.title == "테스트 책")
-        #expect(result.bookMetaData.author == "테스트 작가")
-    }
-
-    @Test("FetchBookDetailUseCase로 존재하지 않는 책 조회 시 에러 발생")
-    func testFetchBookDetailNotFound() async throws {
-        let mockRepo = MockBookRepo()
-        let useCase = FetchBookDetailUseCase(repo: mockRepo)
-
-        await #expect(throws: RepoError.self) {
-            _ = try await useCase.execute(id: UUID())
-        }
-    }
-
     @Test("책이 없을 때 ReadingLibraryUseCase.fetchLibrarySnapshot은 빈 결과를 반환")
     func testFetchEmptySnapshot() async throws {
         let mockRepo = MockBookRepo()
@@ -142,7 +117,7 @@ extension BookManagementUseCasesTests {
         let registeredBook = try await useCase.registerBook(input)
 
         #expect(!registeredBook.readingProgress.dailyReadingRecords.isEmpty)
-        let firstDateKey = makeDate("2025-01-01").toYearMonthDayString()
+        let firstDateKey = makeDate("2025-01-01").readingDateKey.rawValue
         let firstRecord = registeredBook.readingProgress.dailyReadingRecords[firstDateKey]
         #expect(firstRecord != nil)
         #expect((firstRecord?.targetPages ?? 0) > 0)

@@ -1,0 +1,109 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [develop, main]
+  push:
+    branches: [develop]
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    name: Build & Test
+    runs-on: macos-15
+    timeout-minutes: 45
+
+    env:
+      PROJECT: FiveGuyes/FiveGuyes.xcodeproj
+      SCHEME: FiveGuyes
+      SPM_CACHE_PATH: SourcePackages
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select latest Xcode
+        run: |
+          set -euo pipefail
+          latest=$(ls -d /Applications/Xcode*.app | sort -V | tail -1)
+          echo "Selecting $latest"
+          sudo xcode-select -s "$latest/Contents/Developer"
+          xcodebuild -version
+
+      # Config.xcconfig는 Debug/Release의 base configuration이며 gitignore 대상이라
+      # 복사하지 않으면 빌드 자체가 실패한다. 값은 placeholder로 충분하다
+      # (CI는 알라딘 API를 호출하지 않는다).
+      #
+      # GoogleService-Info.plist는 일부러 만들지 않는다. Debug 빌드는 plist가 없으면
+      # Firebase 초기화를 건너뛰므로 CI에 가짜 자격증명을 심을 이유가 없다.
+      - name: Bootstrap local build config
+        run: cp FiveGuyes/Config.xcconfig.example FiveGuyes/Config.xcconfig
+
+      - name: Cache Swift packages
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.SPM_CACHE_PATH }}
+          key: spm-${{ runner.os }}-${{ hashFiles('FiveGuyes/FiveGuyes.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
+          restore-keys: spm-${{ runner.os }}-
+
+      # 시뮬레이터 이름을 하드코딩하면 러너 이미지의 Xcode가 올라갈 때 깨진다.
+      # 사용 가능한 iPhone 중 최신 OS를 골라 UDID로 고정한다.
+      - name: Resolve simulator
+        id: sim
+        run: |
+          set -euo pipefail
+          xcrun simctl list devices available --json > devices.json
+          python3 - <<'PYEOF' >> "$GITHUB_OUTPUT"
+          import json, re, sys
+
+          data = json.load(open("devices.json"))["devices"]
+          best = None
+          for runtime, devices in data.items():
+              match = re.search(r"iOS-(\d+)-(\d+)", runtime)
+              if not match:
+                  continue
+              version = (int(match.group(1)), int(match.group(2)))
+              for device in devices:
+                  if not device.get("isAvailable"):
+                      continue
+                  if not device["name"].startswith("iPhone"):
+                      continue
+                  if best is None or version > best[0]:
+                      best = (version, device["udid"], device["name"])
+
+          if best is None:
+              sys.exit("No available iPhone simulator found")
+
+          version, udid, name = best
+          print(f"udid={udid}")
+          print(f"Selected {name} on iOS {version[0]}.{version[1]}", file=sys.stderr)
+          PYEOF
+
+      # SwiftLint는 SwiftLintBuildToolPlugin으로 등록되어 있어 이 단계에서 함께 실행된다.
+      # 계층 의존성 커스텀 룰 3개는 severity: error라 위반 시 여기서 빌드가 깨진다.
+      # 병렬 테스트는 끈다. 시뮬레이터 안에서 테스트가 멈추는 사례가 있었고,
+      # 단일 시뮬레이터로 돌려야 hang 지점을 진단할 수 있다.
+      - name: Test
+        run: |
+          set -euo pipefail
+          xcodebuild test \
+            -project "$PROJECT" \
+            -scheme "$SCHEME" \
+            -destination "platform=iOS Simulator,id=${{ steps.sim.outputs.udid }}" \
+            -clonedSourcePackagesDirPath "$SPM_CACHE_PATH" \
+            -resultBundlePath TestResults.xcresult \
+            -parallel-testing-enabled NO \
+            -maximum-concurrent-test-simulator-destinations 1 \
+            -skipPackagePluginValidation \
+            CODE_SIGNING_ALLOWED=NO
+
+      - name: Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: TestResults
+          path: TestResults.xcresult
+          retention-days: 7
