@@ -51,10 +51,6 @@ jobs:
 
       # 시뮬레이터 이름을 하드코딩하면 러너 이미지의 Xcode가 올라갈 때 깨진다.
       # 사용 가능한 iPhone 중 최신 OS를 골라 UDID로 고정한다.
-      # (docs/harness ADR 0003의 select-name-uses-latest-available-os와 같은 방침)
-      # 시뮬레이터 이름을 하드코딩하면 러너 이미지의 Xcode가 올라갈 때 깨진다.
-      # 사용 가능한 iPhone 중 최신 OS를 골라 UDID로 고정한다.
-      # (docs/harness ADR 0003의 select-name-uses-latest-available-os와 같은 방침)
       - name: Resolve simulator
         id: sim
         run: |
@@ -88,7 +84,8 @@ jobs:
 
       # SwiftLint는 SwiftLintBuildToolPlugin으로 등록되어 있어 이 단계에서 함께 실행된다.
       # 계층 의존성 커스텀 룰 3개는 severity: error라 위반 시 여기서 빌드가 깨진다.
-      # 병렬 테스트를 끄는 이유는 docs/harness ADR 0007 참고 (hang 진단 가능성 우선).
+      # 병렬 테스트는 끈다. 시뮬레이터 안에서 테스트가 멈추는 사례가 있었고,
+      # 단일 시뮬레이터로 돌려야 hang 지점을 진단할 수 있다.
       - name: Test
         run: |
           set -euo pipefail
