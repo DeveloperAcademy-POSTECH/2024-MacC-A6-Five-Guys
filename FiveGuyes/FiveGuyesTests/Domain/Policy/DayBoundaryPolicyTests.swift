@@ -34,16 +34,16 @@ struct DayBoundaryPolicyTests {
         return date
     }
 
-    @Test("adjustedDayKey - 04시 이전은 전날 키")
-    func adjustedDayKey_beforeBoundary_isPreviousDay() {
+    @Test("adjustedDate - 04시 이전은 전날 키")
+    func adjustedDate_beforeBoundary_isPreviousDayKey() {
         let input = makeDate(year: 2026, month: 2, day: 14, hour: 3, minute: 59)
         let key = ReadingDateKey(date: policy.adjustedDate(from: input), calendar: .app)
 
         #expect(key.rawValue == "2026-02-13")
     }
 
-    @Test("adjustedDayKey - 04시부터 당일 키")
-    func adjustedDayKey_atBoundary_isSameDay() {
+    @Test("adjustedDate - 04시부터 당일 키")
+    func adjustedDate_atBoundary_isSameDayKey() {
         let input = makeDate(year: 2026, month: 2, day: 14, hour: 4, minute: 0)
         let key = ReadingDateKey(date: policy.adjustedDate(from: input), calendar: .app)
 

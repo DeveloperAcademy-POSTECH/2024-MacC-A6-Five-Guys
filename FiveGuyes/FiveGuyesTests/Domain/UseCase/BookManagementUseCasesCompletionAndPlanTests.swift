@@ -364,8 +364,4 @@ private struct FixedNowDayBoundaryPolicy: DayBoundaryProviding {
     func adjustedNow() -> Date {
         policy.adjustedDate(from: now)
     }
-
-    func adjustedDate(from date: Date) -> Date {
-        policy.adjustedDate(from: date)
-    }
 }
