@@ -8,12 +8,12 @@
 import UserNotifications
 
 final class NotificationManager {
-    private let notificationCenter: UNUserNotificationCenter
+    private let notificationCenter: any UserNotificationCentering
     private let todayProvider: any ReadingDateProviding
     private let settingsStore: any NotificationSettingsStoring
 
     init(
-        notificationCenter: UNUserNotificationCenter = .current(),
+        notificationCenter: any UserNotificationCentering = UNUserNotificationCenter.current(),
         todayProvider: any ReadingDateProviding = DefaultReadingDateProvider(),
         settingsStore: any NotificationSettingsStoring = UserDefaultsNotificationSettingsStore()
     ) {
@@ -24,9 +24,10 @@ final class NotificationManager {
 
     /// 모든 노티를 요청하는 메서드
     func canSendNotifications() async -> Bool {
-        let isSystemAuthorized = await requestAuthorization()
-        let isAppEnabled = !settingsStore.fetchNotificationDisabled()
-        return isSystemAuthorized && isAppEnabled
+        guard !settingsStore.fetchNotificationDisabled() else {
+            return false
+        }
+        return await requestAuthorization()
     }
 
     /// 노티를 요청하는 메서드
@@ -79,10 +80,7 @@ final class NotificationManager {
 
     /// 현재 Notification 권한 설정을 가져오는 함수
      private func getCurrentSettings() async -> Bool {
-        let currentSettings = await notificationCenter.notificationSettings()
-        let isAuthorized = (currentSettings.authorizationStatus == .authorized)
-
-        return isAuthorized
+        await notificationCenter.currentAuthorizationStatus() == .authorized
     }
 
     private func scheduleReminderNotification(notificationType: NotificationType) async {
