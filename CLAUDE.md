@@ -21,12 +21,17 @@
 
 ```bash
 cp FiveGuyes/Config.xcconfig.example FiveGuyes/Config.xcconfig
-cp FiveGuyes/GoogleService-Info.plist.example FiveGuyes/FiveGuyes/GoogleService-Info.plist
 ```
 
 `Config.xcconfig`의 `API_KEY`에 알라딘 API 키를 넣습니다. 실제 인증 정보는 커밋하지 않습니다.
 
-`GoogleService-Info.plist`는 빌드에는 필요 없고 Firebase 런타임 동작에만 쓰입니다. 복사 위치에 주의하세요. 앱 타깃은 `FiveGuyes/FiveGuyes/`를 파일시스템 동기화 그룹으로 참조하므로 **그 폴더 안에 있는 파일만 앱 번들에 포함됩니다.** 한 단계 위(`FiveGuyes/`)에 두면 `FirebaseApp.configure()`가 설정을 찾지 못합니다.
+`GoogleService-Info.plist`는 Firebase 런타임 동작에만 쓰이며 **Debug 빌드에서는 없어도 됩니다.** 없으면 앱이 Firebase 초기화를 건너뛰고 정상 실행되므로, 자격증명이 없어도 빌드·실행·테스트가 모두 가능합니다. CI도 이 파일을 만들지 않습니다. Release 빌드는 plist를 요구합니다.
+
+Firebase 기능을 실제로 확인해야 한다면 복사 위치에 주의하세요. 앱 타깃은 `FiveGuyes/FiveGuyes/`를 파일시스템 동기화 그룹으로 참조하므로 **그 폴더 안에 있는 파일만 앱 번들에 포함됩니다.** 한 단계 위(`FiveGuyes/`)에 두면 `FirebaseApp.configure()`가 설정을 찾지 못합니다.
+
+```bash
+cp FiveGuyes/GoogleService-Info.plist.example FiveGuyes/FiveGuyes/GoogleService-Info.plist
+```
 
 ## 빌드, 테스트, 개발 명령
 
