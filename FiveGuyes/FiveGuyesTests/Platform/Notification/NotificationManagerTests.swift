@@ -12,11 +12,11 @@ import UserNotifications
 
 @Suite("NotificationManager 테스트")
 struct NotificationManagerTests {
-    @Test("updateMorningNotification은 canSendNotifications가 false면 재등록하지 않는다")
-    func updateMorningNotification_whenCannotSend_doesNotAddRequest() async {
-        let notificationCenter = UNUserNotificationCenter.current()
+    @Test("updateMorningNotification은 앱 설정이 켜져 있으면 알림을 등록한다")
+    func updateMorningNotification_whenAppEnabled_addsRequest() async {
+        let notificationCenter = UserNotificationCenterStub()
         let settingsStore = NotificationSettingsStoreStub(
-            disabled: true,
+            disabled: false,
             reminderHour: 8,
             reminderMinute: 0
         )
@@ -29,22 +29,32 @@ struct NotificationManagerTests {
         let readingBook = makeReadingBook(today: today)
         let identifier = "\(readingBook.id)-morning"
 
-        notificationCenter.removePendingNotificationRequests(withIdentifiers: [identifier])
-        let beforeCount = await pendingRequestCount(
-            in: notificationCenter,
-            identifier: identifier
+        await manager.updateMorningNotification(for: readingBook)
+
+        #expect(notificationCenter.requestAuthorizationCallCount == 1)
+        #expect(notificationCenter.addedIdentifiers == [identifier])
+    }
+
+    @Test("updateMorningNotification은 앱 설정이 꺼져 있으면 등록하지도, 권한을 요청하지도 않는다")
+    func updateMorningNotification_whenAppDisabled_doesNotAddRequestOrRequestAuthorization() async {
+        let notificationCenter = UserNotificationCenterStub()
+        let settingsStore = NotificationSettingsStoreStub(
+            disabled: true,
+            reminderHour: 8,
+            reminderMinute: 0
         )
+        let today = makeDate("2025-01-01")
+        let manager = NotificationManager(
+            notificationCenter: notificationCenter,
+            todayProvider: FixedReadingDateProvider(todayValue: today),
+            settingsStore: settingsStore
+        )
+        let readingBook = makeReadingBook(today: today)
 
         await manager.updateMorningNotification(for: readingBook)
 
-        let afterCount = await pendingRequestCount(
-            in: notificationCenter,
-            identifier: identifier
-        )
-
-        #expect(beforeCount == 0)
-        #expect(afterCount == 0)
-        notificationCenter.removePendingNotificationRequests(withIdentifiers: [identifier])
+        #expect(notificationCenter.requestAuthorizationCallCount == 0)
+        #expect(notificationCenter.addedIdentifiers.isEmpty)
     }
 
     private func makeDate(_ dateString: String) -> Date {
@@ -87,18 +97,6 @@ struct NotificationManagerTests {
             )
         )
     }
-
-    private func pendingRequestCount(
-        in center: UNUserNotificationCenter,
-        identifier: String
-    ) async -> Int {
-        let requests = await withCheckedContinuation { continuation in
-            center.getPendingNotificationRequests { requests in
-                continuation.resume(returning: requests)
-            }
-        }
-        return requests.filter { $0.identifier == identifier }.count
-    }
 }
 
 private struct FixedReadingDateProvider: ReadingDateProviding {
@@ -106,5 +104,35 @@ private struct FixedReadingDateProvider: ReadingDateProviding {
 
     func today() -> Date {
         todayValue
+    }
+}
+
+private final class UserNotificationCenterStub: UserNotificationCentering {
+    var authorizationStatus: UNAuthorizationStatus = .authorized
+
+    var requestAuthorizationCallCount = 0
+    var addedIdentifiers: [String] = []
+    var removedIdentifiers: [String] = []
+    var removeAllPendingNotificationRequestsCallCount = 0
+
+    func requestAuthorization(options: UNAuthorizationOptions) async throws -> Bool {
+        requestAuthorizationCallCount += 1
+        return authorizationStatus == .authorized
+    }
+
+    func currentAuthorizationStatus() async -> UNAuthorizationStatus {
+        authorizationStatus
+    }
+
+    func add(_ request: UNNotificationRequest) async throws {
+        addedIdentifiers.append(request.identifier)
+    }
+
+    func removePendingNotificationRequests(withIdentifiers identifiers: [String]) {
+        removedIdentifiers.append(contentsOf: identifiers)
+    }
+
+    func removeAllPendingNotificationRequests() {
+        removeAllPendingNotificationRequestsCallCount += 1
     }
 }
