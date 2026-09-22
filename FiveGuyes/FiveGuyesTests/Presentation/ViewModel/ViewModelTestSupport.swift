@@ -343,6 +343,7 @@ final class ReadingGoalMetricsUseCaseStub: ReadingGoalMetricsUsing {
 final class NotificationManagerStub: NotificationManaging {
     var isAuthorized = true
     var requestAuthorizationCallCount = 0
+    var isSystemAuthorizedCallCount = 0
     var clearRequestsCallCount = 0
     var setupAllNotificationsCallCount = 0
     var setupAllNotificationsBookIDs: [UUID] = []
@@ -352,6 +353,11 @@ final class NotificationManagerStub: NotificationManaging {
 
     func requestAuthorization() async -> Bool {
         requestAuthorizationCallCount += 1
+        return isAuthorized
+    }
+
+    func isSystemAuthorized() async -> Bool {
+        isSystemAuthorizedCallCount += 1
         return isAuthorized
     }
 

@@ -201,6 +201,30 @@ struct NotiSettingViewModelTests {
         #expect(settingsOpener.openSettingsCallCount == 1)
     }
 
+    @Test("NotiSettingViewModel: 설정 화면 진입은 권한 팝업을 띄우지 않고 상태만 조회한다")
+    func notiSetting_refreshAuthorization_doesNotRequestAuthorization() async {
+        let notificationService = NotificationManagerStub()
+        notificationService.isAuthorized = false
+        let settingsStore = NotificationSettingsStoreStub(
+            disabled: true,
+            reminderHour: 9,
+            reminderMinute: 0
+        )
+        let settingsOpener = SystemSettingsOpenerStub()
+        let viewModel = makeViewModel(
+            notificationService: notificationService,
+            settingsOpener: settingsOpener,
+            settingsStore: settingsStore
+        )
+
+        await viewModel.refreshSystemNotificationAuthorization()
+
+        // 화면 진입은 상태 표시용 조회이므로 OS 권한 팝업을 띄워서는 안 된다.
+        #expect(notificationService.requestAuthorizationCallCount == 0)
+        #expect(notificationService.isSystemAuthorizedCallCount == 1)
+        #expect(viewModel.isSystemNotificationEnabled == false)
+    }
+
     private func makeViewModel(
         notificationService: NotificationManagerStub,
         settingsOpener: SystemSettingsOpenerStub,

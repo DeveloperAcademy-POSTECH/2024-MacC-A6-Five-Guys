@@ -57,6 +57,51 @@ struct NotificationManagerTests {
         #expect(notificationCenter.addedIdentifiers.isEmpty)
     }
 
+    @Test("updateMorningNotification은 앱 설정이 켜져 있어도 OS 권한이 거부되면 등록하지 않는다")
+    func updateMorningNotification_whenAppEnabledButSystemDenied_doesNotAddRequest() async {
+        let notificationCenter = UserNotificationCenterStub()
+        notificationCenter.authorizationStatus = .denied
+        let settingsStore = NotificationSettingsStoreStub(
+            disabled: false,
+            reminderHour: 8,
+            reminderMinute: 0
+        )
+        let today = makeDate("2025-01-01")
+        let manager = NotificationManager(
+            notificationCenter: notificationCenter,
+            todayProvider: FixedReadingDateProvider(todayValue: today),
+            settingsStore: settingsStore
+        )
+        let readingBook = makeReadingBook(today: today)
+
+        await manager.updateMorningNotification(for: readingBook)
+
+        // 앱 설정이 켜져 있으므로 권한 요청까지는 진행하되, OS가 거부한 상태에서는 등록하지 않는다.
+        #expect(notificationCenter.requestAuthorizationCallCount == 1)
+        #expect(notificationCenter.addedIdentifiers.isEmpty)
+    }
+
+    @Test("isSystemAuthorized는 권한 팝업을 띄우지 않고 상태만 읽는다")
+    func isSystemAuthorized_readsStatusWithoutRequestingAuthorization() async {
+        let notificationCenter = UserNotificationCenterStub()
+        notificationCenter.authorizationStatus = .notDetermined
+        let settingsStore = NotificationSettingsStoreStub(
+            disabled: false,
+            reminderHour: 8,
+            reminderMinute: 0
+        )
+        let manager = NotificationManager(
+            notificationCenter: notificationCenter,
+            todayProvider: FixedReadingDateProvider(todayValue: makeDate("2025-01-01")),
+            settingsStore: settingsStore
+        )
+
+        let isAuthorized = await manager.isSystemAuthorized()
+
+        #expect(isAuthorized == false)
+        #expect(notificationCenter.requestAuthorizationCallCount == 0)
+    }
+
     private func makeDate(_ dateString: String) -> Date {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
