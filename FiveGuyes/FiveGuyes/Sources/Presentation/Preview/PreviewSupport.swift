@@ -218,6 +218,10 @@ final class PreviewNotificationManager: NotificationManaging {
         isAuthorized
     }
 
+    func isSystemAuthorized() async -> Bool {
+        isAuthorized
+    }
+
     func clearRequests() async {}
 
     func setupAllNotifications(_ readingBook: FGUserBook) async {}
