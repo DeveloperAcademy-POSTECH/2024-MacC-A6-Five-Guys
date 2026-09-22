@@ -257,6 +257,43 @@ struct NotiSettingViewModelTests {
         #expect(notificationService.setupAllNotificationsCallCount == 1)
     }
 
+    @Test("NotiSettingViewModel: 뒤늦게 끝난 이전 권한 조회가 최신 배너 상태를 덮어쓰지 않는다")
+    func notiSetting_staleAuthorizationResult_doesNotOverwriteLatestState() async {
+        let notificationService = NotificationManagerStub()
+        notificationService.isAuthorized = true
+        notificationService.isSystemAuthorizedDelayNanoseconds = 300_000_000
+        let settingsStore = NotificationSettingsStoreStub(
+            disabled: true,
+            reminderHour: 9,
+            reminderMinute: 0
+        )
+        let settingsOpener = SystemSettingsOpenerStub()
+        let viewModel = makeViewModel(
+            notificationService: notificationService,
+            settingsOpener: settingsOpener,
+            settingsStore: settingsStore
+        )
+
+        // 앱 알림을 켠다. 이 조회는 느리고, 허용(true)을 반환할 예정이다.
+        viewModel.isNotificationDisabled = false
+        viewModel.handleNotificationStatusChange(userBook: makeBook())
+        #expect(await waitUntil { notificationService.isSystemAuthorizedCallCount == 1 })
+
+        // 조회가 끝나기 전에 다시 끈다. 이쪽 조회는 즉시 거부(false)를 반환한다.
+        notificationService.isAuthorized = false
+        notificationService.isSystemAuthorizedDelayNanoseconds = 0
+        viewModel.isNotificationDisabled = true
+        viewModel.handleNotificationStatusChange(userBook: makeBook())
+
+        #expect(await waitUntil { viewModel.isSystemNotificationEnabled == false })
+
+        // 앞선 느린 조회가 뒤늦게 끝나도 최신 상태(false)를 되돌려서는 안 된다.
+        let becameStale = await waitUntil(timeoutNanoseconds: 500_000_000) {
+            viewModel.isSystemNotificationEnabled
+        }
+        #expect(becameStale == false)
+    }
+
     private func makeViewModel(
         notificationService: NotificationManagerStub,
         settingsOpener: SystemSettingsOpenerStub,
