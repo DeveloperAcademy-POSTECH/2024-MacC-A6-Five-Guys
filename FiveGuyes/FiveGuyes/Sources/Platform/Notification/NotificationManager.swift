@@ -49,7 +49,7 @@ final class NotificationManager {
         do {
             try await notificationCenter
                 .requestAuthorization(options: [.sound, .badge, .alert])
-            return await getCurrentSettings()
+            return await isSystemAuthorized()
         } catch {
             print("❌ NotificationManager/requestAuthorization: \(error.localizedDescription)")
             return false
@@ -78,8 +78,9 @@ final class NotificationManager {
         await scheduleReminderNotification(notificationType: notificationType) // 새로운 알림 등록
     }
 
-    /// 현재 Notification 권한 설정을 가져오는 함수
-     private func getCurrentSettings() async -> Bool {
+    /// 현재 Notification 권한 상태만 읽는 함수입니다.
+    /// `requestAuthorization()`과 달리 OS 권한 팝업을 띄우지 않습니다.
+    func isSystemAuthorized() async -> Bool {
         await notificationCenter.currentAuthorizationStatus() == .authorized
     }
 
