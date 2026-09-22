@@ -56,7 +56,7 @@ struct NotificationSettingUseCase: NotificationSettingUsing {
     }
 
     func refreshSystemAuthorization() async -> Bool {
-        await notificationService.requestAuthorization()
+        await notificationService.isSystemAuthorized()
     }
 
     func setNotificationDisabled(_ isDisabled: Bool, userBook: FGUserBook?) async {
