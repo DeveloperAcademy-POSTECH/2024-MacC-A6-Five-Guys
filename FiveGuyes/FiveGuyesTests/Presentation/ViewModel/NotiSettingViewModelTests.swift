@@ -225,6 +225,38 @@ struct NotiSettingViewModelTests {
         #expect(viewModel.isSystemNotificationEnabled == false)
     }
 
+    @Test("NotiSettingViewModel: 앱 알림을 켜서 권한을 허용하면 배너가 사라진다")
+    func notiSetting_enable_afterAuthorizationGranted_refreshesBanner() async {
+        let notificationService = NotificationManagerStub()
+        notificationService.isAuthorized = false
+        let settingsStore = NotificationSettingsStoreStub(
+            disabled: true,
+            reminderHour: 9,
+            reminderMinute: 0
+        )
+        let settingsOpener = SystemSettingsOpenerStub()
+        let viewModel = makeViewModel(
+            notificationService: notificationService,
+            settingsOpener: settingsOpener,
+            settingsStore: settingsStore
+        )
+
+        // 화면 진입: OS 권한이 아직 허용되지 않아 배너가 보인다.
+        await viewModel.refreshSystemNotificationAuthorization()
+        #expect(viewModel.isSystemNotificationEnabled == false)
+
+        // 앱 알림을 켜면 권한 팝업이 뜨고, 사용자가 허용한 상황을 가정한다.
+        notificationService.isAuthorized = true
+        viewModel.isNotificationDisabled = false
+        viewModel.handleNotificationStatusChange(userBook: makeBook())
+
+        #expect(await waitUntil { viewModel.isSystemNotificationEnabled })
+
+        // 허용한 뒤에는 배너가 남아 있어서는 안 된다.
+        #expect(viewModel.isSystemNotificationEnabled)
+        #expect(notificationService.setupAllNotificationsCallCount == 1)
+    }
+
     private func makeViewModel(
         notificationService: NotificationManagerStub,
         settingsOpener: SystemSettingsOpenerStub,
