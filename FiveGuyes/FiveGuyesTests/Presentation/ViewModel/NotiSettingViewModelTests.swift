@@ -12,8 +12,8 @@ import Testing
 @Suite("NotiSettingViewModel 테스트")
 @MainActor
 struct NotiSettingViewModelTests {
-    @Test("NotiSettingViewModel: 저장된 설정 로드")
-    func notiSetting_loadPersistedSettings() {
+    @Test("NotiSettingViewModel: 저장된 설정 로드는 저장과 알림 요청을 발생시키지 않는다")
+    func notiSetting_loadPersistedSettings_doesNotPersistOrRequestNotification() {
         let notificationService = NotificationManagerStub()
         let settingsStore = NotificationSettingsStoreStub(
             disabled: true,
@@ -34,6 +34,13 @@ struct NotiSettingViewModelTests {
         let timeComponents = Calendar.app.dateComponents([.hour, .minute], from: viewModel.selectedTime)
         #expect(timeComponents.hour == 8)
         #expect(timeComponents.minute == 30)
+        #expect(settingsStore.savedNotificationDisabled == nil)
+        #expect(settingsStore.savedReminderHour == nil)
+        #expect(settingsStore.savedReminderMinute == nil)
+        #expect(notificationService.clearRequestsCallCount == 0)
+        #expect(notificationService.setupAllNotificationsCallCount == 0)
+        #expect(notificationService.updateMorningNotificationCallCount == 0)
+        #expect(notificationService.requestAuthorizationCallCount == 0)
     }
 
     @Test("NotiSettingViewModel: 알림 비활성화 시 요청 삭제 호출")
@@ -51,8 +58,8 @@ struct NotiSettingViewModelTests {
             settingsStore: settingsStore
         )
 
-        viewModel.isNotificationDisabled = true
-        viewModel.handleNotificationStatusChange(userBook: makeBook())
+        viewModel.loadPersistedSettings()
+        viewModel.setNotificationDisabled(true, userBook: makeBook())
 
         #expect(
             await waitUntil {
@@ -83,13 +90,14 @@ struct NotiSettingViewModelTests {
         )
 
         let baseDate = makeDate("2025-01-01")
-        viewModel.selectedTime = Calendar.app.date(
+        let selectedTime = Calendar.app.date(
             bySettingHour: 21,
             minute: 15,
             second: 0,
             of: baseDate
         ) ?? baseDate
-        viewModel.handleNotificationTimeChange(userBook: makeBook())
+        viewModel.loadPersistedSettings()
+        viewModel.updateReminderTime(selectedTime, userBook: makeBook())
 
         #expect(
             await waitUntil {

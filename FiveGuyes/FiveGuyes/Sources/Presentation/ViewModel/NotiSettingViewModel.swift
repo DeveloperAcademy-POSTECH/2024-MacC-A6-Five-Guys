@@ -46,6 +46,16 @@ final class NotiSettingViewModel {
         isNotificationDisabled = snapshot.isNotificationDisabled
     }
 
+    func setNotificationDisabled(_ isDisabled: Bool, userBook: FGUserBook?) {
+        isNotificationDisabled = isDisabled
+        handleNotificationStatusChange(userBook: userBook)
+    }
+
+    func updateReminderTime(_ time: Date, userBook: FGUserBook?) {
+        selectedTime = time
+        handleNotificationTimeChange(userBook: userBook)
+    }
+
     func refreshSystemNotificationAuthorization() async {
         let generation = beginSystemAuthorizationRefresh()
         let isAuthorized = await notificationSettingUseCase.refreshSystemAuthorization()
