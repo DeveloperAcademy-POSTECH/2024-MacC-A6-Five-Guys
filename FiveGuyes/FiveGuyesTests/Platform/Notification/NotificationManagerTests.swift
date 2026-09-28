@@ -81,6 +81,37 @@ struct NotificationManagerTests {
         #expect(notificationCenter.addedIdentifiers.isEmpty)
     }
 
+    @Test("권한 조회 중 앱 알림을 끄면 이전 조회 결과로 알림을 재등록하지 않는다")
+    func updateMorningNotification_whenAppDisabledDuringAuthorization_doesNotAddRequest() async {
+        let notificationCenter = UserNotificationCenterStub()
+        let authorizationGate = AsyncGate()
+        notificationCenter.requestAuthorizationGate = authorizationGate
+        let settingsStore = MutableNotificationSettingsStoreStub(
+            disabled: false,
+            reminderHour: 8,
+            reminderMinute: 0
+        )
+        let today = makeDate("2025-01-01")
+        let manager = NotificationManager(
+            notificationCenter: notificationCenter,
+            todayProvider: FixedReadingDateProvider(todayValue: today),
+            settingsStore: settingsStore
+        )
+
+        let updateTask = Task {
+            await manager.updateMorningNotification(for: makeReadingBook(today: today))
+        }
+        #expect(await waitUntil { notificationCenter.requestAuthorizationCallCount == 1 })
+
+        settingsStore.disabled = true
+        await manager.clearRequests()
+        await authorizationGate.open()
+        await updateTask.value
+
+        #expect(notificationCenter.removeAllPendingNotificationRequestsCallCount == 1)
+        #expect(notificationCenter.addedIdentifiers.isEmpty)
+    }
+
     @Test("isSystemAuthorized는 권한 팝업을 띄우지 않고 상태만 읽는다")
     func isSystemAuthorized_readsStatusWithoutRequestingAuthorization() async {
         let notificationCenter = UserNotificationCenterStub()
@@ -154,6 +185,7 @@ private struct FixedReadingDateProvider: ReadingDateProviding {
 
 private final class UserNotificationCenterStub: UserNotificationCentering {
     var authorizationStatus: UNAuthorizationStatus = .authorized
+    var requestAuthorizationGate: AsyncGate?
 
     var requestAuthorizationCallCount = 0
     var addedIdentifiers: [String] = []
@@ -162,6 +194,9 @@ private final class UserNotificationCenterStub: UserNotificationCentering {
 
     func requestAuthorization(options: UNAuthorizationOptions) async throws -> Bool {
         requestAuthorizationCallCount += 1
+        if let requestAuthorizationGate {
+            await requestAuthorizationGate.wait()
+        }
         return authorizationStatus == .authorized
     }
 
@@ -179,5 +214,31 @@ private final class UserNotificationCenterStub: UserNotificationCentering {
 
     func removeAllPendingNotificationRequests() {
         removeAllPendingNotificationRequestsCallCount += 1
+    }
+}
+
+private final class MutableNotificationSettingsStoreStub: NotificationSettingsStoring {
+    var disabled: Bool
+    private let reminderHour: Int
+    private let reminderMinute: Int
+
+    init(disabled: Bool, reminderHour: Int, reminderMinute: Int) {
+        self.disabled = disabled
+        self.reminderHour = reminderHour
+        self.reminderMinute = reminderMinute
+    }
+
+    func saveNotificationDisabled(_ isNotificationDisabled: Bool) {
+        disabled = isNotificationDisabled
+    }
+
+    func fetchNotificationDisabled() -> Bool {
+        disabled
+    }
+
+    func saveNotificationTime(hour: Int, minute: Int) {}
+
+    func fetchNotificationReminderTime() -> (hour: Int, minute: Int) {
+        (reminderHour, reminderMinute)
     }
 }

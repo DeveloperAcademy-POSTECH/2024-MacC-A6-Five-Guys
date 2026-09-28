@@ -27,7 +27,12 @@ final class NotificationManager {
         guard !settingsStore.fetchNotificationDisabled() else {
             return false
         }
-        return await requestAuthorization()
+
+        guard await requestAuthorization() else {
+            return false
+        }
+
+        return !settingsStore.fetchNotificationDisabled()
     }
 
     /// 노티를 요청하는 메서드
