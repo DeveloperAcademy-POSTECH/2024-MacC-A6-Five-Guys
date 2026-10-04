@@ -464,6 +464,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"FiveGuyes/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
+				FIREBASE_ANALYTICS_COLLECTION_ENABLED = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FiveGuyes/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "한입독서";
@@ -507,6 +508,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"FiveGuyes/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
+				FIREBASE_ANALYTICS_COLLECTION_ENABLED = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FiveGuyes/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "한입독서";
