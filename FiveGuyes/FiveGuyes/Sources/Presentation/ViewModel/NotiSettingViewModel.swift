@@ -18,6 +18,7 @@ final class NotiSettingViewModel {
 
     private var notificationStatusTask: Task<Void, Never>?
     private var notificationTimeTask: Task<Void, Never>?
+    private var systemAuthorizationRefreshGeneration = 0
 
     private let notificationSettingUseCase: any NotificationSettingUsing
     private let nowProvider: () -> Date
@@ -46,7 +47,9 @@ final class NotiSettingViewModel {
     }
 
     func refreshSystemNotificationAuthorization() async {
-        isSystemNotificationEnabled = await notificationSettingUseCase.refreshSystemAuthorization()
+        let generation = beginSystemAuthorizationRefresh()
+        let isAuthorized = await notificationSettingUseCase.refreshSystemAuthorization()
+        updateSystemNotificationAuthorization(isAuthorized, for: generation)
     }
 
     func handleNotificationStatusChange(userBook: FGUserBook?) {
@@ -60,7 +63,13 @@ final class NotiSettingViewModel {
             // 앱 알림을 켜는 순간 OS 권한 팝업이 뜰 수 있고, 그 결과가 배너 표시를 좌우한다.
             // 화면 진입 시점의 조회는 팝업을 띄우지 않으므로 여기서 상태를 다시 읽어야 한다.
             guard !Task.isCancelled else { return }
-            isSystemNotificationEnabled = await notificationSettingUseCase.refreshSystemAuthorization()
+            let generation = beginSystemAuthorizationRefresh()
+            let isAuthorized = await notificationSettingUseCase.refreshSystemAuthorization()
+
+            // 조회가 취소를 관찰하지 않을 수 있으므로, 대입 직전에 최신 조회인지 다시 확인한다.
+            // 그러지 않으면 뒤늦게 끝난 이전 조회가 최신 결과를 덮어쓴다.
+            guard !Task.isCancelled else { return }
+            updateSystemNotificationAuthorization(isAuthorized, for: generation)
         }
     }
 
@@ -81,5 +90,15 @@ final class NotiSettingViewModel {
 
     func openSystemSettings() {
         notificationSettingUseCase.openSystemSettings()
+    }
+
+    private func beginSystemAuthorizationRefresh() -> Int {
+        systemAuthorizationRefreshGeneration += 1
+        return systemAuthorizationRefreshGeneration
+    }
+
+    private func updateSystemNotificationAuthorization(_ isAuthorized: Bool, for generation: Int) {
+        guard generation == systemAuthorizationRefreshGeneration else { return }
+        isSystemNotificationEnabled = isAuthorized
     }
 }

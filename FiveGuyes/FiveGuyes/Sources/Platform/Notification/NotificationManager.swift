@@ -47,7 +47,7 @@ final class NotificationManager {
     /// Notification 권한 요청 함수
      func requestAuthorization() async -> Bool {
         do {
-            try await notificationCenter
+            _ = try await notificationCenter
                 .requestAuthorization(options: [.sound, .badge, .alert])
             return await isSystemAuthorized()
         } catch {

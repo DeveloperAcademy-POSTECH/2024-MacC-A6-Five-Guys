@@ -344,9 +344,13 @@ final class NotificationManagerStub: NotificationManaging {
     var isAuthorized = true
     var requestAuthorizationCallCount = 0
     var isSystemAuthorizedCallCount = 0
+    var isSystemAuthorizedDelayNanoseconds: UInt64 = 0
+    var isSystemAuthorizedResults: [Bool] = []
+    var isSystemAuthorizedGates: [AsyncGate] = []
     var clearRequestsCallCount = 0
     var setupAllNotificationsCallCount = 0
     var setupAllNotificationsBookIDs: [UUID] = []
+    var setupAllNotificationsGate: AsyncGate?
     var updateMorningNotificationCallCount = 0
     var updateMorningNotificationDelayNanoseconds: UInt64 = 0
     var ignoreCancelledCalls = false
@@ -358,7 +362,26 @@ final class NotificationManagerStub: NotificationManaging {
 
     func isSystemAuthorized() async -> Bool {
         isSystemAuthorizedCallCount += 1
-        return isAuthorized
+        let callIndex = isSystemAuthorizedCallCount - 1
+        let result = isSystemAuthorizedResults.indices.contains(callIndex)
+            ? isSystemAuthorizedResults[callIndex]
+            : isAuthorized
+
+        if isSystemAuthorizedGates.indices.contains(callIndex) {
+            await isSystemAuthorizedGates[callIndex].wait()
+        }
+
+        // 실제 OS 조회는 Task 취소를 관찰하지 않으므로, 취소와 무관하게 지연시킨다.
+        if isSystemAuthorizedDelayNanoseconds > 0 {
+            let delay = isSystemAuthorizedDelayNanoseconds
+            await withCheckedContinuation { continuation in
+                DispatchQueue.main.asyncAfter(deadline: .now() + .nanoseconds(Int(delay))) {
+                    continuation.resume()
+                }
+            }
+        }
+
+        return result
     }
 
     func clearRequests() async {
@@ -368,6 +391,9 @@ final class NotificationManagerStub: NotificationManaging {
     func setupAllNotifications(_ readingBook: FGUserBook) async {
         setupAllNotificationsCallCount += 1
         setupAllNotificationsBookIDs.append(readingBook.id)
+        if let setupAllNotificationsGate {
+            await setupAllNotificationsGate.wait()
+        }
     }
 
     func updateMorningNotification(for readingBook: FGUserBook) async {
