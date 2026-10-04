@@ -257,6 +257,119 @@ struct NotiSettingViewModelTests {
         #expect(notificationService.setupAllNotificationsCallCount == 1)
     }
 
+    @Test("NotiSettingViewModel: 뒤늦게 끝난 이전 권한 조회가 최신 배너 상태를 덮어쓰지 않는다")
+    func notiSetting_staleAuthorizationResult_doesNotOverwriteLatestState() async {
+        let notificationService = NotificationManagerStub()
+        notificationService.isAuthorized = true
+        notificationService.isSystemAuthorizedDelayNanoseconds = 300_000_000
+        let settingsStore = NotificationSettingsStoreStub(
+            disabled: true,
+            reminderHour: 9,
+            reminderMinute: 0
+        )
+        let settingsOpener = SystemSettingsOpenerStub()
+        let viewModel = makeViewModel(
+            notificationService: notificationService,
+            settingsOpener: settingsOpener,
+            settingsStore: settingsStore
+        )
+
+        // 앱 알림을 켠다. 이 조회는 느리고, 허용(true)을 반환할 예정이다.
+        viewModel.isNotificationDisabled = false
+        viewModel.handleNotificationStatusChange(userBook: makeBook())
+        #expect(await waitUntil { notificationService.isSystemAuthorizedCallCount == 1 })
+
+        // 조회가 끝나기 전에 다시 끈다. 이쪽 조회는 즉시 거부(false)를 반환한다.
+        notificationService.isAuthorized = false
+        notificationService.isSystemAuthorizedDelayNanoseconds = 0
+        viewModel.isNotificationDisabled = true
+        viewModel.handleNotificationStatusChange(userBook: makeBook())
+
+        #expect(await waitUntil { viewModel.isSystemNotificationEnabled == false })
+
+        // 앞선 느린 조회가 뒤늦게 끝나도 최신 상태(false)를 되돌려서는 안 된다.
+        let becameStale = await waitUntil(timeoutNanoseconds: 500_000_000) {
+            viewModel.isSystemNotificationEnabled
+        }
+        #expect(becameStale == false)
+    }
+
+    @Test("NotiSettingViewModel: 화면 진입 조회가 토글 경로의 최신 배너 상태를 덮어쓰지 않는다")
+    func notiSetting_initialAuthorizationResult_doesNotOverwriteToggleState() async {
+        let notificationService = NotificationManagerStub()
+        let initialAuthorizationGate = AsyncGate()
+        notificationService.isSystemAuthorizedResults = [false, true]
+        notificationService.isSystemAuthorizedGates = [initialAuthorizationGate]
+        let settingsStore = NotificationSettingsStoreStub(
+            disabled: true,
+            reminderHour: 9,
+            reminderMinute: 0
+        )
+        let settingsOpener = SystemSettingsOpenerStub()
+        let viewModel = makeViewModel(
+            notificationService: notificationService,
+            settingsOpener: settingsOpener,
+            settingsStore: settingsStore
+        )
+
+        // 화면 진입 조회는 거부(false)를 반환하기 전에 대기한다.
+        let initialRefreshTask = Task {
+            await viewModel.refreshSystemNotificationAuthorization()
+        }
+        #expect(await waitUntil { notificationService.isSystemAuthorizedCallCount == 1 })
+
+        // 그 사이 토글 경로가 허용(true)을 반영한다.
+        viewModel.isNotificationDisabled = false
+        viewModel.handleNotificationStatusChange(userBook: makeBook())
+        #expect(
+            await waitUntil {
+                notificationService.isSystemAuthorizedCallCount == 2 &&
+                    viewModel.isSystemNotificationEnabled
+            }
+        )
+
+        // 대기 중이던 진입 조회도 반드시 재개해 끝낸다.
+        await initialAuthorizationGate.open()
+        await initialRefreshTask.value
+
+        #expect(viewModel.isSystemNotificationEnabled)
+    }
+
+    @Test("NotiSettingViewModel: 권한 팝업 중 화면 복귀 조회 뒤에도 토글의 최신 권한 상태를 반영한다")
+    func notiSetting_toggleAuthorizationResult_overwritesRefreshDuringPermissionPrompt() async {
+        let notificationService = NotificationManagerStub()
+        let permissionPromptGate = AsyncGate()
+        notificationService.isSystemAuthorizedResults = [false, true]
+        notificationService.setupAllNotificationsGate = permissionPromptGate
+        let settingsStore = NotificationSettingsStoreStub(
+            disabled: true,
+            reminderHour: 9,
+            reminderMinute: 0
+        )
+        let settingsOpener = SystemSettingsOpenerStub()
+        let viewModel = makeViewModel(
+            notificationService: notificationService,
+            settingsOpener: settingsOpener,
+            settingsStore: settingsStore
+        )
+
+        // 알림을 켜면 OS 권한 팝업이 열린 상태로 대기한다.
+        viewModel.isNotificationDisabled = false
+        viewModel.handleNotificationStatusChange(userBook: makeBook())
+        #expect(await waitUntil { notificationService.setupAllNotificationsCallCount == 1 })
+
+        // 팝업이 열린 사이 화면이 복귀하면서 거부(false) 상태를 조회한다.
+        await viewModel.refreshSystemNotificationAuthorization()
+        #expect(viewModel.isSystemNotificationEnabled == false)
+
+        // 사용자가 권한을 허용해 팝업을 닫으면 토글 경로의 최종 조회는 허용(true)이다.
+        await permissionPromptGate.open()
+        #expect(await waitUntil { notificationService.isSystemAuthorizedCallCount == 2 })
+        await Task.yield()
+
+        #expect(viewModel.isSystemNotificationEnabled)
+    }
+
     private func makeViewModel(
         notificationService: NotificationManagerStub,
         settingsOpener: SystemSettingsOpenerStub,
