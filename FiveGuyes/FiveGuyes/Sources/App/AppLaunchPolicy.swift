@@ -13,6 +13,8 @@ struct AppLaunchPolicy {
         let isDebugBuild: Bool
         /// 테스트 호스트로 실행됐는지 (`XCTestConfigurationFilePath` 환경변수 존재 여부).
         let isRunningTests: Bool
+        /// 번들에 `GoogleService-Info.plist`가 있는지.
+        let hasFirebaseConfig: Bool
     }
 
     struct Decision: Equatable {
@@ -31,6 +33,7 @@ struct AppLaunchPolicy {
             return Decision(shouldConfigureFirebase: false, shouldRequestTracking: false)
         }
 
-        return Decision(shouldConfigureFirebase: true, shouldRequestTracking: true)
+        // plist가 없으면 `FirebaseApp.configure()`가 크래시하므로 초기화를 건너뛴다.
+        return Decision(shouldConfigureFirebase: environment.hasFirebaseConfig, shouldRequestTracking: true)
     }
 }
