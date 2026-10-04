@@ -47,12 +47,30 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
     ) -> Bool {
-        FirebaseApp.configure()
+        let decision = AppLaunchPolicy.decide(makeLaunchEnvironment())
 
-        Task {
-            await requestTrackingAuthorization()
+        if decision.shouldConfigureFirebase {
+            FirebaseApp.configure()
+        }
+
+        if decision.shouldRequestTracking {
+            Task {
+                await requestTrackingAuthorization()
+            }
         }
         return true
+    }
+
+    private func makeLaunchEnvironment() -> AppLaunchPolicy.Environment {
+        #if DEBUG
+        return AppLaunchPolicy.Environment(
+            isDebugBuild: true,
+            // 테스트 러너가 호스트 앱에 넣어 주는 키. 값은 빈 문자열이므로 존재 여부만 본다.
+            isRunningTests: ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
+        )
+        #else
+        return AppLaunchPolicy.Environment(isDebugBuild: false, isRunningTests: false)
+        #endif
     }
 
     /// 비동기 추적 권한 요청 함수
