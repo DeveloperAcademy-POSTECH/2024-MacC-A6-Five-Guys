@@ -10,6 +10,7 @@ import AppTrackingTransparency
 import SwiftData
 import SwiftUI
 
+import FirebaseAnalytics
 import FirebaseCore
 
 @MainActor
@@ -53,6 +54,10 @@ class AppDelegate: NSObject, UIApplicationDelegate {
             FirebaseApp.configure()
         }
 
+        if let isCollectionEnabled = decision.analyticsCollectionOverride {
+            Analytics.setAnalyticsCollectionEnabled(isCollectionEnabled)
+        }
+
         if decision.shouldRequestTracking {
             Task {
                 await requestTrackingAuthorization()
@@ -67,10 +72,16 @@ class AppDelegate: NSObject, UIApplicationDelegate {
             isDebugBuild: true,
             // 테스트 러너가 호스트 앱에 넣어 주는 키. 값은 빈 문자열이므로 존재 여부만 본다.
             isRunningTests: ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil,
-            hasFirebaseConfig: Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") != nil
+            hasFirebaseConfig: Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") != nil,
+            isAnalyticsDebugRequested: ProcessInfo.processInfo.arguments.contains("-FIRDebugEnabled")
         )
         #else
-        return AppLaunchPolicy.Environment(isDebugBuild: false, isRunningTests: false, hasFirebaseConfig: true)
+        return AppLaunchPolicy.Environment(
+            isDebugBuild: false,
+            isRunningTests: false,
+            hasFirebaseConfig: true,
+            isAnalyticsDebugRequested: false
+        )
         #endif
     }
 

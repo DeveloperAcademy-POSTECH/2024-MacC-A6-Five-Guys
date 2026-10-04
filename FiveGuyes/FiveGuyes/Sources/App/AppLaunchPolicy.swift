@@ -15,25 +15,38 @@ struct AppLaunchPolicy {
         let isRunningTests: Bool
         /// 번들에 `GoogleService-Info.plist`가 있는지.
         let hasFirebaseConfig: Bool
+        /// GA 확인 모드(실행 인자 `-FIRDebugEnabled`)가 요청됐는지.
+        let isAnalyticsDebugRequested: Bool
     }
 
     struct Decision: Equatable {
         let shouldConfigureFirebase: Bool
+        /// nil이면 수집 설정을 건드리지 않는다.
+        let analyticsCollectionOverride: Bool?
         let shouldRequestTracking: Bool
     }
 
     static func decide(_ environment: Environment) -> Decision {
         // Release에서는 테스트 여부를 보지 않고 항상 기존 동작을 유지한다.
         guard environment.isDebugBuild else {
-            return Decision(shouldConfigureFirebase: true, shouldRequestTracking: true)
+            return Decision(shouldConfigureFirebase: true, analyticsCollectionOverride: nil, shouldRequestTracking: true)
         }
 
         // 테스트 호스트 실행 중에는 Firebase와 시스템 팝업(ATT)을 건드리지 않는다.
         if environment.isRunningTests {
-            return Decision(shouldConfigureFirebase: false, shouldRequestTracking: false)
+            return Decision(shouldConfigureFirebase: false, analyticsCollectionOverride: nil, shouldRequestTracking: false)
         }
 
-        // plist가 없으면 `FirebaseApp.configure()`가 크래시하므로 초기화를 건너뛴다.
-        return Decision(shouldConfigureFirebase: environment.hasFirebaseConfig, shouldRequestTracking: true)
+        // plist가 없으면 `FirebaseApp.configure()`가 크래시하므로 초기화를 건너뛴다. 초기화하지 않았으니 수집 설정도 건드리지 않는다.
+        guard environment.hasFirebaseConfig else {
+            return Decision(shouldConfigureFirebase: false, analyticsCollectionOverride: nil, shouldRequestTracking: true)
+        }
+
+        // Debug 수집은 GA 확인 모드일 때만 켠다. 설정값이 실행 간에 유지되므로 끄는 쪽도 매번 명시한다.
+        return Decision(
+            shouldConfigureFirebase: true,
+            analyticsCollectionOverride: environment.isAnalyticsDebugRequested,
+            shouldRequestTracking: true
+        )
     }
 }
