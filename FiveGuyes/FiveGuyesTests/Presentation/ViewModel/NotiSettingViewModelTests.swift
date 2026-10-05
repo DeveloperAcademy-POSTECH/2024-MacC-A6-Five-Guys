@@ -96,6 +96,49 @@ struct NotiSettingViewModelTests {
         #expect(viewModel.isNotificationDisabled == false)
     }
 
+    @Test("NotiSettingViewModel: C9 읽는 책이 없어도 알림을 끄면 대기 중인 알림을 모두 제거한다")
+    func notiSetting_c9_disableWithoutBook_clearsRequests() async {
+        let notificationService = NotificationManagerStub()
+        let settingsStore = NotificationSettingsStoreStub(
+            disabled: false,
+            reminderHour: 9,
+            reminderMinute: 0
+        )
+        let viewModel = makeViewModel(
+            notificationService: notificationService,
+            settingsOpener: SystemSettingsOpenerStub(),
+            settingsStore: settingsStore
+        )
+
+        viewModel.setNotificationDisabled(true, userBook: nil)
+
+        #expect(await waitUntil { notificationService.clearRequestsCallCount == 1 })
+        #expect(settingsStore.savedNotificationDisabled == true)
+        #expect(notificationService.setupAllNotificationsCallCount == 0)
+        #expect(notificationService.requestAuthorizationCallCount == 0)
+    }
+
+    @Test("NotiSettingViewModel: C8 읽는 책이 없을 때 알림을 받음으로 바꾸면 설정만 저장한다")
+    func notiSetting_c8_enableWithoutBook_onlySavesSetting() async {
+        let notificationService = NotificationManagerStub()
+        let settingsStore = NotificationSettingsStoreStub(
+            disabled: true,
+            reminderHour: 9,
+            reminderMinute: 0
+        )
+        let viewModel = makeViewModel(
+            notificationService: notificationService,
+            settingsOpener: SystemSettingsOpenerStub(),
+            settingsStore: settingsStore
+        )
+
+        viewModel.setNotificationDisabled(false, userBook: nil)
+
+        #expect(await waitUntil { settingsStore.savedNotificationDisabled == false })
+        #expect(notificationService.clearRequestsCallCount == 0)
+        #expect(notificationService.setupAllNotificationsCallCount == 0)
+    }
+
     @Test("NotiSettingViewModel: 시간 변경 시 설정 저장 및 알림 업데이트")
     func notiSetting_timeChange_updatesSettingsAndNotification() async {
         let notificationService = NotificationManagerStub()

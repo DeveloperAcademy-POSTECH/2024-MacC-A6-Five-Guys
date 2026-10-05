@@ -62,13 +62,13 @@ struct NotificationSettingUseCase: NotificationSettingUsing {
     func setNotificationDisabled(_ isDisabled: Bool, userBook: FGUserBook?) async {
         settingsStore.saveNotificationDisabled(isDisabled)
 
-        guard let userBook else { return }
-
         if isDisabled {
             await notificationService.clearRequests()
-        } else {
-            await notificationService.setupAllNotifications(userBook)
+            return
         }
+
+        guard let userBook else { return }
+        await notificationService.setupAllNotifications(userBook)
     }
 
     func updateReminderTime(
