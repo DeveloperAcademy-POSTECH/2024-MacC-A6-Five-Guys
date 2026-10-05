@@ -14,7 +14,7 @@ struct NotificationSettingSnapshot {
 
 protocol NotificationSettingUsing {
     func loadSnapshot(now: Date) -> NotificationSettingSnapshot
-    func refreshSystemAuthorization() async -> Bool
+    func refreshSystemAuthorization() async -> NotificationAuthorizationStatus
     func setNotificationDisabled(_ isDisabled: Bool, userBook: FGUserBook?) async
     func updateReminderTime(
         _ time: Date,
@@ -55,8 +55,8 @@ struct NotificationSettingUseCase: NotificationSettingUsing {
         )
     }
 
-    func refreshSystemAuthorization() async -> Bool {
-        await notificationService.isSystemAuthorized()
+    func refreshSystemAuthorization() async -> NotificationAuthorizationStatus {
+        await notificationService.authorizationStatus()
     }
 
     func setNotificationDisabled(_ isDisabled: Bool, userBook: FGUserBook?) async {

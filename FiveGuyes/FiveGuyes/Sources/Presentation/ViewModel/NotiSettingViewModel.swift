@@ -14,7 +14,7 @@ final class NotiSettingViewModel {
     var selectedTime: Date = Date()
     var isNotificationDisabled = false
     var isReminderTimePickerVisible = false
-    var isSystemNotificationEnabled = true
+    var systemAuthorizationStatus: NotificationAuthorizationStatus = .authorized
 
     private var notificationStatusTask: Task<Void, Never>?
     private var notificationTimeTask: Task<Void, Never>?
@@ -29,6 +29,10 @@ final class NotiSettingViewModel {
     ) {
         self.notificationSettingUseCase = notificationSettingUseCase
         self.nowProvider = nowProvider
+    }
+
+    var isSystemNotificationBannerVisible: Bool {
+        !isNotificationDisabled && systemAuthorizationStatus == .denied
     }
 
     var timeSelectionRange: ClosedRange<Date> {
@@ -58,8 +62,8 @@ final class NotiSettingViewModel {
 
     func refreshSystemNotificationAuthorization() async {
         let generation = beginSystemAuthorizationRefresh()
-        let isAuthorized = await notificationSettingUseCase.refreshSystemAuthorization()
-        updateSystemNotificationAuthorization(isAuthorized, for: generation)
+        let status = await notificationSettingUseCase.refreshSystemAuthorization()
+        updateSystemAuthorizationStatus(status, for: generation)
     }
 
     func handleNotificationStatusChange(userBook: FGUserBook?) {
@@ -74,12 +78,12 @@ final class NotiSettingViewModel {
             // 화면 진입 시점의 조회는 팝업을 띄우지 않으므로 여기서 상태를 다시 읽어야 한다.
             guard !Task.isCancelled else { return }
             let generation = beginSystemAuthorizationRefresh()
-            let isAuthorized = await notificationSettingUseCase.refreshSystemAuthorization()
+            let status = await notificationSettingUseCase.refreshSystemAuthorization()
 
             // 조회가 취소를 관찰하지 않을 수 있으므로, 대입 직전에 최신 조회인지 다시 확인한다.
             // 그러지 않으면 뒤늦게 끝난 이전 조회가 최신 결과를 덮어쓴다.
             guard !Task.isCancelled else { return }
-            updateSystemNotificationAuthorization(isAuthorized, for: generation)
+            updateSystemAuthorizationStatus(status, for: generation)
         }
     }
 
@@ -107,8 +111,8 @@ final class NotiSettingViewModel {
         return systemAuthorizationRefreshGeneration
     }
 
-    private func updateSystemNotificationAuthorization(_ isAuthorized: Bool, for generation: Int) {
+    private func updateSystemAuthorizationStatus(_ status: NotificationAuthorizationStatus, for generation: Int) {
         guard generation == systemAuthorizationRefreshGeneration else { return }
-        isSystemNotificationEnabled = isAuthorized
+        systemAuthorizationStatus = status
     }
 }

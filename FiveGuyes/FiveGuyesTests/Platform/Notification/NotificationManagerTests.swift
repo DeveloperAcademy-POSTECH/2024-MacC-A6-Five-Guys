@@ -112,25 +112,59 @@ struct NotificationManagerTests {
         #expect(notificationCenter.addedIdentifiers.isEmpty)
     }
 
-    @Test("isSystemAuthorized는 권한 팝업을 띄우지 않고 상태만 읽는다")
-    func isSystemAuthorized_readsStatusWithoutRequestingAuthorization() async {
+    @Test(
+        "authorizationStatus(C6)는 iOS 권한 상태를 앱의 3가지 상태로 바꾼다",
+        arguments: [
+            (UNAuthorizationStatus.notDetermined, NotificationAuthorizationStatus.notDetermined),
+            (.denied, .denied),
+            (.authorized, .authorized),
+            (.provisional, .authorized),
+            (.ephemeral, .authorized)
+        ]
+    )
+    func authorizationStatus_mapsSystemStatus(
+        systemStatus: UNAuthorizationStatus,
+        expected: NotificationAuthorizationStatus
+    ) async {
+        let notificationCenter = UserNotificationCenterStub()
+        notificationCenter.authorizationStatus = systemStatus
+        let manager = makeManager(notificationCenter: notificationCenter)
+
+        let status = await manager.authorizationStatus()
+
+        #expect(status == expected)
+    }
+
+    @Test("authorizationStatus(C6)는 알 수 없는 iOS 상태를 거절로 본다")
+    func authorizationStatus_unknownSystemStatus_isDenied() async throws {
+        let unknownStatus = try #require(UNAuthorizationStatus(rawValue: 99))
+        let notificationCenter = UserNotificationCenterStub()
+        notificationCenter.authorizationStatus = unknownStatus
+        let manager = makeManager(notificationCenter: notificationCenter)
+
+        let status = await manager.authorizationStatus()
+
+        #expect(status == .denied)
+    }
+
+    @Test("authorizationStatus는 권한 팝업을 띄우지 않고 상태만 읽는다")
+    func authorizationStatus_readsStatusWithoutRequestingAuthorization() async {
         let notificationCenter = UserNotificationCenterStub()
         notificationCenter.authorizationStatus = .notDetermined
-        let settingsStore = NotificationSettingsStoreStub(
-            disabled: false,
-            reminderHour: 8,
-            reminderMinute: 0
-        )
-        let manager = NotificationManager(
+        let manager = makeManager(notificationCenter: notificationCenter)
+
+        let status = await manager.authorizationStatus()
+
+        #expect(status == .notDetermined)
+        #expect(notificationCenter.requestAuthorizationCallCount == 0)
+    }
+
+    private func makeManager(notificationCenter: UserNotificationCenterStub) -> NotificationManager {
+        NotificationManager(
             notificationCenter: notificationCenter,
             todayProvider: FixedReadingDateProvider(todayValue: makeDate("2025-01-01")),
-            settingsStore: settingsStore
+            settingsStore: NotificationSettingsStoreStub(disabled: false, reminderHour: 8, reminderMinute: 0)
         )
-
-        let isAuthorized = await manager.isSystemAuthorized()
-
-        #expect(isAuthorized == false)
-        #expect(notificationCenter.requestAuthorizationCallCount == 0)
     }
 
     private func makeDate(_ dateString: String) -> Date {
