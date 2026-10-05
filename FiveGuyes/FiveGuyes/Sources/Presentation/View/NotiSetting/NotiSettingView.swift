@@ -18,10 +18,10 @@ struct NotiSettingView: View {
         self._viewModel = State(initialValue: viewModel)
     }
 
-    private var isNotificationToggleEnabled: Binding<Bool> {
+    private var notificationDisabledBinding: Binding<Bool> {
         Binding(
-            get: { !viewModel.isNotificationDisabled },
-            set: { viewModel.setNotificationDisabled(!$0, userBook: userBook) }
+            get: { viewModel.isNotificationDisabled },
+            set: { viewModel.setNotificationDisabled($0, userBook: userBook) }
         )
     }
 
@@ -119,7 +119,7 @@ struct NotiSettingView: View {
 
     private var toggleSection: some View {
         VStack(alignment: .leading, spacing: .zero) {
-            Toggle("알림 끄기", isOn: isNotificationToggleEnabled)
+            Toggle("알림 끄기", isOn: notificationDisabledBinding)
                 .toggleStyle(.switch)
                 .fontStyle(.title2, weight: .semibold)
                 .foregroundStyle(Color.Labels.primaryBlack1)

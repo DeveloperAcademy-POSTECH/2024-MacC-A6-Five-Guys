@@ -73,6 +73,29 @@ struct NotiSettingViewModelTests {
         #expect(notificationService.setupAllNotificationsCallCount == 0)
     }
 
+    @Test("NotiSettingViewModel: C5 알림 끄기 스위치를 켜면 끔, 끄면 받음으로 저장된다")
+    func notiSetting_c5_toggleMapsToDisabledSetting() async {
+        let notificationService = NotificationManagerStub()
+        let settingsStore = NotificationSettingsStoreStub(
+            disabled: false,
+            reminderHour: 9,
+            reminderMinute: 0
+        )
+        let viewModel = makeViewModel(
+            notificationService: notificationService,
+            settingsOpener: SystemSettingsOpenerStub(),
+            settingsStore: settingsStore
+        )
+
+        viewModel.setNotificationDisabled(true, userBook: makeBook())
+        #expect(await waitUntil { settingsStore.savedNotificationDisabled == true })
+        #expect(viewModel.isNotificationDisabled)
+
+        viewModel.setNotificationDisabled(false, userBook: makeBook())
+        #expect(await waitUntil { settingsStore.savedNotificationDisabled == false })
+        #expect(viewModel.isNotificationDisabled == false)
+    }
+
     @Test("NotiSettingViewModel: 시간 변경 시 설정 저장 및 알림 업데이트")
     func notiSetting_timeChange_updatesSettingsAndNotification() async {
         let notificationService = NotificationManagerStub()
