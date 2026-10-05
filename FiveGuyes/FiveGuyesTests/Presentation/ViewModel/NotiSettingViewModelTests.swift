@@ -450,6 +450,38 @@ struct NotiSettingViewModelTests {
         #expect(notificationService.requestAuthorizationCallCount == 0)
     }
 
+    @Test("NotiSettingViewModel: C2 진입 팝업이 떠 있는 동안 들어온 복귀 조회가 팝업 결과를 덮지 않는다")
+    func notiSetting_c2_returnDuringEntryPrompt_doesNotOverwriteEntryResult() async {
+        let notificationService = NotificationManagerStub()
+        let promptGate = AsyncGate()
+        notificationService.currentStatus = .notDetermined
+        notificationService.statusAfterRequest = .denied
+        notificationService.requestAuthorizationGate = promptGate
+        let viewModel = makeViewModel(
+            notificationService: notificationService,
+            settingsOpener: SystemSettingsOpenerStub(),
+            settingsStore: NotificationSettingsStoreStub(disabled: false, reminderHour: 9, reminderMinute: 0)
+        )
+
+        // 진입 처리가 OS 팝업에서 멈춰 있다.
+        let entryTask = Task {
+            await viewModel.handleScreenEntry()
+        }
+        #expect(await waitUntil { notificationService.requestAuthorizationCallCount == 1 })
+
+        // 팝업 때문에 앱이 inactive → active가 되면서 복귀 처리가 들어온다. 이 시점의 OS 상태는 아직 미결정이다.
+        await viewModel.handleReturnToForeground(userBook: makeBook())
+
+        // 사용자가 거절해 팝업이 닫히면 진입 처리의 최종 결과(거절)가 배너에 반영돼야 한다.
+        await promptGate.open()
+        await entryTask.value
+
+        #expect(viewModel.systemAuthorizationStatus == .denied)
+        #expect(viewModel.isSystemNotificationBannerVisible)
+        #expect(notificationService.setupAllNotificationsCallCount == 0)
+        #expect(notificationService.requestAuthorizationCallCount == 1)
+    }
+
     @Test("NotiSettingViewModel: 앱 알림을 켜서 권한을 허용하면 배너가 사라진다")
     func notiSetting_enable_afterAuthorizationGranted_refreshesBanner() async {
         let notificationService = NotificationManagerStub()

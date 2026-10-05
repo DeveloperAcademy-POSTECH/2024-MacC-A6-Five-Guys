@@ -345,6 +345,7 @@ final class NotificationManagerStub: NotificationManaging {
     /// 권한 요청 뒤 바뀔 상태. 사용자가 팝업에서 허용/거절한 결과를 흉내 낸다.
     var statusAfterRequest: NotificationAuthorizationStatus?
     var requestAuthorizationCallCount = 0
+    var requestAuthorizationGate: AsyncGate?
     var authorizationStatusCallCount = 0
     var authorizationStatusResults: [NotificationAuthorizationStatus] = []
     var authorizationStatusGates: [AsyncGate] = []
@@ -358,6 +359,9 @@ final class NotificationManagerStub: NotificationManaging {
 
     func requestAuthorization() async -> Bool {
         requestAuthorizationCallCount += 1
+        if let requestAuthorizationGate {
+            await requestAuthorizationGate.wait()
+        }
         if let statusAfterRequest {
             currentStatus = statusAfterRequest
         }
