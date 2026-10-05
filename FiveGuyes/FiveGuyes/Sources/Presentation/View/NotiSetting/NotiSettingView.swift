@@ -70,7 +70,7 @@ struct NotiSettingView: View {
         .onChange(of: scenePhase) {
             if scenePhase == .active { // 시스템 설정에 갔다가 다시 오는 상황 체크
                 Task {
-                    await viewModel.refreshSystemNotificationAuthorization()
+                    await viewModel.handleReturnToForeground(userBook: userBook)
                 }
             }
         }
