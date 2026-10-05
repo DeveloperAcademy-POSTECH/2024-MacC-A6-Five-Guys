@@ -66,9 +66,9 @@ final class NotiSettingViewModel {
         updateSystemAuthorizationStatus(status, for: generation)
     }
 
-    func refreshSystemNotificationAuthorization() async {
+    func handleReturnToForeground(userBook: FGUserBook?) async {
         let generation = beginSystemAuthorizationRefresh()
-        let status = await notificationSettingUseCase.refreshSystemAuthorization()
+        let status = await notificationSettingUseCase.refreshAuthorizationOnReturn(userBook: userBook)
         updateSystemAuthorizationStatus(status, for: generation)
     }
 

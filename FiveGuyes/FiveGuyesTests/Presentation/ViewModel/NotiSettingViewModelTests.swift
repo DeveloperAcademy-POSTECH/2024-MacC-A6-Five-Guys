@@ -303,8 +303,8 @@ struct NotiSettingViewModelTests {
         #expect(viewModel.isSystemNotificationBannerVisible == expectedVisible)
     }
 
-    @Test("NotiSettingViewModel: C6 권한 조회 결과가 미결정이면 배너를 보이지 않는다")
-    func notiSetting_c6_refreshWithNotDetermined_hidesBanner() async {
+    @Test("NotiSettingViewModel: C6 복귀 시 권한 조회 결과가 미결정이면 배너를 보이지 않는다")
+    func notiSetting_c6_returnWithNotDetermined_hidesBanner() async {
         let notificationService = NotificationManagerStub()
         notificationService.currentStatus = .notDetermined
         let viewModel = makeViewModel(
@@ -313,7 +313,7 @@ struct NotiSettingViewModelTests {
             settingsStore: NotificationSettingsStoreStub(disabled: false, reminderHour: 9, reminderMinute: 0)
         )
 
-        await viewModel.refreshSystemNotificationAuthorization()
+        await viewModel.handleReturnToForeground(userBook: nil)
 
         #expect(viewModel.systemAuthorizationStatus == .notDetermined)
         #expect(viewModel.isSystemNotificationBannerVisible == false)
@@ -391,6 +391,65 @@ struct NotiSettingViewModelTests {
         #expect(viewModel.isSystemNotificationBannerVisible == false)
     }
 
+    @Test(
+        "NotiSettingViewModel: C4 복귀 시 권한을 요청하지 않고 조회하며, 받음 + 허용 + 책이 있을 때만 다시 등록한다",
+        arguments: [
+            (NotificationAuthorizationStatus.authorized, false, true, 1),
+            (.authorized, false, false, 0),
+            (.authorized, true, true, 0),
+            (.denied, false, true, 0),
+            (.notDetermined, false, true, 0)
+        ]
+    )
+    func notiSetting_c4_returnToForeground_reregistersOnlyWhenAllowed(
+        status: NotificationAuthorizationStatus,
+        isNotificationDisabled: Bool,
+        hasBook: Bool,
+        expectedSetupCount: Int
+    ) async {
+        let notificationService = NotificationManagerStub()
+        notificationService.currentStatus = status
+        let viewModel = makeViewModel(
+            notificationService: notificationService,
+            settingsOpener: SystemSettingsOpenerStub(),
+            settingsStore: NotificationSettingsStoreStub(
+                disabled: isNotificationDisabled,
+                reminderHour: 9,
+                reminderMinute: 0
+            )
+        )
+        let book = makeBook()
+
+        await viewModel.handleReturnToForeground(userBook: hasBook ? book : nil)
+
+        #expect(notificationService.requestAuthorizationCallCount == 0)
+        #expect(notificationService.setupAllNotificationsCallCount == expectedSetupCount)
+        #expect(notificationService.setupAllNotificationsBookIDs == (expectedSetupCount == 1 ? [book.id] : []))
+        #expect(notificationService.clearRequestsCallCount == 0)
+        #expect(viewModel.systemAuthorizationStatus == status)
+    }
+
+    @Test("NotiSettingViewModel: C4 설정 앱에서 권한을 허용하고 돌아오면 배너가 사라지고 알림이 다시 등록된다")
+    func notiSetting_c4_returnAfterGrantingInSettings_hidesBannerAndReregisters() async {
+        let notificationService = NotificationManagerStub()
+        notificationService.currentStatus = .denied
+        let viewModel = makeViewModel(
+            notificationService: notificationService,
+            settingsOpener: SystemSettingsOpenerStub(),
+            settingsStore: NotificationSettingsStoreStub(disabled: false, reminderHour: 9, reminderMinute: 0)
+        )
+
+        await viewModel.handleScreenEntry()
+        #expect(viewModel.isSystemNotificationBannerVisible)
+
+        notificationService.currentStatus = .authorized
+        await viewModel.handleReturnToForeground(userBook: makeBook())
+
+        #expect(viewModel.isSystemNotificationBannerVisible == false)
+        #expect(notificationService.setupAllNotificationsCallCount == 1)
+        #expect(notificationService.requestAuthorizationCallCount == 0)
+    }
+
     @Test("NotiSettingViewModel: 앱 알림을 켜서 권한을 허용하면 배너가 사라진다")
     func notiSetting_enable_afterAuthorizationGranted_refreshesBanner() async {
         let notificationService = NotificationManagerStub()
@@ -408,7 +467,7 @@ struct NotiSettingViewModelTests {
         )
 
         // 화면 진입: OS 권한이 아직 허용되지 않아 배너가 보인다.
-        await viewModel.refreshSystemNotificationAuthorization()
+        await viewModel.handleScreenEntry()
         #expect(viewModel.systemAuthorizationStatus == .denied)
 
         // 앱 알림을 켜면 권한 팝업이 뜨고, 사용자가 허용한 상황을 가정한다.
@@ -480,7 +539,7 @@ struct NotiSettingViewModelTests {
 
         // 화면 진입 조회는 거부(false)를 반환하기 전에 대기한다.
         let initialRefreshTask = Task {
-            await viewModel.refreshSystemNotificationAuthorization()
+            await viewModel.handleScreenEntry()
         }
         #expect(await waitUntil { notificationService.authorizationStatusCallCount == 1 })
 
@@ -525,7 +584,7 @@ struct NotiSettingViewModelTests {
         #expect(await waitUntil { notificationService.setupAllNotificationsCallCount == 1 })
 
         // 팝업이 열린 사이 화면이 복귀하면서 거부(false) 상태를 조회한다.
-        await viewModel.refreshSystemNotificationAuthorization()
+        await viewModel.handleScreenEntry()
         #expect(viewModel.systemAuthorizationStatus == .denied)
 
         // 사용자가 권한을 허용해 팝업을 닫으면 토글 경로의 최종 조회는 허용(true)이다.
