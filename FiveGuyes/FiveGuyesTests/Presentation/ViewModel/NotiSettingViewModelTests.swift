@@ -485,8 +485,9 @@ struct NotiSettingViewModelTests {
     @Test("NotiSettingViewModel: 뒤늦게 끝난 이전 권한 조회가 최신 배너 상태를 덮어쓰지 않는다")
     func notiSetting_staleAuthorizationResult_doesNotOverwriteLatestState() async {
         let notificationService = NotificationManagerStub()
-        notificationService.currentStatus = .authorized
-        notificationService.authorizationStatusDelayNanoseconds = 300_000_000
+        let staleAuthorizationGate = AsyncGate()
+        notificationService.authorizationStatusResults = [.authorized, .denied]
+        notificationService.authorizationStatusGates = [staleAuthorizationGate]
         let settingsStore = NotificationSettingsStoreStub(
             disabled: true,
             reminderHour: 9,
@@ -499,24 +500,28 @@ struct NotiSettingViewModelTests {
             settingsStore: settingsStore
         )
 
-        // 앱 알림을 켠다. 이 조회는 느리고, 허용(true)을 반환할 예정이다.
-        viewModel.isNotificationDisabled = false
-        viewModel.handleNotificationStatusChange(userBook: makeBook())
+        // 첫 조회는 게이트에서 붙잡아 둔다. 풀리면 허용(authorized)을 반환할 예정이다.
+        // 취소되는 토글 Task가 아니라 취소되지 않는 진입 경로를 써서 세대 비교만이 이 결과를 막게 한다.
+        let staleEntryTask = Task {
+            await viewModel.handleScreenEntry()
+        }
         #expect(await waitUntil { notificationService.authorizationStatusCallCount == 1 })
 
-        // 조회가 끝나기 전에 다시 끈다. 이쪽 조회는 즉시 거부(false)를 반환한다.
-        notificationService.currentStatus = .denied
-        notificationService.authorizationStatusDelayNanoseconds = 0
+        // 두 번째 조회를 먼저 끝낸다. 즉시 거절(denied)을 반환한다.
         viewModel.isNotificationDisabled = true
         viewModel.handleNotificationStatusChange(userBook: makeBook())
+        #expect(
+            await waitUntil {
+                notificationService.authorizationStatusCallCount == 2 &&
+                    viewModel.systemAuthorizationStatus == .denied
+            }
+        )
 
-        #expect(await waitUntil { viewModel.systemAuthorizationStatus == .denied })
+        // 그다음 첫 조회를 풀고 끝날 때까지 기다린다. 최신 상태(denied)를 되돌려서는 안 된다.
+        await staleAuthorizationGate.open()
+        await staleEntryTask.value
 
-        // 앞선 느린 조회가 뒤늦게 끝나도 최신 상태(false)를 되돌려서는 안 된다.
-        let becameStale = await waitUntil(timeoutNanoseconds: 500_000_000) {
-            viewModel.systemAuthorizationStatus == .authorized
-        }
-        #expect(becameStale == false)
+        #expect(viewModel.systemAuthorizationStatus == .denied)
     }
 
     @Test("NotiSettingViewModel: 화면 진입 조회가 토글 경로의 최신 배너 상태를 덮어쓰지 않는다")
