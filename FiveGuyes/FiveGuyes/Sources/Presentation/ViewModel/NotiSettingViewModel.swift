@@ -60,6 +60,12 @@ final class NotiSettingViewModel {
         handleNotificationTimeChange(userBook: userBook)
     }
 
+    func handleScreenEntry() async {
+        let generation = beginSystemAuthorizationRefresh()
+        let status = await notificationSettingUseCase.prepareAuthorizationOnEntry()
+        updateSystemAuthorizationStatus(status, for: generation)
+    }
+
     func refreshSystemNotificationAuthorization() async {
         let generation = beginSystemAuthorizationRefresh()
         let status = await notificationSettingUseCase.refreshSystemAuthorization()

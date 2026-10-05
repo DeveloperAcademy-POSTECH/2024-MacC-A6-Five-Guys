@@ -62,7 +62,7 @@ struct NotiSettingView: View {
         .navigationTitle("알림 설정")
         .customNavigationBackButton()
         .task {
-            await viewModel.refreshSystemNotificationAuthorization()
+            await viewModel.handleScreenEntry()
         }
         .onAppear {
             viewModel.loadPersistedSettings()
