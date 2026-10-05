@@ -21,12 +21,15 @@
 
 ```bash
 cp FiveGuyes/Config.xcconfig.example FiveGuyes/Config.xcconfig
-cp FiveGuyes/GoogleService-Info.plist.example FiveGuyes/FiveGuyes/GoogleService-Info.plist
 ```
 
 `Config.xcconfig`의 `API_KEY`에 알라딘 API 키를 넣습니다. 실제 인증 정보는 커밋하지 않습니다.
 
-`GoogleService-Info.plist`는 빌드에는 필요 없고 Firebase 런타임 동작에만 쓰입니다. 복사 위치에 주의하세요. 앱 타깃은 `FiveGuyes/FiveGuyes/`를 파일시스템 동기화 그룹으로 참조하므로 **그 폴더 안에 있는 파일만 앱 번들에 포함됩니다.** 한 단계 위(`FiveGuyes/`)에 두면 `FirebaseApp.configure()`가 설정을 찾지 못합니다.
+`GoogleService-Info.plist`(Firebase 설정 파일, `.gitignore` 대상)는 **Debug 빌드에서는 없어도 됩니다.** 없으면 앱이 Firebase 초기화를 건너뛰고 정상 실행되므로, 자격증명 없이도 빌드·실행이 가능합니다. 테스트는 plist 유무와 상관없이 Firebase와 ATT(앱 추적 투명성) 요청 없이 실행되며, CI도 이 파일을 만들지 않습니다. Release 빌드는 plist를 요구합니다.
+
+Firebase 동작을 실제로 확인해야 할 때만 Firebase 콘솔(프로젝트 설정 > iOS 앱)에서 받은 `GoogleService-Info.plist`를 `FiveGuyes/FiveGuyes/` 안에 넣으세요. 앱 타깃은 이 폴더를 파일시스템 동기화 그룹으로 참조하므로 **그 폴더 안에 있는 파일만 앱 번들에 포함됩니다.** 견본 파일을 복사해 넣으면 `FirebaseApp.configure()`가 시작 중 크래시합니다.
+
+Debug 빌드의 GA(Google Analytics) 수집은 기본으로 꺼져 있습니다. GA 동작을 확인하는 모드를 켜고 끄는 방법과 시작 동작 규칙은 `FiveGuyes/FiveGuyes/Sources/Platform/Analytics/CLAUDE.md`를 참고하세요.
 
 ## 빌드, 테스트, 개발 명령
 
@@ -51,7 +54,7 @@ SwiftLint는 `SwiftLintBuildToolPlugin`(SPM 빌드 플러그인)으로 등록되
 swiftlint lint --config FiveGuyes/.swiftlint.yml
 ```
 
-**주의:** 테스트가 시뮬레이터 안에서 멈추는 사례가 있었습니다. 병렬 테스트를 끄고 단일 시뮬레이터로 실행하세요. Firebase/네트워크 로그가 계속 출력되는 동안에도 테스트 자체는 멈춰 있을 수 있어, 로그 출력량만으로 진행 여부를 판단하면 안 됩니다.
+**주의:** 테스트는 병렬 실행을 끄고 단일 시뮬레이터로 실행하세요. 과거에 알림 권한 팝업 때문에 테스트가 멈춘 사례(#214)는 #215와, 테스트 중 Firebase·ATT 요청을 생략하는 앱 시작 규칙으로 원인이 해결되었습니다.
 
 ## 코딩 스타일 및 네이밍 규칙
 
@@ -92,6 +95,10 @@ struct DailyProgressViewModelTests {
 ```
 
 테스트 파일은 대상 타입 이름을 따라 `DailyProgressViewModelTests.swift`처럼 작성하고, 공통 픽스처는 `*TestSupport.swift`에 둡니다. 테스트 대역은 역할에 따라 `...Stub`(고정 응답) 또는 `...Spy`(호출 기록)로 이름 짓습니다. 도메인 계산기, 정책, UseCase, Repository 동작, ViewModel 상태 전이가 바뀌면 관련 테스트를 추가하거나 갱신하세요.
+
+## 기능 문서와 우선순위
+
+`docs/README.md`가 `docs/` 하위 폴더의 성격과 고치는 법을 설명합니다. 앱이 어떻게 동작해야 하는지의 기준은 `docs/features/`의 기능 문서입니다. 코드가 기능 문서와 다르면 코드의 버그로 보고 이슈로 추적합니다.
 
 ## 설계 배경 문서
 
