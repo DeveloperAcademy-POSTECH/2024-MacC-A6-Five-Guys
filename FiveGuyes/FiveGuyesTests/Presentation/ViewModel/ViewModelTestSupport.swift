@@ -346,7 +346,6 @@ final class NotificationManagerStub: NotificationManaging {
     var statusAfterRequest: NotificationAuthorizationStatus?
     var requestAuthorizationCallCount = 0
     var authorizationStatusCallCount = 0
-    var authorizationStatusDelayNanoseconds: UInt64 = 0
     var authorizationStatusResults: [NotificationAuthorizationStatus] = []
     var authorizationStatusGates: [AsyncGate] = []
     var clearRequestsCallCount = 0
@@ -374,16 +373,6 @@ final class NotificationManagerStub: NotificationManaging {
 
         if authorizationStatusGates.indices.contains(callIndex) {
             await authorizationStatusGates[callIndex].wait()
-        }
-
-        // 실제 OS 조회는 Task 취소를 관찰하지 않으므로, 취소와 무관하게 지연시킨다.
-        if authorizationStatusDelayNanoseconds > 0 {
-            let delay = authorizationStatusDelayNanoseconds
-            await withCheckedContinuation { continuation in
-                DispatchQueue.main.asyncAfter(deadline: .now() + .nanoseconds(Int(delay))) {
-                    continuation.resume()
-                }
-            }
         }
 
         return result
