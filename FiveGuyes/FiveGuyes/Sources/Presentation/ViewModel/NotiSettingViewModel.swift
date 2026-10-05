@@ -87,8 +87,7 @@ final class NotiSettingViewModel {
             guard !Task.isCancelled else { return }
             await notificationSettingUseCase.setNotificationDisabled(isDisabled, userBook: userBook)
 
-            // 앱 알림을 켜는 순간 OS 권한 팝업이 뜰 수 있고, 그 결과가 배너 표시를 좌우한다.
-            // 진입 시 읽은 상태는 이 팝업 이전 값이라 여기서 다시 읽어야 한다.
+            // 토글 처리 뒤의 최신 OS 권한 상태를 다시 읽어 배너에 반영한다.
             guard !Task.isCancelled else { return }
             let generation = beginSystemAuthorizationRefresh()
             let status = await notificationSettingUseCase.refreshSystemAuthorization()

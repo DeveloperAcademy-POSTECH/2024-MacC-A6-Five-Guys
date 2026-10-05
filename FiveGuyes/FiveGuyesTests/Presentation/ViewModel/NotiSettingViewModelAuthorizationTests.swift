@@ -334,7 +334,7 @@ struct NotiSettingViewModelAuthorizationTests {
         #expect(viewModel.systemAuthorizationStatus == .authorized)
     }
 
-    @Test("NotiSettingViewModel: 권한 팝업 중 화면 복귀 조회 뒤에도 토글의 최신 권한 상태를 반영한다")
+    @Test("NotiSettingViewModel: 권한 팝업 중 화면 진입 조회 뒤에도 토글의 최신 권한 상태를 반영한다")
     func notiSetting_toggleAuthorizationResult_overwritesRefreshDuringPermissionPrompt() async {
         let notificationService = NotificationManagerStub()
         let permissionPromptGate = AsyncGate()
@@ -357,7 +357,7 @@ struct NotiSettingViewModelAuthorizationTests {
         viewModel.handleNotificationStatusChange(userBook: makeBook())
         #expect(await waitUntil { notificationService.setupAllNotificationsCallCount == 1 })
 
-        // 팝업이 열린 사이 화면이 복귀하면서 거부(false) 상태를 조회한다.
+        // 팝업이 열린 사이 화면 진입 조회가 거부(false) 상태를 읽는다.
         await viewModel.handleScreenEntry()
         #expect(viewModel.systemAuthorizationStatus == .denied)
 
