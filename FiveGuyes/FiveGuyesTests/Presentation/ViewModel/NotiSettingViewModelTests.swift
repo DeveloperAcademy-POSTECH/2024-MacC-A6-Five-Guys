@@ -319,28 +319,76 @@ struct NotiSettingViewModelTests {
         #expect(viewModel.isSystemNotificationBannerVisible == false)
     }
 
-    @Test("NotiSettingViewModel: 설정 화면 진입은 권한 팝업을 띄우지 않고 상태만 조회한다")
-    func notiSetting_refreshAuthorization_doesNotRequestAuthorization() async {
+    @Test(
+        "NotiSettingViewModel: C2 받음 + 미결정이면 책이 없어도 진입 시 팝업을 1회 띄우고 결과로 배너를 갱신한다",
+        arguments: [
+            (NotificationAuthorizationStatus.authorized, false),
+            (.denied, true)
+        ]
+    )
+    func notiSetting_c2_entryWithNotDetermined_requestsAuthorizationOnce(
+        resultStatus: NotificationAuthorizationStatus,
+        expectedBannerVisible: Bool
+    ) async {
         let notificationService = NotificationManagerStub()
-        notificationService.currentStatus = .denied
-        let settingsStore = NotificationSettingsStoreStub(
-            disabled: true,
-            reminderHour: 9,
-            reminderMinute: 0
-        )
-        let settingsOpener = SystemSettingsOpenerStub()
+        notificationService.currentStatus = .notDetermined
+        notificationService.statusAfterRequest = resultStatus
         let viewModel = makeViewModel(
             notificationService: notificationService,
-            settingsOpener: settingsOpener,
-            settingsStore: settingsStore
+            settingsOpener: SystemSettingsOpenerStub(),
+            settingsStore: NotificationSettingsStoreStub(disabled: false, reminderHour: 9, reminderMinute: 0)
         )
 
-        await viewModel.refreshSystemNotificationAuthorization()
+        await viewModel.handleScreenEntry()
 
-        // 화면 진입은 상태 표시용 조회이므로 OS 권한 팝업을 띄워서는 안 된다.
+        #expect(notificationService.requestAuthorizationCallCount == 1)
+        #expect(viewModel.systemAuthorizationStatus == resultStatus)
+        #expect(viewModel.isSystemNotificationBannerVisible == expectedBannerVisible)
+        #expect(notificationService.setupAllNotificationsCallCount == 0)
+        #expect(notificationService.clearRequestsCallCount == 0)
+    }
+
+    @Test(
+        "NotiSettingViewModel: C3 진입 시 권한이 이미 결정됐으면 팝업 없이 상태만 조회한다",
+        arguments: [
+            (NotificationAuthorizationStatus.authorized, false),
+            (.denied, true)
+        ]
+    )
+    func notiSetting_c3_entryWithDecidedStatus_onlyReadsStatus(
+        status: NotificationAuthorizationStatus,
+        expectedBannerVisible: Bool
+    ) async {
+        let notificationService = NotificationManagerStub()
+        notificationService.currentStatus = status
+        let viewModel = makeViewModel(
+            notificationService: notificationService,
+            settingsOpener: SystemSettingsOpenerStub(),
+            settingsStore: NotificationSettingsStoreStub(disabled: false, reminderHour: 9, reminderMinute: 0)
+        )
+
+        await viewModel.handleScreenEntry()
+
         #expect(notificationService.requestAuthorizationCallCount == 0)
-        #expect(notificationService.authorizationStatusCallCount == 1)
-        #expect(viewModel.systemAuthorizationStatus == .denied)
+        #expect(viewModel.systemAuthorizationStatus == status)
+        #expect(viewModel.isSystemNotificationBannerVisible == expectedBannerVisible)
+    }
+
+    @Test("NotiSettingViewModel: C2 끔 + 미결정이면 진입해도 팝업을 띄우지 않는다")
+    func notiSetting_c2_entryWhenDisabled_doesNotRequestAuthorization() async {
+        let notificationService = NotificationManagerStub()
+        notificationService.currentStatus = .notDetermined
+        let viewModel = makeViewModel(
+            notificationService: notificationService,
+            settingsOpener: SystemSettingsOpenerStub(),
+            settingsStore: NotificationSettingsStoreStub(disabled: true, reminderHour: 9, reminderMinute: 0)
+        )
+
+        await viewModel.handleScreenEntry()
+
+        #expect(notificationService.requestAuthorizationCallCount == 0)
+        #expect(viewModel.systemAuthorizationStatus == .notDetermined)
+        #expect(viewModel.isSystemNotificationBannerVisible == false)
     }
 
     @Test("NotiSettingViewModel: 앱 알림을 켜서 권한을 허용하면 배너가 사라진다")
