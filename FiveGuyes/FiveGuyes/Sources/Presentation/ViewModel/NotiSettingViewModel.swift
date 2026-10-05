@@ -19,6 +19,7 @@ final class NotiSettingViewModel {
     private var notificationStatusTask: Task<Void, Never>?
     private var notificationTimeTask: Task<Void, Never>?
     private var systemAuthorizationRefreshGeneration = 0
+    private var isHandlingScreenEntry = false
 
     private let notificationSettingUseCase: any NotificationSettingUsing
     private let nowProvider: () -> Date
@@ -61,12 +62,18 @@ final class NotiSettingViewModel {
     }
 
     func handleScreenEntry() async {
+        isHandlingScreenEntry = true
+        defer { isHandlingScreenEntry = false }
+
         let generation = beginSystemAuthorizationRefresh()
         let status = await notificationSettingUseCase.prepareAuthorizationOnEntry()
         updateSystemAuthorizationStatus(status, for: generation)
     }
 
     func handleReturnToForeground(userBook: FGUserBook?) async {
+        // 진입 처리 중 OS 팝업 때문에 들어온 복귀는 건너뛴다. 진입 처리가 팝업 이후의 최종 상태를 반영한다.
+        guard !isHandlingScreenEntry else { return }
+
         let generation = beginSystemAuthorizationRefresh()
         let status = await notificationSettingUseCase.refreshAuthorizationOnReturn(userBook: userBook)
         updateSystemAuthorizationStatus(status, for: generation)
@@ -81,7 +88,7 @@ final class NotiSettingViewModel {
             await notificationSettingUseCase.setNotificationDisabled(isDisabled, userBook: userBook)
 
             // 앱 알림을 켜는 순간 OS 권한 팝업이 뜰 수 있고, 그 결과가 배너 표시를 좌우한다.
-            // 화면 진입 시점의 조회는 팝업을 띄우지 않으므로 여기서 상태를 다시 읽어야 한다.
+            // 진입 시 읽은 상태는 이 팝업 이전 값이라 여기서 다시 읽어야 한다.
             guard !Task.isCancelled else { return }
             let generation = beginSystemAuthorizationRefresh()
             let status = await notificationSettingUseCase.refreshSystemAuthorization()
