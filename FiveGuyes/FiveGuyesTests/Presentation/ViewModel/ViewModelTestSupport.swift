@@ -62,6 +62,25 @@ func makeDate(_ dateString: String) -> Date {
 }
 
 @MainActor
+func makeNotiSettingViewModel(
+    notificationService: NotificationManagerStub,
+    settingsOpener: SystemSettingsOpenerStub,
+    settingsStore: NotificationSettingsStoreStub,
+    nowProvider: @escaping () -> Date = Date.init
+) -> NotiSettingViewModel {
+    let useCase = NotificationSettingUseCase(
+        notificationService: notificationService,
+        systemSettingsOpener: settingsOpener,
+        settingsStore: settingsStore
+    )
+
+    return NotiSettingViewModel(
+        notificationSettingUseCase: useCase,
+        nowProvider: nowProvider
+    )
+}
+
+@MainActor
 func waitUntil(
     timeoutNanoseconds: UInt64 = 500_000_000,
     pollIntervalNanoseconds: UInt64 = 5_000_000,
