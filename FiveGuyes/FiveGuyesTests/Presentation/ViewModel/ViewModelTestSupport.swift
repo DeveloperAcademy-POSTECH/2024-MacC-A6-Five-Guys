@@ -341,12 +341,12 @@ final class ReadingGoalMetricsUseCaseStub: ReadingGoalMetricsUsing {
 }
 
 final class NotificationManagerStub: NotificationManaging {
-    var isAuthorized = true
+    var currentStatus: NotificationAuthorizationStatus = .authorized
     var requestAuthorizationCallCount = 0
-    var isSystemAuthorizedCallCount = 0
-    var isSystemAuthorizedDelayNanoseconds: UInt64 = 0
-    var isSystemAuthorizedResults: [Bool] = []
-    var isSystemAuthorizedGates: [AsyncGate] = []
+    var authorizationStatusCallCount = 0
+    var authorizationStatusDelayNanoseconds: UInt64 = 0
+    var authorizationStatusResults: [NotificationAuthorizationStatus] = []
+    var authorizationStatusGates: [AsyncGate] = []
     var clearRequestsCallCount = 0
     var setupAllNotificationsCallCount = 0
     var setupAllNotificationsBookIDs: [UUID] = []
@@ -357,23 +357,23 @@ final class NotificationManagerStub: NotificationManaging {
 
     func requestAuthorization() async -> Bool {
         requestAuthorizationCallCount += 1
-        return isAuthorized
+        return currentStatus == .authorized
     }
 
-    func isSystemAuthorized() async -> Bool {
-        isSystemAuthorizedCallCount += 1
-        let callIndex = isSystemAuthorizedCallCount - 1
-        let result = isSystemAuthorizedResults.indices.contains(callIndex)
-            ? isSystemAuthorizedResults[callIndex]
-            : isAuthorized
+    func authorizationStatus() async -> NotificationAuthorizationStatus {
+        authorizationStatusCallCount += 1
+        let callIndex = authorizationStatusCallCount - 1
+        let result = authorizationStatusResults.indices.contains(callIndex)
+            ? authorizationStatusResults[callIndex]
+            : currentStatus
 
-        if isSystemAuthorizedGates.indices.contains(callIndex) {
-            await isSystemAuthorizedGates[callIndex].wait()
+        if authorizationStatusGates.indices.contains(callIndex) {
+            await authorizationStatusGates[callIndex].wait()
         }
 
         // 실제 OS 조회는 Task 취소를 관찰하지 않으므로, 취소와 무관하게 지연시킨다.
-        if isSystemAuthorizedDelayNanoseconds > 0 {
-            let delay = isSystemAuthorizedDelayNanoseconds
+        if authorizationStatusDelayNanoseconds > 0 {
+            let delay = authorizationStatusDelayNanoseconds
             await withCheckedContinuation { continuation in
                 DispatchQueue.main.asyncAfter(deadline: .now() + .nanoseconds(Int(delay))) {
                     continuation.resume()

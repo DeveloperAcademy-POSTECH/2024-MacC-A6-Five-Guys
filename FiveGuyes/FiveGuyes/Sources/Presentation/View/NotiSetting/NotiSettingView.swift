@@ -38,7 +38,7 @@ struct NotiSettingView: View {
                 .ignoresSafeArea()
 
             VStack(alignment: .leading, spacing: .zero) {
-                if !viewModel.isSystemNotificationEnabled {
+                if viewModel.isSystemNotificationBannerVisible {
                     notificationDisabledView
                 }
 
@@ -200,7 +200,7 @@ struct NotiSettingView: View {
     NavigationStack {
         NotiSettingView(
             userBook: PreviewSupport.sampleReadingBook,
-            viewModel: makeNotiSettingPreviewViewModel(isSystemNotificationEnabled: false)
+            viewModel: makeNotiSettingPreviewViewModel(systemAuthorizationStatus: .denied)
         )
     }
     .environment(PreviewSupport.makeCoordinator())
@@ -221,12 +221,12 @@ struct NotiSettingView: View {
 
 @MainActor
 private func makeNotiSettingPreviewViewModel(
-    isSystemNotificationEnabled: Bool = true,
+    systemAuthorizationStatus: NotificationAuthorizationStatus = .authorized,
     isNotificationDisabled: Bool = false,
     isReminderTimePickerVisible: Bool = false
 ) -> NotiSettingViewModel {
     let notificationService = PreviewNotificationManager()
-    notificationService.isAuthorized = isSystemNotificationEnabled
+    notificationService.currentStatus = systemAuthorizationStatus
 
     let settingsStore = PreviewNotificationSettingsStore(
         isDisabled: isNotificationDisabled,
@@ -242,7 +242,7 @@ private func makeNotiSettingPreviewViewModel(
     let viewModel = NotiSettingViewModel(
         notificationSettingUseCase: notificationSettingUseCase
     )
-    viewModel.isSystemNotificationEnabled = isSystemNotificationEnabled
+    viewModel.systemAuthorizationStatus = systemAuthorizationStatus
     viewModel.isNotificationDisabled = isNotificationDisabled
     viewModel.isReminderTimePickerVisible = isReminderTimePickerVisible
     viewModel.loadPersistedSettings()
