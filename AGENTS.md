@@ -13,7 +13,7 @@
 
 테스트는 `FiveGuyes/FiveGuyesTests`에 있으며 소스 계층을 따라 구성됩니다. 앱 리소스와 폰트는 `FiveGuyes/FiveGuyes/Resources`, 프리뷰 전용 리소스는 `Preview Content`에 둡니다.
 
-계층별 상세 규약은 해당 디렉터리의 `CLAUDE.md`를 함께 참고하세요.
+계층별 상세 규약은 해당 디렉터리의 `AGENTS.md`를 함께 참고하세요. 레포 안에 `CLAUDE.md`·`.claude/CLAUDE.md`·`CLAUDE.local.md`를 만들지 마세요. 만들면 그 폴더와 하위에서 Claude Code가 `AGENTS.md` 대신 해당 파일을 읽습니다.
 
 ## 첫 빌드 전 필수 설정
 
@@ -29,7 +29,7 @@ cp FiveGuyes/Config.xcconfig.example FiveGuyes/Config.xcconfig
 
 Firebase 동작을 실제로 확인해야 할 때만 Firebase 콘솔(프로젝트 설정 > iOS 앱)에서 받은 `GoogleService-Info.plist`를 `FiveGuyes/FiveGuyes/` 안에 넣으세요. 앱 타깃은 이 폴더를 파일시스템 동기화 그룹으로 참조하므로 **그 폴더 안에 있는 파일만 앱 번들에 포함됩니다.** 견본 파일을 복사해 넣으면 `FirebaseApp.configure()`가 시작 중 크래시합니다.
 
-Debug 빌드의 GA(Google Analytics) 수집은 기본으로 꺼져 있습니다. GA 동작을 확인하는 모드를 켜고 끄는 방법과 시작 동작 규칙은 `FiveGuyes/FiveGuyes/Sources/Platform/Analytics/CLAUDE.md`를 참고하세요.
+Debug 빌드의 GA(Google Analytics) 수집은 기본으로 꺼져 있습니다. GA 동작을 확인하는 모드를 켜고 끄는 방법과 시작 동작 규칙은 `FiveGuyes/FiveGuyes/Sources/Platform/Analytics/AGENTS.md`를 참고하세요.
 
 ## 빌드, 테스트, 개발 명령
 

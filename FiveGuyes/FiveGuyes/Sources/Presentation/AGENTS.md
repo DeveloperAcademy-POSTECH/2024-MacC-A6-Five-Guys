@@ -38,4 +38,4 @@ back 동작을 바꾸기 전에 `docs/decisions/adr-0006-stack-back-path-only-po
 
 ## 테스트
 
-`FiveGuyesTests/Presentation/`에 대응 테스트를 둡니다. Swift Testing 사용법과 대역 네이밍은 루트 `CLAUDE.md`를 따르세요.
+`FiveGuyesTests/Presentation/`에 대응 테스트를 둡니다. Swift Testing 사용법과 대역 네이밍은 루트 `AGENTS.md`를 따르세요.
