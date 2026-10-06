@@ -34,25 +34,19 @@ Debug 빌드의 GA(Google Analytics) 수집은 기본으로 꺼져 있습니다.
 ## 빌드, 테스트, 개발 명령
 
 ```bash
-# 타깃과 스킴 확인
-xcodebuild -list -project FiveGuyes/FiveGuyes.xcodeproj
+# 패키지 해석, lint, 단일 시뮬레이터 테스트
+scripts/verify.sh
 
-# 시뮬레이터용 빌드
-xcodebuild build -project FiveGuyes/FiveGuyes.xcodeproj -scheme FiveGuyes \
-  -destination 'platform=iOS Simulator,name=iPhone 17'
+# 특정 시뮬레이터로 검사
+SIMULATOR_DESTINATION='platform=iOS Simulator,name=iPhone 17' scripts/verify.sh
 
-# 단위 테스트 (병렬 비활성화 — 아래 주의 참고)
-xcodebuild test -project FiveGuyes/FiveGuyes.xcodeproj -scheme FiveGuyes \
-  -destination 'platform=iOS Simulator,name=iPhone 17' \
-  -parallel-testing-enabled NO \
-  -maximum-concurrent-test-simulator-destinations 1
+# verify.sh를 한 번 실행한 뒤 lint만 검사
+cd FiveGuyes && ../.build/SourcePackages/artifacts/swiftlintplugins/SwiftLintBinary/SwiftLintBinary.artifactbundle/macos/swiftlint lint
 ```
 
-SwiftLint는 `SwiftLintBuildToolPlugin`(SPM 빌드 플러그인)으로 등록되어 있어 **빌드 시 자동 실행**됩니다. 별도 실행이 필요하면 CLI를 쓸 수 있습니다.
+SwiftLint는 `SwiftLintBuildToolPlugin`(SPM 빌드 플러그인)으로 등록되어 있어 **빌드 시 자동 실행**됩니다. lint만 확인할 때는 위 명령을 사용하세요. 플러그인 버전이 바뀌면 Xcode가 플러그인을 다시 승인하라고 요구하고, 승인 전에는 로컬 빌드와 `verify.sh` 테스트가 실패합니다. Xcode에서 한 번 빌드하고 플러그인 경고에서 **Trust & Enable**을 누르세요(CI는 `-skipPackagePluginValidation`으로 건너뜀).
 
-```bash
-swiftlint lint --config FiveGuyes/.swiftlint.yml
-```
+push 전 검증을 켜려면 클론마다 한 번 `git config core.hooksPath .githooks`를 실행합니다. 끄려면 `git config --unset core.hooksPath`를 실행합니다. hook은 깨끗한 작업 트리의 현재 HEAD를 push할 때만 검증을 보장합니다.
 
 **주의:** 테스트는 병렬 실행을 끄고 단일 시뮬레이터로 실행하세요. 과거에 알림 권한 팝업 때문에 테스트가 멈춘 사례(#214)는 #215와, 테스트 중 Firebase·ATT 요청을 생략하는 앱 시작 규칙으로 원인이 해결되었습니다.
 
@@ -60,11 +54,12 @@ swiftlint lint --config FiveGuyes/.swiftlint.yml
 
 Swift 기본 관례를 따릅니다. 들여쓰기는 4칸, 타입은 `UpperCamelCase`, 프로퍼티와 함수는 `lowerCamelCase`를 사용합니다. 가능하면 파일 하나에 주요 타입 하나를 둡니다. import는 정렬하고, 프로덕션 경로에서 강제 언래핑은 피합니다.
 
-`FiveGuyes/.swiftlint.yml`의 규칙을 지키세요. SwiftLint는 정렬된 import, 강제 언래핑 경고, 라인 길이, 함수/타입 길이를 검사하며, 계층 의존성을 막는 커스텀 룰 3개를 `severity: error`로 강제합니다.
+`FiveGuyes/.swiftlint.yml`의 규칙을 지키세요. SwiftLint는 정렬된 import, 강제 언래핑 경고, 라인 길이, 함수/타입 길이를 검사하며, 계층 경계와 Domain·Presentation import를 `severity: error`로 강제합니다. `print`, 신규 `@Published` 등은 warning으로 알립니다.
 
-- ViewModel은 `...Managing` / `...Providing` / `...Storing` / `...Opening`을 직접 의존하지 않습니다 — UseCase(`...Using`) 경계를 거칩니다.
+- ViewModel은 Service·Repository를 직접 의존하지 않습니다 — UseCase(`...Using`) 경계를 거칩니다.
 - View는 `any ...Using`을 직접 참조하지 않습니다 — ViewModel을 경유합니다.
 - View는 `@Environment(AppDependencies.self)`를 직접 사용하지 않습니다 — 조립 루트에서만 다룹니다.
+- Domain은 UI·인프라 프레임워크를, Presentation은 Preview 외 SwiftData·Firebase·UserNotifications를 import하지 않습니다.
 
 ## 테스트 가이드라인
 
@@ -98,6 +93,8 @@ struct DailyProgressViewModelTests {
 
 ## 기능 문서와 우선순위
 
+작업 흐름은 `develop`에서 `feature/issue-<번호>-<설명>` 또는 `bugfix/...` 브랜치를 만들고, 동작이 바뀌면 `docs/features` 명세를 같은 PR에서 먼저 고친 뒤 구현·`scripts/verify.sh`·PR 템플릿·develop 머지 순서입니다. 출시는 develop에서 main으로 머지합니다. 기능 요구사항을 검증하는 테스트 이름에는 대응 ID를 넣습니다(예: `notiSetting_c2_...`). 계산기·마이그레이션·저장소 등 ID가 없는 테스트에는 요구하지 않습니다.
+
 `docs/README.md`가 `docs/` 하위 폴더의 성격과 고치는 법을 설명합니다. 앱이 어떻게 동작해야 하는지의 기준은 `docs/features/`의 기능 문서입니다. 코드가 기능 문서와 다르면 코드의 버그로 보고 이슈로 추적합니다.
 
 ## 설계 배경 문서
@@ -114,4 +111,10 @@ struct DailyProgressViewModelTests {
 
 ## 커밋 및 Pull Request 가이드라인
 
-최근 커밋은 `fix:`, `refactor:`, `docs:`, `chore:` 같은 Conventional Commit 스타일 접두사를 사용합니다. 제목은 짧고 변경 내용을 구체적으로 적습니다. PR에는 변경 목적, 검증한 명령, 관련 이슈나 ADR 링크를 포함하고, UI가 바뀌면 스크린샷 또는 녹화를 첨부하세요.
+접두사(`feat`, `fix`, `refactor`, `docs`, `test`, `chore`, `ci`)는 영어로 쓰고 제목·본문은 한국어로 씁니다. PR에는 변경 목적, 검증한 명령, 관련 이슈나 ADR 링크를 포함하고, UI가 바뀌면 스크린샷 또는 녹화를 첨부하세요.
+
+## 프로젝트와 비밀값 주의
+
+새 Swift 파일은 Xcode 프로젝트 파일을 고칠 필요가 없습니다. 소스·테스트 폴더 안 비코드 파일은 해당 타깃의 `membershipExceptions`에 추가합니다. `DEVELOPMENT_TEAM`과 공유 스킴의 디버그 인자 변경은 커밋하지 않습니다. `Config.xcconfig`의 키와 plist 값은 출력·커밋하지 않습니다(현재 키 이름: `API_KEY`).
+
+시뮬레이터·프리뷰가 깨지면 시뮬레이터 서비스를 재시작하고, 프리뷰 캐시를 삭제한 뒤, 시뮬레이터를 초기화합니다. `.local/`은 개인 작업 문서 보관용이며 git이 추적하지 않습니다.
