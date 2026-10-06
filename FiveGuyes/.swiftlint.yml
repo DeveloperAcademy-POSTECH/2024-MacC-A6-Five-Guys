@@ -15,6 +15,9 @@ opt_in_rules: # 기본(default) 룰이 아닌 룰들을 활성화
     # .isEmpty를 사용해 더 효율적인 빈 컬렉션 확인
     - empty_count # From https://realm.github.io/SwiftLint/empty_count.html
 
+    # SwiftUI 상태 프로퍼티의 접근 범위 일관성
+    - private_swiftui_state # From https://realm.github.io/SwiftLint/private_swiftui_state.html
+
 # 강제 캐스팅에 대한 경고 수준 설정
 force_cast: # From https://realm.github.io/SwiftLint/force_cast.html
     severity: warning # 강제 캐스팅을 error 대신 warning으로 설정
@@ -47,8 +50,12 @@ custom_rules:
         name: "No Service Dependency In ViewModel"
         included:
             - "FiveGuyes/Sources/Presentation/ViewModel"
-        regex: "\\b(?:any\\s+)?\\w+(Managing|Providing|Storing|Opening)\\b"
-        message: "ViewModel은 ...Managing/...Providing/...Storing/...Opening 직접 의존 대신 UseCase(...Using) 경계를 사용하세요."
+        regex: "\\b[A-Z]\\w*(?:Managing|Providing|Storing|Opening|Scheduling|Centering|Logging|Repo)\\b"
+        excluded_match_kinds:
+            - comment
+            - doccomment
+            - string
+        message: "ViewModel은 Service·Repository 직접 의존 대신 UseCase(...Using) 경계를 사용하세요."
         severity: error
 
     no_usecase_dependency_in_view:
@@ -58,6 +65,10 @@ custom_rules:
         excluded:
             - "FiveGuyes/Sources/Presentation/ViewModel/"
         regex: "\\b(?:any\\s+)?\\w+Using\\b"
+        excluded_match_kinds:
+            - comment
+            - doccomment
+            - string
         message: "View는 any ...Using을 직접 참조하지 말고 ViewModel 경유로 호출하세요."
         severity: error
 
@@ -68,5 +79,59 @@ custom_rules:
         excluded:
             - "FiveGuyes/Sources/Presentation/ViewModel/"
         regex: "@Environment\\(AppDependencies\\.self\\)"
+        excluded_match_kinds:
+            - comment
+            - doccomment
+            - string
         message: "AppDependencies는 Coordinator/Composition Root에서 조립하고 View에서는 직접 사용하지 않습니다."
         severity: error
+
+    domain_framework_import:
+        name: "No Presentation or Infrastructure Import In Domain"
+        included:
+            - "FiveGuyes/Sources/Domain"
+        regex: "(?m)^[ \\t]*(?:@\\w+\\s+)*(?:(?:public|package|internal|fileprivate|private)\\s+)?import\\s+(?:(?:typealias|struct|class|enum|protocol|let|var|func)\\s+)?(?:SwiftUI|UIKit|SwiftData|Firebase\\w*|UserNotifications)\\b"
+        excluded_match_kinds:
+            - comment
+            - doccomment
+            - string
+        message: "Domain은 SwiftUI·UIKit·SwiftData·Firebase·UserNotifications를 import하지 않습니다."
+        severity: error
+
+    presentation_infra_import:
+        name: "No Infrastructure Import In Presentation"
+        included:
+            - "FiveGuyes/Sources/Presentation"
+        excluded:
+            - "FiveGuyes/Sources/Presentation/Preview"
+        regex: "(?m)^[ \\t]*(?:@\\w+\\s+)*(?:(?:public|package|internal|fileprivate|private)\\s+)?import\\s+(?:(?:typealias|struct|class|enum|protocol|let|var|func)\\s+)?(?:SwiftData|Firebase\\w*|UserNotifications)\\b"
+        excluded_match_kinds:
+            - comment
+            - doccomment
+            - string
+        message: "Presentation은 Preview를 제외하고 SwiftData·Firebase·UserNotifications를 import하지 않습니다."
+        severity: error
+
+    no_print:
+        name: "No Print In App Sources"
+        included:
+            - "FiveGuyes/Sources"
+        regex: "\\bprint\\s*\\("
+        excluded_match_kinds:
+            - comment
+            - doccomment
+            - string
+        message: "앱 소스에서는 print 대신 적절한 로깅을 사용하세요."
+        severity: warning
+
+    no_published_in_new_code:
+        name: "No Published In New Presentation Code"
+        included:
+            - "FiveGuyes/Sources/Presentation"
+        regex: "@Published\\b"
+        excluded_match_kinds:
+            - comment
+            - doccomment
+            - string
+        message: "새 Presentation 코드에서는 @Observable을 사용하세요."
+        severity: warning

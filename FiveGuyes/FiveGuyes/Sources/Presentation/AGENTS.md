@@ -21,9 +21,10 @@ Feature 단위 MVVM. 상태 흐름은 `Action -> ViewModel -> State -> View`입�
 
 빌드 시 자동 검사되므로 위반하면 빌드가 깨집니다.
 
-- ViewModel이 `...Managing` / `...Providing` / `...Storing` / `...Opening`을 직접 의존
+- ViewModel이 `...Managing` / `...Providing` / `...Storing` / `...Opening` / `...Scheduling` / `...Centering` / `...Logging` / `...Repo`를 직접 의존
 - View가 `any ...Using`을 직접 참조
 - View가 `@Environment(AppDependencies.self)`를 사용
+- Presentation이 Preview를 제외하고 `SwiftData` / `Firebase` / `UserNotifications`를 import
 
 ## Navigation
 
