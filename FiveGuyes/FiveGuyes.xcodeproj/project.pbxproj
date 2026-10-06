@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		2621EE212ED468E400CC5D72 /* .swiftlint.yml in Resources */ = {isa = PBXBuildFile; fileRef = 2621EE202ED468E400CC5D72 /* .swiftlint.yml */; };
 		26EBDEA82CF1C5C900B3A2BC /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 26EBDEA72CF1C5C900B3A2BC /* FirebaseAnalytics */; };
 		26EBDEAA2CF1C5C900B3A2BC /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 26EBDEA92CF1C5C900B3A2BC /* FirebaseCrashlytics */; };
 		26EBDEAC2CF1C5C900B3A2BC /* FirebaseDynamicLinks in Frameworks */ = {isa = PBXBuildFile; productRef = 26EBDEAB2CF1C5C900B3A2BC /* FirebaseDynamicLinks */; };
@@ -43,11 +42,18 @@
 			);
 			target = 26890B902CAE811A008DFF49 /* FiveGuyes */;
 		};
+		2621F1602ED495A800CC5D72 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				.swiftlint.yml,
+			);
+			target = 2621F1522ED495A800CC5D72 /* FiveGuyesTests */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		2621F0EF2ED46BCE00CC5D72 /* FiveGuyes */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (2621F1482ED46BCE00CC5D72 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = FiveGuyes; sourceTree = "<group>"; };
-		2621F1542ED495A800CC5D72 /* FiveGuyesTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = FiveGuyesTests; sourceTree = "<group>"; };
+		2621F1542ED495A800CC5D72 /* FiveGuyesTests */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (2621F1602ED495A800CC5D72 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = FiveGuyesTests; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -212,7 +218,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2621EE212ED468E400CC5D72 /* .swiftlint.yml in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -580,7 +585,7 @@
 			repositoryURL = "https://github.com/SimplyDanny/SwiftLintPlugins";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 0.57.0;
+				minimumVersion = 0.65.1;
 			};
 		};
 		26EBDEA62CF1C5C900B3A2BC /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
