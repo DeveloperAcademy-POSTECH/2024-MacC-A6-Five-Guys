@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+needs_verification=false
+while read -r local_ref local_sha remote_ref remote_sha; do
+    [[ "$local_sha" =~ ^0+$ ]] && continue
+    [[ -z "$(git status --porcelain)" ]] || { echo '커밋 안 된 변경이 있어 push 대상과 검사 대상이 다릅니다. 커밋/stash 후 다시 push하거나 --no-verify를 사용하세요.' >&2; exit 1; }
+    [[ "$local_sha" == "$(git rev-parse HEAD)" ]] || { echo 'HEAD가 아닌 커밋을 push할 수 없습니다. --no-verify를 사용하세요.' >&2; exit 1; }
+    needs_verification=true
+done
+[[ "$needs_verification" == true ]] || exit 0
+echo '검증 중(수 분 소요). 건너뛰려면 git push --no-verify'
+scripts/verify.sh </dev/null
