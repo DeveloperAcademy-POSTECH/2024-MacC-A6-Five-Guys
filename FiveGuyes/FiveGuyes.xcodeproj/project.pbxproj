@@ -37,8 +37,6 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
-				Sources/Platform/Analytics/AGENTS.md,
-				Sources/Presentation/AGENTS.md,
 			);
 			target = 26890B902CAE811A008DFF49 /* FiveGuyes */;
 		};

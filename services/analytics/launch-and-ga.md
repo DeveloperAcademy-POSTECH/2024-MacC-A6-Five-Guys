@@ -2,9 +2,11 @@
 
 앱 시작 시 Firebase 초기화, GA 수집, ATT 요청을 정하는 규칙과 GA 확인 모드 사용법.
 
+범위: GA 수집뿐 아니라 앱 시작 정책(`AppLaunchPolicy`) 전체를 다룬다. Firebase 초기화와 ATT 요청도 이 문서가 기준이다.
+
 ## 시작 동작
 
-판단은 `Sources/App/AppLaunchPolicy.swift`의 `AppLaunchPolicy.decide(_:)`가 한다. `AppDelegate`는 환경 값을 모아 넘기고 결과대로 호출만 한다. 조합별 테스트는 `FiveGuyesTests/App/AppLaunchPolicyTests.swift`.
+판단은 `FiveGuyes/FiveGuyes/Sources/App/AppLaunchPolicy.swift`의 `AppLaunchPolicy.decide(_:)`가 한다. `AppDelegate`는 환경 값을 모아 넘기고 결과대로 호출만 한다. 조합별 테스트는 `FiveGuyes/FiveGuyesTests/App/AppLaunchPolicyTests.swift`.
 
 | 구성 | Firebase 초기화 | GA 수집 설정 | ATT 요청 |
 |---|---|---|---|
@@ -20,7 +22,7 @@
 
 ## 진짜 plist가 필요할 때
 
-plist 없이도 Debug 앱 실행과 테스트가 가능하다. Firebase 동작을 실제로 확인할 때만 Firebase 콘솔(프로젝트 설정 > iOS 앱)에서 받은 `GoogleService-Info.plist`를 `FiveGuyes/FiveGuyes/` 안에 넣는다. 견본을 복사해 넣으면 안 된다.
+plist 없이도 Debug 앱 실행과 테스트가 가능하다. Firebase 동작을 실제로 확인할 때만 넣는다. 넣는 방법은 `handbook/where/setup.md`를 본다.
 
 ## GA 확인 모드 켜기/끄기
 
