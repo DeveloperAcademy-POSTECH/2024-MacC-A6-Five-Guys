@@ -28,11 +28,7 @@ struct KakaoBookSearchProviderTests {
             },
             {
               "title": "ISBN-10만 있는 책",
-              "authors": [],
-              "publisher": "출판사",
-              "datetime": "invalid",
-              "isbn": "1234567890",
-              "thumbnail": ""
+              "isbn": "1234567890"
             }
           ]
         }
@@ -55,6 +51,7 @@ struct KakaoBookSearchProviderTests {
         #expect(books[0].coverImageURL == "https://example.com/cover.jpg")
         #expect(books[0].publishedDate != nil)
         #expect(books[1].author.isEmpty)
+        #expect(books[1].publisher.isEmpty)
         #expect(books[1].isbn13 == nil)
         #expect(books[1].coverImageURL == nil)
         #expect(books[1].publishedDate == nil)
@@ -66,6 +63,40 @@ struct KakaoBookSearchProviderTests {
         #expect(request.queryItems.first(where: { $0.name == "query" })?.value == "소년이 & 온다+")
         #expect(request.queryItems.first(where: { $0.name == "sort" })?.value == "accuracy")
         #expect(request.queryItems.first(where: { $0.name == "size" })?.value == "10")
+    }
+
+    @Test("선택 필드가 빠진 항목이 섞여 있어도 모든 문서를 변환한다")
+    func missingOptionalFieldsDoNotFailResponse() async throws {
+        let responseJSON = #"""
+        {
+          "documents": [
+            {
+              "title": "완전한 항목",
+              "authors": ["저자"],
+              "publisher": "출판사",
+              "datetime": "2021-04-20T00:00:00+09:00",
+              "isbn": "9788936434120",
+              "thumbnail": "https://example.com/cover.jpg"
+            },
+            {
+              "title": "선택 필드가 없는 항목"
+            }
+          ]
+        }
+        """#
+        let client = HTTPClientStub { _ in
+            HTTPResponse(statusCode: 200, headers: [:], body: Data(responseJSON.utf8))
+        }
+        let provider = makeProvider(httpClient: client, apiKey: "kakao-key")
+
+        let books = try await provider.searchBooks(query: "테스트")
+
+        #expect(books.map(\.title) == ["완전한 항목", "선택 필드가 없는 항목"])
+        #expect(books[1].author.isEmpty)
+        #expect(books[1].publisher.isEmpty)
+        #expect(books[1].publishedDate == nil)
+        #expect(books[1].isbn13 == nil)
+        #expect(books[1].coverImageURL == nil)
     }
 
     @Test("2xx가 아닌 응답은 invalidResponse로 변환한다")
@@ -97,6 +128,18 @@ struct KakaoBookSearchProviderTests {
         let provider = KakaoBookSearchProvider(
             httpClient: HTTPClientStub(error: .invalidRequest),
             apiKeyProvider: BundleAPIKeyStore(values: [:])
+        )
+
+        await expectError(.missingAPIKey(setting: "KAKAO_API_KEY")) {
+            _ = try await provider.searchBooks(query: "테스트")
+        }
+    }
+
+    @Test("자리표시자 API 키는 누락으로 처리한다")
+    func placeholderAPIKeyIsMissing() async {
+        let provider = KakaoBookSearchProvider(
+            httpClient: HTTPClientStub(error: .invalidRequest),
+            apiKeyProvider: BundleAPIKeyStore(values: ["KAKAO_API_KEY": "$(KAKAO_API_KEY)"])
         )
 
         await expectError(.missingAPIKey(setting: "KAKAO_API_KEY")) {

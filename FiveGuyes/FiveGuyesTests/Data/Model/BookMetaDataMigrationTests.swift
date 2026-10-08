@@ -24,41 +24,139 @@ struct BookMetaDataMigrationTests {
         defer { try? FileManager.default.removeItem(at: storeDirectory) }
 
         let storeURL = storeDirectory.appendingPathComponent("legacy.store")
+        let bookID = UUID()
+        let startDate = Date(timeIntervalSince1970: 1_700_000_000)
+        let endDate = Date(timeIntervalSince1970: 1_700_604_800)
+        let lastReadDate = Date(timeIntervalSince1970: 1_700_086_400)
 
-        do {
-            let legacySchema = Schema([LegacyBookMetaDataSchema.BookMetaData.self])
-            let configuration = ModelConfiguration(schema: legacySchema, url: storeURL)
-            let container = try ModelContainer(
-                for: legacySchema,
-                configurations: [configuration]
-            )
-            container.mainContext.insert(
-                LegacyBookMetaDataSchema.BookMetaData(
+        try writeLegacyStore(
+            at: storeURL,
+            bookID: bookID,
+            startDate: startDate,
+            endDate: endDate,
+            lastReadDate: lastReadDate
+        )
+
+        let container = try migratedContainer(at: storeURL)
+        let storedItems = try container.mainContext.fetch(FetchDescriptor<UserBookSchemaV2.UserBookV2>())
+        let storedItem = try #require(storedItems.first)
+        #expect(storedItems.count == 1)
+        assertPreservedFields(
+            of: storedItem,
+            bookID: bookID,
+            startDate: startDate,
+            endDate: endDate,
+            lastReadDate: lastReadDate
+        )
+    }
+
+    private func writeLegacyStore(
+        at storeURL: URL,
+        bookID: UUID,
+        startDate: Date,
+        endDate: Date,
+        lastReadDate: Date
+    ) throws {
+        let legacySchema = Schema([LegacyUserBookSchema.UserBookV2.self])
+        let configuration = ModelConfiguration(schema: legacySchema, url: storeURL)
+        let container = try ModelContainer(for: legacySchema, configurations: [configuration])
+        container.mainContext.insert(
+            LegacyUserBookSchema.UserBookV2(
+                id: bookID,
+                bookMetaData: LegacyUserBookSchema.BookMetaData(
                     title: "기존 도서",
                     author: "기존 저자",
-                    coverURL: nil,
+                    coverURL: "https://example.com/legacy-cover.jpg",
                     totalPages: 300
+                ),
+                userSettings: LegacyUserBookSchema.UserSettings(
+                    startPage: 10,
+                    targetEndPage: 290,
+                    startDate: startDate,
+                    targetEndDate: endDate,
+                    nonReadingDays: [startDate],
+                    startDateKey: "2023-11-15",
+                    targetEndDateKey: "2023-11-22",
+                    nonReadingDayKeys: ["2023-11-15"]
+                ),
+                readingProgress: LegacyUserBookSchema.ReadingProgress(
+                    readingRecords: [:],
+                    lastReadDate: lastReadDate,
+                    lastPagesRead: 42
+                ),
+                completionStatus: LegacyUserBookSchema.CompletionStatus(
+                    isCompleted: true,
+                    completionReview: "기존 소감"
                 )
             )
-            try container.mainContext.save()
-        }
-
-        let currentSchema = Schema([BookMetaData.self])
-        let configuration = ModelConfiguration(schema: currentSchema, url: storeURL)
-        let container = try ModelContainer(
-            for: currentSchema,
-            configurations: [configuration]
         )
-        let storedItems = try container.mainContext.fetch(FetchDescriptor<BookMetaData>())
-        let storedItem = try #require(storedItems.first)
+        try container.mainContext.save()
+    }
 
-        #expect(storedItems.count == 1)
-        #expect(storedItem.title == "기존 도서")
-        #expect(storedItem.isbn13 == nil)
+    private func migratedContainer(at storeURL: URL) throws -> ModelContainer {
+        let currentSchema = Schema([UserBookSchemaV2.UserBookV2.self])
+        let configuration = ModelConfiguration(schema: currentSchema, url: storeURL)
+        return try ModelContainer(for: currentSchema, configurations: [configuration])
+    }
+
+    private func assertPreservedFields(
+        of storedItem: UserBookSchemaV2.UserBookV2,
+        bookID: UUID,
+        startDate: Date,
+        endDate: Date,
+        lastReadDate: Date
+    ) {
+        #expect(storedItem.id == bookID)
+        #expect(storedItem.bookMetaData.title == "기존 도서")
+        #expect(storedItem.bookMetaData.author == "기존 저자")
+        #expect(storedItem.bookMetaData.coverURL == "https://example.com/legacy-cover.jpg")
+        #expect(storedItem.bookMetaData.totalPages == 300)
+        #expect(storedItem.bookMetaData.isbn13 == nil)
+        #expect(storedItem.userSettings.startPage == 10)
+        #expect(storedItem.userSettings.targetEndPage == 290)
+        #expect(storedItem.userSettings.startDate == startDate)
+        #expect(storedItem.userSettings.targetEndDate == endDate)
+        #expect(storedItem.userSettings.nonReadingDays == [startDate])
+        #expect(storedItem.userSettings.startDateKey == "2023-11-15")
+        #expect(storedItem.userSettings.targetEndDateKey == "2023-11-22")
+        #expect(storedItem.userSettings.nonReadingDayKeys == ["2023-11-15"])
+        #expect(storedItem.readingProgress.readingRecords.isEmpty)
+        #expect(storedItem.readingProgress.lastReadDate == lastReadDate)
+        #expect(storedItem.readingProgress.lastPagesRead == 42)
+        #expect(storedItem.completionStatus.isCompleted)
+        #expect(storedItem.completionStatus.completionReview == "기존 소감")
     }
 }
 
-private enum LegacyBookMetaDataSchema {
+private enum LegacyUserBookSchema {
+    @Model
+    final class UserBookV2 {
+        @Attribute(.unique) var id: UUID
+
+        @Relationship(deleteRule: .cascade)
+        var bookMetaData: BookMetaData
+        @Relationship(deleteRule: .cascade)
+        var userSettings: UserSettings
+        @Relationship(deleteRule: .cascade)
+        var readingProgress: ReadingProgress
+        @Relationship(deleteRule: .cascade)
+        var completionStatus: CompletionStatus
+
+        init(
+            id: UUID,
+            bookMetaData: BookMetaData,
+            userSettings: UserSettings,
+            readingProgress: ReadingProgress,
+            completionStatus: CompletionStatus
+        ) {
+            self.id = id
+            self.bookMetaData = bookMetaData
+            self.userSettings = userSettings
+            self.readingProgress = readingProgress
+            self.completionStatus = completionStatus
+        }
+    }
+
     @Model
     final class BookMetaData {
         var title: String
@@ -71,6 +169,62 @@ private enum LegacyBookMetaDataSchema {
             self.author = author
             self.coverURL = coverURL
             self.totalPages = totalPages
+        }
+    }
+
+    @Model
+    final class UserSettings {
+        var startPage: Int
+        var targetEndPage: Int
+        var startDate: Date
+        var targetEndDate: Date
+        var nonReadingDays: [Date]
+        var startDateKey: String?
+        var targetEndDateKey: String?
+        var nonReadingDayKeys: [String]?
+
+        init(
+            startPage: Int,
+            targetEndPage: Int,
+            startDate: Date,
+            targetEndDate: Date,
+            nonReadingDays: [Date],
+            startDateKey: String?,
+            targetEndDateKey: String?,
+            nonReadingDayKeys: [String]?
+        ) {
+            self.startPage = startPage
+            self.targetEndPage = targetEndPage
+            self.startDate = startDate
+            self.targetEndDate = targetEndDate
+            self.nonReadingDays = nonReadingDays
+            self.startDateKey = startDateKey
+            self.targetEndDateKey = targetEndDateKey
+            self.nonReadingDayKeys = nonReadingDayKeys
+        }
+    }
+
+    @Model
+    final class ReadingProgress {
+        var readingRecords: [String: ReadingRecord]
+        var lastReadDate: Date?
+        var lastPagesRead: Int
+
+        init(readingRecords: [String: ReadingRecord], lastReadDate: Date?, lastPagesRead: Int) {
+            self.readingRecords = readingRecords
+            self.lastReadDate = lastReadDate
+            self.lastPagesRead = lastPagesRead
+        }
+    }
+
+    @Model
+    final class CompletionStatus {
+        var isCompleted: Bool
+        var completionReview: String
+
+        init(isCompleted: Bool, completionReview: String) {
+            self.isCompleted = isCompleted
+            self.completionReview = completionReview
         }
     }
 }
