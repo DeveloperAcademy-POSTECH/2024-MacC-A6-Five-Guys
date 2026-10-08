@@ -18,7 +18,7 @@ FiveGuyes(한입독서)는 iOS SwiftUI 앱이다. `FiveGuyes/FiveGuyes.xcodeproj
 ## Rules
 
 - PR 전에 `scripts/verify.sh`를 통과시킨다.
-- 문서가 SoT다. 동작이 바뀌면 `services/<서비스>/spec.md`를, 구조가 바뀌면 `services/_common/architecture.md`를 같은 PR에서 먼저 고친다. 코드가 문서와 다르면 `history/backlog.md`에 적는다.
+- 문서가 SoT다. 동작이 바뀌면 `services/<서비스>/`의 문서를, 구조가 바뀌면 `services/_common/architecture.md`를 같은 PR에서 먼저 고친다. 코드가 문서와 다르면 `history/backlog.md`에 적는다.
 - layer 경계의 일부는 lint가 error로 막지만 전부는 아니다. 새 타입의 위치는 architecture를 따른다.
 - 테스트는 Swift Testing으로 작성한다(XCTest 아님).
 - 비밀값(`Config.xcconfig`의 `API_KEY`, plist 값)은 출력하거나 커밋하지 않는다. `DEVELOPMENT_TEAM`과 공유 스킴의 디버그 인자 변경도 커밋하지 않는다.
