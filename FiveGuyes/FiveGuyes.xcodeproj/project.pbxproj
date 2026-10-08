@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A22500000000000000000001 /* FGNetwork in Frameworks */ = {isa = PBXBuildFile; productRef = A22500000000000000000003 /* FGNetwork */; };
 		26EBDEA82CF1C5C900B3A2BC /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 26EBDEA72CF1C5C900B3A2BC /* FirebaseAnalytics */; };
 		26EBDEAA2CF1C5C900B3A2BC /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 26EBDEA92CF1C5C900B3A2BC /* FirebaseCrashlytics */; };
 		26EBDEAC2CF1C5C900B3A2BC /* FirebaseDynamicLinks in Frameworks */ = {isa = PBXBuildFile; productRef = 26EBDEAB2CF1C5C900B3A2BC /* FirebaseDynamicLinks */; };
@@ -66,6 +67,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A22500000000000000000001 /* FGNetwork in Frameworks */,
 				26EBDEA82CF1C5C900B3A2BC /* FirebaseAnalytics in Frameworks */,
 				26EBDEAA2CF1C5C900B3A2BC /* FirebaseCrashlytics in Frameworks */,
 				26EBDEB02CF1C5C900B3A2BC /* FirebaseMessaging in Frameworks */,
@@ -151,6 +153,7 @@
 			);
 			name = FiveGuyes;
 			packageProductDependencies = (
+				A22500000000000000000003 /* FGNetwork */,
 				26EBDEA72CF1C5C900B3A2BC /* FirebaseAnalytics */,
 				26EBDEA92CF1C5C900B3A2BC /* FirebaseCrashlytics */,
 				26EBDEAB2CF1C5C900B3A2BC /* FirebaseDynamicLinks */,
@@ -191,6 +194,7 @@
 			);
 			mainGroup = 26890B882CAE811A008DFF49;
 			packageReferences = (
+				A22500000000000000000002 /* XCLocalSwiftPackageReference "FGNetwork" */,
 				26EBDEA62CF1C5C900B3A2BC /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
 			productRefGroup = 26890B922CAE811A008DFF49 /* Products */;
@@ -593,6 +597,13 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCLocalSwiftPackageReference section */
+		A22500000000000000000002 /* XCLocalSwiftPackageReference "FGNetwork" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/FGNetwork;
+		};
+/* End XCLocalSwiftPackageReference section */
+
 /* Begin XCRemoteSwiftPackageReference section */
 		26EBDEA62CF1C5C900B3A2BC /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -605,6 +616,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		A22500000000000000000003 /* FGNetwork */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A22500000000000000000002 /* XCLocalSwiftPackageReference "FGNetwork" */;
+			productName = FGNetwork;
+		};
 		26EBDEA72CF1C5C900B3A2BC /* FirebaseAnalytics */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 26EBDEA62CF1C5C900B3A2BC /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
