@@ -42,7 +42,7 @@ cd FiveGuyes && ../scripts/swiftlint.sh lint --no-cache
 **SwiftLint**
 
 - `verify.sh`와 위 lint 명령은 SwiftLint 0.65.1을 첫 실행 시 내려받아 SHA-256을 확인하고 `.build/tools/`에 보관한다. 이후에는 보관된 바이너리를 사용한다.
-- lint는 `verify.sh`와 이를 호출하는 CI·pre-push에서 실행된다. Xcode 빌드만 실행할 때는 lint가 실행되지 않는다.
+- lint는 `verify.sh`에서 실행된다. Xcode 빌드만 실행할 때는 lint가 실행되지 않는다.
 
 ## Pre-push Hook
 
@@ -51,7 +51,7 @@ cd FiveGuyes && ../scripts/swiftlint.sh lint --no-cache
 | 켜기 | `git config core.hooksPath .githooks` |
 | 끄기 | `git config --unset core.hooksPath` |
 
-hook은 push할 때 `scripts/verify.sh`를 실행한다. 커밋 안 된 변경이 있거나 HEAD가 아닌 커밋을 push하면 거부한다. 건너뛰려면 `git push --no-verify`를 쓴다.
+hook은 클론마다 위 명령으로 활성화해야 한다. 활성화하면 push 전에 `scripts/verify.sh`를 실행하고, 커밋 안 된 변경이 있거나 HEAD가 아닌 커밋을 push하면 거부한다. 건너뛰려면 `git push --no-verify`를 쓴다. hook 설정과 무관하게 `develop`·`main` 대상 PR과 `develop` 푸시에는 CI가 실행된다.
 
 ## Local Files
 
