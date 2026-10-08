@@ -6,12 +6,15 @@
 //
 
 struct NationalLibraryBookDTO: Decodable, Sendable {
-    let totalCount: String
     let docs: [NationalLibraryDocumentDTO]
 
-    enum CodingKeys: String, CodingKey {
-        case totalCount = "TOTAL_COUNT"
+    enum CodingKeys: CodingKey {
         case docs
+    }
+
+    init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        docs = try container.decodeIfPresent([NationalLibraryDocumentDTO].self, forKey: .docs) ?? []
     }
 }
 

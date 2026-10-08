@@ -13,24 +13,26 @@ struct KakaoBookSearchResponseDTO: Decodable, Sendable {
 
 struct KakaoBookSearchDTO: Decodable, Sendable {
     let title: String
-    let authors: [String]
-    let publisher: String
-    let datetime: String
-    let isbn: String
-    let thumbnail: String
+    let authors: [String]?
+    let publisher: String?
+    let datetime: String?
+    let isbn: String?
+    let thumbnail: String?
 
     func toBookSearchItem() -> BookSearchItem {
         BookSearchItem(
             title: title,
-            author: authors.joined(separator: ", "),
-            coverImageURL: thumbnail.isEmpty ? nil : thumbnail,
-            publisher: publisher,
+            author: authors?.joined(separator: ", ") ?? "",
+            coverImageURL: nonEmptyThumbnail,
+            publisher: publisher ?? "",
             isbn13: extractISBN13(),
             publishedDate: parsePublishedDate()
         )
     }
 
     private func parsePublishedDate() -> Date? {
+        guard let datetime else { return nil }
+
         let formatter = ISO8601DateFormatter()
         formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
         if let date = formatter.date(from: datetime) {
@@ -42,12 +44,21 @@ struct KakaoBookSearchDTO: Decodable, Sendable {
     }
 
     private func extractISBN13() -> String? {
-        isbn.split(whereSeparator: \Character.isWhitespace)
+        isbn?.split(whereSeparator: \Character.isWhitespace)
             .map(String.init)
             .first { value in
                 value.count == 13 && value.unicodeScalars.allSatisfy {
                     (48...57).contains($0.value)
                 }
             }
+    }
+
+    private var nonEmptyThumbnail: String? {
+        guard let thumbnail = thumbnail?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !thumbnail.isEmpty
+        else {
+            return nil
+        }
+        return thumbnail
     }
 }
