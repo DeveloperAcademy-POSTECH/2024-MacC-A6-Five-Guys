@@ -14,28 +14,11 @@ struct BookRowView: View {
     var body: some View {
         VStack {
             HStack {
-                VStack {
-                    if let coverUrl = book.coverImageURL, let url = URL(string: coverUrl) {
-                        AsyncImage(url: url) { phase in
-                            switch phase {
-                            case .empty:
-                                ProgressView()
-                            case let .success(image):
-                                image.resizable()
-                            case .failure:
-                                defaultCover
-                            @unknown default:
-                                defaultCover
-                            }
-                        }
-                        .cornerRadius(6)
-                        .commonShadow()
-                    } else {
-                        defaultCover
-                    }
-                }
-                .frame(width: 115, height: 178)
-                .padding(.leading, 20)
+                BookCoverImageView(coverURL: book.coverImageURL)
+                    .cornerRadius(6)
+                    .commonShadow()
+                    .frame(width: 115, height: 178)
+                    .padding(.leading, 20)
 
                 VStack(alignment: .leading) {
                     Text(book.title)
@@ -75,11 +58,6 @@ struct BookRowView: View {
 
         let year = Calendar.app.component(.year, from: publishedDate)
         return "\(author) | \(year) | \(book.publisher)"
-    }
-
-    private var defaultCover: some View {
-        Rectangle()
-            .foregroundStyle(.green)
     }
 }
 

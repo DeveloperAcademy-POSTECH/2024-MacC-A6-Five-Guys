@@ -69,19 +69,12 @@ struct MultiBookProgressView: View {
 
             Spacer()
 
-            if let coverImageURLString = book.bookMetaData.coverImageURL,
-               let url = URL(string: coverImageURLString) {
-                AsyncImage(url: url) { image in
-                    image.resizable()
-                        .scaledToFill()
-                        .frame(width: 44, height: 68)
-                        .clipShape(
-                            UnevenRoundedRectangle(cornerRadii: .init(bottomTrailing: 8, topTrailing: 8))
-                        )
-                } placeholder: {
-                    ProgressView()
-                }
-            }
+            BookCoverImageView(coverURL: book.bookMetaData.coverImageURL)
+                .scaledToFill()
+                .frame(width: 44, height: 68)
+                .clipShape(
+                    UnevenRoundedRectangle(cornerRadii: .init(bottomTrailing: 8, topTrailing: 8))
+                )
         }
     }
 
