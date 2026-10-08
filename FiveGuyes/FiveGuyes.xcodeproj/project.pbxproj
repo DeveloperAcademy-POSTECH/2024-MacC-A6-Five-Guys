@@ -137,6 +137,7 @@
 			buildConfigurationList = 26890B9F2CAE811D008DFF49 /* Build configuration list for PBXNativeTarget "FiveGuyes" */;
 			buildPhases = (
 				26890B8D2CAE811A008DFF49 /* Sources */,
+				26A7E1C02EA6000100D1F0A1 /* SwiftLint */,
 				26890B8E2CAE811A008DFF49 /* Frameworks */,
 				26890B8F2CAE811A008DFF49 /* Resources */,
 				264443F02D12B92D009422BA /* ShellScript */,
@@ -220,6 +221,25 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		26A7E1C02EA6000100D1F0A1 /* SwiftLint */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = SwiftLint;
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if [ \"${CI:-}\" = true ]; then\n  exit 0\nfi\n\ncd \"${SRCROOT}\"\nSWIFTLINT_SKIP_DOWNLOAD=1 ../scripts/swiftlint.sh lint --quiet\n";
+		};
 		264443F02D12B92D009422BA /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
@@ -463,6 +483,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"FiveGuyes/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				FIREBASE_ANALYTICS_COLLECTION_ENABLED = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FiveGuyes/Info.plist;
@@ -507,6 +528,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"FiveGuyes/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				FIREBASE_ANALYTICS_COLLECTION_ENABLED = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FiveGuyes/Info.plist;

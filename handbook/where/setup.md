@@ -42,7 +42,7 @@ cd FiveGuyes && ../scripts/swiftlint.sh lint --no-cache
 **SwiftLint**
 
 - `verify.sh`와 위 lint 명령은 SwiftLint 0.65.1을 첫 실행 시 내려받아 SHA-256을 확인하고 `.build/tools/`에 보관한다. 이후 실행할 때도 보관된 실행 파일의 SHA-256을 확인하며, 일치하지 않으면 다시 내려받는다.
-- lint는 `verify.sh`에서 실행된다. Xcode 빌드만 실행할 때는 lint가 실행되지 않는다.
+- Xcode에서 앱을 빌드하면 lint 결과가 코드 옆에 경고로 표시된다. 보관된 실행 파일이 없으면 내려받지 않고 lint를 건너뛰며, `verify.sh`를 한 번 실행하라는 경고를 띄운다.
 
 ## Pre-push Hook
 
