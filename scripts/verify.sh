@@ -5,14 +5,12 @@ REPO_ROOT="$(git rev-parse --show-toplevel)"
 cd "$REPO_ROOT"
 SPM_DIR="${SPM_DIR:-$REPO_ROOT/.build/SourcePackages}"
 [[ "$SPM_DIR" = /* ]] || SPM_DIR="$REPO_ROOT/$SPM_DIR"
-SWIFTLINT="$SPM_DIR/artifacts/swiftlintplugins/SwiftLintBinary/SwiftLintBinary.artifactbundle/macos/swiftlint"
 stage="준비"
 started_at=$(date +%s)
 results=()
 
 finish() {
     local status=$? now elapsed
-    rm -f "${test_log:-}"
     if [[ $status -ne 0 ]]; then
         now=$(date +%s)
         elapsed=$((now - started_at))
@@ -37,13 +35,6 @@ check_result_bundle() {
     [[ -z "${RESULT_BUNDLE_PATH:-}" || ! -e "$RESULT_BUNDLE_PATH" ]] || { echo "결과 번들이 이미 있습니다: $RESULT_BUNDLE_PATH"; exit 1; }
 }
 
-check_swiftlint() {
-    [[ -x "$SWIFTLINT" ]] || { echo "SwiftLint 실행 파일이 없습니다: $SWIFTLINT"; exit 1; }
-    expected_version=$(python3 -c 'import json; p=json.load(open("FiveGuyes/FiveGuyes.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved")); print(next(x["state"]["version"] for x in p["pins"] if x["identity"] == "swiftlintplugins"))')
-    actual_version=$($SWIFTLINT version)
-    [[ "$actual_version" == "$expected_version" ]] || { echo "SwiftLint $expected_version이 필요합니다: $actual_version"; exit 1; }
-}
-
 select_destination() {
     if [[ -n "${SIMULATOR_DESTINATION:-}" ]]; then
         destination=$SIMULATOR_DESTINATION
@@ -63,19 +54,9 @@ print(best[1])')"
 [[ -f FiveGuyes/Config.xcconfig ]] || { echo 'FiveGuyes/Config.xcconfig가 없습니다. Config.xcconfig.example을 복사하세요.'; exit 1; }
 run_stage '결과 번들 확인' check_result_bundle
 run_stage '패키지 해석' xcodebuild -resolvePackageDependencies -project FiveGuyes/FiveGuyes.xcodeproj -clonedSourcePackagesDirPath "$SPM_DIR"
-run_stage 'SwiftLint 확인' check_swiftlint
-run_stage 'lint' bash -c 'cd FiveGuyes && "$1" lint --no-cache' _ "$SWIFTLINT"
+run_stage 'lint' bash -c 'cd FiveGuyes && ../scripts/swiftlint.sh lint --no-cache'
 run_stage '시뮬레이터 선택' select_destination
 args=(test -project FiveGuyes/FiveGuyes.xcodeproj -scheme FiveGuyes -destination "$destination" -clonedSourcePackagesDirPath "$SPM_DIR" -parallel-testing-enabled NO -maximum-concurrent-test-simulator-destinations 1)
 [[ -z "${RESULT_BUNDLE_PATH:-}" ]] || args+=(-resultBundlePath "$RESULT_BUNDLE_PATH")
-[[ "${CI:-}" != true ]] || args+=(-skipPackagePluginValidation CODE_SIGNING_ALLOWED=NO)
-run_tests() {
-    test_log=$(mktemp)
-    if ! xcodebuild "${args[@]}" 2>&1 | tee "$test_log"; then
-        if grep -q 'was disabled because it has changed' "$test_log"; then
-            echo 'SwiftLint 플러그인 버전이 바뀌어 Xcode 승인이 필요합니다. Xcode에서 FiveGuyes 프로젝트를 빌드하고 플러그인 경고에서 Trust & Enable을 누른 뒤 다시 실행하세요.'
-        fi
-        return 1
-    fi
-}
-run_stage '테스트' run_tests
+[[ "${CI:-}" != true ]] || args+=(CODE_SIGNING_ALLOWED=NO)
+run_stage '테스트' xcodebuild "${args[@]}"

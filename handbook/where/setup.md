@@ -32,18 +32,17 @@ scripts/verify.sh
 # 특정 시뮬레이터로 검사
 SIMULATOR_DESTINATION='platform=iOS Simulator,name=iPhone 17' scripts/verify.sh
 
-# verify.sh를 한 번 실행한 뒤 lint만 검사
-cd FiveGuyes && ../.build/SourcePackages/artifacts/swiftlintplugins/SwiftLintBinary/SwiftLintBinary.artifactbundle/macos/swiftlint lint
+# lint만 검사 (SwiftLint가 없으면 자동 설치)
+cd FiveGuyes && ../scripts/swiftlint.sh lint --no-cache
 ```
 
 - 앱·테스트 타깃은 폴더를 파일시스템 동기화 그룹으로 참조한다. 새 Swift 파일은 Xcode 프로젝트 파일을 고치지 않아도 타깃에 들어간다.
 - `xcodebuild`로 테스트를 직접 돌릴 때는 병렬 실행을 끄고 단일 시뮬레이터를 쓴다. `verify.sh`는 이미 그렇게 실행한다.
 
-**SwiftLint 플러그인**
+**SwiftLint**
 
-- SwiftLint는 `SwiftLintBuildToolPlugin`(SPM 빌드 플러그인)으로 등록되어 **빌드 시 자동 실행**된다.
-- 플러그인 버전이 바뀌면 Xcode가 다시 승인을 요구하고, 승인 전에는 로컬 빌드와 `verify.sh` 테스트가 실패한다.
-- Xcode에서 한 번 빌드하고 플러그인 경고에서 **Trust & Enable**을 누른다. CI는 `-skipPackagePluginValidation`으로 건너뛴다.
+- `verify.sh`와 위 lint 명령은 SwiftLint 0.65.1을 첫 실행 시 내려받아 SHA-256을 확인하고 `.build/tools/`에 보관한다. 이후에는 보관된 바이너리를 사용한다.
+- lint는 `verify.sh`와 이를 호출하는 CI·pre-push에서 실행된다. Xcode 빌드만 실행할 때는 lint가 실행되지 않는다.
 
 ## Pre-push Hook
 
