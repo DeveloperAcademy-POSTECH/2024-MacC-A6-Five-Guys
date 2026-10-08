@@ -4,11 +4,15 @@ public struct URLSessionHTTPClient: HTTPClient {
     private let session: URLSession
 
     public init() {
+        self.session = URLSession(configuration: Self.makeDefaultConfiguration())
+    }
+
+    static func makeDefaultConfiguration() -> URLSessionConfiguration {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
         configuration.urlCache = nil
         configuration.timeoutIntervalForRequest = 15
-        self.session = URLSession(configuration: configuration)
+        return configuration
     }
 
     public init(session: URLSession) {

@@ -1,4 +1,5 @@
-import FGNetwork
+// 기본 세션 구성 팩토리는 internal이므로 직접 검증하기 위해 testable import를 사용한다.
+@testable import FGNetwork
 import Foundation
 import os
 import Testing
@@ -6,15 +7,12 @@ import Testing
 @Suite("URLSessionHTTPClient 테스트")
 struct URLSessionHTTPClientTests {
     @Test("기본 세션은 캐시를 사용하지 않고 요청 제한 시간이 15초")
-    func init_defaultSession_usesExpectedConfiguration() throws {
-        let client = URLSessionHTTPClient()
-        let session = try #require(
-            Mirror(reflecting: client).descendant("session") as? URLSession
-        )
+    func init_defaultSession_usesExpectedConfiguration() {
+        let configuration = URLSessionHTTPClient.makeDefaultConfiguration()
 
-        #expect(session.configuration.urlCache == nil)
-        #expect(session.configuration.requestCachePolicy == .reloadIgnoringLocalCacheData)
-        #expect(session.configuration.timeoutIntervalForRequest == 15)
+        #expect(configuration.urlCache == nil)
+        #expect(configuration.requestCachePolicy == .reloadIgnoringLocalCacheData)
+        #expect(configuration.timeoutIntervalForRequest == 15)
     }
 
     @Test("요청을 URLRequest로 변환하고 HTTP 응답을 그대로 반환")
