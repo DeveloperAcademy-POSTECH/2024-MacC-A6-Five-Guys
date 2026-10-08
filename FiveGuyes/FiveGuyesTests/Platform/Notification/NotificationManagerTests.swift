@@ -185,6 +185,7 @@ struct NotificationManagerTests {
                 title: "테스트 도서",
                 author: "테스트 저자",
                 coverImageURL: nil,
+                isbn13: nil,
                 totalPages: 300
             ),
             userSettings: FGUserSetting(

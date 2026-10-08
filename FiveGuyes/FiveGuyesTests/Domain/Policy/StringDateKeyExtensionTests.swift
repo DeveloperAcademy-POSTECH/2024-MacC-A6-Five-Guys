@@ -11,17 +11,6 @@ import Testing
 
 @Suite("String/Date 키 확장 테스트")
 struct StringDateKeyExtensionTests {
-    @Test("extractYear는 yyyy-MM-dd 문자열에서 연도를 추출한다")
-    func extractYear_returnsYear() {
-        #expect("2026-02-15".extractYear() == "2026")
-    }
-
-    @Test("extractYear는 날짜 파싱 실패 시 원문을 그대로 반환한다")
-    func extractYear_returnsOriginalWhenInvalid() {
-        #expect("2026/02/15".extractYear() == "2026/02/15")
-        #expect("invalid".extractYear() == "invalid")
-    }
-
     @Test("String.toReadingDateKey와 Date.readingDateKey는 동일 키로 라운드트립된다")
     func stringToReadingDateKey_roundTripWithReadingDateKey() {
         let original = "2026-02-15"

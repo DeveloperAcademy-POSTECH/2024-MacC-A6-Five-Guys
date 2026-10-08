@@ -63,6 +63,7 @@ extension BookManagementUseCasesTests {
                 title: "테스트 책",
                 author: "테스트 작가",
                 coverImageURL: "https://example.com/cover.jpg",
+                isbn13: "9781234567890",
                 totalPages: 300
             ),
             userSettings: FGUserSetting(
@@ -103,6 +104,7 @@ extension BookManagementUseCasesTests {
                 title: "스케줄 테스트",
                 author: "작가",
                 coverImageURL: nil,
+                isbn13: nil,
                 totalPages: 300
             ),
             userSettings: FGUserSetting(
