@@ -25,10 +25,10 @@ struct FinishGoalViewModelTests {
         let selectedBook = BookSearchItem(
             title: "테스트 도서",
             author: "작가",
-            cover: nil,
+            coverImageURL: nil,
             publisher: "출판사",
             isbn13: "1234567890123",
-            pubDate: "20250101"
+            publishedDate: nil
         )
 
         let isRegistered = await viewModel.registerBook(
@@ -42,6 +42,7 @@ struct FinishGoalViewModelTests {
 
         #expect(isRegistered)
         #expect(bookRegistrationUseCase.registerBookCallCount == 1)
+        #expect(bookRegistrationUseCase.lastRegisterBookInput?.bookMetaData.isbn13 == "1234567890123")
     }
 
     @Test("FinishGoalViewModel: 등록 실패 시 false 반환")
@@ -58,10 +59,10 @@ struct FinishGoalViewModelTests {
         let selectedBook = BookSearchItem(
             title: "테스트 도서",
             author: "작가",
-            cover: nil,
+            coverImageURL: nil,
             publisher: "출판사",
             isbn13: "1234567890123",
-            pubDate: "20250101"
+            publishedDate: nil
         )
 
         let isRegistered = await viewModel.registerBook(
@@ -91,10 +92,10 @@ struct FinishGoalViewModelTests {
         let selectedBook = BookSearchItem(
             title: "테스트 도서",
             author: "작가",
-            cover: nil,
+            coverImageURL: nil,
             publisher: "출판사",
             isbn13: "1234567890123",
-            pubDate: "20250101"
+            publishedDate: nil
         )
 
         let firstTask = Task {
