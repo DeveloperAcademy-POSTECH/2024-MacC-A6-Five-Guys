@@ -6,7 +6,7 @@
 
 | 파일 | 필요 여부 | 할 일 |
 |---|---|---|
-| `FiveGuyes/Config.xcconfig` | **필수.** 없으면 빌드 실패 | 값이 비어 있는 견본을 복사한다. 도서 검색을 확인할 때만 `API_KEY`에 알라딘 API 키를 넣는다 |
+| `FiveGuyes/Config.xcconfig` | **필수.** 없으면 빌드 실패 | 값이 비어 있는 견본을 복사한다. 도서 검색을 확인할 때 `KAKAO_API_KEY`에 카카오 REST API 키를, 페이지 자동 채움을 확인할 때 `NL_API_KEY`에 국립중앙도서관 Open API 인증키를 넣는다 |
 | `FiveGuyes/FiveGuyes/GoogleService-Info.plist` | Debug·테스트는 없어도 됨. Release는 필수 | Firebase 동작을 확인할 때만 넣는다 |
 
 ```bash
