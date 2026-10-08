@@ -52,6 +52,7 @@ public protocol HTTPClient: Sendable {
 ```swift
 public protocol Endpoint: Sendable {
     associatedtype Response: Decodable & Sendable
+    var decoder: @Sendable () -> JSONDecoder { get }   // 기본 구현: { JSONDecoder() }
     func makeRequest() throws(HTTPClientError) -> HTTPRequest
 }
 
@@ -61,7 +62,7 @@ extension HTTPClient {
 ```
 
 - `request(_:)`가 공통 처리를 한 번에 한다. `makeRequest` → `send` → 2xx 검사(`unexpectedStatus`) → `JSONDecoder`로 `Response` 디코딩(`decoding`).
-- 디코더는 호출마다 새로 만든다. 날짜·키 전략이 필요하면 `Endpoint`에 `decoder: @Sendable () -> JSONDecoder` 기본 구현을 두고 엔드포인트가 재정의한다.
+- 디코더는 호출마다 새로 만든다. `decoder`의 기본 구현은 `{ JSONDecoder() }`이고, 날짜·키 전략이 필요한 엔드포인트가 재정의한다.
 - 엔드포인트 하나가 요청 하나다. API 키는 엔드포인트가 생성자 인자로 받아 `makeRequest`에서 헤더나 쿼리에 넣는다.
 
 ### API 키 저장소
