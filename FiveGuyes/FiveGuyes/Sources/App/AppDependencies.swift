@@ -5,6 +5,7 @@
 //  Created by zaehorang on 2/12/26.
 //
 
+import FGNetwork
 import Foundation
 import Observation
 import SwiftData
@@ -127,9 +128,17 @@ final class AppDependencies {
         self.notificationService = notificationService
         self.notiSettingsStore = notiSettingsStore
         self.systemSettingsOpener = systemSettingsOpener
-        self.bookSearchUseCase = BookSearchUseCase(
-            bookSearchProvider: AladinBookSearchProvider()
+        self.bookSearchUseCase = Self.makeBookSearchUseCase()
+    }
+
+    private static func makeBookSearchUseCase() -> any BookSearchUsing {
+        let httpClient = URLSessionHTTPClient()
+        let apiKeyStore = BundleAPIKeyStore()
+        let provider = AladinBookSearchProvider(
+            httpClient: httpClient,
+            apiKeyProvider: apiKeyStore
         )
+        return BookSearchUseCase(bookSearchProvider: provider)
     }
 
     private static func makeMigrationCompletionKey() -> String {
