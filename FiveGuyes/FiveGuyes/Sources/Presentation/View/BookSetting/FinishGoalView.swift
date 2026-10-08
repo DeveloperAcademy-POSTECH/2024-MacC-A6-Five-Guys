@@ -68,21 +68,9 @@ struct FinishGoalView: View {
 
                     /// book card view
                     HStack(spacing: 16) {
-                        if let coverUrl = book.coverImageURL, let url = URL(string: coverUrl) {
-                            AsyncImage(url: url) { image in
-                                image
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 90, height: 139)
-                            } placeholder: {
-                                ProgressView()
-                            }
-                        } else {
-                            Rectangle()
-                                .foregroundStyle(Color.Colors.green)
-                                .frame(width: 90, height: 139)
-                                .padding(.leading, 20)
-                        }
+                        BookCoverImageView(coverURL: book.coverImageURL)
+                            .scaledToFit()
+                            .frame(width: 90, height: 139)
 
                         VStack(alignment: .leading, spacing: 8) {
                             VStack(alignment: .leading, spacing: 0) {
