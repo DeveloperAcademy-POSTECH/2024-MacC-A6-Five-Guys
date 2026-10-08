@@ -11,6 +11,11 @@ import Testing
 
 @Suite("BookRowView 테스트")
 struct BookRowViewTests {
+    @Test("표지 URL이 없으면 기본 표지를 사용한다")
+    func missingCoverURLUsesDefaultCover() {
+        #expect(BookCoverImageView.initialContent(for: nil) == .defaultCover)
+    }
+
     @Test("출간일이 있으면 저자 괄호를 제거하고 연도를 표시한다")
     func metadataIncludesPublishedYear() throws {
         let publishedDate = try #require(
