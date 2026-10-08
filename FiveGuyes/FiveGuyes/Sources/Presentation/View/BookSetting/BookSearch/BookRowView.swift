@@ -16,16 +16,22 @@ struct BookRowView: View {
             HStack {
                 VStack {
                     if let coverUrl = book.coverImageURL, let url = URL(string: coverUrl) {
-                        AsyncImage(url: url) { image in
-                            image.resizable()
-                        } placeholder: {
-                            ProgressView()
+                        AsyncImage(url: url) { phase in
+                            switch phase {
+                            case .empty:
+                                ProgressView()
+                            case let .success(image):
+                                image.resizable()
+                            case .failure:
+                                defaultCover
+                            @unknown default:
+                                defaultCover
+                            }
                         }
                         .cornerRadius(6)
                         .commonShadow()
                     } else {
-                        Rectangle()
-                            .foregroundStyle(.green)
+                        defaultCover
                     }
                 }
                 .frame(width: 115, height: 178)
@@ -36,7 +42,7 @@ struct BookRowView: View {
                         .fontStyle(.body, weight: .semibold)
                         .foregroundStyle(Color.Labels.primaryBlack1)
 
-                    Text(bookMetadataText)
+                    Text(Self.metadataText(for: book))
                         .fontStyle(.caption1)
                         .foregroundStyle(Color.Labels.secondaryBlack2)
                 }
@@ -61,7 +67,7 @@ struct BookRowView: View {
         .padding(.vertical, 24)
     }
 
-    private var bookMetadataText: String {
+    static func metadataText(for book: BookSearchItem) -> String {
         let author = book.author.removingParenthesesContent()
         guard let publishedDate = book.publishedDate else {
             return "\(author) | \(book.publisher)"
@@ -69,6 +75,11 @@ struct BookRowView: View {
 
         let year = Calendar.app.component(.year, from: publishedDate)
         return "\(author) | \(year) | \(book.publisher)"
+    }
+
+    private var defaultCover: some View {
+        Rectangle()
+            .foregroundStyle(.green)
     }
 }
 
