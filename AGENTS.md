@@ -22,7 +22,7 @@ FiveGuyes(한입독서)는 iOS SwiftUI 앱이다. `FiveGuyes/FiveGuyes.xcodeproj
 - 문서가 SoT다. 동작이 바뀌면 `services/<서비스>/`의 문서를, 구조가 바뀌면 `services/_common/architecture.md`를 같은 PR에서 먼저 고친다. 코드가 문서와 다르면 `history/backlog.md`에 적는다.
 - layer 경계의 일부는 lint가 error로 막지만 전부는 아니다. 새 타입의 위치는 architecture를 따른다.
 - 테스트는 Swift Testing으로 작성한다(XCTest 아님).
-- 비밀값(`Config.xcconfig`의 `API_KEY`, plist 값)은 출력하거나 커밋하지 않는다. `DEVELOPMENT_TEAM`과 공유 스킴의 디버그 인자 변경도 커밋하지 않는다.
+- 비밀값(`Config.xcconfig`의 `KAKAO_API_KEY`·`NL_API_KEY`, plist 값)은 출력하거나 커밋하지 않는다. `DEVELOPMENT_TEAM`과 공유 스킴의 디버그 인자 변경도 커밋하지 않는다.
 - 소스·테스트 폴더에는 코드만 둔다. 이 폴더의 파일은 자동으로 타깃에 들어간다. 문서는 아래 Docs Map의 폴더에 두고, 그 밖의 비코드 파일이 꼭 필요하면 해당 타깃의 `membershipExceptions`에 추가한다.
 - 레포 안에 `CLAUDE.md`·`.claude/CLAUDE.md`·`CLAUDE.local.md`를 만들지 않는다. 만들면 그 폴더와 하위에서 Claude Code가 `AGENTS.md` 대신 그 파일을 읽는다.
 
