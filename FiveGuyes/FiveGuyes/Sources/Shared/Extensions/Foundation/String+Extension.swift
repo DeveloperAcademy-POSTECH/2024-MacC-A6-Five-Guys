@@ -44,14 +44,6 @@ extension String {
             return finalConsonant > 0 ? "은" : "는"
         }
 
-    func extractYear() -> String {
-           guard let date = toReadingDateKey()?.toDate(calendar: .app) else {
-               return self
-           }
-
-           let year = Calendar.app.component(.year, from: date)
-           return "\(year)"
-       }
     func removingParenthesesContent() -> String {
          return self.replacingOccurrences(of: "\\(.*?\\)", with: "", options: .regularExpression)
              .trimmingCharacters(in: .whitespacesAndNewlines)

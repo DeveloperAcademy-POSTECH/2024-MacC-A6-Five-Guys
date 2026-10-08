@@ -15,18 +15,18 @@ extension PreviewSupport {
     static func makeBookSearchItem(
         title: String,
         author: String = "한입독서 팀",
-        cover: String? = nil,
+        coverImageURL: String? = nil,
         publisher: String = "Five Guys Press",
-        isbn13: String = "9781234567890",
-        pubDate: String = "20250101"
+        isbn13: String? = "9781234567890",
+        publishedDate: Date? = Calendar.app.date(from: DateComponents(year: 2025, month: 1, day: 1))
     ) -> BookSearchItem {
         BookSearchItem(
             title: title,
             author: author,
-            cover: cover,
+            coverImageURL: coverImageURL,
             publisher: publisher,
             isbn13: isbn13,
-            pubDate: pubDate
+            publishedDate: publishedDate
         )
     }
 
@@ -38,7 +38,7 @@ extension PreviewSupport {
                 author: "홍길동",
                 publisher: "Sample House",
                 isbn13: "9781234567891",
-                pubDate: "20240220"
+                publishedDate: Calendar.app.date(from: DateComponents(year: 2024, month: 2, day: 20))
             )
         ]
     }
@@ -61,7 +61,8 @@ extension PreviewSupport {
         selectedBook: BookSearchItem? = nil
     ) -> BookSearchViewModel {
         let useCase = BookSearchUseCase(
-            bookSearchProvider: PreviewBookSearchProvider(books: books)
+            bookSearchProvider: PreviewBookSearchProvider(books: books),
+            bookPageCountProvider: PreviewBookPageCountProvider()
         )
         let viewModel = BookSearchViewModel(bookSearchUseCase: useCase)
         viewModel.books = books
@@ -76,18 +77,20 @@ extension PreviewSupport {
 
 struct PreviewBookSearchProvider: BookSearchProviding {
     let books: [BookSearchItem]
+
+    func searchBooks(query: String) async throws -> [BookSearchItem] {
+        books
+    }
+}
+
+struct PreviewBookPageCountProvider: BookPageCountProviding {
     let totalPages: Int
 
-    init(books: [BookSearchItem], totalPages: Int = 320) {
-        self.books = books
+    init(totalPages: Int = 320) {
         self.totalPages = totalPages
     }
 
-    func fetchBooks(query: String) async throws -> [BookSearchItem] {
-        books
-    }
-
-    func fetchBookTotalPages(isbn: String) async throws -> Int {
+    func fetchTotalPages(isbn13: String) async throws -> Int? {
         totalPages
     }
 }

@@ -68,7 +68,7 @@ struct FinishGoalView: View {
 
                     /// book card view
                     HStack(spacing: 16) {
-                        if let coverUrl = book.cover, let url = URL(string: coverUrl) {
+                        if let coverUrl = book.coverImageURL, let url = URL(string: coverUrl) {
                             AsyncImage(url: url) { image in
                                 image
                                     .resizable()
