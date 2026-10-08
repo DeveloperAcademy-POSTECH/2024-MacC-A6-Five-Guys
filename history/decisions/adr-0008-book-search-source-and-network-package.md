@@ -54,7 +54,7 @@
 - 패키지는 Foundation만 import한다. 앱 코드와 다른 패키지를 참조하지 않는다.
 - 패키지의 공개 타입은 `Sendable`이고, 오류는 `HTTPClientError` typed throws로 고정한다. Domain interface는 일반 `throws`를 유지한다.
 - Domain과 Presentation은 패키지를 import하지 않는다.
-- 페이지 조회 실패는 어떤 경우에도 등록을 막지 않는다 (`services/book-search/spec.md` B7, #226 PR에서 추가).
+- 페이지 조회 실패는 어떤 경우에도 등록을 막지 않는다 (`services/book-search/spec.md` B7).
 - 키 값은 로그·오류·커밋에 남기지 않는다.
 
 ## Consequences
@@ -73,7 +73,7 @@
 
 ## References
 
-- `services/book-search/spec.md`, `services/book-search/sources.md` (#226 PR에서 추가)
+- `services/book-search/spec.md`, `services/book-search/sources.md`
 - `services/network/module.md`
 - 알라딘 OpenAPI 종료 공지: https://blog.aladin.co.kr/m/openapi/6695306
 - 카카오 책 검색: https://developers.kakao.com/docs/latest/ko/daum-search/dev-guide#search-book

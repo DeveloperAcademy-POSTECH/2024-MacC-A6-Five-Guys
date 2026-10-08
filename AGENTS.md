@@ -37,6 +37,8 @@ FiveGuyes(한입독서)는 iOS SwiftUI 앱이다. `FiveGuyes/FiveGuyes.xcodeproj
 | PR 작성 | `.github/pull_request_template.md` |
 | 새 타입의 위치, layer 경계, View·ViewModel 구조 | `services/_common/architecture.md` |
 | 알림 동작 | `services/notification/spec.md` |
+| 도서 검색, 페이지 자동 채움 | `services/book-search/spec.md` |
+| 도서 검색 외부 API(카카오·국립중앙도서관) 연동 | `services/book-search/sources.md` |
 | HTTP 호출, API 키 읽기 (`FGNetwork` 패키지) | `services/network/module.md` |
 | 앱 시작, Firebase·GA·ATT | `services/analytics/launch-and-ga.md` |
 | 문서와 다른 코드 목록 | `history/backlog.md` |
