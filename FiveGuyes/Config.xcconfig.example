@@ -1,4 +1,5 @@
 // Copy this file to Config.xcconfig. Leave values empty here and fill them locally only.
 // This file is safe to commit because it contains no secrets.
 
-API_KEY =
+KAKAO_API_KEY =
+NL_API_KEY =
