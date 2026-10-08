@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct AladinSearchBookDTO: Decodable {
+struct AladinSearchBookDTO: Decodable, Sendable {
     let title: String
     let author: String
     let cover: String?
@@ -27,18 +27,18 @@ struct AladinSearchBookDTO: Decodable {
     }
 }
 
-struct AladinBookSearchResponseDTO: Decodable {
+struct AladinBookSearchResponseDTO: Decodable, Sendable {
     let item: [AladinSearchBookDTO]
 }
 
-struct AladinBookDetailResponseDTO: Decodable {
+struct AladinBookDetailResponseDTO: Decodable, Sendable {
     let item: [AladinBookDetailDTO]?
 }
 
-struct AladinBookDetailDTO: Decodable {
+struct AladinBookDetailDTO: Decodable, Sendable {
     let subInfo: AladinBookSubInfoDTO?
 }
 
-struct AladinBookSubInfoDTO: Decodable {
+struct AladinBookSubInfoDTO: Decodable, Sendable {
     let itemPage: Int?
 }

@@ -5,85 +5,47 @@
 //  Created by zaehorang on 2026-02-16.
 //
 
+import FGNetwork
 @testable import FiveGuyes
 import Foundation
 import Testing
 
 @Suite("AladinBookSearchProvider 테스트")
 struct AladinBookSearchProviderTests {
-    @Test("fetchBooks는 특수문자 query를 인코딩해 요청하고 결과를 디코딩")
+    @Test("fetchBooks는 특수문자 query와 ttbkey를 인코딩하고 결과를 디코딩")
     func aladinProvider_fetchBooks_encodesQueryAndDecodesItems() async throws {
-        let stubID = UUID().uuidString
-        let session = makeStubSession(stubID: stubID)
-        URLProtocolStub.registerHandler(for: stubID) { request in
-            guard let url = request.url else {
-                throw URLError(.badURL)
-            }
-            let response = HTTPURLResponse(
-                url: url,
+        let recorder = HTTPRequestRecorder()
+        let client = HTTPClientStub { request in
+            await recorder.record(request)
+            return HTTPResponse(
                 statusCode: 200,
-                httpVersion: nil,
-                headerFields: nil
-            )!
-            let data = """
-            {
-              "item": [
-                {
-                  "title": "Swift & iOS",
-                  "author": "Tester",
-                  "cover": null,
-                  "publisher": "FG",
-                  "isbn13": "9781234567890",
-                  "pubDate": "20250101"
-                }
-              ]
-            }
-            """.data(using: .utf8) ?? Data()
-            return (response, data)
+                headers: [:],
+                body: Data(
+                    #"{"item":[{"title":"Swift & iOS","author":"Tester","cover":null,"publisher":"FG","isbn13":"9781234567890","pubDate":"20250101"}]}"#.utf8
+                )
+            )
         }
-        defer {
-            URLProtocolStub.unregisterHandler(for: stubID)
-        }
+        let provider = makeProvider(httpClient: client, apiKey: "testKey")
 
-        let provider = AladinBookSearchProvider(apiKey: "testKey", urlSession: session)
         let books = try await provider.fetchBooks(query: "스위프트 & iOS+")
 
         #expect(books.count == 1)
         #expect(books.first?.title == "Swift & iOS")
-
-        guard let requestURL = URLProtocolStub.lastRequest(for: stubID)?.url else {
-            Issue.record("요청 URL이 기록되지 않았습니다.")
-            return
-        }
-        let components = URLComponents(url: requestURL, resolvingAgainstBaseURL: false)
-        let queryItems = components?.queryItems ?? []
-
-        #expect(queryItems.first(where: { $0.name == "ttbkey" })?.value == "testKey")
-        #expect(queryItems.first(where: { $0.name == "Query" })?.value == "스위프트 & iOS+")
+        let request = try #require(await recorder.lastRequest())
+        #expect(request.method == .get)
+        #expect(request.url.absoluteString == "https://www.aladin.co.kr/ttb/api/ItemSearch.aspx")
+        #expect(request.queryItems.first(where: { $0.name == "ttbkey" })?.value == "testKey")
+        #expect(request.queryItems.first(where: { $0.name == "Query" })?.value == "스위프트 & iOS+")
+        #expect(request.queryItems.first(where: { $0.name == "MaxResults" })?.value == "10")
+        #expect(request.queryItems.first(where: { $0.name == "Output" })?.value == "js")
+        #expect(request.queryItems.first(where: { $0.name == "Cover" })?.value == "Big")
+        #expect(request.queryItems.first(where: { $0.name == "Version" })?.value == "20131101")
     }
 
     @Test("fetchBooks는 2xx가 아닌 HTTP 응답을 명시 오류로 매핑")
-    func aladinProvider_fetchBooks_nonSuccessStatus_throwsMappedError() async throws {
-        let stubID = UUID().uuidString
-        let session = makeStubSession(stubID: stubID)
-        URLProtocolStub.registerHandler(for: stubID) { request in
-            guard let url = request.url else {
-                throw URLError(.badURL)
-            }
-            let response = HTTPURLResponse(
-                url: url,
-                statusCode: 500,
-                httpVersion: nil,
-                headerFields: nil
-            )!
-            let data = Data("{}".utf8)
-            return (response, data)
-        }
-        defer {
-            URLProtocolStub.unregisterHandler(for: stubID)
-        }
-
-        let provider = AladinBookSearchProvider(apiKey: "testKey", urlSession: session)
+    func aladinProvider_fetchBooks_nonSuccessStatus_throwsMappedError() async {
+        let client = HTTPClientStub(error: .unexpectedStatus(500, Data("{}".utf8)))
+        let provider = makeProvider(httpClient: client, apiKey: "testKey")
 
         do {
             _ = try await provider.fetchBooks(query: "실패")
@@ -95,164 +57,131 @@ struct AladinBookSearchProviderTests {
         }
     }
 
-    @Test("fetchBooks는 API_KEY가 빈 문자열이면 missingAPIKey 오류를 반환")
-    func aladinProvider_fetchBooks_emptyAPIKey_throwsMissingAPIKey() async throws {
-        let session = makeStubSession(stubID: UUID().uuidString)
-        let provider = AladinBookSearchProvider(apiKey: "", urlSession: session)
+    @Test("fetchBooks는 HTTP가 아닌 응답 오류를 invalidResponse로 매핑")
+    func aladinProvider_fetchBooks_invalidResponse_throwsMappedError() async {
+        let client = HTTPClientStub(error: .invalidResponse)
+        let provider = makeProvider(httpClient: client, apiKey: "testKey")
 
         do {
-            _ = try await provider.fetchBooks(query: "테스트")
-            Issue.record("빈 API_KEY에서는 missingAPIKey 오류가 발생해야 합니다.")
+            _ = try await provider.fetchBooks(query: "실패")
+            Issue.record("HTTP가 아닌 응답에서 오류가 발생해야 합니다.")
         } catch let error as BookSearchNetworkError {
-            #expect(error == .missingAPIKey)
+            #expect(error == .invalidResponse)
         } catch {
             Issue.record("예상하지 못한 오류 타입: \(error)")
+        }
+    }
+
+    @Test("fetchBooks는 API_KEY가 빈 문자열이면 missingAPIKey 오류를 반환")
+    func aladinProvider_fetchBooks_emptyAPIKey_throwsMissingAPIKey() async {
+        await expectMissingAPIKey(apiKey: "") { provider in
+            _ = try await provider.fetchBooks(query: "테스트")
         }
     }
 
     @Test("fetchBookTotalPages는 API_KEY가 공백 문자열이면 missingAPIKey 오류를 반환")
-    func aladinProvider_fetchBookTotalPages_whitespaceAPIKey_throwsMissingAPIKey() async throws {
-        let session = makeStubSession(stubID: UUID().uuidString)
-        let provider = AladinBookSearchProvider(apiKey: "   ", urlSession: session)
-
-        do {
+    func aladinProvider_fetchBookTotalPages_whitespaceAPIKey_throwsMissingAPIKey() async {
+        await expectMissingAPIKey(apiKey: "   ") { provider in
             _ = try await provider.fetchBookTotalPages(isbn: "9781234567890")
-            Issue.record("공백 API_KEY에서는 missingAPIKey 오류가 발생해야 합니다.")
-        } catch let error as BookSearchNetworkError {
-            #expect(error == .missingAPIKey)
-        } catch {
-            Issue.record("예상하지 못한 오류 타입: \(error)")
         }
     }
 
     @Test("fetchBooks는 미치환 플레이스홀더 API_KEY에서 missingAPIKey 오류를 반환")
-    func aladinProvider_fetchBooks_unresolvedPlaceholderAPIKey_throwsMissingAPIKey() async throws {
-        let session = makeStubSession(stubID: UUID().uuidString)
-        let provider = AladinBookSearchProvider(apiKey: "$(API_KEY)", urlSession: session)
+    func aladinProvider_fetchBooks_unresolvedPlaceholderAPIKey_throwsMissingAPIKey() async {
+        await expectMissingAPIKey(apiKey: "$(API_KEY)") { provider in
+            _ = try await provider.fetchBooks(query: "테스트")
+        }
+    }
+
+    @Test("fetchBookTotalPages는 ItemId와 ttbkey를 인코딩하고 페이지 수를 반환")
+    func aladinProvider_fetchBookTotalPages_encodesISBNAndReturnsPageCount() async throws {
+        let recorder = HTTPRequestRecorder()
+        let client = HTTPClientStub { request in
+            await recorder.record(request)
+            return HTTPResponse(
+                statusCode: 200,
+                headers: [:],
+                body: Data(#"{"item":[{"subInfo":{"itemPage":321}}]}"#.utf8)
+            )
+        }
+        let provider = makeProvider(httpClient: client, apiKey: "testKey")
+
+        let totalPages = try await provider.fetchBookTotalPages(isbn: "978-1 2345&67890")
+
+        #expect(totalPages == 321)
+        let request = try #require(await recorder.lastRequest())
+        #expect(request.url.absoluteString == "https://www.aladin.co.kr/ttb/api/ItemLookUp.aspx")
+        #expect(request.queryItems.first(where: { $0.name == "ttbkey" })?.value == "testKey")
+        #expect(request.queryItems.first(where: { $0.name == "ItemId" })?.value == "978-1 2345&67890")
+        #expect(request.queryItems.first(where: { $0.name == "itemIdType" })?.value == "ISBN13")
+        #expect(request.queryItems.first(where: { $0.name == "output" })?.value == "js")
+        #expect(request.queryItems.first(where: { $0.name == "OptResult" })?.value == "itemPage")
+    }
+
+    private func makeProvider(
+        httpClient: some HTTPClient,
+        apiKey: String
+    ) -> AladinBookSearchProvider {
+        AladinBookSearchProvider(
+            httpClient: httpClient,
+            apiKeyProvider: BundleAPIKeyStore(values: ["API_KEY": apiKey])
+        )
+    }
+
+    private func expectMissingAPIKey(
+        apiKey: String,
+        operation: (AladinBookSearchProvider) async throws -> Void
+    ) async {
+        let client = HTTPClientStub(error: .invalidRequest)
+        let provider = makeProvider(httpClient: client, apiKey: apiKey)
 
         do {
-            _ = try await provider.fetchBooks(query: "테스트")
-            Issue.record("미치환 플레이스홀더 API_KEY에서는 missingAPIKey 오류가 발생해야 합니다.")
+            try await operation(provider)
+            Issue.record("유효하지 않은 API_KEY에서 missingAPIKey 오류가 발생해야 합니다.")
         } catch let error as BookSearchNetworkError {
             #expect(error == .missingAPIKey)
         } catch {
             Issue.record("예상하지 못한 오류 타입: \(error)")
         }
     }
+}
 
-    @Test("fetchBookTotalPages는 ItemId를 인코딩해 요청하고 페이지 수를 반환")
-    func aladinProvider_fetchBookTotalPages_encodesISBNAndReturnsPageCount() async throws {
-        let stubID = UUID().uuidString
-        let session = makeStubSession(stubID: stubID)
-        URLProtocolStub.registerHandler(for: stubID) { request in
-            guard let url = request.url else {
-                throw URLError(.badURL)
-            }
-            let response = HTTPURLResponse(
-                url: url,
-                statusCode: 200,
-                httpVersion: nil,
-                headerFields: nil
-            )!
-            let data = """
-            {
-              "item": [
-                {
-                  "subInfo": {
-                    "itemPage": 321
-                  }
-                }
-              ]
-            }
-            """.data(using: .utf8) ?? Data()
-            return (response, data)
-        }
-        defer {
-            URLProtocolStub.unregisterHandler(for: stubID)
-        }
-
-        let provider = AladinBookSearchProvider(apiKey: "testKey", urlSession: session)
-        let totalPages = try await provider.fetchBookTotalPages(isbn: "978-1 2345&67890")
-
-        #expect(totalPages == 321)
-
-        guard let requestURL = URLProtocolStub.lastRequest(for: stubID)?.url else {
-            Issue.record("요청 URL이 기록되지 않았습니다.")
-            return
-        }
-        let components = URLComponents(url: requestURL, resolvingAgainstBaseURL: false)
-        let queryItems = components?.queryItems ?? []
-        #expect(queryItems.first(where: { $0.name == "ItemId" })?.value == "978-1 2345&67890")
+private struct HTTPClientStub: HTTPClient {
+    private enum Behavior: Sendable {
+        case handler(@Sendable (HTTPRequest) async throws(HTTPClientError) -> HTTPResponse)
+        case failure(HTTPClientError)
     }
 
-    private func makeStubSession(stubID: String) -> URLSession {
-        let configuration = URLSessionConfiguration.ephemeral
-        configuration.protocolClasses = [URLProtocolStub.self]
-        configuration.httpAdditionalHeaders = ["X-Stub-ID": stubID]
-        return URLSession(configuration: configuration)
+    private let behavior: Behavior
+
+    init(
+        handler: @escaping @Sendable (HTTPRequest) async throws(HTTPClientError) -> HTTPResponse
+    ) {
+        self.behavior = .handler(handler)
+    }
+
+    init(error: HTTPClientError) {
+        self.behavior = .failure(error)
+    }
+
+    func send(_ request: HTTPRequest) async throws(HTTPClientError) -> HTTPResponse {
+        switch behavior {
+        case let .handler(handler):
+            try await handler(request)
+        case let .failure(error):
+            throw error
+        }
     }
 }
 
-private final class URLProtocolStub: URLProtocol {
-    private static let lock = NSLock()
-    private static var handlers: [String: (URLRequest) throws -> (HTTPURLResponse, Data)] = [:]
-    private static var lastRequests: [String: URLRequest] = [:]
+private actor HTTPRequestRecorder {
+    private var requests: [HTTPRequest] = []
 
-    static func registerHandler(
-        for stubID: String,
-        _ handler: @escaping (URLRequest) throws -> (HTTPURLResponse, Data)
-    ) {
-        lock.lock()
-        handlers[stubID] = handler
-        lock.unlock()
+    func record(_ request: HTTPRequest) {
+        requests.append(request)
     }
 
-    static func unregisterHandler(for stubID: String) {
-        lock.lock()
-        handlers.removeValue(forKey: stubID)
-        lastRequests.removeValue(forKey: stubID)
-        lock.unlock()
+    func lastRequest() -> HTTPRequest? {
+        requests.last
     }
-
-    static func lastRequest(for stubID: String) -> URLRequest? {
-        lock.lock()
-        defer { lock.unlock() }
-        return lastRequests[stubID]
-    }
-
-    override class func canInit(with request: URLRequest) -> Bool {
-        request.value(forHTTPHeaderField: "X-Stub-ID") != nil
-    }
-
-    override class func canonicalRequest(for request: URLRequest) -> URLRequest {
-        request
-    }
-
-    override func startLoading() {
-        guard let stubID = request.value(forHTTPHeaderField: "X-Stub-ID") else {
-            client?.urlProtocol(self, didFailWithError: URLError(.badURL))
-            return
-        }
-
-        Self.lock.lock()
-        let requestHandler = Self.handlers[stubID]
-        Self.lastRequests[stubID] = request
-        Self.lock.unlock()
-
-        guard let requestHandler else {
-            client?.urlProtocol(self, didFailWithError: URLError(.badServerResponse))
-            return
-        }
-
-        do {
-            let (response, data) = try requestHandler(request)
-            client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
-            client?.urlProtocol(self, didLoad: data)
-            client?.urlProtocolDidFinishLoading(self)
-        } catch {
-            client?.urlProtocol(self, didFailWithError: error)
-        }
-    }
-
-    override func stopLoading() {}
 }
