@@ -42,23 +42,10 @@ struct CompletedBooksView: View {
                                 let book = completedBooks[index]
 
                                 VStack(alignment: .leading, spacing: 6) {
-                                    if let coverURL = book.bookMetaData.coverImageURL, let url = URL(string: coverURL) {
-                                        AsyncImage(url: url) { image in
-                                            image
-                                                .resizable()
-                                                .scaledToFill()
-                                                .frame(width: 115, height: 178)
-                                                .clipToBookShape()
-                                        } placeholder: {
-                                            ProgressView()
-                                        }
-                                    } else {
-                                        Image("bookCoverDummy")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .frame(width: 115, height: 178)
-                                            .clipToBookShape()
-                                    }
+                                    BookCoverImageView(coverURL: book.bookMetaData.coverImageURL)
+                                        .scaledToFill()
+                                        .frame(width: 115, height: 178)
+                                        .clipToBookShape()
 
                                     VStack(alignment: .leading, spacing: 0) {
                                         Text(book.bookMetaData.title)
