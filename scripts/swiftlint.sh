@@ -16,8 +16,8 @@ valid_binary() {
 }
 
 if ! valid_binary "$SWIFTLINT"; then
-    if [[ -n "${SWIFTLINT_SKIP_DOWNLOAD:-}" ]]; then
-        echo "warning: SwiftLint ${VERSION}이 없어 lint를 건너뜁니다. scripts/verify.sh를 한 번 실행하세요."
+    if [[ "${SWIFTLINT_SKIP_DOWNLOAD:-}" == 1 ]]; then
+        echo "warning: SwiftLint ${VERSION}이 없거나 손상돼 lint를 건너뜁니다. scripts/verify.sh를 한 번 실행하세요."
         exit 0
     fi
     mkdir -p "$TOOLS_DIR/$VERSION"

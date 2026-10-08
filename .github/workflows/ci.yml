@@ -47,6 +47,12 @@ jobs:
           key: spm-${{ runner.os }}-${{ hashFiles('FiveGuyes/FiveGuyes.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
           restore-keys: spm-${{ runner.os }}-
 
+      - name: Cache SwiftLint
+        uses: actions/cache@v4
+        with:
+          path: .build/tools
+          key: swiftlint-${{ runner.os }}-${{ hashFiles('scripts/swiftlint.sh') }}
+
       # 시뮬레이터 선택, lint, 단일 시뮬레이터 테스트는 로컬과 같은 스크립트가 맡는다.
       - name: Verify
         run: CI=true RESULT_BUNDLE_PATH=TestResults.xcresult scripts/verify.sh
