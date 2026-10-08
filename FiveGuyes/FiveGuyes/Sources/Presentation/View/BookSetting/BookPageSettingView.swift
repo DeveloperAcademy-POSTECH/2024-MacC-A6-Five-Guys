@@ -100,7 +100,10 @@ struct BookPageSettingView: View {
     }
 
     private func nextButtonTapped() {
-        if let message = pageValidationError() {
+        if let message = Self.pageValidationError(
+            startPage: startPage,
+            targetEndPage: targetEndPage
+        ) {
             toastViewModel.showToast(message: message)
             return
         }
@@ -113,7 +116,7 @@ struct BookPageSettingView: View {
 
     /// 시작 페이지와 마지막 페이지의 입력값을 검증하여, 오류가 있으면 에러 메시지를 반환합니다.
     /// 유효한 입력이면 nil을 반환합니다.
-    private func pageValidationError() -> String? {
+    static func pageValidationError(startPage: Int, targetEndPage: Int) -> String? {
         if startPage <= 0 {
             return "시작 페이지를 0보다 큰 페이지로 입력해주세요!"
         } else if startPage > targetEndPage {
