@@ -20,7 +20,7 @@ final class KakaoBookSearchProvider: BookSearchProviding {
         let apiKey: String
         do {
             apiKey = try apiKeyProvider.key(named: "KAKAO_API_KEY")
-        } catch let error as APIKeyError {
+        } catch {
             throw BookSearchErrorMapper.map(error)
         }
 
@@ -29,7 +29,7 @@ final class KakaoBookSearchProvider: BookSearchProviding {
                 KakaoBookSearchEndpoint(apiKey: apiKey, query: query)
             )
             return response.documents.map { $0.toBookSearchItem() }
-        } catch let error as HTTPClientError {
+        } catch {
             throw BookSearchErrorMapper.map(error)
         }
     }
