@@ -20,8 +20,10 @@ final class NationalLibraryPageCountProvider: BookPageCountProviding {
         let apiKey: String
         do {
             apiKey = try apiKeyProvider.key(named: "NL_API_KEY")
-        } catch {
+        } catch let error as APIKeyError {
             throw BookSearchErrorMapper.map(error)
+        } catch {
+            throw BookSearchError.invalidResponse
         }
 
         do {
@@ -30,8 +32,10 @@ final class NationalLibraryPageCountProvider: BookPageCountProviding {
             )
             guard let page = response.docs.first?.page else { return nil }
             return PageCountParser.parse(page)
-        } catch {
+        } catch let error as HTTPClientError {
             throw BookSearchErrorMapper.map(error)
+        } catch {
+            throw BookSearchError.invalidResponse
         }
     }
 }
