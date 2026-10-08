@@ -72,6 +72,69 @@ struct AladinBookSearchProviderTests {
         }
     }
 
+    @Test("fetchBooks는 전송 오류의 URLError를 그대로 전파")
+    func aladinProvider_fetchBooks_transportError_rethrowsURLError() async {
+        let client = HTTPClientStub(error: .transport(URLError(.notConnectedToInternet)))
+        let provider = makeProvider(httpClient: client, apiKey: "testKey")
+
+        do {
+            _ = try await provider.fetchBooks(query: "실패")
+            Issue.record("전송 오류가 발생해야 합니다.")
+        } catch let error as URLError {
+            #expect(error.code == .notConnectedToInternet)
+        } catch {
+            Issue.record("예상하지 못한 오류 타입: \(error)")
+        }
+    }
+
+    @Test("fetchBooks는 디코딩 오류를 그대로 전파")
+    func aladinProvider_fetchBooks_decodingError_rethrowsDecodingError() async {
+        let decodingError = DecodingError.dataCorrupted(
+            .init(codingPath: [], debugDescription: "invalid payload")
+        )
+        let client = HTTPClientStub(error: .decoding(decodingError))
+        let provider = makeProvider(httpClient: client, apiKey: "testKey")
+
+        do {
+            _ = try await provider.fetchBooks(query: "실패")
+            Issue.record("디코딩 오류가 발생해야 합니다.")
+        } catch let DecodingError.dataCorrupted(context) {
+            #expect(context.debugDescription == "invalid payload")
+        } catch {
+            Issue.record("예상하지 못한 오류 타입: \(error)")
+        }
+    }
+
+    @Test("fetchBooks는 cancelled를 CancellationError로 전파")
+    func aladinProvider_fetchBooks_cancelled_throwsCancellationError() async {
+        let client = HTTPClientStub(error: .cancelled)
+        let provider = makeProvider(httpClient: client, apiKey: "testKey")
+
+        do {
+            _ = try await provider.fetchBooks(query: "취소")
+            Issue.record("취소 오류가 발생해야 합니다.")
+        } catch is CancellationError {
+            // Expected.
+        } catch {
+            Issue.record("예상하지 못한 오류 타입: \(error)")
+        }
+    }
+
+    @Test("fetchBooks는 invalidRequest를 badURL로 전파")
+    func aladinProvider_fetchBooks_invalidRequest_throwsBadURLError() async {
+        let client = HTTPClientStub(error: .invalidRequest)
+        let provider = makeProvider(httpClient: client, apiKey: "testKey")
+
+        do {
+            _ = try await provider.fetchBooks(query: "잘못된 요청")
+            Issue.record("잘못된 URL 오류가 발생해야 합니다.")
+        } catch let error as URLError {
+            #expect(error.code == .badURL)
+        } catch {
+            Issue.record("예상하지 못한 오류 타입: \(error)")
+        }
+    }
+
     @Test("fetchBooks는 API_KEY가 빈 문자열이면 missingAPIKey 오류를 반환")
     func aladinProvider_fetchBooks_emptyAPIKey_throwsMissingAPIKey() async {
         await expectMissingAPIKey(apiKey: "") { provider in

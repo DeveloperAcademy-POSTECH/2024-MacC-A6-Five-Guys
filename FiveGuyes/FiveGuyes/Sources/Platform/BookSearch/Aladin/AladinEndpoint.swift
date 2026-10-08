@@ -1,3 +1,10 @@
+//
+//  AladinEndpoint.swift
+//  FiveGuyes
+//
+//  Created by Codex on 2026-10-08.
+//
+
 import FGNetwork
 import Foundation
 

@@ -51,12 +51,20 @@ final class AladinBookSearchProvider: BookSearchProviding {
         }
     }
 
-    private func map(_ error: HTTPClientError) -> BookSearchNetworkError {
+    private func map(_ error: HTTPClientError) -> any Error {
         switch error {
         case let .unexpectedStatus(statusCode, _):
-            .unexpectedStatusCode(statusCode)
-        case .invalidRequest, .transport, .invalidResponse, .decoding, .cancelled:
-            .invalidResponse
+            BookSearchNetworkError.unexpectedStatusCode(statusCode)
+        case .invalidResponse:
+            BookSearchNetworkError.invalidResponse
+        case .invalidRequest:
+            URLError(.badURL)
+        case let .transport(error):
+            error
+        case let .decoding(error):
+            error
+        case .cancelled:
+            CancellationError()
         }
     }
 }
