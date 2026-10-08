@@ -20,20 +20,6 @@
                ReferencedContainer = "container:FiveGuyes.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "NO"
-            buildForProfiling = "NO"
-            buildForArchiving = "NO"
-            buildForAnalyzing = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "FGNetworkTests"
-               BuildableName = "FGNetworkTests"
-               BlueprintName = "FGNetworkTests"
-               ReferencedContainer = "container:Packages/FGNetwork">
-            </BuildableReference>
-         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
@@ -52,17 +38,6 @@
                BuildableName = "FiveGuyesTests.xctest"
                BlueprintName = "FiveGuyesTests"
                ReferencedContainer = "container:FiveGuyes.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO"
-            parallelizable = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "FGNetworkTests"
-               BuildableName = "FGNetworkTests"
-               BlueprintName = "FGNetworkTests"
-               ReferencedContainer = "container:Packages/FGNetwork">
             </BuildableReference>
          </TestableReference>
       </Testables>

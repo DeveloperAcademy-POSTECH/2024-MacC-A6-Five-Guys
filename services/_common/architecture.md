@@ -161,7 +161,7 @@ func submit() async -> Destination?     // 화면 이동: 판단 결과만 반�
 |---|---|
 | 의존 방향 | 패키지는 앱 코드와 다른 패키지를 import하지 않는다. 앱의 Platform·Data만 패키지를 import한다. Domain·Presentation은 패키지를 모른다 |
 | 언어 모드 | `swiftLanguageModes: [.v6]`. 공개 타입은 `Sendable`이고 전역 가변 상태를 두지 않는다. 앱 타깃의 Swift 6 전환은 패키지 분리가 끝난 뒤 별도로 정한다 |
-| 테스트 | 패키지 안의 테스트 타깃에 Swift Testing으로 쓰고, 공유 스킴 `FiveGuyes`의 테스트 액션에 넣어 `scripts/verify.sh`가 함께 돌린다 |
+| 테스트 | 패키지 안의 테스트 타깃에 Swift Testing으로 쓰고, `scripts/verify.sh`의 '패키지 테스트' 단계가 패키지 스킴으로 실행한다 |
 | 문서 | 패키지의 공개 API와 규칙은 `services/<서비스>/`에 둔다. 패키지 폴더 안에는 코드만 둔다 |
 
 현재 패키지: `FGNetwork` (`services/network/module.md`).

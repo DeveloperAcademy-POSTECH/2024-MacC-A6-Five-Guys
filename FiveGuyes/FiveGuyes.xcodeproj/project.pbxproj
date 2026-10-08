@@ -7,13 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		A22500000000000000000001 /* FGNetwork in Frameworks */ = {isa = PBXBuildFile; productRef = A22500000000000000000003 /* FGNetwork */; };
 		26EBDEA82CF1C5C900B3A2BC /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 26EBDEA72CF1C5C900B3A2BC /* FirebaseAnalytics */; };
 		26EBDEAA2CF1C5C900B3A2BC /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 26EBDEA92CF1C5C900B3A2BC /* FirebaseCrashlytics */; };
 		26EBDEAC2CF1C5C900B3A2BC /* FirebaseDynamicLinks in Frameworks */ = {isa = PBXBuildFile; productRef = 26EBDEAB2CF1C5C900B3A2BC /* FirebaseDynamicLinks */; };
 		26EBDEAE2CF1C5C900B3A2BC /* FirebaseInAppMessaging-Beta in Frameworks */ = {isa = PBXBuildFile; productRef = 26EBDEAD2CF1C5C900B3A2BC /* FirebaseInAppMessaging-Beta */; };
 		26EBDEB02CF1C5C900B3A2BC /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 26EBDEAF2CF1C5C900B3A2BC /* FirebaseMessaging */; };
 		26EBDEB22CF1C5C900B3A2BC /* FirebaseRemoteConfig in Frameworks */ = {isa = PBXBuildFile; productRef = 26EBDEB12CF1C5C900B3A2BC /* FirebaseRemoteConfig */; };
+		A22500000000000000000001 /* FGNetwork in Frameworks */ = {isa = PBXBuildFile; productRef = A22500000000000000000003 /* FGNetwork */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */

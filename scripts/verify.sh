@@ -51,11 +51,24 @@ print(best[1])')"
     fi
 }
 
+test_package() {
+    (
+        cd FiveGuyes/Packages/FGNetwork
+        xcodebuild test \
+            -scheme FGNetwork \
+            -destination "$destination" \
+            -clonedSourcePackagesDirPath "$SPM_DIR" \
+            -parallel-testing-enabled NO \
+            -maximum-concurrent-test-simulator-destinations 1
+    )
+}
+
 [[ -f FiveGuyes/Config.xcconfig ]] || { echo 'FiveGuyes/Config.xcconfig가 없습니다. Config.xcconfig.example을 복사하세요.'; exit 1; }
 run_stage '결과 번들 확인' check_result_bundle
 run_stage '패키지 해석' xcodebuild -resolvePackageDependencies -project FiveGuyes/FiveGuyes.xcodeproj -clonedSourcePackagesDirPath "$SPM_DIR"
 run_stage 'lint' bash -c 'cd FiveGuyes && ../scripts/swiftlint.sh lint --no-cache'
 run_stage '시뮬레이터 선택' select_destination
+run_stage '패키지 테스트' test_package
 args=(test -project FiveGuyes/FiveGuyes.xcodeproj -scheme FiveGuyes -destination "$destination" -clonedSourcePackagesDirPath "$SPM_DIR" -parallel-testing-enabled NO -maximum-concurrent-test-simulator-destinations 1)
 [[ -z "${RESULT_BUNDLE_PATH:-}" ]] || args+=(-resultBundlePath "$RESULT_BUNDLE_PATH")
 [[ "${CI:-}" != true ]] || args+=(CODE_SIGNING_ALLOWED=NO)

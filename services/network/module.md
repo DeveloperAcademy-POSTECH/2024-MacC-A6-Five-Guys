@@ -108,7 +108,7 @@ Platform/<연동>/<출처>/
 | `BundleAPIKeyStore` | 패키지 | 사전 주입으로 없음·빈 값·자리표시자 세 경우 |
 | 앱의 provider | `FiveGuyesTests/Platform/` | `HTTPClient` 대역 주입. 요청 내용(URL, 쿼리, 헤더)과 DTO 변환만 검증. URLProtocol을 쓰지 않는다 |
 
-패키지 테스트는 공유 스킴 `FiveGuyes`의 테스트 액션에 포함되어 `scripts/verify.sh`가 함께 실행한다. 모두 Swift Testing으로 쓴다.
+패키지 테스트는 `scripts/verify.sh`의 '패키지 테스트' 단계가 패키지 스킴으로 실행한다. 모두 Swift Testing으로 쓴다.
 
 ## 5. 바꿀 때
 
