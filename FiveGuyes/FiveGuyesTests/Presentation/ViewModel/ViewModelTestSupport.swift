@@ -17,6 +17,7 @@ func makeBook(id: UUID = UUID(), isCompleted: Bool = false) -> FGUserBook {
             title: "테스트 책",
             author: "테스트 작가",
             coverImageURL: nil,
+            isbn13: "9781234567890",
             totalPages: 300
         ),
         userSettings: FGUserSetting(
@@ -43,10 +44,10 @@ func makeBookSearchItem(title: String) -> BookSearchItem {
     BookSearchItem(
         title: title,
         author: "테스트 저자",
-        cover: nil,
+        coverImageURL: nil,
         publisher: "테스트 출판사",
         isbn13: "9781234567890",
-        pubDate: "20250101"
+        publishedDate: Calendar.app.date(from: DateComponents(year: 2025, month: 1, day: 1))
     )
 }
 
@@ -309,6 +310,7 @@ final class BookRegistrationUseCaseStub: BookRegistrationUsing {
     var registerBookError: Error?
     var registerBookDelayNanoseconds: UInt64 = 0
     var registerBookCallCount = 0
+    var lastRegisterBookInput: RegisterBookInput?
 
     init(book: FGUserBook = .dummy) {
         self.registerBookResult = book
@@ -316,6 +318,7 @@ final class BookRegistrationUseCaseStub: BookRegistrationUsing {
 
     func registerBook(_ input: RegisterBookInput) async throws -> FGUserBook {
         registerBookCallCount += 1
+        lastRegisterBookInput = input
         if registerBookDelayNanoseconds > 0 {
             try? await Task.sleep(nanoseconds: registerBookDelayNanoseconds)
         }
@@ -465,9 +468,9 @@ final class NotificationSettingsStoreStub: NotificationSettingsStoring {
     }
 }
 
-final class BookSearchProviderStub: BookSearchProviding {
+final class BookSearchProviderStub: BookSearchProviding, BookPageCountProviding {
     var fetchBooksResult: [BookSearchItem] = []
-    var fetchBookTotalPagesResult: Int = 0
+    var fetchBookTotalPagesResult: Int? = 0
 
     var fetchBooksError: Error?
     var fetchBookTotalPagesError: Error?
@@ -478,14 +481,14 @@ final class BookSearchProviderStub: BookSearchProviding {
     var fetchBooksQueries: [String] = []
     var fetchTotalPagesISBNs: [String] = []
 
-    func fetchBooks(query: String) async throws -> [BookSearchItem] {
+    func searchBooks(query: String) async throws -> [BookSearchItem] {
         fetchBooksQueries.append(query)
         if let fetchBooksError { throw fetchBooksError }
         return fetchBooksResult
     }
 
-    func fetchBookTotalPages(isbn: String) async throws -> Int {
-        fetchTotalPagesISBNs.append(isbn)
+    func fetchTotalPages(isbn13: String) async throws -> Int? {
+        fetchTotalPagesISBNs.append(isbn13)
         if let onFetchBookTotalPagesStart {
             await onFetchBookTotalPagesStart()
         }
