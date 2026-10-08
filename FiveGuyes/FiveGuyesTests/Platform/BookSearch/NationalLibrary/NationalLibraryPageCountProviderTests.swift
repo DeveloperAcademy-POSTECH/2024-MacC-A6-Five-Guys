@@ -20,7 +20,7 @@ struct NationalLibraryPageCountProviderTests {
             return HTTPResponse(
                 statusCode: 200,
                 headers: [:],
-                body: Data(#"{"TOTAL_COUNT":"1","docs":[{"PAGE":"[130] p."}]}"#.utf8)
+                body: Data(#"{"docs":[{"PAGE":"[130] p."}]}"#.utf8)
             )
         }
         let provider = makeProvider(httpClient: client, apiKey: "nl-key")
@@ -40,13 +40,13 @@ struct NationalLibraryPageCountProviderTests {
         #expect(request.timeout == 10)
     }
 
-    @Test("docs가 비어 있으면 페이지 수를 모름으로 반환한다")
+    @Test("TOTAL_COUNT와 docs가 없어도 페이지 수를 모름으로 반환한다")
     func emptyDocumentsReturnNil() async throws {
         let client = HTTPClientStub { _ in
             HTTPResponse(
                 statusCode: 200,
                 headers: [:],
-                body: Data(#"{"TOTAL_COUNT":"0","docs":[]}"#.utf8)
+                body: Data(#"{}"#.utf8)
             )
         }
         let provider = makeProvider(httpClient: client, apiKey: "nl-key")
