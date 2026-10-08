@@ -1,10 +1,22 @@
-@testable import FGNetwork
+import FGNetwork
 import Foundation
 import os
 import Testing
 
 @Suite("URLSessionHTTPClient 테스트")
 struct URLSessionHTTPClientTests {
+    @Test("기본 세션은 캐시를 사용하지 않고 요청 제한 시간이 15초")
+    func init_defaultSession_usesExpectedConfiguration() throws {
+        let client = URLSessionHTTPClient()
+        let session = try #require(
+            Mirror(reflecting: client).descendant("session") as? URLSession
+        )
+
+        #expect(session.configuration.urlCache == nil)
+        #expect(session.configuration.requestCachePolicy == .reloadIgnoringLocalCacheData)
+        #expect(session.configuration.timeoutIntervalForRequest == 15)
+    }
+
     @Test("요청을 URLRequest로 변환하고 HTTP 응답을 그대로 반환")
     func send_response_returnsStatusHeadersAndBody() async throws {
         let stubID = UUID().uuidString
@@ -15,7 +27,7 @@ struct URLSessionHTTPClientTests {
         )
         defer { URLProtocolStub.unregister(stubID) }
         let client = makeClient(stubID: stubID)
-        let url = try #require(URL(string: "https://example.com/books?old=value"))
+        let url = try #require(URL(string: "https://example.com/books"))
         let request = HTTPRequest(
             method: .post,
             url: url,
@@ -40,6 +52,34 @@ struct URLSessionHTTPClientTests {
         #expect(sentRequest.timeoutInterval == 3)
         #expect(components?.queryItems?.first?.name == "query")
         #expect(components?.queryItems?.first?.value == "Swift & iOS")
+    }
+
+    @Test("URL의 기존 쿼리를 보존하고 새 쿼리를 뒤에 추가")
+    func send_existingQuery_preservesAndAppendsQueryItems() async throws {
+        let stubID = UUID().uuidString
+        URLProtocolStub.register(
+            .response(statusCode: 200, headers: [:], body: Data()),
+            for: stubID
+        )
+        defer { URLProtocolStub.unregister(stubID) }
+        let client = makeClient(stubID: stubID)
+        let request = HTTPRequest(
+            method: .get,
+            url: try #require(URL(string: "https://example.com/books?old=value")),
+            queryItems: [URLQueryItem(name: "query", value: "Swift & iOS")]
+        )
+
+        _ = try await client.send(request)
+
+        let sentRequest = try #require(URLProtocolStub.lastRequest(for: stubID))
+        let components = try #require(
+            sentRequest.url.map { URLComponents(url: $0, resolvingAgainstBaseURL: false) }
+        )
+        #expect(components?.queryItems?.count == 2)
+        #expect(components?.queryItems?.first?.name == "old")
+        #expect(components?.queryItems?.first?.value == "value")
+        #expect(components?.queryItems?.last?.name == "query")
+        #expect(components?.queryItems?.last?.value == "Swift & iOS")
     }
 
     @Test("전송 오류를 transport로 매핑")
@@ -93,7 +133,7 @@ struct URLSessionHTTPClientTests {
         let request = HTTPRequest(
             method: .get,
             url: try #require(URL(string: "https://example.com")),
-            timeout: 0.05
+            timeout: 1
         )
 
         do {
@@ -119,8 +159,10 @@ struct URLSessionHTTPClientTests {
         let task = Task {
             try await client.send(request)
         }
-        while !URLProtocolStub.didStart(for: stubID) {
-            await Task.yield()
+        guard await waitUntil({ URLProtocolStub.didStart(for: stubID) }) else {
+            task.cancel()
+            Issue.record("제한 시간 안에 요청이 시작되지 않았습니다.")
+            return
         }
 
         task.cancel()
@@ -129,13 +171,26 @@ struct URLSessionHTTPClientTests {
             _ = try await task.value
             Issue.record("취소된 요청에서 오류가 발생해야 합니다.")
         } catch HTTPClientError.cancelled {
-            for _ in 0..<1_000 where !URLProtocolStub.didStop(for: stubID) {
-                await Task.yield()
-            }
-            #expect(URLProtocolStub.didStop(for: stubID))
+            let didStop = await waitUntil { URLProtocolStub.didStop(for: stubID) }
+            #expect(didStop, "제한 시간 안에 URLProtocol 요청이 중단되어야 합니다.")
         } catch {
             Issue.record("예상하지 못한 오류: \(error)")
         }
+    }
+
+    private func waitUntil(
+        _ condition: () -> Bool,
+        timeout: Duration = .seconds(1)
+    ) async -> Bool {
+        let clock = ContinuousClock()
+        let deadline = clock.now.advanced(by: timeout)
+        while clock.now < deadline {
+            if condition() {
+                return true
+            }
+            try? await Task.sleep(for: .milliseconds(1))
+        }
+        return condition()
     }
 
     private func makeClient(stubID: String) -> URLSessionHTTPClient {

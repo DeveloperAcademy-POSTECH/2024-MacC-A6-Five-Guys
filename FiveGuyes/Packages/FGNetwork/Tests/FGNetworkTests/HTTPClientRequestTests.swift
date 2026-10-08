@@ -1,4 +1,4 @@
-@testable import FGNetwork
+import FGNetwork
 import Foundation
 import Testing
 
