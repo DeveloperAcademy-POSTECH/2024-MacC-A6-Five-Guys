@@ -135,11 +135,18 @@ final class AppDependencies {
     private static func makeBookSearchUseCase() -> any BookSearchUsing {
         let httpClient = URLSessionHTTPClient()
         let apiKeyStore = BundleAPIKeyStore()
-        let provider = AladinBookSearchProvider(
+        let bookSearchProvider = KakaoBookSearchProvider(
             httpClient: httpClient,
             apiKeyProvider: apiKeyStore
         )
-        return BookSearchUseCase(bookSearchProvider: provider)
+        let bookPageCountProvider = NationalLibraryPageCountProvider(
+            httpClient: httpClient,
+            apiKeyProvider: apiKeyStore
+        )
+        return BookSearchUseCase(
+            bookSearchProvider: bookSearchProvider,
+            bookPageCountProvider: bookPageCountProvider
+        )
     }
 
     private static func makeMigrationCompletionKey() -> String {
