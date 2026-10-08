@@ -3,7 +3,7 @@
 - Status: Accepted
 - Date: 2026-02-21
 - Owners: FiveGuyes team
-- Related: `docs/decisions/adr-0006-stack-back-path-only-policy.md`
+- Related: [ADR-0006](adr-0006-stack-back-path-only-policy.md)
 
 ## Decision
 
@@ -201,6 +201,6 @@
 
 ## References
 
-- `docs/decisions/adr-0006-stack-back-path-only-policy.md`
+- [ADR-0006](adr-0006-stack-back-path-only-policy.md)
 - `FiveGuyes/FiveGuyes/Sources/Presentation/ViewModel/NavigationCoordinator.swift`
 - `FiveGuyes/FiveGuyes/Sources/Presentation/Shared/Navigation/NavigationInteractivePopHost.swift`
