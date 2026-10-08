@@ -5,13 +5,13 @@
 //  Created by zaehorang on 2026-02-15.
 //
 
-enum BookSearchNetworkError: Error, Equatable {
-    case missingAPIKey
+enum BookSearchError: Error, Equatable {
+    case missingAPIKey(setting: String)
+    case network
     case invalidResponse
-    case unexpectedStatusCode(Int)
+    case cancelled
 }
 
 protocol BookSearchProviding {
-    func fetchBooks(query: String) async throws -> [BookSearchItem]
-    func fetchBookTotalPages(isbn: String) async throws -> Int
+    func searchBooks(query: String) async throws -> [BookSearchItem]
 }
