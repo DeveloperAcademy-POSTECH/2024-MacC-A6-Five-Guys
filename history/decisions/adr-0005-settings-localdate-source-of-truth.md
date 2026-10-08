@@ -4,8 +4,7 @@
 - Date: 2026-02-17
 - Owners: FiveGuyes team
 - Related:
-  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/docs/decisions/adr-0004-reading-record-timezone-forward-only-policy.md`
-  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/docs/exec-plans/td-007-settings-localdate-stability-execplan.md`
+  - [ADR-0004](adr-0004-reading-record-timezone-forward-only-policy.md)
 
 ## Decision
 

@@ -4,7 +4,7 @@
 - Date: 2026-02-17
 - Owners: FiveGuyes team
 - Related:
-  - `/Users/zaehorang/Documents/Projects/2024-MacC-A6-Five-Guys/docs/decisions/adr-0003-reading-record-key-migration-policy.md`
+  - [ADR-0003](adr-0003-reading-record-key-migration-policy.md)
 
 ## Decision
 
