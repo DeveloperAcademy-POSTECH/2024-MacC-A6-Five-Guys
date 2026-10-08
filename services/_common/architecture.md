@@ -13,7 +13,7 @@
 | 플랫폼 | iOS 17+, Swift (language mode 5) |
 | UI | SwiftUI, Observation(`@Observable`) |
 | 저장 | SwiftData, UserDefaults |
-| 외부 연동 | UserNotifications(로컬 알림), URLSession(알라딘 OpenAPI), Firebase Analytics, AppTrackingTransparency |
+| 외부 연동 | UserNotifications(로컬 알림), FGNetwork 패키지의 URLSession(카카오 책 검색, 국립중앙도서관 ISBN 서지정보), Firebase Analytics, AppTrackingTransparency |
 | 테스트·품질 | Swift Testing, SwiftLint(`scripts/verify.sh`·CI·pre-push) |
 
 ```text
