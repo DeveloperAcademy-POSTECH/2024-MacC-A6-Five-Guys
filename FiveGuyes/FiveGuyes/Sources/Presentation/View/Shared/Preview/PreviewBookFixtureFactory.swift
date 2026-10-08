@@ -30,6 +30,7 @@ enum PreviewBookFixtureFactory {
                 title: title,
                 author: "샘플 저자",
                 coverImageURL: coverImageURL,
+                isbn13: "9781234567890",
                 totalPages: 320
             ),
             userSettings: FGUserSetting(
