@@ -42,7 +42,9 @@ public struct URLSessionHTTPClient: HTTPClient {
             if Task.isCancelled {
                 throw .cancelled
             }
-            throw .transport(URLError(.unknown))
+            throw .transport(
+                URLError(.unknown, userInfo: [NSUnderlyingErrorKey: error])
+            )
         }
     }
 
@@ -50,7 +52,11 @@ public struct URLSessionHTTPClient: HTTPClient {
         guard var components = URLComponents(url: request.url, resolvingAgainstBaseURL: false) else {
             throw .invalidRequest
         }
-        components.queryItems = request.queryItems.isEmpty ? components.queryItems : request.queryItems
+        if !request.queryItems.isEmpty {
+            var queryItems = components.queryItems ?? []
+            queryItems.append(contentsOf: request.queryItems)
+            components.queryItems = queryItems
+        }
         guard let url = components.url else {
             throw .invalidRequest
         }

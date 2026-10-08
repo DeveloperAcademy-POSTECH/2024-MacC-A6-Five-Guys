@@ -1,4 +1,4 @@
-@testable import FGNetwork
+import FGNetwork
 import Testing
 
 @Suite("BundleAPIKeyStore 테스트")
