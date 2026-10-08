@@ -59,4 +59,4 @@ run_stage '시뮬레이터 선택' select_destination
 args=(test -project FiveGuyes/FiveGuyes.xcodeproj -scheme FiveGuyes -destination "$destination" -clonedSourcePackagesDirPath "$SPM_DIR" -parallel-testing-enabled NO -maximum-concurrent-test-simulator-destinations 1)
 [[ -z "${RESULT_BUNDLE_PATH:-}" ]] || args+=(-resultBundlePath "$RESULT_BUNDLE_PATH")
 [[ "${CI:-}" != true ]] || args+=(CODE_SIGNING_ALLOWED=NO)
-run_stage '테스트' xcodebuild "${args[@]}"
+run_stage '테스트' env SWIFTLINT_ALREADY_RUN=1 xcodebuild "${args[@]}"

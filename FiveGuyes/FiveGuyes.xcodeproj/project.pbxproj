@@ -238,7 +238,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if [ \"${CI:-}\" = true ]; then\n  exit 0\nfi\n\ncd \"${SRCROOT}\"\nSWIFTLINT_SKIP_DOWNLOAD=1 ../scripts/swiftlint.sh lint --quiet\n";
+			shellScript = "if [ \"${SWIFTLINT_ALREADY_RUN:-}\" = 1 ]; then\n  exit 0\nfi\n\ncd \"${SRCROOT}\"\nSWIFTLINT_SKIP_DOWNLOAD=1 ../scripts/swiftlint.sh lint --quiet\n";
 		};
 		264443F02D12B92D009422BA /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
