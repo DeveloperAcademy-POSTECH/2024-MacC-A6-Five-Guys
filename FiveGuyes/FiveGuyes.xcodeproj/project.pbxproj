@@ -144,7 +144,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				26890BBB2CAE9896008DFF49 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				2621F0EF2ED46BCE00CC5D72 /* FiveGuyes */,
@@ -191,7 +190,6 @@
 			);
 			mainGroup = 26890B882CAE811A008DFF49;
 			packageReferences = (
-				26890BB92CAE9843008DFF49 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */,
 				26EBDEA62CF1C5C900B3A2BC /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
 			productRefGroup = 26890B922CAE811A008DFF49 /* Products */;
@@ -269,10 +267,6 @@
 			isa = PBXTargetDependency;
 			target = 26890B902CAE811A008DFF49 /* FiveGuyes */;
 			targetProxy = 2621F1572ED495A800CC5D72 /* PBXContainerItemProxy */;
-		};
-		26890BBB2CAE9896008DFF49 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			productRef = 26890BBA2CAE9896008DFF49 /* SwiftLintBuildToolPlugin */;
 		};
 /* End PBXTargetDependency section */
 
@@ -578,14 +572,6 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		26890BB92CAE9843008DFF49 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/SimplyDanny/SwiftLintPlugins";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.65.1;
-			};
-		};
 		26EBDEA62CF1C5C900B3A2BC /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
@@ -597,11 +583,6 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		26890BBA2CAE9896008DFF49 /* SwiftLintBuildToolPlugin */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 26890BB92CAE9843008DFF49 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */;
-			productName = "plugin:SwiftLintBuildToolPlugin";
-		};
 		26EBDEA72CF1C5C900B3A2BC /* FirebaseAnalytics */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 26EBDEA62CF1C5C900B3A2BC /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;

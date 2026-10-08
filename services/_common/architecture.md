@@ -14,7 +14,7 @@
 | UI | SwiftUI, Observation(`@Observable`) |
 | 저장 | SwiftData, UserDefaults |
 | 외부 연동 | UserNotifications(로컬 알림), URLSession(알라딘 OpenAPI), Firebase Analytics, AppTrackingTransparency |
-| 테스트·품질 | Swift Testing, SwiftLint(SPM 빌드 플러그인) |
+| 테스트·품질 | Swift Testing, SwiftLint(`scripts/verify.sh`·CI·pre-push) |
 
 ```text
 ┌─ Presentation (MVVM) ────────────────────────────────────────┐
