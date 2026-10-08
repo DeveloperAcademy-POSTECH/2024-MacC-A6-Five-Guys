@@ -4,10 +4,18 @@ set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 VERSION=0.65.1
 CHECKSUM=c3a1d77647ca18c1b7e9be7dbc6cd4490d26422f28814b76370244ff61970869
+BINARY_CHECKSUM=52112ece2dfa99c2442a1367f9a365d43784714cf224c3675bf8bc2f18ebd7c8
 TOOLS_DIR="$REPO_ROOT/.build/tools/swiftlint"
 SWIFTLINT="$TOOLS_DIR/$VERSION/swiftlint"
 
-if [[ ! -x "$SWIFTLINT" || "$("$SWIFTLINT" version)" != "$VERSION" ]]; then
+valid_binary() {
+    [[ -x "$1" ]] || return 1
+    local checksum
+    checksum=$(shasum -a 256 "$1")
+    [[ "${checksum%% *}" == "$BINARY_CHECKSUM" ]]
+}
+
+if ! valid_binary "$SWIFTLINT"; then
     mkdir -p "$TOOLS_DIR/$VERSION"
     temp_dir=$(mktemp -d "$TOOLS_DIR/.download.XXXXXX")
     trap 'rm -rf "$temp_dir"' EXIT
@@ -25,8 +33,8 @@ if [[ ! -x "$SWIFTLINT" || "$("$SWIFTLINT" version)" != "$VERSION" ]]; then
 
     unzip -q "$archive" -d "$temp_dir"
     extracted="$temp_dir/SwiftLintBinary.artifactbundle/macos/swiftlint"
-    [[ -x "$extracted" && "$("$extracted" version)" == "$VERSION" ]] || {
-        echo 'SwiftLint 실행 파일이나 버전이 올바르지 않습니다.' >&2
+    [[ -x "$extracted" && "$("$extracted" version)" == "$VERSION" ]] && valid_binary "$extracted" || {
+        echo 'SwiftLint 실행 파일, 버전 또는 SHA-256이 올바르지 않습니다.' >&2
         exit 1
     }
     mv -f "$extracted" "$SWIFTLINT"
