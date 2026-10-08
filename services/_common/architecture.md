@@ -147,3 +147,21 @@ func submit() async -> Destination?     // 화면 이동: 판단 결과만 반�
 
 - Foundation의 값 타입과 계산(`Date`, `Calendar`, `UUID` 등)만 쓴다. Foundation 외 프레임워크(`os` 포함)는 import하지 않는다.
 - 저장·네트워크·앱 환경 API(`UserDefaults`, `URLSession`, `FileManager`, `Bundle` 등)는 Repository나 Service로 요구한다. 이 API를 쓰는 구현은 Data·Platform에 둔다.
+
+### Platform
+
+- OS 기능과 외부 서비스에 연결하는 구현을 둔다. 외부 서비스 연동은 `Platform/<연동>/<출처>/`로 나누고, 출처가 주는 형식(날짜 문자열, 식별자 묶음 등)의 해석은 그 폴더 안에서 끝낸다. Domain 엔티티에는 해석된 값만 넘긴다.
+- 여러 연동이 함께 쓰는 공통 코드(HTTP 호출, API 키 읽기)는 아래 로컬 패키지에 둔다. Platform 안에 중복으로 만들지 않는다.
+
+### Local Packages
+
+앱 타입을 몰라도 되는 공통 기반은 `FiveGuyes/Packages/<이름>/`에 로컬 Swift Package로 둔다.
+
+| 규칙 | 내용 |
+|---|---|
+| 의존 방향 | 패키지는 앱 코드와 다른 패키지를 import하지 않는다. 앱의 Platform·Data만 패키지를 import한다. Domain·Presentation은 패키지를 모른다 |
+| 언어 모드 | `swiftLanguageModes: [.v6]`. 공개 타입은 `Sendable`이고 전역 가변 상태를 두지 않는다. 앱 타깃의 Swift 6 전환은 패키지 분리가 끝난 뒤 별도로 정한다 |
+| 테스트 | 패키지 안의 테스트 타깃에 Swift Testing으로 쓰고, 공유 스킴 `FiveGuyes`의 테스트 액션에 넣어 `scripts/verify.sh`가 함께 돌린다 |
+| 문서 | 패키지의 공개 API와 규칙은 `services/<서비스>/`에 둔다. 패키지 폴더 안에는 코드만 둔다 |
+
+현재 패키지: `FGNetwork` (`services/network/module.md`).
