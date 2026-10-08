@@ -19,7 +19,22 @@ struct FGBookMetaData: Hashable {
     let title: String
     let author: String
     let coverImageURL: String?
+    let isbn13: String?
     let totalPages: Int
+
+    init(
+        title: String,
+        author: String,
+        coverImageURL: String?,
+        isbn13: String? = nil,
+        totalPages: Int
+    ) {
+        self.title = title
+        self.author = author
+        self.coverImageURL = coverImageURL
+        self.isbn13 = isbn13
+        self.totalPages = totalPages
+    }
 }
 
 struct FGUserSetting: Hashable {
