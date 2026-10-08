@@ -13,6 +13,7 @@ FiveGuyes(한입독서)는 iOS SwiftUI 앱이다. `FiveGuyes/FiveGuyes.xcodeproj
 
 - `FiveGuyes/FiveGuyes/Sources/`: App · Presentation · Domain · Data · Platform · Shared (layer별 폴더)
 - `FiveGuyes/FiveGuyesTests/`: 소스와 같은 layer 구조
+- `FiveGuyes/Packages/`: 앱을 모르는 공통 기반의 로컬 Swift Package (Swift 6 언어 모드). 현재 `FGNetwork`
 - 의존은 Domain 쪽으로만 향하고, 구체 타입 조립은 App이 한다. 규칙은 `services/_common/architecture.md`를 본다.
 
 ## Rules
@@ -36,6 +37,7 @@ FiveGuyes(한입독서)는 iOS SwiftUI 앱이다. `FiveGuyes/FiveGuyes.xcodeproj
 | PR 작성 | `.github/pull_request_template.md` |
 | 새 타입의 위치, layer 경계, View·ViewModel 구조 | `services/_common/architecture.md` |
 | 알림 동작 | `services/notification/spec.md` |
+| HTTP 호출, API 키 읽기 (`FGNetwork` 패키지) | `services/network/module.md` |
 | 앱 시작, Firebase·GA·ATT | `services/analytics/launch-and-ga.md` |
 | 문서와 다른 코드 목록 | `history/backlog.md` |
 | 결정의 이유 | `history/decisions/` |
