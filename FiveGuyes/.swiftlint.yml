@@ -112,6 +112,22 @@ custom_rules:
         message: "Presentation은 Preview를 제외하고 SwiftData·Firebase·UserNotifications를 import하지 않습니다."
         severity: error
 
+    layer_package_import:
+        name: "No Local Package Import In Domain Presentation Shared"
+        included:
+            - "FiveGuyes/Sources/Domain"
+            - "FiveGuyes/Sources/Presentation"
+            - "FiveGuyes/Sources/Shared"
+        excluded:
+            - "FiveGuyes/Sources/Presentation/Preview"
+        regex: "(?m)^[ \\t]*(?:@\\w+\\s+)*(?:(?:public|package|internal|fileprivate|private)\\s+)?import\\s+(?:(?:typealias|struct|class|enum|protocol|let|var|func)\\s+)?FG\\w+\\b"
+        excluded_match_kinds:
+            - comment
+            - doccomment
+            - string
+        message: "Domain·Presentation·Shared는 FG 접두어 로컬 패키지를 import하지 않습니다."
+        severity: error
+
     no_print:
         name: "No Print In App Sources"
         included:
