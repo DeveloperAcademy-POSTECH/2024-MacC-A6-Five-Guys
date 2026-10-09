@@ -51,7 +51,7 @@ cd FiveGuyes && ../scripts/swiftlint.sh lint --no-cache
 | 켜기 | `git config core.hooksPath .githooks` |
 | 끄기 | `git config --unset core.hooksPath` |
 
-hook은 클론마다 위 명령으로 활성화해야 한다. 활성화하면 push 전에 `scripts/verify.sh`를 실행하고, 커밋 안 된 변경이 있거나 HEAD가 아닌 커밋을 push하면 거부한다. 건너뛰려면 `git push --no-verify`를 쓴다. hook 설정과 무관하게 `develop`·`main` 대상 PR과 `develop` 푸시에는 CI가 실행된다.
+hook은 클론마다 위 명령으로 활성화해야 한다. 활성화하면 push 전에 `scripts/verify.sh`를 실행하고, 커밋 안 된 변경이 있거나 HEAD가 아닌 커밋을 push하면 거부한다. 건너뛰려면 `git push --no-verify`를 쓴다. git worktree에서도 동작한다. hook 설정과 무관하게 `develop`·`main` 대상 PR과 `develop` 푸시에는 CI가 실행된다.
 
 ## Local Files
 
