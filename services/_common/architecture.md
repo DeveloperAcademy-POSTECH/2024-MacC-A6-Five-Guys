@@ -49,7 +49,7 @@
 | ViewModel | 의도를 처리해 상태를 바꾸고, 필요한 기능은 UseCase에 요청한다 | — | Presentation |
 | UseCase | ViewModel이 요청하는 기능 단위. 앱 규칙을 실행하고 Repository·Service를 조합한다 | `...Using` | `...UseCase` (Domain). 구현 안에서만 쓰는 단일 동작 UseCase는 interface 없이 `...UseCase`로 둔다 |
 | Repository | 영속 데이터 접근 | `...Repo` | Data |
-| Service | UseCase가 쓰는 Repository 외 기능. 도메인 로직(오늘 날짜, 하루 경계 등)과 외부 연동(알림, 도서 검색 등)을 제공한다 | `...ing` (`...Providing`, `...Scheduling` 등) | Platform, Data(저장), Domain(Foundation 값 타입만 쓰는 구현) |
+| Service | UseCase가 쓰는 Repository 외 기능. 도메인 로직(오늘 날짜, 하루 경계 등. 날짜 값의 종류는 `dates.md`)과 외부 연동(알림, 도서 검색 등)을 제공한다 | `...ing` (`...Providing`, `...Scheduling` 등) | Platform, Data(저장), Domain(Foundation 값 타입만 쓰는 구현) |
 
 ### Clean Architecture
 
