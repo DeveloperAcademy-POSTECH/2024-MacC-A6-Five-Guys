@@ -22,7 +22,10 @@ final class KakaoBookSearchProvider: BookSearchProviding {
             apiKey = try apiKeyProvider.key(named: "KAKAO_API_KEY")
         } catch {
             // `key(named:)`는 typed throws라 `error`가 `APIKeyError`로 추론된다.
-            throw BookSearchErrorMapper.map(error)
+            switch error {
+            case let .missing(name):
+                throw BookSearchError.missingAPIKey(setting: name)
+            }
         }
 
         do {
@@ -31,8 +34,7 @@ final class KakaoBookSearchProvider: BookSearchProviding {
             )
             return response.documents.map { $0.toBookSearchItem() }
         } catch {
-            // `request(_:)`는 typed throws라 `error`가 `HTTPClientError`로 추론된다.
-            throw BookSearchErrorMapper.map(error)
+            throw BookSearchError.failed
         }
     }
 }

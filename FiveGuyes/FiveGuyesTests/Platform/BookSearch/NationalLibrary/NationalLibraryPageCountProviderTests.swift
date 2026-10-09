@@ -28,7 +28,7 @@ struct NationalLibraryPageCountProviderTests {
         let pageCount = try await provider.fetchTotalPages(isbn13: "9788936434120")
 
         #expect(pageCount == 130)
-        let request = try #require(await recorder.lastRequest())
+        let request = try #require(await recorder.lastRequest)
         #expect(request.method == .get)
         #expect(request.url.absoluteString == "https://www.nl.go.kr/seoji/SearchApi.do")
         #expect(request.queryItems.first(where: { $0.name == "cert_key" })?.value == "nl-key")
@@ -54,14 +54,14 @@ struct NationalLibraryPageCountProviderTests {
         #expect(try await provider.fetchTotalPages(isbn13: "9788936434120") == nil)
     }
 
-    @Test("2xx가 아닌 응답은 invalidResponse로 변환한다")
-    func nonSuccessStatusMapsToInvalidResponse() async {
+    @Test("2xx가 아닌 응답은 failed로 변환한다")
+    func nonSuccessStatusMapsToFailed() async {
         let client = HTTPClientStub { _ in
             HTTPResponse(statusCode: 404, headers: [:], body: Data())
         }
         let provider = makeProvider(httpClient: client, apiKey: "nl-key")
 
-        await expectError(.invalidResponse) {
+        await #expect(throws: BookSearchError.failed) {
             _ = try await provider.fetchTotalPages(isbn13: "9788936434120")
         }
     }
@@ -73,7 +73,7 @@ struct NationalLibraryPageCountProviderTests {
             apiKeyProvider: BundleAPIKeyStore(values: [:])
         )
 
-        await expectError(.missingAPIKey(setting: "NL_API_KEY")) {
+        await #expect(throws: BookSearchError.missingAPIKey(setting: "NL_API_KEY")) {
             _ = try await provider.fetchTotalPages(isbn13: "9788936434120")
         }
     }
@@ -86,19 +86,5 @@ struct NationalLibraryPageCountProviderTests {
             httpClient: httpClient,
             apiKeyProvider: BundleAPIKeyStore(values: ["NL_API_KEY": apiKey])
         )
-    }
-
-    private func expectError(
-        _ expectedError: BookSearchError,
-        operation: () async throws -> Void
-    ) async {
-        do {
-            try await operation()
-            Issue.record("오류가 발생해야 합니다.")
-        } catch let error as BookSearchError {
-            #expect(error == expectedError)
-        } catch {
-            Issue.record("예상하지 못한 오류 타입: \(error)")
-        }
     }
 }

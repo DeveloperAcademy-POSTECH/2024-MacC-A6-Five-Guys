@@ -25,22 +25,11 @@ struct BookSearchUseCase: BookSearchUsing {
     }
 
     func fetchBooks(query: String) async throws -> [BookSearchItem] {
-        let trimmedQuery = query.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmedQuery.isEmpty else { return [] }
-
-        return try await bookSearchProvider.searchBooks(query: trimmedQuery)
+        try await bookSearchProvider.searchBooks(query: query)
     }
 
     func fetchBookTotalPages(isbn: String?) async -> Int {
-        guard let isbn = isbn?.trimmingCharacters(in: .whitespacesAndNewlines),
-              !isbn.isEmpty else {
-            return 0
-        }
-
-        do {
-            return try await bookPageCountProvider.fetchTotalPages(isbn13: isbn) ?? 0
-        } catch {
-            return 0
-        }
+        guard let isbn else { return 0 }
+        return (try? await bookPageCountProvider.fetchTotalPages(isbn13: isbn)) ?? 0
     }
 }
