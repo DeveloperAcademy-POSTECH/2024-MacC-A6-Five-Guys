@@ -55,7 +55,7 @@ struct KakaoBookSearchDTO: Decodable, Sendable {
         return originalImageURL(fromThumbnail: thumbnail) ?? thumbnail
     }
 
-    /// 썸네일의 `fname` 쿼리에 담긴 원본 주소를 https로 돌려준다. 못 읽으면 nil.
+    /// 썸네일의 `fname` 쿼리에 담긴 원본 주소를 돌려준다. 호스트가 `daumcdn.net`이면 https로 바꾼다. 못 읽으면 nil.
     private func originalImageURL(fromThumbnail thumbnail: String) -> String? {
         guard let fname = URLComponents(string: thumbnail)?.queryItems?
             .first(where: { $0.name == "fname" })?.value,
@@ -66,7 +66,9 @@ struct KakaoBookSearchDTO: Decodable, Sendable {
         else {
             return nil
         }
-        original.scheme = "https"
+        if let host = original.host?.lowercased(), host == "daumcdn.net" || host.hasSuffix(".daumcdn.net") {
+            original.scheme = "https"
+        }
         return original.string
     }
 }
