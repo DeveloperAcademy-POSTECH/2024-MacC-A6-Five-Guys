@@ -52,11 +52,10 @@ struct BookRowView: View {
 
     static func metadataText(for book: BookSearchItem) -> String {
         let author = book.author.removingParenthesesContent()
-        guard let publishedDate = book.publishedDate else {
+        guard let year = book.publishedDate?.year else {
             return "\(author) | \(book.publisher)"
         }
 
-        let year = Calendar.app.component(.year, from: publishedDate)
         return "\(author) | \(year) | \(book.publisher)"
     }
 }

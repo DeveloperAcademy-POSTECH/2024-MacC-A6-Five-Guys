@@ -30,17 +30,18 @@ struct KakaoBookSearchDTO: Decodable, Sendable {
         )
     }
 
-    private func parsePublishedDate() -> Date? {
+    func parsePublishedDate() -> PublicationDate? {
         guard let datetime else { return nil }
 
-        let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        if let date = formatter.date(from: datetime) {
-            return date
-        }
+        let parts = datetime.prefix(10).split(separator: "-", omittingEmptySubsequences: false)
+        guard datetime.count >= 10,
+              parts.map(\.count) == [4, 2, 2],
+              let year = Int(parts[0]),
+              let month = Int(parts[1]),
+              let day = Int(parts[2])
+        else { return nil }
 
-        formatter.formatOptions = [.withInternetDateTime]
-        return formatter.date(from: datetime)
+        return PublicationDate(year: year, month: month, day: day)
     }
 
     private func extractISBN13() -> String? {
