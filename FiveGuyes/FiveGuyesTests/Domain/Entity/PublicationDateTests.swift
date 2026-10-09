@@ -2,7 +2,7 @@
 //  PublicationDateTests.swift
 //  FiveGuyesTests
 //
-//  Created by Codex on 2026-10-09.
+//  Created by Claude on 2026-10-09.
 //
 
 @testable import FiveGuyes
@@ -19,8 +19,8 @@ struct PublicationDateTests {
         #expect(date?.day == 1)
     }
 
-    @Test("A4: 월·일은 없어도 된다")
-    func publicationDate_a4_optionalMonthAndDay_created() {
+    @Test("A5: 월·일은 없어도 된다")
+    func publicationDate_a5_optionalMonthAndDay_created() {
         let yearOnly = PublicationDate(year: 2021)
         let yearMonth = PublicationDate(year: 2021, month: 12)
 
@@ -30,8 +30,8 @@ struct PublicationDateTests {
         #expect(yearMonth?.day == nil)
     }
 
-    @Test("A4: 범위 밖 값이면 nil이다")
-    func publicationDate_a4_outOfRange_returnsNil() {
+    @Test("A5: 범위 밖 값이면 nil이다")
+    func publicationDate_a5_outOfRange_returnsNil() {
         #expect(PublicationDate(year: 0) == nil)
         #expect(PublicationDate(year: -1) == nil)
         #expect(PublicationDate(year: 2021, month: 0) == nil)

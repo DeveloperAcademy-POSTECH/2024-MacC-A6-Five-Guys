@@ -30,12 +30,12 @@ struct KakaoBookSearchDTO: Decodable, Sendable {
         )
     }
 
-    func parsePublishedDate() -> PublicationDate? {
+    private func parsePublishedDate() -> PublicationDate? {
         guard let datetime else { return nil }
 
         let parts = datetime.prefix(10).split(separator: "-", omittingEmptySubsequences: false)
-        guard datetime.count >= 10,
-              parts.map(\.count) == [4, 2, 2],
+        guard parts.map(\.count) == [4, 2, 2],
+              parts.allSatisfy({ $0.utf8.allSatisfy { (48...57).contains($0) } }),
               let year = Int(parts[0]),
               let month = Int(parts[1]),
               let day = Int(parts[2])
