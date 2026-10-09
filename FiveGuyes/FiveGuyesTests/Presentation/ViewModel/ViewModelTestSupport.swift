@@ -47,7 +47,7 @@ func makeBookSearchItem(title: String) -> BookSearchItem {
         coverImageURL: nil,
         publisher: "테스트 출판사",
         isbn13: "9781234567890",
-        publishedDate: Calendar.app.date(from: DateComponents(year: 2025, month: 1, day: 1))
+        publishedDate: PublicationDate(year: 2025, month: 1, day: 1)
     )
 }
 
