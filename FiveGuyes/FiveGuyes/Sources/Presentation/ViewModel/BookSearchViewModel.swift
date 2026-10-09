@@ -28,10 +28,11 @@ final class BookSearchViewModel {
     }
 
     func searchBooks(query: String) async {
-        guard !query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
+        let trimmedQuery = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedQuery.isEmpty else { return }
 
         do {
-            let books = try await bookSearchUseCase.fetchBooks(query: query)
+            let books = try await bookSearchUseCase.fetchBooks(query: trimmedQuery)
             self.books = books
         } catch {
             handleSearchError(error)

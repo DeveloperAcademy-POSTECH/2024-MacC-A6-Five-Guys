@@ -7,9 +7,7 @@
 
 enum BookSearchError: Error, Equatable {
     case missingAPIKey(setting: String)
-    case network
-    case invalidResponse
-    case cancelled
+    case failed
 }
 
 protocol BookSearchProviding {

@@ -19,7 +19,7 @@ final class BookMetaData {
         title: String,
         author: String,
         coverURL: String?,
-        isbn13: String? = nil,
+        isbn13: String?,
         totalPages: Int
     ) {
         self.title = title

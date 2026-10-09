@@ -6,16 +6,7 @@
 //
 
 struct NationalLibraryBookDTO: Decodable, Sendable {
-    let docs: [NationalLibraryDocumentDTO]
-
-    enum CodingKeys: CodingKey {
-        case docs
-    }
-
-    init(from decoder: any Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        docs = try container.decodeIfPresent([NationalLibraryDocumentDTO].self, forKey: .docs) ?? []
-    }
+    let docs: [NationalLibraryDocumentDTO]?
 }
 
 struct NationalLibraryDocumentDTO: Decodable, Sendable {

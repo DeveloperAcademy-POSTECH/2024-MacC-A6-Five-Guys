@@ -7,12 +7,8 @@
 
 enum PageCountParser {
     static func parse(_ value: String) -> Int? {
-        let digits = value.unicodeScalars
-            .drop { !(48...57).contains($0.value) }
-            .prefix { (48...57).contains($0.value) }
-
-        guard !digits.isEmpty,
-              let pageCount = Int(String(String.UnicodeScalarView(digits))),
+        guard let match = value.firstMatch(of: /[0-9]+/),
+              let pageCount = Int(match.output),
               pageCount > 0 else {
             return nil
         }
