@@ -42,7 +42,7 @@ struct KakaoBookSearchDTO: Decodable, Sendable {
 
     private func extractISBN13() -> String? {
         isbn?.split(whereSeparator: \Character.isWhitespace)
-            .first { $0.wholeMatch(of: /[0-9]{13}/) != nil }
+            .first { $0.wholeMatch(of: /97[89][0-9]{10}/) != nil }
             .map(String.init)
     }
 
