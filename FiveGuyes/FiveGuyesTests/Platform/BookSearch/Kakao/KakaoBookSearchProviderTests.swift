@@ -37,7 +37,6 @@ struct KakaoBookSearchProviderTests {
             await recorder.record(request)
             return HTTPResponse(
                 statusCode: 200,
-                headers: [:],
                 body: Data(responseJSON.utf8)
             )
         }
@@ -57,7 +56,6 @@ struct KakaoBookSearchProviderTests {
         #expect(books[1].publishedDate == nil)
 
         let request = try #require(await recorder.lastRequest)
-        #expect(request.method == .get)
         #expect(request.url.absoluteString == "https://dapi.kakao.com/v3/search/book")
         #expect(request.headers["Authorization"] == "KakaoAK kakao-key")
         #expect(request.queryItems.first(where: { $0.name == "query" })?.value == "소년이 & 온다+")
@@ -68,7 +66,7 @@ struct KakaoBookSearchProviderTests {
     @Test("2xx가 아닌 응답은 failed로 변환한다")
     func nonSuccessStatusMapsToFailed() async {
         let client = HTTPClientStub { _ in
-            HTTPResponse(statusCode: 500, headers: [:], body: Data())
+            HTTPResponse(statusCode: 500, body: Data())
         }
         let provider = makeProvider(httpClient: client, apiKey: "kakao-key")
 
