@@ -1,9 +1,5 @@
 # Architecture
 
-> 기준일: 2026-10-07 (규칙을 바꾸면 함께 고친다)
->
-> 새 코드를 어느 layer에 두고 무엇에 의존할지 정하는 목표 구조 문서다. 코드가 이 문서와 다르면 코드를 고칠 대상으로 보고 [backlog](../../history/backlog.md)에 추가한다.
-
 ## Overall Architecture
 
 - **Feature 단위 MVVM + Clean Architecture**를 따른다. ([ADR-0001](../../history/decisions/adr-0001-presentation-architecture.md))
@@ -13,7 +9,7 @@
 | 플랫폼 | iOS 17+, Swift (language mode 5) |
 | UI | SwiftUI, Observation(`@Observable`) |
 | 저장 | SwiftData, UserDefaults |
-| 외부 연동 | UserNotifications(로컬 알림), FGNetwork 패키지의 URLSession(카카오 책 검색, 국립중앙도서관 ISBN 서지정보), Firebase Analytics, AppTrackingTransparency |
+| 외부 연동 | UserNotifications(로컬 알림), FGNetwork 패키지의 URLSession(도서 검색 출처는 `services/book-search/sources.md`), Firebase Analytics, AppTrackingTransparency |
 | 테스트·품질 | Swift Testing, SwiftLint(`scripts/verify.sh`·CI·pre-push) |
 
 ```text
