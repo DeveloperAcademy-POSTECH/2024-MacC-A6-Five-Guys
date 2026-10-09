@@ -103,7 +103,7 @@ custom_rules:
         included:
             - "FiveGuyes/Sources/Presentation"
         excluded:
-            - "FiveGuyes/Sources/Presentation/Preview"
+            - "FiveGuyes/Sources/Presentation/Preview/"
         regex: "(?m)^[ \\t]*(?:@\\w+\\s+)*(?:(?:public|package|internal|fileprivate|private)\\s+)?import\\s+(?:(?:typealias|struct|class|enum|protocol|let|var|func)\\s+)?(?:SwiftData|Firebase\\w*|UserNotifications)\\b"
         excluded_match_kinds:
             - comment
@@ -119,7 +119,7 @@ custom_rules:
             - "FiveGuyes/Sources/Presentation"
             - "FiveGuyes/Sources/Shared"
         excluded:
-            - "FiveGuyes/Sources/Presentation/Preview"
+            - "FiveGuyes/Sources/Presentation/Preview/"
         regex: "(?m)^[ \\t]*(?:@\\w+\\s+)*(?:(?:public|package|internal|fileprivate|private)\\s+)?import\\s+(?:(?:typealias|struct|class|enum|protocol|let|var|func)\\s+)?FG\\w+\\b"
         excluded_match_kinds:
             - comment

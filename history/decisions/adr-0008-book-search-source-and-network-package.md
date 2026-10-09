@@ -8,7 +8,7 @@
 ## Decision
 
 1. 도서 검색 출처를 알라딘 OpenAPI에서 **카카오 책 검색(검색)과 국립중앙도서관 ISBN 서지정보(페이지 수)** 조합으로 바꾼다. 두 출처는 Domain에서 별개의 Service interface(`BookSearchProviding`, `BookPageCountProviding`)로 두고, `BookSearchUseCase`가 조합한다.
-2. HTTP 호출과 API 키 읽기는 **`FGNetwork` 로컬 Swift Package**로 분리한다. 패키지는 Swift 6 언어 모드이고 앱 타입을 모른다. 앱의 Platform 구현만 패키지를 import한다.
+2. HTTP 호출과 API 키 읽기는 **`FGNetwork` 로컬 Swift Package**로 분리한다. 패키지는 Swift 6 언어 모드이고 앱 타입을 모른다. 앱의 조립 코드(App)와 Platform·Data가 패키지를 import한다. Domain·Presentation·Shared는 모른다(`Presentation/Preview/`는 조립 코드로 보아 예외).
 3. 출처가 주는 외부 형식(날짜 문자열, ISBN 묶음, 페이지 문자열)은 Platform 안에서 해석을 끝내고, Domain 엔티티에는 해석된 값(`Date?`, `String?`, `Int?`)만 넘긴다.
 4. 검색으로 등록한 책은 ISBN-13을 함께 보관한다.
 5. 앱 타깃의 Swift 6 언어 모드 전환은 이 결정에 포함하지 않는다. 공통 기반을 패키지로 분리하는 작업이 끝난 뒤 별도로 정한다.
@@ -59,7 +59,7 @@
 
 ## Consequences
 
-- 구현은 두 단계로 나눈다. #225에서 패키지를 만들고 알라딘 provider를 그 위로 옮긴 뒤(동작 변화 없음), 다음 이슈에서 출처를 교체한다.
+- 구현은 두 단계로 나눈다. #225에서 패키지를 만들고 알라딘 provider를 그 위로 옮긴 뒤(기본 세션이 공유 세션(60초, 캐시)에서 패키지 세션(15초, 캐시 없음)으로 바뀌는 것은 의도된 변경이다. `services/network/module.md` 참조), 다음 이슈에서 출처를 교체한다.
 - `BookSearchItem`의 출간일이 `Date?`, ISBN-13이 `String?`로 바뀌어 화면의 연도 표시와 Preview 샘플 데이터가 함께 바뀐다.
 - `BookMetaData`에 선택 필드가 추가된다. 경량 마이그레이션으로 충분한지 기존 데이터로 확인하고, 안 되면 스키마 버전을 올린다.
 - 패키지 테스트는 `scripts/verify.sh`의 '패키지 테스트' 단계가 패키지 스킴으로 실행한다. 공유 프로젝트 스킴은 로컬 패키지 테스트 타깃을 구성원으로 인식하지 않았다.
