@@ -20,7 +20,6 @@ struct NationalLibraryISBNEndpoint: Endpoint {
         }
 
         return HTTPRequest(
-            method: .get,
             url: url,
             queryItems: [
                 URLQueryItem(name: "cert_key", value: apiKey),
