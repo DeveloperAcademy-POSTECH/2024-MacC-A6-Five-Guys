@@ -10,4 +10,6 @@ while read -r local_ref local_sha remote_ref remote_sha; do
 done
 [[ "$needs_verification" == true ]] || exit 0
 echo '검증 중(수 분 소요). 건너뛰려면 git push --no-verify'
+# git이 worktree hook에 GIT_DIR을 내보내고 SwiftPM의 git 호출이 이를 상속해 미러 저장소 대신 이 repo를 본다.
+unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE
 scripts/verify.sh </dev/null
