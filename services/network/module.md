@@ -41,7 +41,7 @@
 ### 규칙
 
 - `send`는 상태 코드를 검사하지 않는다. 받은 그대로 돌려준다.
-- `URLSessionHTTPClient`가 유일한 `HTTPClient` 구현이다. 기본 세션은 `.shared`가 아니라 `URLSessionConfiguration.ephemeral`이라 캐시·쿠키·자격증명을 보관하지 않고, 데이터 수신이 없을 때의 대기 시간은 15초다(`.shared`는 60초). 엔드포인트별로 다른 값이 필요하면 `HTTPRequest.timeout`으로 재정의한다.
+- `URLSessionHTTPClient`가 유일한 `HTTPClient` 구현이다. 기본 세션은 `.shared`가 아니라 `URLSessionConfiguration.ephemeral`이라 캐시를 쓰지 않고, 쿠키·자격증명은 디스크에 저장하지 않으며(메모리에만 보관), 데이터 수신이 없을 때의 대기 시간은 15초다(`.shared`는 60초). 엔드포인트별로 다른 값이 필요하면 `HTTPRequest.timeout`으로 재정의한다.
 - 테스트와 Preview는 `HTTPClient`를 채택한 대역을 쓴다. 패키지는 대역을 제공하지 않는다.
 - `request(_:)`(`HTTPClient` 확장)가 `makeRequest` → `send` → 2xx 검사(`unexpectedStatus`) → `Response` 디코딩(`decoding`)을 한 번에 한다. 디코더는 기본 `JSONDecoder`로 고정이다. 키 이름이나 날짜 해석은 DTO에서 처리한다.
 - 엔드포인트 하나가 요청 하나다. API 키는 엔드포인트가 생성자 인자로 받아 `makeRequest`에서 헤더나 쿼리에 넣는다.
