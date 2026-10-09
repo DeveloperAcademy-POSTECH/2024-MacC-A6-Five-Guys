@@ -19,7 +19,6 @@ struct AladinBookSearchProviderTests {
             await recorder.record(request)
             return HTTPResponse(
                 statusCode: 200,
-                headers: [:],
                 body: Data(
                     #"{"item":[{"title":"Swift & iOS","author":"Tester","cover":null,"publisher":"FG","isbn13":"9781234567890","pubDate":"20250101"}]}"#.utf8
                 )
@@ -32,7 +31,6 @@ struct AladinBookSearchProviderTests {
         #expect(books.count == 1)
         #expect(books.first?.title == "Swift & iOS")
         let request = try #require(await recorder.lastRequest())
-        #expect(request.method == .get)
         #expect(request.url.absoluteString == "https://www.aladin.co.kr/ttb/api/ItemSearch.aspx")
         #expect(request.queryItems.first(where: { $0.name == "ttbkey" })?.value == "testKey")
         #expect(request.queryItems.first(where: { $0.name == "Query" })?.value == "스위프트 & iOS+")
@@ -163,7 +161,6 @@ struct AladinBookSearchProviderTests {
             await recorder.record(request)
             return HTTPResponse(
                 statusCode: 200,
-                headers: [:],
                 body: Data(#"{"item":[{"subInfo":{"itemPage":321}}]}"#.utf8)
             )
         }
@@ -210,30 +207,20 @@ struct AladinBookSearchProviderTests {
 }
 
 private struct HTTPClientStub: HTTPClient {
-    private enum Behavior: Sendable {
-        case handler(@Sendable (HTTPRequest) async throws(HTTPClientError) -> HTTPResponse)
-        case failure(HTTPClientError)
-    }
-
-    private let behavior: Behavior
+    let handler: @Sendable (HTTPRequest) async throws(HTTPClientError) -> HTTPResponse
 
     init(
         handler: @escaping @Sendable (HTTPRequest) async throws(HTTPClientError) -> HTTPResponse
     ) {
-        self.behavior = .handler(handler)
+        self.handler = handler
     }
 
     init(error: HTTPClientError) {
-        self.behavior = .failure(error)
+        self.init { (_) throws(HTTPClientError) -> HTTPResponse in throw error }
     }
 
     func send(_ request: HTTPRequest) async throws(HTTPClientError) -> HTTPResponse {
-        switch behavior {
-        case let .handler(handler):
-            try await handler(request)
-        case let .failure(error):
-            throw error
-        }
+        try await handler(request)
     }
 }
 

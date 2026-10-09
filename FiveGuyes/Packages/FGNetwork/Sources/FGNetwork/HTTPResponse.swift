@@ -2,12 +2,10 @@ import Foundation
 
 public struct HTTPResponse: Sendable {
     public let statusCode: Int
-    public let headers: [String: String]
     public let body: Data
 
-    public init(statusCode: Int, headers: [String: String], body: Data) {
+    public init(statusCode: Int, body: Data) {
         self.statusCode = statusCode
-        self.headers = headers
         self.body = body
     }
 }

@@ -20,7 +20,6 @@ struct AladinSearchEndpoint: Endpoint {
         }
 
         return HTTPRequest(
-            method: .get,
             url: url,
             queryItems: [
                 URLQueryItem(name: "ttbkey", value: apiKey),
@@ -46,7 +45,6 @@ struct AladinLookupEndpoint: Endpoint {
         }
 
         return HTTPRequest(
-            method: .get,
             url: url,
             queryItems: [
                 URLQueryItem(name: "ttbkey", value: apiKey),

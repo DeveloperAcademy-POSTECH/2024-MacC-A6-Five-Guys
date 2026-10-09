@@ -3,15 +3,7 @@ import Foundation
 public protocol Endpoint: Sendable {
     associatedtype Response: Decodable & Sendable
 
-    var decoder: @Sendable () -> JSONDecoder { get }
-
     func makeRequest() throws(HTTPClientError) -> HTTPRequest
-}
-
-public extension Endpoint {
-    var decoder: @Sendable () -> JSONDecoder {
-        { JSONDecoder() }
-    }
 }
 
 public extension HTTPClient {
@@ -22,7 +14,7 @@ public extension HTTPClient {
         }
 
         do {
-            return try endpoint.decoder().decode(E.Response.self, from: response.body)
+            return try JSONDecoder().decode(E.Response.self, from: response.body)
         } catch {
             throw .decoding(error)
         }

@@ -12,11 +12,7 @@ public struct BundleAPIKeyStore: APIKeyProviding {
     private let values: [String: String]
 
     public init(bundle: Bundle = .main) {
-        self.values = bundle.infoDictionary?.reduce(into: [:]) { values, entry in
-            if let value = entry.value as? String {
-                values[entry.key] = value
-            }
-        } ?? [:]
+        self.values = bundle.infoDictionary?.compactMapValues { $0 as? String } ?? [:]
     }
 
     public init(values: [String: String]) {

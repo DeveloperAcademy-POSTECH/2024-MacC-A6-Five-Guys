@@ -10,7 +10,6 @@ struct HTTPClientRequestTests {
             #expect(request.url.absoluteString == "https://example.com/books")
             return HTTPResponse(
                 statusCode: 200,
-                headers: [:],
                 body: Data(#"{"value":"decoded"}"#.utf8)
             )
         }
@@ -24,7 +23,7 @@ struct HTTPClientRequestTests {
     func request_nonSuccess_throwsUnexpectedStatus() async {
         let responseBody = Data("server error".utf8)
         let client = HTTPClientStub { _ in
-            HTTPResponse(statusCode: 503, headers: [:], body: responseBody)
+            HTTPResponse(statusCode: 503, body: responseBody)
         }
 
         do {
@@ -41,7 +40,7 @@ struct HTTPClientRequestTests {
     @Test("잘못된 응답 본문을 decoding 오류로 매핑")
     func request_invalidBody_throwsDecodingError() async {
         let client = HTTPClientStub { _ in
-            HTTPResponse(statusCode: 200, headers: [:], body: Data("not-json".utf8))
+            HTTPResponse(statusCode: 200, body: Data("not-json".utf8))
         }
 
         do {
@@ -62,7 +61,7 @@ private struct TestEndpoint: Endpoint {
         guard let url = URL(string: "https://example.com/books") else {
             throw .invalidRequest
         }
-        return HTTPRequest(method: .get, url: url)
+        return HTTPRequest(url: url)
     }
 }
 
