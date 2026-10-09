@@ -5,6 +5,7 @@
 - `develop`에서 만든다.
   - 기능: `feature/issue-<번호>-<설명>`
   - 버그: `bugfix/...`
+  - 문서: `docs/issue-<번호>-<설명>`
 - 출시는 `develop`을 `main`으로 머지한다.
 
 ## Commits
