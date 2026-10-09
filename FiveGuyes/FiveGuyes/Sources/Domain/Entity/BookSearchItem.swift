@@ -14,7 +14,7 @@ struct BookSearchItem: Identifiable, Equatable, Hashable {
     let coverImageURL: String?
     let publisher: String
     let isbn13: String?
-    let publishedDate: Date?
+    let publishedDate: PublicationDate?
 
     init(
         id: UUID = UUID(),
@@ -23,7 +23,7 @@ struct BookSearchItem: Identifiable, Equatable, Hashable {
         coverImageURL: String?,
         publisher: String,
         isbn13: String?,
-        publishedDate: Date?
+        publishedDate: PublicationDate?
     ) {
         self.id = id
         self.title = title
