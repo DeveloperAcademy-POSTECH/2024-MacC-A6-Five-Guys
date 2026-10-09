@@ -20,7 +20,6 @@ struct KakaoBookSearchEndpoint: Endpoint {
         }
 
         return HTTPRequest(
-            method: .get,
             url: url,
             queryItems: [
                 URLQueryItem(name: "query", value: query),

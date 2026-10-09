@@ -19,7 +19,6 @@ struct NationalLibraryPageCountProviderTests {
             await recorder.record(request)
             return HTTPResponse(
                 statusCode: 200,
-                headers: [:],
                 body: Data(#"{"docs":[{"PAGE":"[130] p."}]}"#.utf8)
             )
         }
@@ -29,7 +28,6 @@ struct NationalLibraryPageCountProviderTests {
 
         #expect(pageCount == 130)
         let request = try #require(await recorder.lastRequest)
-        #expect(request.method == .get)
         #expect(request.url.absoluteString == "https://www.nl.go.kr/seoji/SearchApi.do")
         #expect(request.queryItems.first(where: { $0.name == "cert_key" })?.value == "nl-key")
         #expect(request.queryItems.first(where: { $0.name == "result_style" })?.value == "json")
@@ -45,7 +43,6 @@ struct NationalLibraryPageCountProviderTests {
         let client = HTTPClientStub { _ in
             HTTPResponse(
                 statusCode: 200,
-                headers: [:],
                 body: Data(#"{}"#.utf8)
             )
         }
@@ -57,7 +54,7 @@ struct NationalLibraryPageCountProviderTests {
     @Test("2xx가 아닌 응답은 failed로 변환한다")
     func nonSuccessStatusMapsToFailed() async {
         let client = HTTPClientStub { _ in
-            HTTPResponse(statusCode: 404, headers: [:], body: Data())
+            HTTPResponse(statusCode: 404, body: Data())
         }
         let provider = makeProvider(httpClient: client, apiKey: "nl-key")
 
