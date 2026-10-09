@@ -1,6 +1,6 @@
 # 네트워크 모듈 (FGNetwork)
 
-외부 HTTP API를 호출하는 공통 코드. `FiveGuyes/Packages/FGNetwork`에 로컬 Swift Package로 두고, 앱 타깃의 Platform 구현이 가져다 쓴다.
+외부 HTTP API를 호출하는 공통 코드. `FiveGuyes/Packages/FGNetwork`에 로컬 Swift Package로 두고, 앱 타깃의 조립 코드(App)와 Platform 구현이 가져다 쓴다.
 
 범위: HTTP 요청·응답 모델, 클라이언트 인터페이스와 URLSession 구현, 엔드포인트 추상화, API 키 저장소. 특정 API(카카오, 국립중앙도서관 등)에 대한 지식은 담지 않는다. 그것은 `services/<서비스>/`와 앱의 Platform에 있다.
 
@@ -44,7 +44,7 @@ public protocol HTTPClient: Sendable {
 ```
 
 - `send`는 상태 코드를 검사하지 않는다. 받은 그대로 돌려준다.
-- `URLSessionHTTPClient`가 유일한 구현이다. `URLSession`을 주입받으며 기본값은 `.shared`가 아니라 패키지가 만든 세션이다(캐시 없음, 요청 제한 시간 기본 15초).
+- `URLSessionHTTPClient`가 유일한 구현이다. `URLSession`을 주입받으며 기본값은 `.shared`가 아니라 패키지가 만든 세션이다. 캐시를 쓰지 않고, `timeoutIntervalForRequest`는 15초다. 이는 데이터 수신이 없을 때의 대기 시간이며, `.shared`의 기본값과 다른 의도된 동작 변경이다. 엔드포인트별로 다른 값이 필요하면 `HTTPRequest.timeout`으로 재정의한다.
 - 테스트와 Preview는 `HTTPClient`를 채택한 대역을 쓴다. 패키지는 대역을 제공하지 않는다. 각 테스트 타깃이 `@Sendable` 클로저를 담은 struct로 만든다.
 
 ### 엔드포인트
@@ -79,6 +79,7 @@ public enum APIKeyError: Error, Sendable {
 
 - `BundleAPIKeyStore`가 유일한 구현이다. 초기화 시 `Bundle.infoDictionary`에서 문자열 값만 `[String: String]`으로 복사하고 `Bundle`은 보관하지 않는다. 테스트는 사전을 직접 넣는 생성자를 쓴다.
 - 자리표시자 판정: 앞뒤 공백을 지운 값이 비어 있거나 `$(`로 시작해 `)`로 끝나면 `missing`이다. xcconfig 값이 치환되지 않은 채 Info.plist에 남은 경우를 잡는다.
+- `Config.xcconfig.example`의 값은 비워 둔다. 빈 값은 `missing`으로 판정되어 설정 안내가 뜬다. `YOUR_...` 같은 가짜 값은 실제 키로 통과하므로 쓰지 않는다.
 - 키 값은 로그에 남기지 않는다. 오류에도 이름만 담는다.
 
 ## 3. 앱에서 쓰는 방법
@@ -96,6 +97,7 @@ Platform/<연동>/<출처>/
                               키 꺼내기 → endpoint → client.request → 변환 → 오류 변환
 ```
 
+- `FGNetwork`는 조립 코드인 `App/AppDependencies`와 Platform만 import한다. Domain은 이 패키지의 타입을 모른다.
 - provider는 `HTTPClientError`와 `APIKeyError`를 Domain 오류로 바꾼다. Domain은 이 패키지의 타입을 모른다.
 - provider마다 `HTTPClient`를 새로 만들지 않는다. 세션을 공유해야 연결이 재사용된다.
 - 외부 형식 해석(날짜 문자열, 식별자 묶음, 자유 형식 숫자)은 DTO 변환에서 끝낸다. Domain 엔티티에는 해석된 값만 넘긴다.
