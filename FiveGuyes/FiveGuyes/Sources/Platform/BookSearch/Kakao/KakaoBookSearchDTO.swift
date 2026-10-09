@@ -23,7 +23,7 @@ struct KakaoBookSearchDTO: Decodable, Sendable {
         BookSearchItem(
             title: title,
             author: authors?.joined(separator: ", ") ?? "",
-            coverImageURL: nonEmptyThumbnail,
+            coverImageURL: coverImageURL,
             publisher: publisher ?? "",
             isbn13: extractISBN13(),
             publishedDate: parsePublishedDate()
@@ -46,12 +46,27 @@ struct KakaoBookSearchDTO: Decodable, Sendable {
             .map(String.init)
     }
 
-    private var nonEmptyThumbnail: String? {
+    private var coverImageURL: String? {
         guard let thumbnail = thumbnail?.trimmingCharacters(in: .whitespacesAndNewlines),
               !thumbnail.isEmpty
         else {
             return nil
         }
-        return thumbnail
+        return originalImageURL(fromThumbnail: thumbnail) ?? thumbnail
+    }
+
+    /// 썸네일의 `fname` 쿼리에 담긴 원본 주소를 https로 돌려준다. 못 읽으면 nil.
+    private func originalImageURL(fromThumbnail thumbnail: String) -> String? {
+        guard let fname = URLComponents(string: thumbnail)?.queryItems?
+            .first(where: { $0.name == "fname" })?.value,
+              var original = URLComponents(string: fname),
+              let scheme = original.scheme?.lowercased(),
+              scheme == "http" || scheme == "https",
+              original.host?.isEmpty == false
+        else {
+            return nil
+        }
+        original.scheme = "https"
+        return original.string
     }
 }
