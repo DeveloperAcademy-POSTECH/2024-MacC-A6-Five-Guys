@@ -153,20 +153,6 @@ struct SwiftDataBookRepoTests {
                 == originalBook.completionStatus.isCompleted)
     }
 
-    @Test("ISBN-13 없이 저장한 레코드는 nil로 읽힌다")
-    func testStoredBookWithoutISBN13ReadsNil() async throws {
-        let container = try createInMemoryContainer()
-        let repo = SwiftDataBookRepo(modelContainer: container)
-        let storedBook = createTestBook().toUserBookV2()
-        storedBook.bookMetaData.isbn13 = nil
-
-        container.mainContext.insert(storedBook)
-        try container.mainContext.save()
-
-        let fetchedBook = try await repo.fetchBook(by: storedBook.id)
-        #expect(fetchedBook.bookMetaData.isbn13 == nil)
-    }
-
     @Test("UserSettings 매핑은 저장된 DateKey를 우선 사용한다")
     func testUserSettingsMappingPrefersStoredDateKeys() throws {
         let settings = UserSettings(

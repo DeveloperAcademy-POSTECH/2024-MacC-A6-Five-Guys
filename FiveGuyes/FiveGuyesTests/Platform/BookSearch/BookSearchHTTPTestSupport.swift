@@ -8,41 +8,27 @@
 import FGNetwork
 
 struct HTTPClientStub: HTTPClient {
-    private enum Behavior: Sendable {
-        case handler(@Sendable (HTTPRequest) async throws(HTTPClientError) -> HTTPResponse)
-        case failure(HTTPClientError)
-    }
-
-    private let behavior: Behavior
+    private let handler: @Sendable (HTTPRequest) async throws(HTTPClientError) -> HTTPResponse
 
     init(
         handler: @escaping @Sendable (HTTPRequest) async throws(HTTPClientError) -> HTTPResponse
     ) {
-        self.behavior = .handler(handler)
+        self.handler = handler
     }
 
     init(error: HTTPClientError) {
-        self.behavior = .failure(error)
+        self.init { _ throws(HTTPClientError) in throw error }
     }
 
     func send(_ request: HTTPRequest) async throws(HTTPClientError) -> HTTPResponse {
-        switch behavior {
-        case let .handler(handler):
-            try await handler(request)
-        case let .failure(error):
-            throw error
-        }
+        try await handler(request)
     }
 }
 
 actor HTTPRequestRecorder {
-    private var requests: [HTTPRequest] = []
+    private(set) var lastRequest: HTTPRequest?
 
     func record(_ request: HTTPRequest) {
-        requests.append(request)
-    }
-
-    func lastRequest() -> HTTPRequest? {
-        requests.last
+        lastRequest = request
     }
 }
