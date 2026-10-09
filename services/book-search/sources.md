@@ -2,7 +2,7 @@
 
 도서 검색 기능이 연결하는 외부 API와 그 연동 규칙. 동작 기준은 `spec.md`이고, 이 문서는 그 동작을 어떤 출처의 어떤 요청으로 얻는지를 다룬다.
 
-범위: 검색 출처(카카오 책 검색)와 페이지 출처(국립중앙도서관 ISBN 서지정보)의 요청·응답·인증·한도·데이터 특성. 출처를 바꾸거나 추가하면 이 문서와 `history/decisions/`의 ADR을 함께 고친다.
+범위: 검색 출처(카카오 책 검색)와 페이지 출처(국립중앙도서관 ISBN 서지정보)의 요청·응답·인증·한도·데이터 특성. 출처를 바꾸거나 추가하면 이 문서를 고치고, 결정이 바뀌면 새 ADR을 추가하고 예전 ADR에 대체 표시를 한다(`history/decisions/`).
 
 ## 인증 정보
 
@@ -70,21 +70,19 @@ cert_key={NL_API_KEY}&result_style=json&page_no=1&page_size=1
 
 | 필드 | 형식 | 규칙 |
 |---|---|---|
-| `TOTAL_COUNT` | 문자열 숫자 | `0`이면 기록 없음 |
 | `docs[0].PAGE` | 자유 형식 문자열 | 첫 아라비아 숫자 묶음을 총 페이지 수로. spec B5 표 참고 |
-| `docs[0].EBOOK_YN` | `Y`/`N` | 요청에서 걸렀으므로 확인용 |
 
-쓰지 않는 필드: `TITLE`, `AUTHOR`, `PUBLISHER`, `TITLE_URL`(표지, 대부분 비어 있음), `FORM`, 그 외 전부.
+쓰지 않는 필드: `TOTAL_COUNT`, `EBOOK_YN`(요청에서 걸렀으므로 확인하지 않는다), `TITLE`, `AUTHOR`, `PUBLISHER`, `TITLE_URL`(표지, 대부분 비어 있음), `FORM`, 그 외 전부.
 
 **데이터 특성** (2026-10 확인)
 
 - 종이책 기록은 대부분 `PAGE`가 있으나, 2015년 이전 도서와 일부 유명 도서(민음사 데미안, 창비 소년이 온다)는 비어 있다. 카카오 상위 결과 기준 약 4분의 1이 비어 있다.
-- `PAGE` 형식 예: `332`, `784 p.`, `245 p,`, `[130] p.`, `252, 64 p.`, `xiii, 345 p.`, `230페이지 내외`.
+- `PAGE` 형식 예는 spec B5 표를 본다.
 - 제목 검색(`title=`)은 정확도 정렬이 없고 표지가 거의 없어 검색 출처로 쓰지 않는다. 같은 키로 호출되는 통합검색(`/NL/search/openApi/search.do`)에는 페이지 필드가 없다.
 
 ## 출처를 바꾸거나 추가할 때
 
-- 검색 출처와 페이지 출처는 Domain의 interface가 따로 있다(`services/_common/architecture.md`의 Service). 한쪽만 바꿀 수 있다.
+- 검색 출처와 페이지 출처는 Domain의 interface가 따로 있다([architecture.md의 Service](../_common/architecture.md#platform)). 한쪽만 바꿀 수 있다.
 - 새 출처 구현은 `FiveGuyes/FiveGuyes/Sources/Platform/BookSearch/<출처>/`에 두고, 날짜·ISBN·페이지 문자열 해석은 그 폴더 안에서 끝낸다. Domain 엔티티에는 해석된 값만 넘긴다.
-- 페이지 출처를 둘 이상 이어 붙일 때는 앞 출처가 "모름"(nil)일 때만 다음 출처를 묻는다. 0은 "확인했으나 없음"이다.
+- 페이지 출처를 둘 이상 이어 붙이는 규칙은 spec B9를 본다.
 - 검토했으나 쓰지 않은 출처: 네이버 책 검색(페이지 없음), 도서관 정보나루(페이지 없음), Open Library(국내 도서 누락 많음), Google Books(페이지 있음, 키 필요, 국내 도서 채움률 미확인).
