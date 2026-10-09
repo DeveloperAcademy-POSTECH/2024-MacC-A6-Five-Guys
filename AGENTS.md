@@ -7,7 +7,7 @@ FiveGuyes(한입독서)는 iOS SwiftUI 앱이다. `FiveGuyes/FiveGuyes.xcodeproj
 1. `FiveGuyes/Config.xcconfig`가 없으면 `cp FiveGuyes/Config.xcconfig.example FiveGuyes/Config.xcconfig`를 실행한다. 없으면 빌드가 실패한다.
 2. `scripts/verify.sh`로 lint와 테스트를 확인한다.
 
-그 밖의 명령과 설정은 `handbook/where/setup.md`를 본다.
+그 밖의 명령과 설정은 `handbook/setup.md`를 본다.
 
 ## Code Map
 
@@ -28,12 +28,12 @@ FiveGuyes(한입독서)는 iOS SwiftUI 앱이다. `FiveGuyes/FiveGuyes.xcodeproj
 
 ## Docs Map
 
-문서는 루트의 `handbook/`(팀 지식), `services/`(이 코드의 지식), `history/`(기록)에 있다. 무엇을 어디에 두는지는 `handbook/how/documentation.md`를 본다.
+문서는 루트의 `handbook/`(팀 지식), `services/`(이 코드의 지식), `history/`(기록)에 있다. 무엇을 어디에 두는지는 `handbook/documentation.md`를 본다.
 
 | 작업 | 먼저 읽을 문서 |
 |---|---|
-| 환경 설정, 빌드·테스트·lint 명령 | `handbook/where/setup.md` |
-| 브랜치, 커밋 | `handbook/how/workflow.md` |
+| 환경 설정, 빌드·테스트·lint 명령 | `handbook/setup.md` |
+| 브랜치, 커밋 | `handbook/workflow.md` |
 | PR 작성 | `.github/pull_request_template.md` |
 | 고칠 위치 정하기, 새 타입의 위치, layer 경계, View·ViewModel 구조 | `services/_common/architecture.md` |
 | 알림 동작 | `services/notification/spec.md` |

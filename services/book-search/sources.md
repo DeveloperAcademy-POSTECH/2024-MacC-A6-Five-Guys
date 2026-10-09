@@ -12,7 +12,7 @@
 | `NL_API_KEY` | 국립중앙도서관 Open API 인증키 | 국립중앙도서관 Open API 이용 신청 (`https://www.nl.go.kr/NL/contents/N31101010000.do`) |
 
 - 값은 `FiveGuyes/Config.xcconfig`에 넣고, 앱 타깃의 `Info.plist`가 같은 이름으로 받는다. 코드는 `Info.plist`에서만 읽는다.
-- `Config.xcconfig`는 gitignore 대상이다. 키 값은 커밋·출력하지 않는다. 설정 방법은 `handbook/where/setup.md`를 본다.
+- `Config.xcconfig`는 gitignore 대상이다. 키 값은 커밋·출력하지 않는다. 설정 방법은 `handbook/setup.md`를 본다.
 - 값이 없거나 `$(KAKAO_API_KEY)`처럼 치환되지 않은 자리표시자이면 "인증 정보 없음"으로 본다. 검색 출처는 설정 안내 알림(spec A10), 페이지 출처는 조용히 0(spec B7)이다.
 - 두 키 모두 앱 번들에 포함되어 추출될 수 있다. 공개 서지정보이고 도메인 제한 옵션이 없어 서버 경유 없이 클라이언트가 직접 호출한다. 한도가 문제되면 그때 다시 판단한다.
 

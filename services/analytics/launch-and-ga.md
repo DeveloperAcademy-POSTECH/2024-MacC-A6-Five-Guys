@@ -22,7 +22,7 @@
 
 ## 진짜 plist가 필요할 때
 
-plist 없이도 Debug 앱 실행과 테스트가 가능하다. Firebase 동작을 실제로 확인할 때만 넣는다. 넣는 방법은 `handbook/where/setup.md`를 본다.
+plist 없이도 Debug 앱 실행과 테스트가 가능하다. Firebase 동작을 실제로 확인할 때만 넣는다. 넣는 방법은 `handbook/setup.md`를 본다.
 
 ## GA 확인 모드 켜기/끄기
 
