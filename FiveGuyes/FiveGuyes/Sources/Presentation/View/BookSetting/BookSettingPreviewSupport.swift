@@ -18,7 +18,7 @@ extension PreviewSupport {
         coverImageURL: String? = nil,
         publisher: String = "Five Guys Press",
         isbn13: String? = "9781234567890",
-        publishedDate: Date? = Calendar.app.date(from: DateComponents(year: 2025, month: 1, day: 1))
+        publishedDate: PublicationDate? = PublicationDate(year: 2025, month: 1, day: 1)
     ) -> BookSearchItem {
         BookSearchItem(
             title: title,
@@ -38,7 +38,7 @@ extension PreviewSupport {
                 author: "홍길동",
                 publisher: "Sample House",
                 isbn13: "9781234567891",
-                publishedDate: Calendar.app.date(from: DateComponents(year: 2024, month: 2, day: 20))
+                publishedDate: PublicationDate(year: 2024, month: 2, day: 20)
             )
         ]
     }

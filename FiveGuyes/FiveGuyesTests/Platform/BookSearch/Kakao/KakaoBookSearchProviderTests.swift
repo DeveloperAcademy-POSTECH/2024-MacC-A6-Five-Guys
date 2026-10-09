@@ -49,7 +49,7 @@ struct KakaoBookSearchProviderTests {
         #expect(books[0].author == "한강, 공저자")
         #expect(books[0].isbn13 == "9788936434120")
         #expect(books[0].coverImageURL == "https://example.com/cover.jpg")
-        #expect(books[0].publishedDate != nil)
+        #expect(books[0].publishedDate == PublicationDate(year: 2021, month: 4, day: 20))
         #expect(books[1].author.isEmpty)
         #expect(books[1].publisher.isEmpty)
         #expect(books[1].isbn13 == nil)
