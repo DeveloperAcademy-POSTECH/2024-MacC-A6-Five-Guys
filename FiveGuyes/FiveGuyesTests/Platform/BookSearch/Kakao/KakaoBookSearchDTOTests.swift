@@ -82,4 +82,23 @@ struct KakaoBookSearchDTOTests {
         #expect(cover("") == nil)
         #expect(cover(nil) == nil)
     }
+
+    private func isbn13(_ isbn: String?) -> String? {
+        KakaoBookSearchDTO(
+            title: "t",
+            authors: nil,
+            publisher: nil,
+            datetime: nil,
+            isbn: isbn,
+            thumbnail: nil
+        ).toBookSearchItem().isbn13
+    }
+
+    @Test("A11: 978·979로 시작하는 13자리만 ISBN-13이다")
+    func kakaoISBN_a11_prefix_acceptsOnly978And979() {
+        #expect(isbn13("8936434128 9788936434120") == "9788936434120")
+        #expect(isbn13("9791190000000") == "9791190000000")
+        #expect(isbn13("2090000157222") == nil)
+        #expect(isbn13("1234567890") == nil)
+    }
 }
