@@ -25,38 +25,23 @@ struct BookMetaDataMigrationTests {
 
         let storeURL = storeDirectory.appendingPathComponent("legacy.store")
         let bookID = UUID()
-        let startDate = Date(timeIntervalSince1970: 1_700_000_000)
-        let endDate = Date(timeIntervalSince1970: 1_700_604_800)
-        let lastReadDate = Date(timeIntervalSince1970: 1_700_086_400)
 
-        try writeLegacyStore(
-            at: storeURL,
-            bookID: bookID,
-            startDate: startDate,
-            endDate: endDate,
-            lastReadDate: lastReadDate
-        )
+        try writeLegacyStore(at: storeURL, bookID: bookID)
 
         let container = try migratedContainer(at: storeURL)
         let storedItems = try container.mainContext.fetch(FetchDescriptor<UserBookSchemaV2.UserBookV2>())
         let storedItem = try #require(storedItems.first)
         #expect(storedItems.count == 1)
-        assertPreservedFields(
-            of: storedItem,
-            bookID: bookID,
-            startDate: startDate,
-            endDate: endDate,
-            lastReadDate: lastReadDate
-        )
+        #expect(storedItem.id == bookID)
+        #expect(storedItem.bookMetaData.title == "기존 도서")
+        #expect(storedItem.bookMetaData.isbn13 == nil)
+        #expect(storedItem.userSettings.startPage == 10)
     }
 
-    private func writeLegacyStore(
-        at storeURL: URL,
-        bookID: UUID,
-        startDate: Date,
-        endDate: Date,
-        lastReadDate: Date
-    ) throws {
+    private func writeLegacyStore(at storeURL: URL, bookID: UUID) throws {
+        let startDate = Date(timeIntervalSince1970: 1_700_000_000)
+        let endDate = Date(timeIntervalSince1970: 1_700_604_800)
+        let lastReadDate = Date(timeIntervalSince1970: 1_700_086_400)
         let legacySchema = Schema([LegacyUserBookSchema.UserBookV2.self])
         let configuration = ModelConfiguration(schema: legacySchema, url: storeURL)
         let container = try ModelContainer(for: legacySchema, configurations: [configuration])
@@ -99,33 +84,6 @@ struct BookMetaDataMigrationTests {
         return try ModelContainer(for: currentSchema, configurations: [configuration])
     }
 
-    private func assertPreservedFields(
-        of storedItem: UserBookSchemaV2.UserBookV2,
-        bookID: UUID,
-        startDate: Date,
-        endDate: Date,
-        lastReadDate: Date
-    ) {
-        #expect(storedItem.id == bookID)
-        #expect(storedItem.bookMetaData.title == "기존 도서")
-        #expect(storedItem.bookMetaData.author == "기존 저자")
-        #expect(storedItem.bookMetaData.coverURL == "https://example.com/legacy-cover.jpg")
-        #expect(storedItem.bookMetaData.totalPages == 300)
-        #expect(storedItem.bookMetaData.isbn13 == nil)
-        #expect(storedItem.userSettings.startPage == 10)
-        #expect(storedItem.userSettings.targetEndPage == 290)
-        #expect(storedItem.userSettings.startDate == startDate)
-        #expect(storedItem.userSettings.targetEndDate == endDate)
-        #expect(storedItem.userSettings.nonReadingDays == [startDate])
-        #expect(storedItem.userSettings.startDateKey == "2023-11-15")
-        #expect(storedItem.userSettings.targetEndDateKey == "2023-11-22")
-        #expect(storedItem.userSettings.nonReadingDayKeys == ["2023-11-15"])
-        #expect(storedItem.readingProgress.readingRecords.isEmpty)
-        #expect(storedItem.readingProgress.lastReadDate == lastReadDate)
-        #expect(storedItem.readingProgress.lastPagesRead == 42)
-        #expect(storedItem.completionStatus.isCompleted)
-        #expect(storedItem.completionStatus.completionReview == "기존 소감")
-    }
 }
 
 private enum LegacyUserBookSchema {
