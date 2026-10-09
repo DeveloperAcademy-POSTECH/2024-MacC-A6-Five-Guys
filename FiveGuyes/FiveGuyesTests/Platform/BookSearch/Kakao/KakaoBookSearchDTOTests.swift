@@ -8,8 +8,8 @@
 @testable import FiveGuyes
 import Testing
 
-// Calendar·TimeZone을 쓰지 않는다. 기기 시간대와 무관함의 증명이다.
-@Suite("KakaoBookSearchDTO 출간일 파싱 테스트")
+// 출간일 테스트는 Calendar·TimeZone을 쓰지 않는다. 기기 시간대와 무관함의 증명이다.
+@Suite("카카오 DTO 변환 테스트")
 struct KakaoBookSearchDTOTests {
     private func parse(_ datetime: String?) -> PublicationDate? {
         KakaoBookSearchDTO(
@@ -77,9 +77,24 @@ struct KakaoBookSearchDTOTests {
         #expect(cover(badScheme) == badScheme)
     }
 
-    @Test("A4: 썸네일이 비었거나 없으면 nil이다")
+    @Test("A4: fname에 호스트가 없거나 비어 있으면 썸네일 그대로다")
+    func kakaoCover_a4_hostlessOrEmptyFname_keepsThumbnail() {
+        let hostless = "https://search1.kakaocdn.net/thumb/R120x174.q85/?fname=http%3A%2F%2F%2Fa.jpg"
+        let empty = "https://search1.kakaocdn.net/thumb/R120x174.q85/?fname="
+        #expect(cover(hostless) == hostless)
+        #expect(cover(empty) == empty)
+    }
+
+    @Test("A4: daumcdn이 아닌 http 호스트는 스킴을 유지한다")
+    func kakaoCover_a4_nonDaumcdnHost_keepsScheme() {
+        let thumbnail = "https://search1.kakaocdn.net/thumb/R120x174.q85/?fname=http%3A%2F%2Fexample.com%2Fa.jpg"
+        #expect(cover(thumbnail) == "http://example.com/a.jpg")
+    }
+
+    @Test("A4: 썸네일이 비었거나 공백뿐이거나 없으면 nil이다")
     func kakaoCover_a4_emptyThumbnail_returnsNil() {
         #expect(cover("") == nil)
+        #expect(cover("   ") == nil)
         #expect(cover(nil) == nil)
     }
 
@@ -99,6 +114,8 @@ struct KakaoBookSearchDTOTests {
         #expect(isbn13("8936434128 9788936434120") == "9788936434120")
         #expect(isbn13("9791190000000") == "9791190000000")
         #expect(isbn13("2090000157222") == nil)
+        #expect(isbn13("8936434128 2090000157222") == nil)
+        #expect(isbn13("2090000157222 9788936434120") == "9788936434120")
         #expect(isbn13("1234567890") == nil)
     }
 }
