@@ -31,14 +31,10 @@ struct KakaoBookSearchDTO: Decodable, Sendable {
     }
 
     private func parsePublishedDate() -> PublicationDate? {
-        guard let datetime else { return nil }
-
-        let parts = datetime.prefix(10).split(separator: "-", omittingEmptySubsequences: false)
-        guard parts.map(\.count) == [4, 2, 2],
-              parts.allSatisfy({ $0.utf8.allSatisfy { (48...57).contains($0) } }),
-              let year = Int(parts[0]),
-              let month = Int(parts[1]),
-              let day = Int(parts[2])
+        guard let match = datetime?.prefixMatch(of: /([0-9]{4})-([0-9]{2})-([0-9]{2})/),
+              let year = Int(match.1),
+              let month = Int(match.2),
+              let day = Int(match.3)
         else { return nil }
 
         return PublicationDate(year: year, month: month, day: day)
@@ -46,12 +42,8 @@ struct KakaoBookSearchDTO: Decodable, Sendable {
 
     private func extractISBN13() -> String? {
         isbn?.split(whereSeparator: \Character.isWhitespace)
+            .first { $0.wholeMatch(of: /[0-9]{13}/) != nil }
             .map(String.init)
-            .first { value in
-                value.count == 13 && value.unicodeScalars.allSatisfy {
-                    (48...57).contains($0.value)
-                }
-            }
     }
 
     private var nonEmptyThumbnail: String? {

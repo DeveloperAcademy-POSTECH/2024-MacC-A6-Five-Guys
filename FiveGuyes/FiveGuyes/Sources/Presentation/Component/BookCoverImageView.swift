@@ -10,14 +10,8 @@ import SwiftUI
 struct BookCoverImageView: View {
     let coverURL: String?
 
-    enum InitialContent: Equatable {
-        case remote(URL)
-        case defaultCover
-    }
-
     var body: some View {
-        switch Self.initialContent(for: coverURL) {
-        case let .remote(url):
+        if let url = Self.url(from: coverURL) {
             AsyncImage(url: url) { phase in
                 switch phase {
                 case .empty:
@@ -30,19 +24,19 @@ struct BookCoverImageView: View {
                     defaultCover
                 }
             }
-        case .defaultCover:
+        } else {
             defaultCover
         }
     }
 
-    static func initialContent(for coverURL: String?) -> InitialContent {
+    static func url(from coverURL: String?) -> URL? {
         guard let coverURL = coverURL?.trimmingCharacters(in: .whitespacesAndNewlines),
               !coverURL.isEmpty,
               let url = URL(string: coverURL)
         else {
-            return .defaultCover
+            return nil
         }
-        return .remote(url)
+        return url
     }
 
     private var defaultCover: some View {
@@ -53,29 +47,13 @@ struct BookCoverImageView: View {
 
 #Preview {
     VStack(spacing: 20) {
-        BookCoverImageView(
-            coverURL: "https://picsum.photos/200/300"
-        )
-        .scaledToFit()
-        .frame(width: 100, height: 150)
-        .clipToBookShape()
-        .commonShadow()
-
-        BookCoverImageView(
-            coverURL: nil
-        )
-        .scaledToFit()
-        .frame(width: 100, height: 150)
-        .clipToBookShape()
-        .commonShadow()
-
-        BookCoverImageView(
-            coverURL: "invalid_url_string"
-        )
-        .scaledToFit()
-        .frame(width: 100, height: 150)
-        .clipToBookShape()
-        .commonShadow()
+        ForEach(["https://picsum.photos/200/300", nil, "invalid_url_string"] as [String?], id: \.self) { url in
+            BookCoverImageView(coverURL: url)
+                .scaledToFit()
+                .frame(width: 100, height: 150)
+                .clipToBookShape()
+                .commonShadow()
+        }
     }
     .padding()
 }

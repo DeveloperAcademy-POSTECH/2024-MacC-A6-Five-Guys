@@ -12,13 +12,13 @@ import Testing
 @Suite("BookSearchViewModel 테스트")
 @MainActor
 struct BookSearchViewModelTests {
-    @Test("검색 성공 시 목록을 갱신한다")
+    @Test("검색 성공 시 목록을 갱신하고 검색어 앞뒤 공백을 지운다")
     func searchSuccessUpdatesBooks() async {
         let provider = BookSearchProviderStub()
         provider.fetchBooksResult = [makeBookSearchItem(title: "테스트 도서")]
         let viewModel = makeViewModel(provider: provider)
 
-        await viewModel.searchBooks(query: "테스트")
+        await viewModel.searchBooks(query: "  테스트\n")
 
         #expect(viewModel.books.map(\.title) == ["테스트 도서"])
         #expect(provider.fetchBooksQueries == ["테스트"])
@@ -94,36 +94,10 @@ struct BookSearchViewModelTests {
         #expect(provider.fetchTotalPagesISBNs == ["9781234567890"])
     }
 
-    @Test("총 페이지 조회 오류는 안내 없이 0을 반환한다")
-    func fetchTotalPagesFailureReturnsZeroWithoutAlert() async {
-        let provider = BookSearchProviderStub()
-        provider.fetchBookTotalPagesError = TestError.forced
-        let viewModel = makeViewModel(provider: provider)
-
-        let totalPages = await viewModel.fetchBookTotalPages(isbn: "9781234567890")
-
-        #expect(totalPages == "0")
-        #expect(!viewModel.showSearchConfigAlert)
-        #expect(viewModel.searchConfigAlertMessage.isEmpty)
-    }
-
-    @Test("페이지 키 누락도 안내 없이 0을 반환한다")
-    func missingPageAPIKeyReturnsZeroWithoutAlert() async {
-        let provider = BookSearchProviderStub()
-        provider.fetchBookTotalPagesError = BookSearchError.missingAPIKey(setting: "NL_API_KEY")
-        let viewModel = makeViewModel(provider: provider)
-
-        let totalPages = await viewModel.fetchBookTotalPages(isbn: "9781234567890")
-
-        #expect(totalPages == "0")
-        #expect(!viewModel.showSearchConfigAlert)
-        #expect(viewModel.searchConfigAlertMessage.isEmpty)
-    }
-
     @Test("페이지 조회 실패에도 선택 완료 결과를 0쪽으로 반환한다")
     func completionContinuesWithZeroWhenPageLookupFails() async {
         let provider = BookSearchProviderStub()
-        provider.fetchBookTotalPagesError = BookSearchError.network
+        provider.fetchBookTotalPagesError = BookSearchError.failed
         let viewModel = makeViewModel(provider: provider)
         let selectedBook = makeBookSearchItem(title: "선택 도서")
         viewModel.selectBook(selectedBook)

@@ -6,7 +6,7 @@
 //
 
 /// 출간일. 시각·타임존 없이 출처가 준 달력 날짜만 담는다. 월·일은 없을 수 있다.
-struct PublicationDate: Equatable, Hashable, Sendable {
+struct PublicationDate: Hashable, Sendable {
     let year: Int
     let month: Int?
     let day: Int?

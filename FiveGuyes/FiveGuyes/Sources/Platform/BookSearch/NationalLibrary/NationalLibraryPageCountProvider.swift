@@ -22,18 +22,19 @@ final class NationalLibraryPageCountProvider: BookPageCountProviding {
             apiKey = try apiKeyProvider.key(named: "NL_API_KEY")
         } catch {
             // `key(named:)`는 typed throws라 `error`가 `APIKeyError`로 추론된다.
-            throw BookSearchErrorMapper.map(error)
+            switch error {
+            case let .missing(name):
+                throw BookSearchError.missingAPIKey(setting: name)
+            }
         }
 
         do {
             let response = try await httpClient.request(
                 NationalLibraryISBNEndpoint(apiKey: apiKey, isbn13: isbn13)
             )
-            guard let page = response.docs.first?.page else { return nil }
-            return PageCountParser.parse(page)
+            return response.docs?.first?.page.flatMap(PageCountParser.parse)
         } catch {
-            // `request(_:)`는 typed throws라 `error`가 `HTTPClientError`로 추론된다.
-            throw BookSearchErrorMapper.map(error)
+            throw BookSearchError.failed
         }
     }
 }
