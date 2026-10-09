@@ -46,4 +46,40 @@ struct KakaoBookSearchDTOTests {
         #expect(parse("2021-+1-01T00:00:00.000+09:00") == nil)
         #expect(parse("2021-13-01T00:00:00.000+09:00") == nil)
     }
+
+    private func cover(_ thumbnail: String?) -> String? {
+        KakaoBookSearchDTO(
+            title: "t",
+            authors: nil,
+            publisher: nil,
+            datetime: nil,
+            isbn: nil,
+            thumbnail: thumbnail
+        ).toBookSearchItem().coverImageURL
+    }
+
+    @Test("A4: 썸네일의 fname 원본 주소를 https로 쓴다")
+    func kakaoCover_a4_fname_usesOriginalOverHTTPS() {
+        let thumbnail = "https://search1.kakaocdn.net/thumb/R120x174.q85/?fname=http%3A%2F%2Ft1.daumcdn.net%2Flbook%2Fimage%2F123%3Ftimestamp%3D20210101"
+        #expect(cover(thumbnail) == "https://t1.daumcdn.net/lbook/image/123?timestamp=20210101")
+    }
+
+    @Test("A4: fname이 없으면 썸네일 그대로다")
+    func kakaoCover_a4_noFname_keepsThumbnail() {
+        #expect(cover("https://example.com/cover.jpg") == "https://example.com/cover.jpg")
+    }
+
+    @Test("A4: fname이 URL이 아니면 썸네일 그대로다")
+    func kakaoCover_a4_invalidFname_keepsThumbnail() {
+        let notURL = "https://search1.kakaocdn.net/thumb/R120x174.q85/?fname=not%20a%20url"
+        let badScheme = "https://search1.kakaocdn.net/thumb/R120x174.q85/?fname=ftp%3A%2F%2Fexample.com%2Fa.jpg"
+        #expect(cover(notURL) == notURL)
+        #expect(cover(badScheme) == badScheme)
+    }
+
+    @Test("A4: 썸네일이 비었거나 없으면 nil이다")
+    func kakaoCover_a4_emptyThumbnail_returnsNil() {
+        #expect(cover("") == nil)
+        #expect(cover(nil) == nil)
+    }
 }
