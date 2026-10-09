@@ -2,7 +2,7 @@
 //  KakaoBookSearchDTOTests.swift
 //  FiveGuyesTests
 //
-//  Created by Codex on 2026-10-09.
+//  Created by Claude on 2026-10-09.
 //
 
 @testable import FiveGuyes
@@ -19,17 +19,17 @@ struct KakaoBookSearchDTOTests {
             datetime: datetime,
             isbn: nil,
             thumbnail: nil
-        ).parsePublishedDate()
+        ).toBookSearchItem().publishedDate
     }
 
-    @Test("A4: 앞 yyyy-MM-dd를 연·월·일로 읽는다")
-    func kakaoDate_a4_isoDatetime_parsesCalendarDate() {
+    @Test("A5: 앞 yyyy-MM-dd를 연·월·일로 읽는다")
+    func kakaoDate_a5_isoDatetime_parsesCalendarDate() {
         #expect(parse("2021-01-01T00:00:00.000+09:00") == PublicationDate(year: 2021, month: 1, day: 1))
         #expect(parse("2014-11-17T00:00:00.000+09:00") == PublicationDate(year: 2014, month: 11, day: 17))
     }
 
-    @Test("A4: 오프셋이 달라도 앞 10자리를 그대로 읽는다")
-    func kakaoDate_a4_anyOffset_keepsDatePart() {
+    @Test("A5: 오프셋이 달라도 앞 10자리를 그대로 읽는다")
+    func kakaoDate_a5_anyOffset_keepsDatePart() {
         #expect(parse("2021-01-01T00:00:00.000Z") == PublicationDate(year: 2021, month: 1, day: 1))
         #expect(parse("2021-01-01T00:00:00.000-05:00") == PublicationDate(year: 2021, month: 1, day: 1))
     }
@@ -42,6 +42,8 @@ struct KakaoBookSearchDTOTests {
         #expect(parse("20210101") == nil)
         #expect(parse("abcd-ef-gh") == nil)
         #expect(parse("not a date") == nil)
+        #expect(parse("+021-01-01T00:00:00.000+09:00") == nil)
+        #expect(parse("2021-+1-01T00:00:00.000+09:00") == nil)
         #expect(parse("2021-13-01T00:00:00.000+09:00") == nil)
     }
 }
