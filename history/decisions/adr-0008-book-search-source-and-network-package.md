@@ -1,6 +1,6 @@
 # ADR-0008: Book Search Source Replacement and Network Package Boundary
 
-- Status: Accepted
+- Status: Accepted (Decision 3의 출간일 타입은 ADR-0009로 대체)
 - Date: 2026-10-08
 - Owners: FiveGuyes team
 - Related: [ADR-0002](adr-0002-usecase-first-boundary.md), GitHub #212, #225
