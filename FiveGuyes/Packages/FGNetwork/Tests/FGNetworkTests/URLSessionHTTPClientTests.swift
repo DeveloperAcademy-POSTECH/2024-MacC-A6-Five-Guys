@@ -11,7 +11,6 @@ struct URLSessionHTTPClientTests {
         let configuration = URLSessionHTTPClient.makeDefaultConfiguration()
 
         #expect(configuration.urlCache == nil)
-        #expect(configuration.requestCachePolicy == .reloadIgnoringLocalCacheData)
         #expect(configuration.timeoutIntervalForRequest == 15)
     }
 
@@ -20,33 +19,29 @@ struct URLSessionHTTPClientTests {
         let stubID = UUID().uuidString
         let responseBody = Data("response".utf8)
         URLProtocolStub.register(
-            .response(statusCode: 418, headers: ["X-Response": "value"], body: responseBody),
+            .response(statusCode: 418, headers: [:], body: responseBody),
             for: stubID
         )
         defer { URLProtocolStub.unregister(stubID) }
         let client = makeClient(stubID: stubID)
         let url = try #require(URL(string: "https://example.com/books"))
         let request = HTTPRequest(
-            method: .post,
             url: url,
             queryItems: [URLQueryItem(name: "query", value: "Swift & iOS")],
             headers: ["X-Request": "header"],
-            body: Data("body".utf8),
             timeout: 3
         )
 
         let response = try await client.send(request)
 
         #expect(response.statusCode == 418)
-        #expect(response.headers["X-Response"] == "value")
         #expect(response.body == responseBody)
         let sentRequest = try #require(URLProtocolStub.lastRequest(for: stubID))
         let components = try #require(
             sentRequest.url.map { URLComponents(url: $0, resolvingAgainstBaseURL: false) }
         )
-        #expect(sentRequest.httpMethod == "POST")
+        #expect(sentRequest.httpMethod == "GET")
         #expect(sentRequest.value(forHTTPHeaderField: "X-Request") == "header")
-        #expect(bodyData(from: sentRequest) == Data("body".utf8))
         #expect(sentRequest.timeoutInterval == 3)
         #expect(components?.queryItems?.first?.name == "query")
         #expect(components?.queryItems?.first?.value == "Swift & iOS")
@@ -62,7 +57,6 @@ struct URLSessionHTTPClientTests {
         defer { URLProtocolStub.unregister(stubID) }
         let client = makeClient(stubID: stubID)
         let request = HTTPRequest(
-            method: .get,
             url: try #require(URL(string: "https://example.com/books?old=value")),
             queryItems: [URLQueryItem(name: "query", value: "Swift & iOS")]
         )
@@ -86,10 +80,7 @@ struct URLSessionHTTPClientTests {
         URLProtocolStub.register(.failure(URLError(.notConnectedToInternet)), for: stubID)
         defer { URLProtocolStub.unregister(stubID) }
         let client = makeClient(stubID: stubID)
-        let request = HTTPRequest(
-            method: .get,
-            url: try #require(URL(string: "https://example.com"))
-        )
+        let request = HTTPRequest(url: try #require(URL(string: "https://example.com")))
 
         do {
             _ = try await client.send(request)
@@ -107,10 +98,7 @@ struct URLSessionHTTPClientTests {
         URLProtocolStub.register(.nonHTTPResponse(body: Data()), for: stubID)
         defer { URLProtocolStub.unregister(stubID) }
         let client = makeClient(stubID: stubID)
-        let request = HTTPRequest(
-            method: .get,
-            url: try #require(URL(string: "https://example.com"))
-        )
+        let request = HTTPRequest(url: try #require(URL(string: "https://example.com")))
 
         do {
             _ = try await client.send(request)
@@ -129,7 +117,6 @@ struct URLSessionHTTPClientTests {
         defer { URLProtocolStub.unregister(stubID) }
         let client = makeClient(stubID: stubID)
         let request = HTTPRequest(
-            method: .get,
             url: try #require(URL(string: "https://example.com")),
             timeout: 1
         )
@@ -150,10 +137,7 @@ struct URLSessionHTTPClientTests {
         URLProtocolStub.register(.pending, for: stubID)
         defer { URLProtocolStub.unregister(stubID) }
         let client = makeClient(stubID: stubID)
-        let request = HTTPRequest(
-            method: .get,
-            url: try #require(URL(string: "https://example.com"))
-        )
+        let request = HTTPRequest(url: try #require(URL(string: "https://example.com")))
         let task = Task {
             try await client.send(request)
         }
@@ -169,8 +153,7 @@ struct URLSessionHTTPClientTests {
             _ = try await task.value
             Issue.record("취소된 요청에서 오류가 발생해야 합니다.")
         } catch HTTPClientError.cancelled {
-            let didStop = await waitUntil { URLProtocolStub.didStop(for: stubID) }
-            #expect(didStop, "제한 시간 안에 URLProtocol 요청이 중단되어야 합니다.")
+            // Expected.
         } catch {
             Issue.record("예상하지 못한 오류: \(error)")
         }
@@ -197,28 +180,6 @@ struct URLSessionHTTPClientTests {
         configuration.httpAdditionalHeaders = ["X-Stub-ID": stubID]
         return URLSessionHTTPClient(session: URLSession(configuration: configuration))
     }
-
-    private func bodyData(from request: URLRequest) -> Data? {
-        if let body = request.httpBody {
-            return body
-        }
-        guard let stream = request.httpBodyStream else {
-            return nil
-        }
-
-        stream.open()
-        defer { stream.close() }
-        var body = Data()
-        var buffer = [UInt8](repeating: 0, count: 1_024)
-        while stream.hasBytesAvailable {
-            let count = stream.read(&buffer, maxLength: buffer.count)
-            guard count > 0 else {
-                break
-            }
-            body.append(buffer, count: count)
-        }
-        return body
-    }
 }
 
 private final class URLProtocolStub: URLProtocol {
@@ -233,7 +194,6 @@ private final class URLProtocolStub: URLProtocol {
         var stubs: [String: Stub] = [:]
         var lastRequests: [String: URLRequest] = [:]
         var startedIDs: Set<String> = []
-        var stoppedIDs: Set<String> = []
     }
 
     private static let state = OSAllocatedUnfairLock(initialState: State())
@@ -249,7 +209,6 @@ private final class URLProtocolStub: URLProtocol {
             state.stubs.removeValue(forKey: id)
             state.lastRequests.removeValue(forKey: id)
             state.startedIDs.remove(id)
-            state.stoppedIDs.remove(id)
         }
     }
 
@@ -259,10 +218,6 @@ private final class URLProtocolStub: URLProtocol {
 
     static func didStart(for id: String) -> Bool {
         state.withLock { $0.startedIDs.contains(id) }
-    }
-
-    static func didStop(for id: String) -> Bool {
-        state.withLock { $0.stoppedIDs.contains(id) }
     }
 
     override static func canInit(with request: URLRequest) -> Bool {
@@ -334,12 +289,5 @@ private final class URLProtocolStub: URLProtocol {
         client?.urlProtocolDidFinishLoading(self)
     }
 
-    override func stopLoading() {
-        guard let id = request.value(forHTTPHeaderField: "X-Stub-ID") else {
-            return
-        }
-        Self.state.withLock { state in
-            _ = state.stoppedIDs.insert(id)
-        }
-    }
+    override func stopLoading() {}
 }

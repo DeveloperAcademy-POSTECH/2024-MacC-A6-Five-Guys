@@ -9,7 +9,6 @@ public struct URLSessionHTTPClient: HTTPClient {
 
     static func makeDefaultConfiguration() -> URLSessionConfiguration {
         let configuration = URLSessionConfiguration.ephemeral
-        configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
         configuration.urlCache = nil
         configuration.timeoutIntervalForRequest = 15
         return configuration
@@ -22,34 +21,21 @@ public struct URLSessionHTTPClient: HTTPClient {
     public func send(_ request: HTTPRequest) async throws(HTTPClientError) -> HTTPResponse {
         let urlRequest = try makeURLRequest(from: request)
 
+        let body: Data
+        let response: URLResponse
         do {
-            let (body, response) = try await session.data(for: urlRequest)
-            guard let httpResponse = response as? HTTPURLResponse else {
-                throw HTTPClientError.invalidResponse
-            }
-
-            return HTTPResponse(
-                statusCode: httpResponse.statusCode,
-                headers: Self.makeHeaders(from: httpResponse),
-                body: body
-            )
-        } catch let error as HTTPClientError {
-            throw error
-        } catch let error as URLError {
-            if Task.isCancelled || error.code == .cancelled {
-                throw .cancelled
-            }
-            throw .transport(error)
-        } catch is CancellationError {
-            throw .cancelled
+            (body, response) = try await session.data(for: urlRequest)
         } catch {
-            if Task.isCancelled {
+            if Task.isCancelled || error is CancellationError || (error as? URLError)?.code == .cancelled {
                 throw .cancelled
             }
-            throw .transport(
-                URLError(.unknown, userInfo: [NSUnderlyingErrorKey: error])
-            )
+            throw .transport(error as? URLError ?? URLError(.unknown, userInfo: [NSUnderlyingErrorKey: error]))
         }
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw .invalidResponse
+        }
+        return HTTPResponse(statusCode: httpResponse.statusCode, body: body)
     }
 
     private func makeURLRequest(from request: HTTPRequest) throws(HTTPClientError) -> URLRequest {
@@ -66,8 +52,6 @@ public struct URLSessionHTTPClient: HTTPClient {
         }
 
         var urlRequest = URLRequest(url: url)
-        urlRequest.httpMethod = request.method.rawValue
-        urlRequest.httpBody = request.body
         request.headers.forEach { name, value in
             urlRequest.setValue(value, forHTTPHeaderField: name)
         }
@@ -75,14 +59,5 @@ public struct URLSessionHTTPClient: HTTPClient {
             urlRequest.timeoutInterval = timeout
         }
         return urlRequest
-    }
-
-    private static func makeHeaders(from response: HTTPURLResponse) -> [String: String] {
-        response.allHeaderFields.reduce(into: [:]) { headers, field in
-            guard let name = field.key as? String else {
-                return
-            }
-            headers[name] = String(describing: field.value)
-        }
     }
 }

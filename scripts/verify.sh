@@ -6,12 +6,8 @@ cd "$REPO_ROOT"
 SPM_DIR="${SPM_DIR:-$REPO_ROOT/.build/SourcePackages}"
 [[ "$SPM_DIR" = /* ]] || SPM_DIR="$REPO_ROOT/$SPM_DIR"
 RESULT_BUNDLE_PATH="${RESULT_BUNDLE_PATH:-}"
-if [[ -n "$RESULT_BUNDLE_PATH" ]]; then
-    [[ "$RESULT_BUNDLE_PATH" = /* ]] || RESULT_BUNDLE_PATH="$REPO_ROOT/$RESULT_BUNDLE_PATH"
-    PACKAGE_RESULT_BUNDLE_PATH="${RESULT_BUNDLE_PATH%.xcresult}-FGNetwork.xcresult"
-else
-    PACKAGE_RESULT_BUNDLE_PATH=""
-fi
+[[ -z "$RESULT_BUNDLE_PATH" || "$RESULT_BUNDLE_PATH" = /* ]] || RESULT_BUNDLE_PATH="$REPO_ROOT/$RESULT_BUNDLE_PATH"
+PACKAGE_RESULT_BUNDLE_PATH="${RESULT_BUNDLE_PATH:+${RESULT_BUNDLE_PATH%.xcresult}-FGNetwork.xcresult}"
 stage="준비"
 started_at=$(date +%s)
 results=()
