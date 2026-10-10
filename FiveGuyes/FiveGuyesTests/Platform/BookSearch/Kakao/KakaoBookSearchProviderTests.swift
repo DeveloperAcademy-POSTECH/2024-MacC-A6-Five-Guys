@@ -5,10 +5,11 @@
 //  Created by Codex on 2026-10-08.
 //
 
-import FGNetwork
 @testable import FiveGuyes
 import Foundation
 import Testing
+
+import FGNetwork
 
 @Suite("KakaoBookSearchProvider 테스트")
 struct KakaoBookSearchProviderTests {

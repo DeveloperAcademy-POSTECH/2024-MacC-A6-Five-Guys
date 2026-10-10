@@ -5,8 +5,9 @@
 //  Created by Codex on 2026-10-08.
 //
 
-import FGNetwork
 import Foundation
+
+import FGNetwork
 
 struct KakaoBookSearchEndpoint: Endpoint {
     typealias Response = KakaoBookSearchResponseDTO
