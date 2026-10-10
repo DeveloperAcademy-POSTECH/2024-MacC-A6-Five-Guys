@@ -7,6 +7,7 @@
 
 import FGNetwork
 
+/// 카카오 도서 검색 API(`KAKAO_API_KEY`)를 호출한다. 키 누락 외의 모든 실패는 `BookSearchError.failed`로 접는다.
 final class KakaoBookSearchProvider: BookSearchProviding {
     private let httpClient: any HTTPClient
     private let apiKeyProvider: any APIKeyProviding

@@ -9,6 +9,7 @@ import Foundation
 
 import FGNetwork
 
+/// 종이책(`ebook_yn=N`) 한 건만 조회한다. 검색 뒤 이어지는 부가 호출이라 타임아웃을 10초로 짧게 둔다.
 struct NationalLibraryISBNEndpoint: Endpoint {
     typealias Response = NationalLibraryBookDTO
 
