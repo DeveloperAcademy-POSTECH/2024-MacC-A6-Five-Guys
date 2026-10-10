@@ -1,5 +1,6 @@
 import Foundation
 
+/// `URLSession` 기반 `HTTPClient` 기본 구현.
 public struct URLSessionHTTPClient: HTTPClient {
     private let session: URLSession
 
@@ -7,6 +8,7 @@ public struct URLSessionHTTPClient: HTTPClient {
         self.session = URLSession(configuration: Self.makeDefaultConfiguration())
     }
 
+    /// ephemeral + 캐시 없음 + 요청당 15초. 근거는 `services/network/module.md`를 본다.
     static func makeDefaultConfiguration() -> URLSessionConfiguration {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.urlCache = nil
@@ -18,6 +20,7 @@ public struct URLSessionHTTPClient: HTTPClient {
         self.session = session
     }
 
+    /// 취소는 `cancelled`, 그 밖의 URLSession 오류는 `transport`로 매핑한다.
     public func send(_ request: HTTPRequest) async throws(HTTPClientError) -> HTTPResponse {
         let urlRequest = try makeURLRequest(from: request)
 
