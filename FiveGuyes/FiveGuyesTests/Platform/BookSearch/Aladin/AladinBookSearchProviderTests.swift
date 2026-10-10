@@ -5,10 +5,11 @@
 //  Created by zaehorang on 2026-02-16.
 //
 
-import FGNetwork
 @testable import FiveGuyes
 import Foundation
 import Testing
+
+import FGNetwork
 
 @Suite("AladinBookSearchProvider 테스트")
 struct AladinBookSearchProviderTests {

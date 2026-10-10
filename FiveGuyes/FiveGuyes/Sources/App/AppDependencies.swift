@@ -5,10 +5,11 @@
 //  Created by zaehorang on 2/12/26.
 //
 
-import FGNetwork
 import Foundation
 import Observation
 import SwiftData
+
+import FGNetwork
 
 @MainActor
 @Observable
