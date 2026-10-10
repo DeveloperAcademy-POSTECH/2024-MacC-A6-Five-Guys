@@ -45,6 +45,7 @@ struct KakaoBookSearchDTOTests {
         #expect(parse("+021-01-01T00:00:00.000+09:00") == nil)
         #expect(parse("2021-+1-01T00:00:00.000+09:00") == nil)
         #expect(parse("2021-13-01T00:00:00.000+09:00") == nil)
+        #expect(parse("2021-02-31T00:00:00.000+09:00") == nil)
     }
 
     private func cover(_ thumbnail: String?) -> String? {
