@@ -34,4 +34,17 @@ struct PublicationDateTests {
         #expect(PublicationDate(year: 2021, month: 1, day: 0) == nil)
         #expect(PublicationDate(year: 2021, month: 1, day: 32) == nil)
     }
+
+    @Test("A5: 월 없이 일만 있으면 nil이다")
+    func publicationDate_a5_dayWithoutMonth_returnsNil() {
+        #expect(PublicationDate(year: 2021, month: nil, day: 5) == nil)
+        #expect(PublicationDate(year: 2021, month: 4, day: nil) != nil)
+    }
+
+    @Test("A5: 달력에 없는 날짜면 nil이다")
+    func publicationDate_a5_nonexistentDate_returnsNil() {
+        #expect(PublicationDate(year: 2021, month: 2, day: 31) == nil)
+        #expect(PublicationDate(year: 2021, month: 2, day: 29) == nil)
+        #expect(PublicationDate(year: 2020, month: 2, day: 29) != nil)
+    }
 }
