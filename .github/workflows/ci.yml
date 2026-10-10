@@ -32,7 +32,7 @@ jobs:
           xcodebuild -version
 
       # Config.xcconfig는 Debug/Release의 base configuration이며 gitignore 대상이라
-      # 복사하지 않으면 빌드 자체가 실패한다. 값은 placeholder로 충분하다
+      # 복사하지 않으면 빌드 자체가 실패한다. 견본의 값은 비어 있고 그대로 써도 된다
       # (CI는 알라딘 API를 호출하지 않는다).
       #
       # GoogleService-Info.plist는 일부러 만들지 않는다. plist 없이도 Debug 앱이 실행되고
@@ -62,5 +62,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: TestResults
-          path: TestResults.xcresult
+          path: TestResults*.xcresult
           retention-days: 7

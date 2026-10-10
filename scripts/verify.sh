@@ -5,6 +5,9 @@ REPO_ROOT="$(git rev-parse --show-toplevel)"
 cd "$REPO_ROOT"
 SPM_DIR="${SPM_DIR:-$REPO_ROOT/.build/SourcePackages}"
 [[ "$SPM_DIR" = /* ]] || SPM_DIR="$REPO_ROOT/$SPM_DIR"
+RESULT_BUNDLE_PATH="${RESULT_BUNDLE_PATH:-}"
+[[ -z "$RESULT_BUNDLE_PATH" || "$RESULT_BUNDLE_PATH" = /* ]] || RESULT_BUNDLE_PATH="$REPO_ROOT/$RESULT_BUNDLE_PATH"
+PACKAGE_RESULT_BUNDLE_PATH="${RESULT_BUNDLE_PATH:+${RESULT_BUNDLE_PATH%.xcresult}-FGNetwork.xcresult}"
 stage="준비"
 started_at=$(date +%s)
 results=()
@@ -32,7 +35,10 @@ run_stage() {
 }
 
 check_result_bundle() {
-    [[ -z "${RESULT_BUNDLE_PATH:-}" || ! -e "$RESULT_BUNDLE_PATH" ]] || { echo "결과 번들이 이미 있습니다: $RESULT_BUNDLE_PATH"; exit 1; }
+    local result_bundle
+    for result_bundle in "$RESULT_BUNDLE_PATH" "$PACKAGE_RESULT_BUNDLE_PATH"; do
+        [[ -z "$result_bundle" || ! -e "$result_bundle" ]] || { echo "결과 번들이 이미 있습니다: $result_bundle"; exit 1; }
+    done
 }
 
 select_destination() {
@@ -51,12 +57,30 @@ print(best[1])')"
     fi
 }
 
+test_package() {
+    local args=(
+        test
+        -scheme FGNetwork
+        -destination "$destination"
+        -clonedSourcePackagesDirPath "$SPM_DIR"
+        -parallel-testing-enabled NO
+        -maximum-concurrent-test-simulator-destinations 1
+    )
+    [[ -z "$PACKAGE_RESULT_BUNDLE_PATH" ]] || args+=(-resultBundlePath "$PACKAGE_RESULT_BUNDLE_PATH")
+    [[ "${CI:-}" != true ]] || args+=(CODE_SIGNING_ALLOWED=NO)
+    (
+        cd FiveGuyes/Packages/FGNetwork
+        xcodebuild "${args[@]}"
+    )
+}
+
 [[ -f FiveGuyes/Config.xcconfig ]] || { echo 'FiveGuyes/Config.xcconfig가 없습니다. Config.xcconfig.example을 복사하세요.'; exit 1; }
 run_stage '결과 번들 확인' check_result_bundle
 run_stage '패키지 해석' xcodebuild -resolvePackageDependencies -project FiveGuyes/FiveGuyes.xcodeproj -clonedSourcePackagesDirPath "$SPM_DIR"
 run_stage 'lint' bash -c 'cd FiveGuyes && ../scripts/swiftlint.sh lint --no-cache'
 run_stage '시뮬레이터 선택' select_destination
+run_stage '패키지 테스트' test_package
 args=(test -project FiveGuyes/FiveGuyes.xcodeproj -scheme FiveGuyes -destination "$destination" -clonedSourcePackagesDirPath "$SPM_DIR" -parallel-testing-enabled NO -maximum-concurrent-test-simulator-destinations 1)
-[[ -z "${RESULT_BUNDLE_PATH:-}" ]] || args+=(-resultBundlePath "$RESULT_BUNDLE_PATH")
+[[ -z "$RESULT_BUNDLE_PATH" ]] || args+=(-resultBundlePath "$RESULT_BUNDLE_PATH")
 [[ "${CI:-}" != true ]] || args+=(CODE_SIGNING_ALLOWED=NO)
 run_stage '테스트' env SWIFTLINT_ALREADY_RUN=1 xcodebuild "${args[@]}"
