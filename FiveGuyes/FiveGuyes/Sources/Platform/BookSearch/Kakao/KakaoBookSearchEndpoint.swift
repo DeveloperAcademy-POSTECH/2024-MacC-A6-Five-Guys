@@ -9,6 +9,7 @@ import Foundation
 
 import FGNetwork
 
+/// 카카오 도서 검색 요청. 정확도순 10건이고 인증은 헤더로 보낸다.
 struct KakaoBookSearchEndpoint: Endpoint {
     typealias Response = KakaoBookSearchResponseDTO
 

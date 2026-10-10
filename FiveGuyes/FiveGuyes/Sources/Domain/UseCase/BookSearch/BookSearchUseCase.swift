@@ -28,6 +28,7 @@ struct BookSearchUseCase: BookSearchUsing {
         try await bookSearchProvider.searchBooks(query: query)
     }
 
+    /// ISBN이 없거나 조회가 실패했거나 쪽수 정보가 없으면 모두 0으로 접는다(spec B7, B9).
     func fetchBookTotalPages(isbn: String?) async -> Int {
         guard let isbn else { return 0 }
         return (try? await bookPageCountProvider.fetchTotalPages(isbn13: isbn)) ?? 0

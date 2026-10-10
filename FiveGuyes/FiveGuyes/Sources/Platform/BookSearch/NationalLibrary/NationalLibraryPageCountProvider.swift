@@ -7,6 +7,7 @@
 
 import FGNetwork
 
+/// 국립중앙도서관 ISBN 서지정보 API(`NL_API_KEY`)로 총 쪽수를 조회한다. 키 누락 외의 모든 실패는 `BookSearchError.failed`로 접는다.
 final class NationalLibraryPageCountProvider: BookPageCountProviding {
     private let httpClient: any HTTPClient
     private let apiKeyProvider: any APIKeyProviding
