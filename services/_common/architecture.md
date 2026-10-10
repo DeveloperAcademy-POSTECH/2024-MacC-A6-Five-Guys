@@ -1,9 +1,5 @@
 # Architecture
 
-> 기준일: 2026-10-07 (규칙을 바꾸면 함께 고친다)
->
-> 새 코드를 어느 layer에 두고 무엇에 의존할지 정하는 목표 구조 문서다. 코드가 이 문서와 다르면 코드를 고칠 대상으로 보고 [backlog](../../history/backlog.md)에 추가한다.
-
 ## Overall Architecture
 
 - **Feature 단위 MVVM + Clean Architecture**를 따른다. ([ADR-0001](../../history/decisions/adr-0001-presentation-architecture.md))
@@ -13,7 +9,7 @@
 | 플랫폼 | iOS 17+, Swift (language mode 5) |
 | UI | SwiftUI, Observation(`@Observable`) |
 | 저장 | SwiftData, UserDefaults |
-| 외부 연동 | UserNotifications(로컬 알림), URLSession(알라딘 OpenAPI), Firebase Analytics, AppTrackingTransparency |
+| 외부 연동 | UserNotifications(로컬 알림), FGNetwork 패키지의 URLSession(도서 검색 출처는 `services/book-search/sources.md`), Firebase Analytics, AppTrackingTransparency |
 | 테스트·품질 | Swift Testing, SwiftLint(`scripts/verify.sh`·CI·pre-push) |
 
 ```text
@@ -49,7 +45,7 @@
 | ViewModel | 의도를 처리해 상태를 바꾸고, 필요한 기능은 UseCase에 요청한다 | — | Presentation |
 | UseCase | ViewModel이 요청하는 기능 단위. 앱 규칙을 실행하고 Repository·Service를 조합한다 | `...Using` | `...UseCase` (Domain). 구현 안에서만 쓰는 단일 동작 UseCase는 interface 없이 `...UseCase`로 둔다 |
 | Repository | 영속 데이터 접근 | `...Repo` | Data |
-| Service | UseCase가 쓰는 Repository 외 기능. 도메인 로직(오늘 날짜, 하루 경계 등)과 외부 연동(알림, 도서 검색 등)을 제공한다 | `...ing` (`...Providing`, `...Scheduling` 등) | Platform, Data(저장), Domain(Foundation 값 타입만 쓰는 구현) |
+| Service | UseCase가 쓰는 Repository 외 기능. 도메인 로직(오늘 날짜, 하루 경계 등. 날짜 값의 종류는 `dates.md`)과 외부 연동(알림, 도서 검색 등)을 제공한다 | `...ing` (`...Providing`, `...Scheduling` 등) | Platform, Data(저장), Domain(Foundation 값 타입만 쓰는 구현) |
 
 ### Clean Architecture
 
@@ -83,6 +79,18 @@ App ──> Domain   (구현체 조립)
 - Data·Platform의 외부 표현 타입(저장 모델, API DTO)은 그 layer 밖으로 노출하지 않는다. 구현이 Entity로 바꿔 넘긴다.
 - 앱은 단일 모듈로 구성하며 lint custom rule이 경계 일부를 error로 검사한다.
 - 테스트 전용 대역은 테스트 타깃에 둔다.
+
+## 고칠 위치 정하기
+
+증상이 보이는 곳이 아니라 원인이 있는 layer를 고친다. 값이 어디서 들어와 어디까지 흘러가는지, 다음에 올 변화가 어디를 건드리는지 넓게 보되, 한 곳만 고치면 되는 지점을 찾아 좁게 고친다.
+
+1. **뜻과 모양이 맞아야 한다.** 값의 의미와 타입이 어긋나면 그것이 원인이다. 변환으로 덮지 않고 타입을 바꾼다.
+2. **고치는 위치는 그 지식을 가진 layer다.** 안쪽 layer가 바깥을 보정하지 않는다. 아래 Dependency Direction을 따른다.
+3. **다음 변화를 하나만 구체적으로 가정한다.** 문서에 적힌 후속 후보가 실제로 주는 입력에서도 Domain이 바뀌지 않는지 본다. 확인되지 않은 변화에 대비한 기능·코드는 만들지 않는다. 판단이 어려우면 "나중에 넣는다면 리팩터링 비용이 얼마인가"를 묻는다.
+4. **모양은 값의 의미를 따르고, 기능은 쓸 때 만든다.** 타입 모양을 정할 때는 4항이 3항보다 먼저다. 값이 원래 가변적이면 필드를 선택으로 두는 것은 대비가 아니라 의미를 맞추는 일이다. 아직 쓰지 않는 정렬·저장·포매팅은 만들지 않는다.
+5. **규약보다 타입으로 강제한다.** 컴파일러가 잡을 수 있는 형태가 있으면 "이 값은 UTC 정오다" 같은 약속 대신 그쪽을 택한다.
+
+적용 사례: [ADR-0009](../../history/decisions/adr-0009-publication-date-as-partial-civil-date.md)
 
 ## Layer Rules
 

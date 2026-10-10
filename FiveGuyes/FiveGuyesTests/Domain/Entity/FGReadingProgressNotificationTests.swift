@@ -119,6 +119,7 @@ struct FGReadingProgressNotificationTests {
                 title: "테스트",
                 author: "저자",
                 coverImageURL: nil,
+                isbn13: nil,
                 totalPages: 300
             ),
             userSettings: settings,

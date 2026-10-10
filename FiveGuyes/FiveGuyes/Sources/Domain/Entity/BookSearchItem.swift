@@ -11,26 +11,26 @@ struct BookSearchItem: Identifiable, Equatable, Hashable {
     let id: UUID
     let title: String
     let author: String
-    let cover: String?
+    let coverImageURL: String?
     let publisher: String
-    let isbn13: String
-    let pubDate: String
+    let isbn13: String?
+    let publishedDate: PublicationDate?
 
     init(
         id: UUID = UUID(),
         title: String,
         author: String,
-        cover: String?,
+        coverImageURL: String?,
         publisher: String,
-        isbn13: String,
-        pubDate: String
+        isbn13: String?,
+        publishedDate: PublicationDate?
     ) {
         self.id = id
         self.title = title
         self.author = author
-        self.cover = cover
+        self.coverImageURL = coverImageURL
         self.publisher = publisher
         self.isbn13 = isbn13
-        self.pubDate = pubDate
+        self.publishedDate = publishedDate
     }
 }

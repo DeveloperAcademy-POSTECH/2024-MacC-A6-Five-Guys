@@ -23,6 +23,7 @@ extension FGBookMetaData {
             title: self.title,
             author: self.author,
             coverURL: self.coverImageURL,
+            isbn13: self.isbn13,
             totalPages: self.totalPages
         )
     }

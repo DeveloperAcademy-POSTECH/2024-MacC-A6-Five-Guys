@@ -6,7 +6,7 @@
 
 | 파일 | 필요 여부 | 할 일 |
 |---|---|---|
-| `FiveGuyes/Config.xcconfig` | **필수.** 없으면 빌드 실패 | 값이 비어 있는 견본을 복사한다. 도서 검색을 확인할 때만 `API_KEY`에 알라딘 API 키를 넣는다 |
+| `FiveGuyes/Config.xcconfig` | **필수.** 없으면 빌드 실패 | 값이 비어 있는 견본을 복사한다. 도서 검색을 확인할 때 `KAKAO_API_KEY`에 카카오 REST API 키를, 페이지 자동 채움을 확인할 때 `NL_API_KEY`에 국립중앙도서관 Open API 인증키를 넣는다 |
 | `FiveGuyes/FiveGuyes/GoogleService-Info.plist` | Debug·테스트는 없어도 됨. Release는 필수 | Firebase 동작을 확인할 때만 넣는다 |
 
 ```bash
@@ -15,13 +15,7 @@ cp FiveGuyes/Config.xcconfig.example FiveGuyes/Config.xcconfig
 
 두 파일 모두 `.gitignore` 대상이다. 실제 인증 정보는 커밋하지 않는다.
 
-**`GoogleService-Info.plist`**
-
-- Debug 빌드에서는 없으면 Firebase 초기화를 건너뛰고 정상 실행된다. Release는 항상 초기화하므로 반드시 필요하다.
-- 테스트는 plist 유무와 상관없이 Firebase와 ATT(앱 추적 투명성) 요청 없이 실행된다. CI도 이 파일을 만들지 않는다.
-- 넣을 때는 Firebase 콘솔(프로젝트 설정 > iOS 앱)에서 받은 파일을 `FiveGuyes/FiveGuyes/` 안에 둔다. 앱 타깃은 이 폴더를 파일시스템 동기화 그룹으로 참조하므로 **그 폴더 안의 파일만 앱 번들에 포함된다.**
-- 견본 파일을 복사해 넣으면 `FirebaseApp.configure()`가 시작 중 크래시한다.
-- Debug 빌드의 GA 수집은 기본으로 꺼져 있다. 켜고 끄는 방법은 `services/analytics/launch-and-ga.md`를 본다.
+`GoogleService-Info.plist`는 `FiveGuyes/FiveGuyes/` 안에 둔다. 초기화 조건과 GA 설정은 `services/analytics/launch-and-ga.md`를 본다.
 
 ## Build and Test
 

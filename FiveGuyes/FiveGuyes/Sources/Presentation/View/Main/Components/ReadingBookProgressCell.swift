@@ -72,10 +72,12 @@ struct ReadingBookProgressCell: View {
 
     private func userBookImage(_ userBook: FGUserBook) -> some View {
         BookCoverImageView(
-            coverURL: userBook.bookMetaData.coverImageURL,
-            width: 104,
-            height: 161
+            coverURL: userBook.bookMetaData.coverImageURL
         )
+        .scaledToFit()
+        .frame(width: 104, height: 161)
+        .clipToBookShape()
+        .commonShadow()
     }
 
     private func promptTexts(for state: FGReadingProgress.TodayReadingState) -> (primary: String, secondary: String) {

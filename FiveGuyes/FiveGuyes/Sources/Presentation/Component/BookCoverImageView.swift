@@ -9,50 +9,51 @@ import SwiftUI
 
 struct BookCoverImageView: View {
     let coverURL: String?
-    let width: CGFloat
-    let height: CGFloat
 
     var body: some View {
-        Group {
-            if let coverURL, let url = URL(string: coverURL) {
-                AsyncImage(url: url) { image in
-                    image
-                        .resizable()
-                } placeholder: {
-                    Image("book_cover_placeholder")
-                        .resizable()
+        if let url = Self.url(from: coverURL) {
+            AsyncImage(url: url) { phase in
+                switch phase {
+                case .empty:
+                    ProgressView()
+                case let .success(image):
+                    image.resizable()
+                case .failure:
+                    defaultCover
+                @unknown default:
+                    defaultCover
                 }
-            } else {
-                Rectangle()
-                    .foregroundStyle(Color.Fills.white)
             }
+        } else {
+            defaultCover
         }
-        .scaledToFit()
-        .frame(width: width, height: height)
-        .clipToBookShape()
-        .commonShadow()
+    }
+
+    static func url(from coverURL: String?) -> URL? {
+        guard let coverURL = coverURL?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !coverURL.isEmpty,
+              let url = URL(string: coverURL)
+        else {
+            return nil
+        }
+        return url
+    }
+
+    private var defaultCover: some View {
+        Image("book_cover_placeholder")
+            .resizable()
     }
 }
 
 #Preview {
     VStack(spacing: 20) {
-        BookCoverImageView(
-            coverURL: "https://picsum.photos/200/300",
-            width: 100,
-            height: 150
-        )
-
-        BookCoverImageView(
-            coverURL: nil,
-            width: 100,
-            height: 150
-        )
-
-        BookCoverImageView(
-            coverURL: "invalid_url_string",
-            width: 100,
-            height: 150
-        )
+        ForEach(["https://picsum.photos/200/300", nil, "invalid_url_string"] as [String?], id: \.self) { url in
+            BookCoverImageView(coverURL: url)
+                .scaledToFit()
+                .frame(width: 100, height: 150)
+                .clipToBookShape()
+                .commonShadow()
+        }
     }
     .padding()
 }

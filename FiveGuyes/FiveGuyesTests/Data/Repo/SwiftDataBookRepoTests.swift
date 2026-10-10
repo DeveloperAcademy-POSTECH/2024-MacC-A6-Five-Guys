@@ -39,6 +39,7 @@ struct SwiftDataBookRepoTests {
                 title: title,
                 author: author,
                 coverImageURL: "https://example.com/cover.jpg",
+                isbn13: "9781234567890",
                 totalPages: totalPages
             ),
             userSettings: FGUserSetting(
@@ -138,6 +139,8 @@ struct SwiftDataBookRepoTests {
                 == originalBook.bookMetaData.author)
         #expect(convertedBook.bookMetaData.coverImageURL
                 == originalBook.bookMetaData.coverImageURL)
+        #expect(convertedBook.bookMetaData.isbn13
+                == originalBook.bookMetaData.isbn13)
         #expect(convertedBook.bookMetaData.totalPages
                 == originalBook.bookMetaData.totalPages)
         #expect(convertedBook.userSettings.startPage

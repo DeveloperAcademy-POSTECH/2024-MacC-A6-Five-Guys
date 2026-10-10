@@ -25,6 +25,7 @@ extension BookMetaData {
             title: self.title,
             author: self.author,
             coverImageURL: self.coverURL,
+            isbn13: self.isbn13,
             totalPages: self.totalPages
         )
     }
