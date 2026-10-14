@@ -41,6 +41,7 @@
 ### 규칙
 
 - `send`는 상태 코드를 검사하지 않는다. 받은 그대로 돌려준다.
+- `queryItems`의 이름과 값은 `+`·`&`·`=`까지 퍼센트 인코딩한다. 서버가 `+`를 공백으로 읽으므로 그대로 두면 검색어 "C++"가 "C"로 바뀐다. URL에 이미 있던 쿼리는 인코딩된 그대로 두고 그 뒤에 붙인다.
 - `URLSessionHTTPClient`가 유일한 `HTTPClient` 구현이다. 기본 세션은 `.shared`가 아니라 `URLSessionConfiguration.ephemeral`이라 캐시를 쓰지 않고, 쿠키·자격증명은 디스크에 저장하지 않으며(메모리에만 보관), 데이터 수신이 없을 때의 대기 시간은 15초다(`.shared`는 60초). 엔드포인트별로 다른 값이 필요하면 `HTTPRequest.timeout`으로 재정의한다.
 - 테스트와 Preview는 `HTTPClient`를 채택한 대역을 쓴다. 패키지는 대역을 제공하지 않는다.
 - `request(_:)`(`HTTPClient` 확장)가 `makeRequest` → `send` → 2xx 검사(`unexpectedStatus`) → `Response` 디코딩(`decoding`)을 한 번에 한다. 디코더는 기본 `JSONDecoder`로 고정이다. 키 이름이나 날짜 해석은 DTO에서 처리한다.

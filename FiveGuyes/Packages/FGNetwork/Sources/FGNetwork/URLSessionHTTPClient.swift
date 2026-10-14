@@ -46,9 +46,9 @@ public struct URLSessionHTTPClient: HTTPClient {
             throw .invalidRequest
         }
         if !request.queryItems.isEmpty {
-            var queryItems = components.queryItems ?? []
-            queryItems.append(contentsOf: request.queryItems)
-            components.queryItems = queryItems
+            var queryItems = components.percentEncodedQueryItems ?? []
+            queryItems.append(contentsOf: request.queryItems.map(Self.percentEncoded))
+            components.percentEncodedQueryItems = queryItems
         }
         guard let url = components.url else {
             throw .invalidRequest
@@ -62,5 +62,19 @@ public struct URLSessionHTTPClient: HTTPClient {
             urlRequest.timeoutInterval = timeout
         }
         return urlRequest
+    }
+
+    /// `URLComponents.queryItems`는 `+`를 인코딩하지 않아 서버가 공백으로 읽으므로 직접 인코딩한다.
+    private static let queryComponentAllowed: CharacterSet = {
+        var allowed = CharacterSet.urlQueryAllowed
+        allowed.remove(charactersIn: "+&=")
+        return allowed
+    }()
+
+    private static func percentEncoded(_ item: URLQueryItem) -> URLQueryItem {
+        URLQueryItem(
+            name: item.name.addingPercentEncoding(withAllowedCharacters: queryComponentAllowed) ?? item.name,
+            value: item.value?.addingPercentEncoding(withAllowedCharacters: queryComponentAllowed)
+        )
     }
 }

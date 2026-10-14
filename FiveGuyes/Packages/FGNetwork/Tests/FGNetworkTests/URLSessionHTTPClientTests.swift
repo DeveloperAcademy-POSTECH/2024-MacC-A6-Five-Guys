@@ -74,6 +74,30 @@ struct URLSessionHTTPClientTests {
         #expect(components?.queryItems?.last?.value == "Swift & iOS")
     }
 
+    @Test("쿼리 값의 +를 공백이 아닌 %2B로 인코딩")
+    func send_plusInQueryValue_encodesPlusLiterally() async throws {
+        let stubID = UUID().uuidString
+        URLProtocolStub.register(
+            .response(statusCode: 200, headers: [:], body: Data()),
+            for: stubID
+        )
+        defer { URLProtocolStub.unregister(stubID) }
+        let client = makeClient(stubID: stubID)
+        let request = HTTPRequest(
+            url: try #require(URL(string: "https://example.com/books")),
+            queryItems: [URLQueryItem(name: "query", value: "C++ 프로그래밍")]
+        )
+
+        _ = try await client.send(request)
+
+        let sentRequest = try #require(URLProtocolStub.lastRequest(for: stubID))
+        let components = try #require(
+            sentRequest.url.map { URLComponents(url: $0, resolvingAgainstBaseURL: false) }
+        )
+        #expect(components?.percentEncodedQuery?.contains("C%2B%2B%20") == true)
+        #expect(components?.queryItems?.first?.value == "C++ 프로그래밍")
+    }
+
     @Test("전송 오류를 transport로 매핑")
     func send_transportFailure_throwsTransportError() async throws {
         let stubID = UUID().uuidString
