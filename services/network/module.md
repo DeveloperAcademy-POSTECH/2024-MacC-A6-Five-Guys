@@ -21,7 +21,10 @@
 | `HTTPResponse` | struct | `statusCode`, `body: Data` |
 | `HTTPClient` | protocol | `send(_:) async throws(HTTPClientError) -> HTTPResponse` |
 | `Endpoint` | protocol | 요청 하나. `Response` 타입과 `makeRequest()` |
-| `BundleAPIKeyStore` | struct | Info.plist에서 읽은 API 키 저장소 |
+| `URLSessionHTTPClient` | struct | `HTTPClient`의 유일한 구현 |
+| `APIKeyProviding` | protocol | `key(named:) throws(APIKeyError) -> String`. 키가 없거나 비어 있으면 `missing` |
+| `APIKeyError` | enum | `missing(name:)`. 이름만 담는다 |
+| `BundleAPIKeyStore` | struct | `APIKeyProviding` 구현. Info.plist에서 읽은 API 키 저장소 |
 | `HTTPClientError` | enum | 아래 표 |
 
 `HTTPRequest`는 `URLRequest`를 노출하지 않는다. URLSession으로의 변환은 `URLSessionHTTPClient` 안에서만 한다.
@@ -66,7 +69,7 @@ Platform/<연동>/<출처>/
 ```
 
 - 이 패키지를 import하는 곳의 허용 범위는 `services/_common/architecture.md`의 Local Packages 절을 따른다.
-- provider는 `HTTPClientError`와 `APIKeyError`를 Domain 오류로 바꾼다. Domain은 이 패키지의 타입을 모른다. (알라딘 provider는 #228에서 삭제되는 과도기 코드라 `transport`·`decoding`의 원본 오류를 그대로 전파하는 기존 동작을 유지한다. 새 provider는 이 규칙을 따른다.)
+- provider는 `HTTPClientError`와 `APIKeyError`를 Domain 오류로 바꾼다. Domain은 이 패키지의 타입을 모른다.
 - provider마다 `HTTPClient`를 새로 만들지 않는다. 세션을 공유해야 연결이 재사용된다.
 - 외부 형식 해석(날짜 문자열, 식별자 묶음, 자유 형식 숫자)은 DTO 변환에서 끝낸다. Domain 엔티티에는 해석된 값만 넘긴다.
 

@@ -16,7 +16,7 @@
 | Debug + plist 있음 | 한다 | 확인 모드면 `true`, 아니면 `false` (매 실행 명시) | 한다 |
 
 - 테스트 호스트 감지: `ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil`. 값은 빈 문자열로 들어오므로 존재 여부만 본다.
-- plist 감지: 번들에 `GoogleService-Info.plist` 파일이 있는지만 본다. 견본을 복사한 값 틀린 plist는 `FirebaseApp.configure()`가 시작 중 크래시한다.
+- plist 감지: 번들에 `GoogleService-Info.plist` 파일이 있는지만 본다. 값이 틀린 plist는 `FirebaseApp.configure()`가 시작 중 크래시한다.
 - `FIREBASE_ANALYTICS_COLLECTION_ENABLED`는 앱 타깃 빌드 설정(Debug `NO`, Release `YES`)을 `Info.plist`가 받는다. Firebase가 시작하자마자 보내는 자동 이벤트(`first_open` 등)까지 막기 위한 것이다. `Config.xcconfig`는 gitignore 대상이라 여기에 넣지 않는다.
 - 수집 설정은 앱을 다시 실행해도 유지되므로, 코드가 Debug 실행마다 `true`/`false`를 명시한다.
 
