@@ -6,7 +6,7 @@
 
 | 파일 | 필요 여부 | 할 일 |
 |---|---|---|
-| `FiveGuyes/Config.xcconfig` | **필수.** 없으면 빌드 실패 | 값이 비어 있는 견본을 복사한다. 도서 검색을 확인할 때 `KAKAO_API_KEY`에 카카오 REST API 키를, 페이지 자동 채움을 확인할 때 `NL_API_KEY`에 국립중앙도서관 Open API 인증키를 넣는다 |
+| `FiveGuyes/Config.xcconfig` | **필수.** 없으면 빌드 실패 | 값이 비어 있는 견본을 복사한다. 도서 검색을 확인할 때 `KAKAO_API_KEY`에 카카오 REST API 키를, 페이지 자동 채움을 확인할 때 `NL_API_KEY`에 국립중앙도서관 Open API 인증키를 넣는다(`KAKAO_API_KEY = <값>` 형식. 발급처는 `services/book-search/sources.md`의 인증 정보를 본다) |
 | `FiveGuyes/FiveGuyes/GoogleService-Info.plist` | Debug·테스트는 없어도 됨. Release는 필수 | Firebase 동작을 확인할 때만 넣는다 |
 
 ```bash
@@ -14,6 +14,8 @@ cp FiveGuyes/Config.xcconfig.example FiveGuyes/Config.xcconfig
 ```
 
 두 파일 모두 `.gitignore` 대상이다. 실제 인증 정보는 커밋하지 않는다.
+
+키를 비워 두어도 빌드와 테스트는 통과한다. 이때 검색은 설정 안내 알림(`services/book-search/spec.md` A10)이 뜨고, 페이지 자동 채움은 0쪽이 된다(B7). **Release 아카이브는 두 키가 채워진 `Config.xcconfig`로 만든다.** 비어 있어도 빌드는 통과하지만 출시된 앱에서 검색이 동작하지 않는다.
 
 `GoogleService-Info.plist`는 `FiveGuyes/FiveGuyes/` 안에 둔다. 초기화 조건과 GA 설정은 `services/analytics/launch-and-ga.md`를 본다.
 

@@ -17,7 +17,7 @@
 |---|---|---|---|---|---|
 | 독서 기록일 | 달력 날짜 | 기기 시간대. 기록마다 만들 때의 시간대 ID를 함께 저장 | Domain(`ReadingDateKey`) | `yyyy-MM-dd` 문자열 키 | 기록마다 생성 시점 시간대 ID를 저장. 과거 기록은 재계산하지 않음(forward-only). [ADR-0004](../../history/decisions/adr-0004-reading-record-timezone-forward-only-policy.md) |
 | 독서 설정일(시작·목표·쉬는 날) | 달력 날짜 | 기기 시간대 | Domain(`ReadingDateKey`) | 키 필드가 기준, `Date` 필드는 호환용으로 유지 | 키 문자열이 기준. legacy `Date` 필드는 읽기 호환용. [ADR-0005](../../history/decisions/adr-0005-settings-localdate-source-of-truth.md) |
-| 오늘 | 달력 날짜 | 기기 시간대에 하루 경계 정책을 적용 | Domain(`ReadingDateProviding` → `DayBoundaryProviding`) | 저장 안 함 | 하루 경계는 기기 시간대 04:00, `DayBoundaryProviding`이 정함. [알림 명세](../notification/spec.md) 1장(하루 경계) (주인 문서는 #234) |
+| 오늘 | 달력 날짜 | 기기 시간대에 하루 경계 정책을 적용 | Domain(`ReadingDateProviding` → `DayBoundaryProviding`) | 저장 안 함 | 하루 경계는 기기 시간대 04:00, `DayBoundaryProviding`이 정함. [알림 명세](../notification/spec.md) 1장 용어표의 "다음 독서일" 행 |
 | 출간일 | 부분 날짜 | 없음 | Platform이 출처 문자열에서 해석 | 저장 안 함 | 출처 문자열의 달력 날짜만 읽고 월·일은 없을 수 있음. [도서 검색 명세](../book-search/spec.md) A5 |
 | 알림 발송 시각 | 하루 중 시각 | 기기 시간대 | Data(UserDefaults) | 시·분 정수 | 시·분 정수, 기기 시간대로 해석. [알림 명세](../notification/spec.md) 3장 |
 
