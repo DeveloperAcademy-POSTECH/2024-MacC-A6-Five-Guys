@@ -58,7 +58,8 @@ final class FinishGoalViewModel {
             bookMetaData: FGBookMetaData(
                 title: selectedBook.title,
                 author: selectedBook.author,
-                coverImageURL: selectedBook.cover,
+                coverImageURL: selectedBook.coverImageURL,
+                isbn13: selectedBook.isbn13,
                 totalPages: targetEndPage
             ),
             userSettings: FGUserSetting(

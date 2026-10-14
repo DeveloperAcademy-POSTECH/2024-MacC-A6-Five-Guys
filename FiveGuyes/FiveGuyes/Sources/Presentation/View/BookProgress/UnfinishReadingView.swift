@@ -82,23 +82,10 @@ struct UnfinishReadingView: View {
     }
 
     private func userBookImage(book: FGUserBook) -> some View {
-        Group {
-            if let urlString = book.bookMetaData.coverImageURL {
-                AsyncImage(url: URL(string: urlString)) { image in
-                    image
-                        .resizable()
-                } placeholder: {
-                    ProgressView()
-                }
-            } else {
-                Image("")
-                    .resizable()
-                    .frame(width: 173)
-            }
-        }
-        .scaledToFit()
-        .frame(height: 267)
-        .clipToBookShape()
+        BookCoverImageView(coverURL: book.bookMetaData.coverImageURL)
+            .scaledToFit()
+            .frame(height: 267)
+            .clipToBookShape()
     }
 
     private func unfinishMessage(_ text: String) -> some View {

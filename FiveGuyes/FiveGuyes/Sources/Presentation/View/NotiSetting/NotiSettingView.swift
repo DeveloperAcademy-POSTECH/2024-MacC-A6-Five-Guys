@@ -18,10 +18,17 @@ struct NotiSettingView: View {
         self._viewModel = State(initialValue: viewModel)
     }
 
-    private var isNotificationToggleEnabled: Binding<Bool> {
+    private var notificationDisabledBinding: Binding<Bool> {
         Binding(
-            get: { !viewModel.isNotificationDisabled },
-            set: { viewModel.isNotificationDisabled = !$0 }
+            get: { viewModel.isNotificationDisabled },
+            set: { viewModel.setNotificationDisabled($0, userBook: userBook) }
+        )
+    }
+
+    private var selectedTimeBinding: Binding<Date> {
+        Binding(
+            get: { viewModel.selectedTime },
+            set: { viewModel.updateReminderTime($0, userBook: userBook) }
         )
     }
 
@@ -31,7 +38,7 @@ struct NotiSettingView: View {
                 .ignoresSafeArea()
 
             VStack(alignment: .leading, spacing: .zero) {
-                if !viewModel.isSystemNotificationEnabled {
+                if viewModel.isSystemNotificationBannerVisible {
                     notificationDisabledView
                 }
 
@@ -55,21 +62,15 @@ struct NotiSettingView: View {
         .navigationTitle("알림 설정")
         .customNavigationBackButton()
         .task {
-            await viewModel.refreshSystemNotificationAuthorization()
+            await viewModel.handleScreenEntry()
         }
         .onAppear {
             viewModel.loadPersistedSettings()
         }
-        .onChange(of: viewModel.isNotificationDisabled) {
-            viewModel.handleNotificationStatusChange(userBook: userBook)
-        }
-        .onChange(of: viewModel.selectedTime) {
-            viewModel.handleNotificationTimeChange(userBook: userBook)
-        }
         .onChange(of: scenePhase) {
             if scenePhase == .active { // 시스템 설정에 갔다가 다시 오는 상황 체크
                 Task {
-                    await viewModel.refreshSystemNotificationAuthorization()
+                    await viewModel.handleReturnToForeground(userBook: userBook)
                 }
             }
         }
@@ -118,7 +119,7 @@ struct NotiSettingView: View {
 
     private var toggleSection: some View {
         VStack(alignment: .leading, spacing: .zero) {
-            Toggle("알림 끄기", isOn: isNotificationToggleEnabled)
+            Toggle("알림 끄기", isOn: notificationDisabledBinding)
                 .toggleStyle(.switch)
                 .fontStyle(.title2, weight: .semibold)
                 .foregroundStyle(Color.Labels.primaryBlack1)
@@ -164,11 +165,10 @@ struct NotiSettingView: View {
     }
 
     private var timePicker: some View {
-        @Bindable var bindableViewModel = viewModel
         return VStack {
             DatePicker(
                 "",
-                selection: $bindableViewModel.selectedTime,
+                selection: selectedTimeBinding,
                 in: viewModel.timeSelectionRange,
                 displayedComponents: .hourAndMinute
             )
@@ -200,7 +200,7 @@ struct NotiSettingView: View {
     NavigationStack {
         NotiSettingView(
             userBook: PreviewSupport.sampleReadingBook,
-            viewModel: makeNotiSettingPreviewViewModel(isSystemNotificationEnabled: false)
+            viewModel: makeNotiSettingPreviewViewModel(systemAuthorizationStatus: .denied)
         )
     }
     .environment(PreviewSupport.makeCoordinator())
@@ -221,12 +221,12 @@ struct NotiSettingView: View {
 
 @MainActor
 private func makeNotiSettingPreviewViewModel(
-    isSystemNotificationEnabled: Bool = true,
+    systemAuthorizationStatus: NotificationAuthorizationStatus = .authorized,
     isNotificationDisabled: Bool = false,
     isReminderTimePickerVisible: Bool = false
 ) -> NotiSettingViewModel {
     let notificationService = PreviewNotificationManager()
-    notificationService.isAuthorized = isSystemNotificationEnabled
+    notificationService.currentStatus = systemAuthorizationStatus
 
     let settingsStore = PreviewNotificationSettingsStore(
         isDisabled: isNotificationDisabled,
@@ -242,7 +242,7 @@ private func makeNotiSettingPreviewViewModel(
     let viewModel = NotiSettingViewModel(
         notificationSettingUseCase: notificationSettingUseCase
     )
-    viewModel.isSystemNotificationEnabled = isSystemNotificationEnabled
+    viewModel.systemAuthorizationStatus = systemAuthorizationStatus
     viewModel.isNotificationDisabled = isNotificationDisabled
     viewModel.isReminderTimePickerVisible = isReminderTimePickerVisible
     viewModel.loadPersistedSettings()

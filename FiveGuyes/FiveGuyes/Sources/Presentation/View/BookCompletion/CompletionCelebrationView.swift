@@ -72,18 +72,7 @@ struct CompletionCelebrationView: View {
             .frame(height: 89)
             .offset(y: -72)
 
-        return Group {
-            if let coverURL = bookMetadata.coverImageURL, let url = URL(string: coverURL) {
-                AsyncImage(url: url) { image in
-                    image.resizable()
-                } placeholder: {
-                    ProgressView()
-                }
-            } else {
-                Image("")
-                    .resizable()
-            }
-        }
+        return BookCoverImageView(coverURL: bookMetadata.coverImageURL)
         .scaledToFill()
         .frame(width: 173, height: 267)
         .overlay(alignment: .top) {

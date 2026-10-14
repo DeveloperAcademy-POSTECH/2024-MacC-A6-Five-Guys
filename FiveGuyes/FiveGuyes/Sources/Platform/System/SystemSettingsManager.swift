@@ -12,9 +12,9 @@ struct SystemSettingsManager {
         Self.openSettings()
     }
 
-    /// 시스템 설정으로 이동하는 함수
+    /// iOS 설정 앱의 이 앱 알림 설정 화면으로 이동하는 함수
     static func openSettings() {
-        guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
+        guard let url = URL(string: UIApplication.openNotificationSettingsURLString) else { return }
         UIApplication.shared.open(url)
     }
 }

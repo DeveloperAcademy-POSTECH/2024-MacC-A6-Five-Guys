@@ -1,0 +1,54 @@
+# Setup
+
+개발 환경을 준비하고 빌드·검증하는 방법.
+
+## Required Files
+
+| 파일 | 필요 여부 | 할 일 |
+|---|---|---|
+| `FiveGuyes/Config.xcconfig` | **필수.** 없으면 빌드 실패 | 값이 비어 있는 견본을 복사한다. 도서 검색을 확인할 때 `KAKAO_API_KEY`에 카카오 REST API 키를, 페이지 자동 채움을 확인할 때 `NL_API_KEY`에 국립중앙도서관 Open API 인증키를 넣는다(`KAKAO_API_KEY = <값>` 형식. 발급처는 `services/book-search/sources.md`의 인증 정보를 본다) |
+| `FiveGuyes/FiveGuyes/GoogleService-Info.plist` | Debug·테스트는 없어도 됨. Release는 필수 | Firebase 동작을 확인할 때만 넣는다 |
+
+```bash
+cp FiveGuyes/Config.xcconfig.example FiveGuyes/Config.xcconfig
+```
+
+두 파일 모두 `.gitignore` 대상이다. 실제 인증 정보는 커밋하지 않는다.
+
+키를 비워 두어도 빌드와 테스트는 통과한다. 이때 검색은 설정 안내 알림(`services/book-search/spec.md` A10)이 뜨고, 페이지 자동 채움은 0쪽이 된다(B7). **Release 아카이브는 두 키가 채워진 `Config.xcconfig`로 만든다.** 비어 있어도 빌드는 통과하지만 출시된 앱에서 검색이 동작하지 않는다.
+
+`GoogleService-Info.plist`는 `FiveGuyes/FiveGuyes/` 안에 둔다. 초기화 조건과 GA 설정은 `services/analytics/launch-and-ga.md`를 본다.
+
+## Build and Test
+
+```bash
+# 패키지 해석, lint, 단일 시뮬레이터 테스트
+scripts/verify.sh
+
+# 특정 시뮬레이터로 검사
+SIMULATOR_DESTINATION='platform=iOS Simulator,name=iPhone 17' scripts/verify.sh
+
+# lint만 검사 (SwiftLint가 없으면 자동 설치)
+cd FiveGuyes && ../scripts/swiftlint.sh lint --no-cache
+```
+
+- 앱·테스트 타깃은 폴더를 파일시스템 동기화 그룹으로 참조한다. 새 Swift 파일은 Xcode 프로젝트 파일을 고치지 않아도 타깃에 들어간다.
+- `xcodebuild`로 테스트를 직접 돌릴 때는 병렬 실행을 끄고 단일 시뮬레이터를 쓴다. `verify.sh`는 이미 그렇게 실행한다.
+
+**SwiftLint**
+
+- `verify.sh`와 위 lint 명령은 SwiftLint 0.65.1을 첫 실행 시 내려받아 SHA-256을 확인하고 `.build/tools/`에 보관한다. 이후 실행할 때도 보관된 실행 파일의 SHA-256을 확인하며, 일치하지 않으면 다시 내려받는다.
+- Xcode에서 앱을 빌드하면 lint 결과가 코드 옆에 표시된다. error 규칙을 어기면 빌드가 실패한다. 보관된 실행 파일이 없으면 내려받지 않고 lint를 건너뛰며, `verify.sh`를 한 번 실행하라는 경고를 띄운다.
+
+## Pre-push Hook
+
+| 동작 | 명령 (클론마다 한 번) |
+|---|---|
+| 켜기 | `git config core.hooksPath .githooks` |
+| 끄기 | `git config --unset core.hooksPath` |
+
+hook은 클론마다 위 명령으로 활성화해야 한다. 활성화하면 push 전에 `scripts/verify.sh`를 실행하고, 커밋 안 된 변경이 있거나 HEAD가 아닌 커밋을 push하면 거부한다. 건너뛰려면 `git push --no-verify`를 쓴다. git worktree에서도 동작한다. hook 설정과 무관하게 `develop`·`main` 대상 PR과 `develop` 푸시에는 CI가 실행된다.
+
+## Local Files
+
+`.local/`은 개인 작업 문서 보관용이며 git이 추적하지 않는다.
