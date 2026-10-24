@@ -49,17 +49,6 @@ final class SwiftDataBookRepo: BookRepo {
 
     // MARK: - Basic CRUD Operations
 
-    func fetchBooks() async throws -> [FGUserBook] {
-        do {
-            try migrateStorageIfNeeded()
-            let swiftDatabooks = try modelContext.fetch(FetchDescriptor<SDUserBook>())
-            let books = swiftDatabooks.map { $0.toFGUserBook() }
-            return books
-        } catch {
-            throw RepoError.fetchFailed
-        }
-    }
-
     func fetchBook(by id: UUID) async throws -> FGUserBook {
         try migrateStorageIfNeeded()
         let book = try await findSwiftDataBook(by: id)
@@ -135,18 +124,6 @@ final class SwiftDataBookRepo: BookRepo {
     }
 
     // MARK: - Partial Update Operations
-
-    func updateReadingProgress(bookId: UUID, progress: FGReadingProgress) async throws {
-        let swiftDataBook = try await findSwiftDataBook(by: bookId)
-
-        swiftDataBook.readingProgress = progress.toReadingProgress()
-
-        do {
-            try modelContext.save()
-        } catch {
-            throw RepoError.updateFailed
-        }
-    }
 
     func updateSettings(bookId: UUID, settings: FGUserSetting) async throws {
         let swiftDataBook = try await findSwiftDataBook(by: bookId)

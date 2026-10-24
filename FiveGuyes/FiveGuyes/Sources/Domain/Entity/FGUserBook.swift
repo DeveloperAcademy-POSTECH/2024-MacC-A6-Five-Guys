@@ -19,6 +19,7 @@ struct FGBookMetaData: Hashable {
     let title: String
     let author: String
     let coverImageURL: String?
+    let isbn13: String?
     let totalPages: Int
 }
 

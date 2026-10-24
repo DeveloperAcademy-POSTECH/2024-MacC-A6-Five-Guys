@@ -96,14 +96,6 @@ struct FetchCompletedBooksUseCase {
     }
 }
 
-struct FetchBookDetailUseCase {
-    let repo: BookRepo
-
-    func execute(id: UUID) async throws -> FGUserBook {
-        try await repo.fetchBook(by: id)
-    }
-}
-
 struct RescheduleOnAppOpenUseCase {
     let repo: BookRepo
     let scheduleCalculator: ReadingScheduleCalculator

@@ -10,10 +10,6 @@ import Foundation
 actor MockBookRepo: BookRepo {
     var books: [FGUserBook] = []
 
-    func fetchBooks() async throws -> [FGUserBook] {
-        return books
-    }
-
     func fetchBook(by id: UUID) async throws -> FGUserBook {
         guard let book = books.first(where: { $0.id == id }) else {
             throw RepoError.notFound
@@ -42,15 +38,6 @@ actor MockBookRepo: BookRepo {
 
     func getReadingBooks() async throws -> [FGUserBook] {
         return books.filter { !$0.completionStatus.isCompleted }
-    }
-
-    func updateReadingProgress(bookId: UUID, progress: FGReadingProgress) async throws {
-        guard let index = books.firstIndex(where: { $0.id == bookId }) else {
-            throw RepoError.notFound
-        }
-        var updatedBook = books[index]
-        updatedBook.readingProgress = progress
-        books[index] = updatedBook
     }
 
     func updateSettings(bookId: UUID, settings: FGUserSetting) async throws {

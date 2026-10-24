@@ -51,7 +51,7 @@ extension ReadingScheduleCalculatorTests {
 
         let progress = FGReadingProgress(
             dailyReadingRecords: [
-                makeDate("2025-01-09").toYearMonthDayString(): ReadingRecord(targetPages: 10, pagesRead: 10)
+                makeDate("2025-01-09").readingDateKey.rawValue: ReadingRecord(targetPages: 10, pagesRead: 10)
             ],
             lastReadDate: makeDate("2025-01-09"),
             lastReadPage: 10

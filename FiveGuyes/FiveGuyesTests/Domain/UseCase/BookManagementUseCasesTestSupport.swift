@@ -24,6 +24,7 @@ struct BookManagementUseCasesTests {
                 title: title,
                 author: author,
                 coverImageURL: "https://example.com/cover.jpg",
+                isbn13: "9781234567890",
                 totalPages: totalPages
             ),
             userSettings: FGUserSetting(

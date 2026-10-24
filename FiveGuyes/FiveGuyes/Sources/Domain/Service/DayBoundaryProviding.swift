@@ -11,12 +11,6 @@ import Foundation
 protocol DayBoundaryProviding {
     /// 현재 시각을 정책 기준 하루로 정규화한 값을 반환합니다.
     func adjustedNow() -> Date
-
-    /// 전달받은 시각을 정책 기준 하루로 정규화한 값을 반환합니다.
-    func adjustedDate(from date: Date) -> Date
-
-    /// 전달받은 시각을 정책 기준 날짜 키(`yyyy-MM-dd`)로 반환합니다.
-    func adjustedDayKey(from date: Date) -> ReadingDateKey
 }
 
 /// 기본 하루 경계 정책 구현입니다.
@@ -39,13 +33,6 @@ struct DefaultDayBoundaryPolicy: DayBoundaryProviding {
 
     func adjustedDate(from date: Date) -> Date {
         calendar.date(byAdding: .hour, value: -dayStartHour, to: date) ?? date
-    }
-
-    func adjustedDayKey(from date: Date) -> ReadingDateKey {
-        ReadingDateKey(
-            date: adjustedDate(from: date),
-            calendar: calendar
-        )
     }
 }
 

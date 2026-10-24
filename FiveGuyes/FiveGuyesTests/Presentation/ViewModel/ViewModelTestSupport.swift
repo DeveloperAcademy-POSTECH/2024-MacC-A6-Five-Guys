@@ -17,6 +17,7 @@ func makeBook(id: UUID = UUID(), isCompleted: Bool = false) -> FGUserBook {
             title: "테스트 책",
             author: "테스트 작가",
             coverImageURL: nil,
+            isbn13: "9781234567890",
             totalPages: 300
         ),
         userSettings: FGUserSetting(
@@ -43,10 +44,10 @@ func makeBookSearchItem(title: String) -> BookSearchItem {
     BookSearchItem(
         title: title,
         author: "테스트 저자",
-        cover: nil,
+        coverImageURL: nil,
         publisher: "테스트 출판사",
         isbn13: "9781234567890",
-        pubDate: "20250101"
+        publishedDate: PublicationDate(year: 2025, month: 1, day: 1)
     )
 }
 
@@ -59,6 +60,25 @@ func makeDate(_ dateString: String) -> Date {
         fatalError("Invalid date string: \(dateString)")
     }
     return date.onlyDate
+}
+
+@MainActor
+func makeNotiSettingViewModel(
+    notificationService: NotificationManagerStub,
+    settingsOpener: SystemSettingsOpenerStub,
+    settingsStore: NotificationSettingsStoreStub,
+    nowProvider: @escaping () -> Date = Date.init
+) -> NotiSettingViewModel {
+    let useCase = NotificationSettingUseCase(
+        notificationService: notificationService,
+        systemSettingsOpener: settingsOpener,
+        settingsStore: settingsStore
+    )
+
+    return NotiSettingViewModel(
+        notificationSettingUseCase: useCase,
+        nowProvider: nowProvider
+    )
 }
 
 @MainActor
@@ -290,6 +310,7 @@ final class BookRegistrationUseCaseStub: BookRegistrationUsing {
     var registerBookError: Error?
     var registerBookDelayNanoseconds: UInt64 = 0
     var registerBookCallCount = 0
+    var lastRegisterBookInput: RegisterBookInput?
 
     init(book: FGUserBook = .dummy) {
         self.registerBookResult = book
@@ -297,6 +318,7 @@ final class BookRegistrationUseCaseStub: BookRegistrationUsing {
 
     func registerBook(_ input: RegisterBookInput) async throws -> FGUserBook {
         registerBookCallCount += 1
+        lastRegisterBookInput = input
         if registerBookDelayNanoseconds > 0 {
             try? await Task.sleep(nanoseconds: registerBookDelayNanoseconds)
         }
@@ -341,18 +363,45 @@ final class ReadingGoalMetricsUseCaseStub: ReadingGoalMetricsUsing {
 }
 
 final class NotificationManagerStub: NotificationManaging {
-    var isAuthorized = true
+    var currentStatus: NotificationAuthorizationStatus = .authorized
+    /// 권한 요청 뒤 바뀔 상태. 사용자가 팝업에서 허용/거절한 결과를 흉내 낸다.
+    var statusAfterRequest: NotificationAuthorizationStatus?
     var requestAuthorizationCallCount = 0
+    var requestAuthorizationGate: AsyncGate?
+    var authorizationStatusCallCount = 0
+    var authorizationStatusResults: [NotificationAuthorizationStatus] = []
+    var authorizationStatusGates: [AsyncGate] = []
     var clearRequestsCallCount = 0
     var setupAllNotificationsCallCount = 0
     var setupAllNotificationsBookIDs: [UUID] = []
+    var setupAllNotificationsGate: AsyncGate?
     var updateMorningNotificationCallCount = 0
     var updateMorningNotificationDelayNanoseconds: UInt64 = 0
     var ignoreCancelledCalls = false
 
     func requestAuthorization() async -> Bool {
         requestAuthorizationCallCount += 1
-        return isAuthorized
+        if let requestAuthorizationGate {
+            await requestAuthorizationGate.wait()
+        }
+        if let statusAfterRequest {
+            currentStatus = statusAfterRequest
+        }
+        return currentStatus == .authorized
+    }
+
+    func authorizationStatus() async -> NotificationAuthorizationStatus {
+        authorizationStatusCallCount += 1
+        let callIndex = authorizationStatusCallCount - 1
+        let result = authorizationStatusResults.indices.contains(callIndex)
+            ? authorizationStatusResults[callIndex]
+            : currentStatus
+
+        if authorizationStatusGates.indices.contains(callIndex) {
+            await authorizationStatusGates[callIndex].wait()
+        }
+
+        return result
     }
 
     func clearRequests() async {
@@ -362,6 +411,9 @@ final class NotificationManagerStub: NotificationManaging {
     func setupAllNotifications(_ readingBook: FGUserBook) async {
         setupAllNotificationsCallCount += 1
         setupAllNotificationsBookIDs.append(readingBook.id)
+        if let setupAllNotificationsGate {
+            await setupAllNotificationsGate.wait()
+        }
     }
 
     func updateMorningNotification(for readingBook: FGUserBook) async {
@@ -413,40 +465,5 @@ final class NotificationSettingsStoreStub: NotificationSettingsStoring {
 
     func fetchNotificationReminderTime() -> (hour: Int, minute: Int) {
         (storedReminderHour, storedReminderMinute)
-    }
-}
-
-final class BookSearchProviderStub: BookSearchProviding {
-    var fetchBooksResult: [BookSearchItem] = []
-    var fetchBookTotalPagesResult: Int = 0
-
-    var fetchBooksError: Error?
-    var fetchBookTotalPagesError: Error?
-    var fetchBookTotalPagesDelayNanoseconds: UInt64 = 0
-    var fetchBookTotalPagesGate: AsyncGate?
-    var onFetchBookTotalPagesStart: (() async -> Void)?
-
-    var fetchBooksQueries: [String] = []
-    var fetchTotalPagesISBNs: [String] = []
-
-    func fetchBooks(query: String) async throws -> [BookSearchItem] {
-        fetchBooksQueries.append(query)
-        if let fetchBooksError { throw fetchBooksError }
-        return fetchBooksResult
-    }
-
-    func fetchBookTotalPages(isbn: String) async throws -> Int {
-        fetchTotalPagesISBNs.append(isbn)
-        if let onFetchBookTotalPagesStart {
-            await onFetchBookTotalPagesStart()
-        }
-        if let fetchBookTotalPagesGate {
-            await fetchBookTotalPagesGate.wait()
-        }
-        if fetchBookTotalPagesDelayNanoseconds > 0 {
-            try? await Task.sleep(nanoseconds: fetchBookTotalPagesDelayNanoseconds)
-        }
-        if let fetchBookTotalPagesError { throw fetchBookTotalPagesError }
-        return fetchBookTotalPagesResult
     }
 }

@@ -9,6 +9,8 @@ import Foundation
 import Observation
 import SwiftData
 
+import FGNetwork
+
 @MainActor
 @Observable
 final class AppDependencies {
@@ -127,8 +129,23 @@ final class AppDependencies {
         self.notificationService = notificationService
         self.notiSettingsStore = notiSettingsStore
         self.systemSettingsOpener = systemSettingsOpener
-        self.bookSearchUseCase = BookSearchUseCase(
-            bookSearchProvider: AladinBookSearchProvider()
+        self.bookSearchUseCase = Self.makeBookSearchUseCase()
+    }
+
+    private static func makeBookSearchUseCase() -> any BookSearchUsing {
+        let httpClient = URLSessionHTTPClient()
+        let apiKeyStore = BundleAPIKeyStore()
+        let bookSearchProvider = KakaoBookSearchProvider(
+            httpClient: httpClient,
+            apiKeyProvider: apiKeyStore
+        )
+        let bookPageCountProvider = NationalLibraryPageCountProvider(
+            httpClient: httpClient,
+            apiKeyProvider: apiKeyStore
+        )
+        return BookSearchUseCase(
+            bookSearchProvider: bookSearchProvider,
+            bookPageCountProvider: bookPageCountProvider
         )
     }
 

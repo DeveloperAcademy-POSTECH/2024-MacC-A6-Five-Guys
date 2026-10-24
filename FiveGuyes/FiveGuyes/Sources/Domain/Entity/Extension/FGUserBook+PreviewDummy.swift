@@ -15,6 +15,7 @@ extension FGUserBook {
                 title: "Sample Book Title",
                 author: "Sample Author",
                 coverImageURL: "https://picsum.photos/200/300",
+                isbn13: "9781234567890",
                 totalPages: 300
             ),
             userSettings: FGUserSetting(

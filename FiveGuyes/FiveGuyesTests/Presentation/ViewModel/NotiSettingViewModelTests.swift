@@ -12,8 +12,8 @@ import Testing
 @Suite("NotiSettingViewModel 테스트")
 @MainActor
 struct NotiSettingViewModelTests {
-    @Test("NotiSettingViewModel: 저장된 설정 로드")
-    func notiSetting_loadPersistedSettings() {
+    @Test("NotiSettingViewModel: 저장된 설정 로드는 저장과 알림 요청을 발생시키지 않는다")
+    func notiSetting_loadPersistedSettings_doesNotPersistOrRequestNotification() {
         let notificationService = NotificationManagerStub()
         let settingsStore = NotificationSettingsStoreStub(
             disabled: true,
@@ -21,7 +21,7 @@ struct NotiSettingViewModelTests {
             reminderMinute: 30
         )
         let settingsOpener = SystemSettingsOpenerStub()
-        let viewModel = makeViewModel(
+        let viewModel = makeNotiSettingViewModel(
             notificationService: notificationService,
             settingsOpener: settingsOpener,
             settingsStore: settingsStore,
@@ -34,6 +34,13 @@ struct NotiSettingViewModelTests {
         let timeComponents = Calendar.app.dateComponents([.hour, .minute], from: viewModel.selectedTime)
         #expect(timeComponents.hour == 8)
         #expect(timeComponents.minute == 30)
+        #expect(settingsStore.savedNotificationDisabled == nil)
+        #expect(settingsStore.savedReminderHour == nil)
+        #expect(settingsStore.savedReminderMinute == nil)
+        #expect(notificationService.clearRequestsCallCount == 0)
+        #expect(notificationService.setupAllNotificationsCallCount == 0)
+        #expect(notificationService.updateMorningNotificationCallCount == 0)
+        #expect(notificationService.requestAuthorizationCallCount == 0)
     }
 
     @Test("NotiSettingViewModel: 알림 비활성화 시 요청 삭제 호출")
@@ -45,14 +52,14 @@ struct NotiSettingViewModelTests {
             reminderMinute: 0
         )
         let settingsOpener = SystemSettingsOpenerStub()
-        let viewModel = makeViewModel(
+        let viewModel = makeNotiSettingViewModel(
             notificationService: notificationService,
             settingsOpener: settingsOpener,
             settingsStore: settingsStore
         )
 
-        viewModel.isNotificationDisabled = true
-        viewModel.handleNotificationStatusChange(userBook: makeBook())
+        viewModel.loadPersistedSettings()
+        viewModel.setNotificationDisabled(true, userBook: makeBook())
 
         #expect(
             await waitUntil {
@@ -66,6 +73,72 @@ struct NotiSettingViewModelTests {
         #expect(notificationService.setupAllNotificationsCallCount == 0)
     }
 
+    @Test("NotiSettingViewModel: C5 알림 끄기 스위치를 켜면 끔, 끄면 받음으로 저장된다")
+    func notiSetting_c5_toggleMapsToDisabledSetting() async {
+        let notificationService = NotificationManagerStub()
+        let settingsStore = NotificationSettingsStoreStub(
+            disabled: false,
+            reminderHour: 9,
+            reminderMinute: 0
+        )
+        let viewModel = makeNotiSettingViewModel(
+            notificationService: notificationService,
+            settingsOpener: SystemSettingsOpenerStub(),
+            settingsStore: settingsStore
+        )
+
+        viewModel.setNotificationDisabled(true, userBook: makeBook())
+        #expect(await waitUntil { settingsStore.savedNotificationDisabled == true })
+        #expect(viewModel.isNotificationDisabled)
+
+        viewModel.setNotificationDisabled(false, userBook: makeBook())
+        #expect(await waitUntil { settingsStore.savedNotificationDisabled == false })
+        #expect(viewModel.isNotificationDisabled == false)
+    }
+
+    @Test("NotiSettingViewModel: C9 읽는 책이 없어도 알림을 끄면 대기 중인 알림을 모두 제거한다")
+    func notiSetting_c9_disableWithoutBook_clearsRequests() async {
+        let notificationService = NotificationManagerStub()
+        let settingsStore = NotificationSettingsStoreStub(
+            disabled: false,
+            reminderHour: 9,
+            reminderMinute: 0
+        )
+        let viewModel = makeNotiSettingViewModel(
+            notificationService: notificationService,
+            settingsOpener: SystemSettingsOpenerStub(),
+            settingsStore: settingsStore
+        )
+
+        viewModel.setNotificationDisabled(true, userBook: nil)
+
+        #expect(await waitUntil { notificationService.clearRequestsCallCount == 1 })
+        #expect(settingsStore.savedNotificationDisabled == true)
+        #expect(notificationService.setupAllNotificationsCallCount == 0)
+        #expect(notificationService.requestAuthorizationCallCount == 0)
+    }
+
+    @Test("NotiSettingViewModel: C8 읽는 책이 없을 때 알림을 받음으로 바꾸면 설정만 저장한다")
+    func notiSetting_c8_enableWithoutBook_onlySavesSetting() async {
+        let notificationService = NotificationManagerStub()
+        let settingsStore = NotificationSettingsStoreStub(
+            disabled: true,
+            reminderHour: 9,
+            reminderMinute: 0
+        )
+        let viewModel = makeNotiSettingViewModel(
+            notificationService: notificationService,
+            settingsOpener: SystemSettingsOpenerStub(),
+            settingsStore: settingsStore
+        )
+
+        viewModel.setNotificationDisabled(false, userBook: nil)
+
+        #expect(await waitUntil { settingsStore.savedNotificationDisabled == false })
+        #expect(notificationService.clearRequestsCallCount == 0)
+        #expect(notificationService.setupAllNotificationsCallCount == 0)
+    }
+
     @Test("NotiSettingViewModel: 시간 변경 시 설정 저장 및 알림 업데이트")
     func notiSetting_timeChange_updatesSettingsAndNotification() async {
         let notificationService = NotificationManagerStub()
@@ -75,7 +148,7 @@ struct NotiSettingViewModelTests {
             reminderMinute: 0
         )
         let settingsOpener = SystemSettingsOpenerStub()
-        let viewModel = makeViewModel(
+        let viewModel = makeNotiSettingViewModel(
             notificationService: notificationService,
             settingsOpener: settingsOpener,
             settingsStore: settingsStore,
@@ -83,13 +156,14 @@ struct NotiSettingViewModelTests {
         )
 
         let baseDate = makeDate("2025-01-01")
-        viewModel.selectedTime = Calendar.app.date(
+        let selectedTime = Calendar.app.date(
             bySettingHour: 21,
             minute: 15,
             second: 0,
             of: baseDate
         ) ?? baseDate
-        viewModel.handleNotificationTimeChange(userBook: makeBook())
+        viewModel.loadPersistedSettings()
+        viewModel.updateReminderTime(selectedTime, userBook: makeBook())
 
         #expect(
             await waitUntil {
@@ -113,7 +187,7 @@ struct NotiSettingViewModelTests {
             reminderMinute: 0
         )
         let settingsOpener = SystemSettingsOpenerStub()
-        let viewModel = makeViewModel(
+        let viewModel = makeNotiSettingViewModel(
             notificationService: notificationService,
             settingsOpener: settingsOpener,
             settingsStore: settingsStore,
@@ -154,7 +228,7 @@ struct NotiSettingViewModelTests {
             reminderMinute: 0
         )
         let settingsOpener = SystemSettingsOpenerStub()
-        let viewModel = makeViewModel(
+        let viewModel = makeNotiSettingViewModel(
             notificationService: notificationService,
             settingsOpener: settingsOpener,
             settingsStore: settingsStore,
@@ -190,7 +264,7 @@ struct NotiSettingViewModelTests {
             reminderMinute: 0
         )
         let settingsOpener = SystemSettingsOpenerStub()
-        let viewModel = makeViewModel(
+        let viewModel = makeNotiSettingViewModel(
             notificationService: notificationService,
             settingsOpener: settingsOpener,
             settingsStore: settingsStore
@@ -199,23 +273,5 @@ struct NotiSettingViewModelTests {
         viewModel.openSystemSettings()
 
         #expect(settingsOpener.openSettingsCallCount == 1)
-    }
-
-    private func makeViewModel(
-        notificationService: NotificationManagerStub,
-        settingsOpener: SystemSettingsOpenerStub,
-        settingsStore: NotificationSettingsStoreStub,
-        nowProvider: @escaping () -> Date = Date.init
-    ) -> NotiSettingViewModel {
-        let useCase = NotificationSettingUseCase(
-            notificationService: notificationService,
-            systemSettingsOpener: settingsOpener,
-            settingsStore: settingsStore
-        )
-
-        return NotiSettingViewModel(
-            notificationSettingUseCase: useCase,
-            nowProvider: nowProvider
-        )
     }
 }

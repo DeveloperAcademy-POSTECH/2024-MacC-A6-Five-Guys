@@ -212,10 +212,14 @@ final class PreviewBookUseCaseStub: ReadingLibraryUsing,
 
 @MainActor
 final class PreviewNotificationManager: NotificationManaging {
-    var isAuthorized = true
+    var currentStatus: NotificationAuthorizationStatus = .authorized
 
     func requestAuthorization() async -> Bool {
-        isAuthorized
+        currentStatus == .authorized
+    }
+
+    func authorizationStatus() async -> NotificationAuthorizationStatus {
+        currentStatus
     }
 
     func clearRequests() async {}

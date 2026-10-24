@@ -14,29 +14,18 @@ struct BookRowView: View {
     var body: some View {
         VStack {
             HStack {
-                VStack {
-                    if let coverUrl = book.cover, let url = URL(string: coverUrl) {
-                        AsyncImage(url: url) { image in
-                            image.resizable()
-                        } placeholder: {
-                            ProgressView()
-                        }
-                        .cornerRadius(6)
-                        .commonShadow()
-                    } else {
-                        Rectangle()
-                            .foregroundStyle(.green)
-                    }
-                }
-                .frame(width: 115, height: 178)
-                .padding(.leading, 20)
+                BookCoverImageView(coverURL: book.coverImageURL)
+                    .cornerRadius(6)
+                    .commonShadow()
+                    .frame(width: 115, height: 178)
+                    .padding(.leading, 20)
 
                 VStack(alignment: .leading) {
                     Text(book.title)
                         .fontStyle(.body, weight: .semibold)
                         .foregroundStyle(Color.Labels.primaryBlack1)
 
-                    Text("\(book.author.removingParenthesesContent()) | \(book.pubDate.extractYear()) | \(book.publisher)")
+                    Text(Self.metadataText(for: book))
                         .fontStyle(.caption1)
                         .foregroundStyle(Color.Labels.secondaryBlack2)
                 }
@@ -58,7 +47,16 @@ struct BookRowView: View {
             .stroke(Color.Separators.gray)
             .fill(Color.Separators.gray)
             .frame(height: 1)
-            .padding(.vertical, 24)
+        .padding(.vertical, 24)
+    }
+
+    static func metadataText(for book: BookSearchItem) -> String {
+        let author = book.author.removingParenthesesContent()
+        guard let year = book.publishedDate?.year else {
+            return "\(author) | \(book.publisher)"
+        }
+
+        return "\(author) | \(year) | \(book.publisher)"
     }
 }
 

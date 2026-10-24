@@ -14,10 +14,12 @@ final class NotiSettingViewModel {
     var selectedTime: Date = Date()
     var isNotificationDisabled = false
     var isReminderTimePickerVisible = false
-    var isSystemNotificationEnabled = true
+    var systemAuthorizationStatus: NotificationAuthorizationStatus = .authorized
 
     private var notificationStatusTask: Task<Void, Never>?
     private var notificationTimeTask: Task<Void, Never>?
+    private var systemAuthorizationRefreshGeneration = 0
+    private var isHandlingScreenEntry = false
 
     private let notificationSettingUseCase: any NotificationSettingUsing
     private let nowProvider: () -> Date
@@ -28,6 +30,10 @@ final class NotiSettingViewModel {
     ) {
         self.notificationSettingUseCase = notificationSettingUseCase
         self.nowProvider = nowProvider
+    }
+
+    var isSystemNotificationBannerVisible: Bool {
+        !isNotificationDisabled && systemAuthorizationStatus == .denied
     }
 
     var timeSelectionRange: ClosedRange<Date> {
@@ -45,8 +51,32 @@ final class NotiSettingViewModel {
         isNotificationDisabled = snapshot.isNotificationDisabled
     }
 
-    func refreshSystemNotificationAuthorization() async {
-        isSystemNotificationEnabled = await notificationSettingUseCase.refreshSystemAuthorization()
+    func setNotificationDisabled(_ isDisabled: Bool, userBook: FGUserBook?) {
+        isNotificationDisabled = isDisabled
+        handleNotificationStatusChange(userBook: userBook)
+    }
+
+    func updateReminderTime(_ time: Date, userBook: FGUserBook?) {
+        selectedTime = time
+        handleNotificationTimeChange(userBook: userBook)
+    }
+
+    func handleScreenEntry() async {
+        isHandlingScreenEntry = true
+        defer { isHandlingScreenEntry = false }
+
+        let generation = beginSystemAuthorizationRefresh()
+        let status = await notificationSettingUseCase.prepareAuthorizationOnEntry()
+        updateSystemAuthorizationStatus(status, for: generation)
+    }
+
+    func handleReturnToForeground(userBook: FGUserBook?) async {
+        // 진입 처리 중 OS 팝업 때문에 들어온 복귀는 건너뛴다. 진입 처리가 팝업 이후의 최종 상태를 반영한다.
+        guard !isHandlingScreenEntry else { return }
+
+        let generation = beginSystemAuthorizationRefresh()
+        let status = await notificationSettingUseCase.refreshAuthorizationOnReturn(userBook: userBook)
+        updateSystemAuthorizationStatus(status, for: generation)
     }
 
     func handleNotificationStatusChange(userBook: FGUserBook?) {
@@ -56,6 +86,16 @@ final class NotiSettingViewModel {
         notificationStatusTask = Task {
             guard !Task.isCancelled else { return }
             await notificationSettingUseCase.setNotificationDisabled(isDisabled, userBook: userBook)
+
+            // 토글 처리 뒤의 최신 OS 권한 상태를 다시 읽어 배너에 반영한다.
+            guard !Task.isCancelled else { return }
+            let generation = beginSystemAuthorizationRefresh()
+            let status = await notificationSettingUseCase.refreshSystemAuthorization()
+
+            // 조회가 취소를 관찰하지 않을 수 있으므로, 대입 직전에 최신 조회인지 다시 확인한다.
+            // 그러지 않으면 뒤늦게 끝난 이전 조회가 최신 결과를 덮어쓴다.
+            guard !Task.isCancelled else { return }
+            updateSystemAuthorizationStatus(status, for: generation)
         }
     }
 
@@ -76,5 +116,15 @@ final class NotiSettingViewModel {
 
     func openSystemSettings() {
         notificationSettingUseCase.openSystemSettings()
+    }
+
+    private func beginSystemAuthorizationRefresh() -> Int {
+        systemAuthorizationRefreshGeneration += 1
+        return systemAuthorizationRefreshGeneration
+    }
+
+    private func updateSystemAuthorizationStatus(_ status: NotificationAuthorizationStatus, for generation: Int) {
+        guard generation == systemAuthorizationRefreshGeneration else { return }
+        systemAuthorizationStatus = status
     }
 }

@@ -14,7 +14,9 @@ struct NotificationSettingSnapshot {
 
 protocol NotificationSettingUsing {
     func loadSnapshot(now: Date) -> NotificationSettingSnapshot
-    func refreshSystemAuthorization() async -> Bool
+    func prepareAuthorizationOnEntry() async -> NotificationAuthorizationStatus
+    func refreshAuthorizationOnReturn(userBook: FGUserBook?) async -> NotificationAuthorizationStatus
+    func refreshSystemAuthorization() async -> NotificationAuthorizationStatus
     func setNotificationDisabled(_ isDisabled: Bool, userBook: FGUserBook?) async
     func updateReminderTime(
         _ time: Date,
@@ -55,20 +57,39 @@ struct NotificationSettingUseCase: NotificationSettingUsing {
         )
     }
 
-    func refreshSystemAuthorization() async -> Bool {
-        await notificationService.requestAuthorization()
+    /// 알림 설정 화면 진입 시 호출한다. 앱 내 설정이 "받음"이고 권한이 미결정일 때만 OS 팝업을 띄운다.
+    func prepareAuthorizationOnEntry() async -> NotificationAuthorizationStatus {
+        let status = await notificationService.authorizationStatus()
+        guard status == .notDetermined, !settingsStore.fetchNotificationDisabled() else { return status }
+
+        _ = await notificationService.requestAuthorization()
+        return await notificationService.authorizationStatus()
+    }
+
+    /// iOS 설정 앱에서 돌아왔을 때 호출한다. 권한은 요청하지 않고 조회만 하며,
+    /// 앱 내 설정이 "받음"이고 권한이 허용이면 알림을 다시 등록한다.
+    func refreshAuthorizationOnReturn(userBook: FGUserBook?) async -> NotificationAuthorizationStatus {
+        let status = await notificationService.authorizationStatus()
+        guard status == .authorized, !settingsStore.fetchNotificationDisabled(), let userBook else { return status }
+
+        await notificationService.setupAllNotifications(userBook)
+        return status
+    }
+
+    func refreshSystemAuthorization() async -> NotificationAuthorizationStatus {
+        await notificationService.authorizationStatus()
     }
 
     func setNotificationDisabled(_ isDisabled: Bool, userBook: FGUserBook?) async {
         settingsStore.saveNotificationDisabled(isDisabled)
 
-        guard let userBook else { return }
-
         if isDisabled {
             await notificationService.clearRequests()
-        } else {
-            await notificationService.setupAllNotifications(userBook)
+            return
         }
+
+        guard let userBook else { return }
+        await notificationService.setupAllNotifications(userBook)
     }
 
     func updateReminderTime(

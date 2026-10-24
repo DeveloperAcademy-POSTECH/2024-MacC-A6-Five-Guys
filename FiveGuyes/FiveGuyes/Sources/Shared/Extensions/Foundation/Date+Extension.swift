@@ -53,17 +53,9 @@ extension Date {
 }
 
 extension Date {
-    /// 기존 호출부 호환을 위해 Date 확장에 남겨둔 wrapper입니다.
-    /// 실제 키 생성 규칙은 `ReadingDateKey`가 단일 소스로 관리합니다.
     var readingDateKey: ReadingDateKey {
         ReadingDateKey(date: self, calendar: .app)
     }
-
-    /// 기존 메서드 시그니처를 유지하면서 내부 구현만 `ReadingDateKey`로 통일합니다.
-    func toYearMonthDayString() -> String {
-        readingDateKey.rawValue
-    }
-
 }
 
 extension Date {

@@ -8,12 +8,12 @@
 import UserNotifications
 
 final class NotificationManager {
-    private let notificationCenter: UNUserNotificationCenter
+    private let notificationCenter: any UserNotificationCentering
     private let todayProvider: any ReadingDateProviding
     private let settingsStore: any NotificationSettingsStoring
 
     init(
-        notificationCenter: UNUserNotificationCenter = .current(),
+        notificationCenter: any UserNotificationCentering = UNUserNotificationCenter.current(),
         todayProvider: any ReadingDateProviding = DefaultReadingDateProvider(),
         settingsStore: any NotificationSettingsStoring = UserDefaultsNotificationSettingsStore()
     ) {
@@ -24,9 +24,15 @@ final class NotificationManager {
 
     /// 모든 노티를 요청하는 메서드
     func canSendNotifications() async -> Bool {
-        let isSystemAuthorized = await requestAuthorization()
-        let isAppEnabled = !settingsStore.fetchNotificationDisabled()
-        return isSystemAuthorized && isAppEnabled
+        guard !settingsStore.fetchNotificationDisabled() else {
+            return false
+        }
+
+        guard await requestAuthorization() else {
+            return false
+        }
+
+        return !settingsStore.fetchNotificationDisabled()
     }
 
     /// 노티를 요청하는 메서드
@@ -46,9 +52,9 @@ final class NotificationManager {
     /// Notification 권한 요청 함수
      func requestAuthorization() async -> Bool {
         do {
-            try await notificationCenter
+            _ = try await notificationCenter
                 .requestAuthorization(options: [.sound, .badge, .alert])
-            return await getCurrentSettings()
+            return await authorizationStatus() == .authorized
         } catch {
             print("❌ NotificationManager/requestAuthorization: \(error.localizedDescription)")
             return false
@@ -77,12 +83,20 @@ final class NotificationManager {
         await scheduleReminderNotification(notificationType: notificationType) // 새로운 알림 등록
     }
 
-    /// 현재 Notification 권한 설정을 가져오는 함수
-     private func getCurrentSettings() async -> Bool {
-        let currentSettings = await notificationCenter.notificationSettings()
-        let isAuthorized = (currentSettings.authorizationStatus == .authorized)
-
-        return isAuthorized
+    /// 현재 Notification 권한 상태만 읽는 함수입니다.
+    /// `requestAuthorization()`과 달리 OS 권한 팝업을 띄우지 않습니다.
+    /// 알 수 없는 값은 거절로 보아 배너로 설정 앱을 안내한다.
+    func authorizationStatus() async -> NotificationAuthorizationStatus {
+        switch await notificationCenter.currentAuthorizationStatus() {
+        case .notDetermined:
+            return .notDetermined
+        case .authorized, .provisional, .ephemeral:
+            return .authorized
+        case .denied:
+            return .denied
+        @unknown default:
+            return .denied
+        }
     }
 
     private func scheduleReminderNotification(notificationType: NotificationType) async {

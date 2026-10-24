@@ -22,28 +22,25 @@ final class BookSearchViewModel {
     var searchConfigAlertMessage = ""
     private(set) var isCompletingSelection = false
     private let bookSearchUseCase: any BookSearchUsing
-    private let missingAPIKeyAlertMessage = "검색 기능 설정(API_KEY)이 누락되었어요. 앱 설정을 확인한 뒤 다시 시도해주세요."
 
     init(bookSearchUseCase: any BookSearchUsing) {
         self.bookSearchUseCase = bookSearchUseCase
     }
 
     func searchBooks(query: String) async {
+        let trimmedQuery = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedQuery.isEmpty else { return }
+
         do {
-            let books = try await bookSearchUseCase.fetchBooks(query: query)
+            let books = try await bookSearchUseCase.fetchBooks(query: trimmedQuery)
             self.books = books
         } catch {
             handleSearchError(error)
         }
     }
 
-    func fetchBookTotalPages(isbn: String) async -> String {
-        do {
-            return try await String(bookSearchUseCase.fetchBookTotalPages(isbn: isbn))
-        } catch {
-            handleSearchError(error)
-            return "0"
-        }
+    func fetchBookTotalPages(isbn: String?) async -> String {
+        String(await bookSearchUseCase.fetchBookTotalPages(isbn: isbn))
     }
 
     func selectBook(_ book: BookSearchItem) {
@@ -66,10 +63,10 @@ final class BookSearchViewModel {
     }
 
     private func handleSearchError(_ error: Error) {
-        if let networkError = error as? BookSearchNetworkError, networkError == .missingAPIKey {
-            searchConfigAlertMessage = missingAPIKeyAlertMessage
+        if let searchError = error as? BookSearchError,
+           case let .missingAPIKey(setting) = searchError {
+            searchConfigAlertMessage = "검색 기능 설정(\(setting))이 누락되었어요. 앱 설정을 확인한 뒤 다시 시도해주세요."
             showSearchConfigAlert = true
         }
-        print("Book search failed: \(error)")
     }
 }
